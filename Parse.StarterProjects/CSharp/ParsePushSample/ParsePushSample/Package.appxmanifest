@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/2010/manifest">
+  <Identity Name="53399Inlined.ParsePushSample" Publisher="CN=30B9BB96-1FAC-473E-BA8E-91CE601D2348" Version="1.0.0.0" />
+  <Properties>
+    <DisplayName>Parse Push Sample</DisplayName>
+    <PublisherDisplayName>Inlined</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Prerequisites>
+    <OSMinVersion>6.2.1</OSMinVersion>
+    <OSMaxVersionTested>6.2.1</OSMaxVersionTested>
+  </Prerequisites>
+  <Resources>
+    <Resource Language="x-generate" />
+  </Resources>
+  <Applications>
+    <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="ParsePushSample.App">
+      <VisualElements DisplayName="Parse Push Sample" Logo="Assets\Logo.png" SmallLogo="Assets\SmallLogo.png" Description="ParsePushSample" ForegroundText="light" BackgroundColor="#0067AB" ToastCapable="true">
+        <DefaultTile ShowName="allLogos" ShortName="Push" />
+        <SplashScreen Image="Assets\SplashScreen.png" BackgroundColor="#0067AB" />
+      </VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>
