@@ -11,7 +11,7 @@ The SDK is available for download [on our website][parse-download-link] or our [
 You can build the library from Visual Studio 2013+ or Xamarin IDE. You can also build the library using the command line:
 
 ```batch
-# In Windows:
+:: In Windows:
 MSBuild Parse.sln
 ```
 
