@@ -36,7 +36,7 @@ LICENSE file in the root directory of this source tree. An additional grant
 of patent rights can be found in the PATENTS file in the same directory.
 ```
 
- [appveyor-link]: https://ci.appveyor.com/api/projects/status/ixidci5xsd9bcb4x/branch/master?svg=true
+ [appveyor-link]: https://ci.appveyor.com/api/projects/status/ri5jqgkv9hfkcrfl?svg=true
  [contributing]: https://github.com/ParsePlatform/Parse-SDK-dotNET/blob/master/CONTRIBUTING.md
  [coverall-link]: https://coveralls.io/github/ParsePlatform/Parse-SDK-dotNET?branch=master
  [coverall-svg]: https://coveralls.io/repos/ParsePlatform/Parse-SDK-dotNET/badge.svg?branch=master&service=github&t=8rdChC
