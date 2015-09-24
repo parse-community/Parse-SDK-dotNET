@@ -115,9 +115,7 @@ namespace Parse.Internal {
     public IParseObjectController ObjectController {
       get {
         lock (mutex) {
-          if (objectController == null) {
-            objectController = new ParseObjectController();
-          }
+          objectController = objectController ?? new ParseObjectController(ParseClient.ParseCommandRunner);
           return objectController;
         }
       }

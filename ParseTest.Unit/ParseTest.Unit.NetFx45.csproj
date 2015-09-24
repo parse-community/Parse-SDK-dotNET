@@ -96,6 +96,7 @@
     <Compile Include="InstallationTests.cs" />
     <Compile Include="SessionTests.cs" />
     <Compile Include="SessionControllerTests.cs" />
+    <Compile Include="ObjectControllerTests.cs" />
     <Compile Include="UserTests.cs" />
     <Compile Include="UserControllerTests.cs" />
   </ItemGroup>
