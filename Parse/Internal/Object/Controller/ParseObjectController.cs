@@ -8,6 +8,12 @@ using System.Threading.Tasks;
 
 namespace Parse.Internal {
   internal class ParseObjectController : IParseObjectController {
+    private readonly IParseCommandRunner commandRunner;
+
+    internal ParseObjectController(IParseCommandRunner commandRunner) {
+      this.commandRunner = commandRunner;
+    }
+
     public Task<IObjectState> FetchAsync(IObjectState state,
         string sessionToken,
         CancellationToken cancellationToken) {
@@ -18,7 +24,7 @@ namespace Parse.Internal {
           sessionToken: sessionToken,
           data: null);
 
-      return ParseClient.ParseCommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
+      return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
         return ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
       });
     }
@@ -36,7 +42,7 @@ namespace Parse.Internal {
           sessionToken: sessionToken,
           data: objectJSON);
 
-      return ParseClient.ParseCommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
+      return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
         var serverState = ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
         serverState = serverState.MutatedClone(mutableClone => {
           mutableClone.IsNew = t.Result.Item1 == System.Net.HttpStatusCode.Created;
@@ -78,7 +84,7 @@ namespace Parse.Internal {
           sessionToken: sessionToken,
           data: null);
 
-      return ParseClient.ParseCommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
+      return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
     }
 
     public IList<Task> DeleteAllAsync(IList<IObjectState> states,
@@ -132,7 +138,7 @@ namespace Parse.Internal {
         sessionToken: sessionToken,
         data: new Dictionary<string, object> { { "requests", requests } });
 
-      ParseClient.ParseCommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).ContinueWith(t => {
+      commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).ContinueWith(t => {
         if (t.IsFaulted || t.IsCanceled) {
           foreach (var tcs in tcss) {
             if (t.IsFaulted) {
@@ -144,7 +150,7 @@ namespace Parse.Internal {
           return;
         }
 
-        var resultsArray = (List<object>)t.Result.Item2["results"];
+        var resultsArray = ParseClient.As<IList<object>>(t.Result.Item2["results"]);
         int resultLength = resultsArray.Count;
         if (resultLength != batchSize) {
           foreach (var tcs in tcss) {
@@ -162,7 +168,7 @@ namespace Parse.Internal {
             tcs.TrySetResult(result["success"] as IDictionary<string, object>);
           } else if (result.ContainsKey("error")) {
             var error = result["error"] as IDictionary<string, object>;
-            int errorCode = (int)((long)error["code"]);
+            long errorCode = (long)error["code"];
             tcs.TrySetException(new ParseException((ParseException.ErrorCode)errorCode, error["error"] as string));
           } else {
             tcs.TrySetException(new InvalidOperationException(
