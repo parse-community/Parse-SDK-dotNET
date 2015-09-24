@@ -1,5 +1,5 @@
 # Parse SDK for .NET
-![][appveyor-link]
+[![AppVeyor Build][appveyor-svg]][appveyor-link]
 [![Coverage Status][coverall-svg]][coverall-link]
 [![Nuget][nuget-svg]][nuget-link]
 [![License][license-svg]][license-link]
@@ -36,7 +36,8 @@ LICENSE file in the root directory of this source tree. An additional grant
 of patent rights can be found in the PATENTS file in the same directory.
 ```
 
- [appveyor-link]: https://ci.appveyor.com/api/projects/status/ri5jqgkv9hfkcrfl?svg=true
+ [appveyor-link]: https://ci.appveyor.com/project/hallucinogen/parse-sdk-dotnet
+ [appveyor-svg]: https://ci.appveyor.com/api/projects/status/ri5jqgkv9hfkcrfl?svg=true
  [contributing]: https://github.com/ParsePlatform/Parse-SDK-dotNET/blob/master/CONTRIBUTING.md
  [coverall-link]: https://coveralls.io/github/ParsePlatform/Parse-SDK-dotNET?branch=master
  [coverall-svg]: https://coveralls.io/repos/ParsePlatform/Parse-SDK-dotNET/badge.svg?branch=master
