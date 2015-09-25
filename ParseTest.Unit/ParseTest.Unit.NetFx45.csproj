@@ -76,11 +76,11 @@
     <Compile Include="AnalyticsControllerTests.cs" />
     <Compile Include="AnalyticsTests.cs" />
     <Compile Include="CloudControllerTests.cs" />
-    <Compile Include="CommandTests.cs" />
-    <Compile Include="CurrentUserControllerTests.cs" />
-    <Compile Include="CurrentInstallationControllerTests.cs" />
     <Compile Include="CloudTests.cs" />
+    <Compile Include="CommandTests.cs" />
     <Compile Include="ConfigTests.cs" />
+    <Compile Include="CurrentInstallationControllerTests.cs" />
+    <Compile Include="CurrentUserControllerTests.cs" />
     <Compile Include="DecoderTests.cs" />
     <Compile Include="EncoderTests.cs" />
     <Compile Include="FileControllerTests.cs" />
@@ -89,19 +89,20 @@
     <Compile Include="ProgressTests.cs" />
     <Compile Include="GeoPointTests.cs" />
     <Compile Include="InstallationIdControllerTests.cs" />
-    <Compile Include="JsonTests.cs" />
-    <Compile Include="ObjectStateTests.cs" />
-    <Compile Include="PushTests.cs" />
-    <Compile Include="PushStateTests.cs" />
-    <Compile Include="PushEncoderTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="InstallationTests.cs" />
+    <Compile Include="JsonTests.cs" />
+    <Compile Include="ObjectControllerTests.cs" />
+    <Compile Include="ObjectStateTests.cs" />
+    <Compile Include="ObjectTests.cs" />
+    <Compile Include="PushEncoderTests.cs" />
+    <Compile Include="PushStateTests.cs" />
+    <Compile Include="PushTests.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RelationTests.cs" />
     <Compile Include="SessionTests.cs" />
     <Compile Include="SessionControllerTests.cs" />
-    <Compile Include="ObjectControllerTests.cs" />
-    <Compile Include="UserTests.cs" />
     <Compile Include="UserControllerTests.cs" />
+    <Compile Include="UserTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Parse\Parse.csproj">
