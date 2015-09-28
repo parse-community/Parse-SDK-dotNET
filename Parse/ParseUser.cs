@@ -167,7 +167,7 @@ namespace Parse {
           HandleSave(serverState);
         }
         return t;
-      }).OnSuccess(_ => SaveCurrentUserAsync(this)).Unwrap();
+      }).Unwrap().OnSuccess(_ => SaveCurrentUserAsync(this)).Unwrap();
     }
 
     /// <summary>
