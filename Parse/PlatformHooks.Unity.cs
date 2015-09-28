@@ -32,15 +32,10 @@ namespace Parse {
       }
     }
 
+    private string appName;
     public string AppName {
       get {
-        // Unity 5 has `Application.productName`, but will compile error in earlier version.
-        // Reflection is the best way we can do for now.
-        PropertyInfo property = typeof(Application).GetProperty("productName");
-        if (property != null) {
-          return (string)property.GetValue(null, null);
-        }
-        return null;
+        return appName;
       }
     }
 
@@ -51,15 +46,10 @@ namespace Parse {
       }
     }
 
+    private string appDisplayVersion;
     public string AppDisplayVersion {
       get {
-        // Unity 5 has `Application.bundleIdentifier`, but will compile error in earlier version.
-        // Reflection is the best way we can do for now.
-        PropertyInfo property = typeof(Application).GetProperty("bundleIdentifier");
-        if (property != null) {
-          return (string)property.GetValue(null, null);
-        }
-        return null;
+        return appDisplayVersion;
       }
     }
 
@@ -1215,9 +1205,23 @@ namespace Parse {
       osVersion = SystemInfo.deviceModel;
       // Unity 5 has `Application.version`, but will compile-error in earlier version.
       // Reflection is the best way we can do for now.
-      PropertyInfo property = typeof(Application).GetProperty("version");
-      if (property != null) {
-        appBuildVersion = (string)property.GetValue(null, null);
+      PropertyInfo appVersionProp = typeof(Application).GetProperty("version");
+      if (appVersionProp != null) {
+        appBuildVersion = (string)appVersionProp.GetValue(null, null);
+      }
+
+      // Unity 5 has `Application.bundleIdentifier`, but will compile error in earlier version.
+      // Reflection is the best way we can do for now.
+      PropertyInfo bundleIdProp = typeof(Application).GetProperty("bundleIdentifier");
+      if (bundleIdProp != null) {
+        appDisplayVersion = (string)bundleIdProp.GetValue(null, null);
+      }
+
+      // Unity 5 has `Application.productName`, but will compile error in earlier version.
+      // Reflection is the best way we can do for now.
+      PropertyInfo productNameProp = typeof(Application).GetProperty("productName");
+      if (productNameProp != null) {
+        appName = (string)productNameProp.GetValue(null, null);
       }
 
       settings = SettingsWrapper.Wrapper;
