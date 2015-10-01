@@ -140,7 +140,11 @@ namespace Parse.Internal {
         return (HttpStatusCode)201;
       }
       String errorCode = Regex.Match(www.error, @"\d+").Value;
-      return (HttpStatusCode)Int32.Parse(errorCode);
+      int errorNumber = 0;
+      if (!Int32.TryParse(errorCode, out errorNumber)) {
+        return (HttpStatusCode)400;
+      }
+      return (HttpStatusCode)errorNumber;
     }
 
     /// <summary>
