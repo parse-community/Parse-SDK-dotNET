@@ -608,7 +608,8 @@ string propertyName
       return DeepTraversal(estimatedData)
          .OfType<ParseObject>()
          .Where(o => o.ObjectId != null && o.IsDataAvailable)
-         .ToDictionary(pair => pair.ObjectId, pair => pair);
+         .GroupBy(o => o.ObjectId)
+         .ToDictionary(group => group.Key, group => group.Last());
     }
 
     internal static IDictionary<string, object> ToJSONObjectForSaving(
