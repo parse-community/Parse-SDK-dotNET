@@ -19,7 +19,10 @@ namespace Parse {
           PushNotificationReceived(ParseInstallation.CurrentInstallation, args);
 
           var payload = PushJson(args);
-          parsePushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
+          var handler = parsePushNotificationReceived;
+          if (handler != null) {
+            handler.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
+          }
         }
       );
     }
