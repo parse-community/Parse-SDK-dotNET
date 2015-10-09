@@ -55,24 +55,19 @@ namespace Parse {
 
     public string AppName {
       get {
-        var result = new TaskCompletionSource<string>();
-        Action toRun = (async () => {
-          var file = await Package.Current.InstalledLocation.GetFileAsync("AppxManifest.xml");
-          string manifestXml = await FileIO.ReadTextAsync(file);
-
-          var doc = XDocument.Parse(manifestXml);
-          var installedLocation = Windows.ApplicationModel.Package.Current.InstalledLocation;
+        var task = Package.Current.InstalledLocation.GetFileAsync("AppxManifest.xml").AsTask().OnSuccess(t => {
+          return FileIO.ReadTextAsync(t.Result).AsTask();
+        }).Unwrap().OnSuccess(t => {
+          var doc = XDocument.Parse(t.Result);
 
           // Define the default namespace to be used
           var propertiesXName = XName.Get("Properties", "http://schemas.microsoft.com/appx/2010/manifest");
           var displayNameXName = XName.Get("DisplayName", "http://schemas.microsoft.com/appx/2010/manifest");
 
-          result.TrySetResult(doc.Descendants(propertiesXName).Single().Descendants(displayNameXName).Single().Value);
+          return doc.Descendants(propertiesXName).Single().Descendants(displayNameXName).Single().Value;
         });
-        toRun();
-        result.Task.Wait();
-
-        return result.Task.Result;
+        task.Wait();
+        return task.Result;
       }
     }
 
