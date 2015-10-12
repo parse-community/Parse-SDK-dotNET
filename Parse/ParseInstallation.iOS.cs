@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 using Foundation;
 using UIKit;
 using System.Threading.Tasks;
+using CoreFoundation;
 
 namespace Parse {
   public partial class ParseInstallation : ParseObject {
@@ -54,15 +55,38 @@ namespace Parse {
     public int Badge {
       get {
         if (CurrentInstallationController.IsCurrent(this)) {
-          SetProperty<int>((int)UIApplication.SharedApplication.ApplicationIconBadgeNumber);
+          RunOnUIQueue(() =>
+            SetProperty<int>((int)UIApplication.SharedApplication.ApplicationIconBadgeNumber)
+          );
         }
         return GetProperty<int>();
       }
       set {
         int badge = value;
         // Set the UI, too
-        UIApplication.SharedApplication.ApplicationIconBadgeNumber = (nint)badge;
+        RunOnUIQueue(() => {
+          UIApplication.SharedApplication.ApplicationIconBadgeNumber = (nint)badge;
+        });
         SetProperty<int>(badge);
+      }
+    }
+
+    /// <summary>
+    /// Runs (synchronously) the on user interface queue.
+    ///
+    /// Note that this could cause deadlocks, if the main thread is waiting on
+    /// the background thread we're calling this from.
+    ///
+    /// However, Xamarin's native bindings always threw exceptions when calling
+    /// into UIKit code from a background thread, so this at least helps us in
+    /// some deadlock scenarios.
+    /// </summary>
+    /// <param name="action">Action.</param>
+    private static void RunOnUIQueue(Action action) {
+      if (NSThread.IsMain) {
+        action();
+      } else {
+        DispatchQueue.MainQueue.DispatchSync(action);
       }
     }
   }
