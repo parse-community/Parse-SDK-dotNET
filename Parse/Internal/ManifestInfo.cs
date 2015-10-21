@@ -109,6 +109,19 @@ namespace Parse {
       }
     }
 
+    private static int pushIconId = -1;
+    public static int PushIconId {
+      get {
+        lock (mutex) {
+          if (pushIconId == -1) {
+            var customIcon = GetApplicationMetaData().GetInt("com.parse.push.notification_icon", -1);
+            pushIconId = customIcon == -1 ? IconId : customIcon;
+          }
+          return pushIconId;
+        }
+      }
+    }
+
     private static Intent launcherIntent;
     public static Intent LauncherIntent {
       get {
