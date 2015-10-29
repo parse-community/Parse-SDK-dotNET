@@ -43,95 +43,24 @@ namespace Parse {
     public int Badge {
       get {
         if (PlatformHooks.IsIOS) {
-          // Basically what we want to achieve here is:
-          // <code>
-          // if (UnityEngine.iOS.NotificationServices.localNotificationCount > 0) {
-          //   badge = UnityEngine.iOS.NotificationServices.localNotifications[0].applicationIconBadgeNumber;
-          // }
-          // </code>
-          // But because we want to support backward compatibility, we're forced to use Reflection.
-          // We need to return to the non-reflection way once Unity 5 is stable on 95% developers use Unity 5.
-
-          // Warning (iOS Only): Unity 5 namespace for iOS notification is under `iOS.NotificationServices`,
-          // while Unity 4.x put them under `NotificationServices`. They're basically the same class.
-          Type notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("iOS.NotificationServices");
-          if (notificationServicesType == null) {
-            notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("NotificationServices");
-          }
-
-          // Warning (iOS Only): We want to access `NotificationServices.localNotificationCount`.
-          if (notificationServicesType != null) {
-            PropertyInfo localNotificationCountProperty = notificationServicesType.GetProperty("localNotificationCount");
-            int localNotificationCount = (int)localNotificationCountProperty.GetValue(null, null);
-
-            if (localNotificationCount > 0) {
-              // Warning (iOS Only): Unity 5 namespace for iOS notification is under `iOS.LocalNotification`,
-              // while Unity 4.x put them under `LocalNotification`. They're basically the same class.
-              Type localNotificationType = PlatformHooks.GetTypeFromUnityEngine("iOS.LocalNotification");
-              if (localNotificationType == null) {
-                localNotificationType = PlatformHooks.GetTypeFromUnityEngine("LocalNotification");
-              }
-
-              // Warning (iOS Only): We want to access `NotificationServices.localNotifications`.
-              PropertyInfo localNotificationsProperty = notificationServicesType.GetProperty("localNotifications");
-              IEnumerable localNotifications = (IEnumerable)localNotificationsProperty.GetValue(null, null);
-
-              // Warning (iOS Only): We want to access `localNotification.applicationIconBadgeNumber`.
-              PropertyInfo applicationIconBadgeNumberProperty = localNotificationType.GetProperty("applicationIconBadgeNumber");
-              IEnumerator enumerator = localNotifications.GetEnumerator();
-              // Move to first element
-              enumerator.MoveNext();
-              int badge = (int)applicationIconBadgeNumberProperty.GetValue(enumerator.Current, null);
-              SetProperty<int>(badge, "Badge");
+				  PlatformHooks.RunOnMainThread(() => {
+            if (UnityEngine.iOS.NotificationServices.localNotificationCount > 0) {
+              SetProperty<int>(UnityEngine.iOS.NotificationServices.localNotifications[0].applicationIconBadgeNumber, "Badge");
             }
-          }
+          });
         }
-
         return GetProperty<int>("Badge");
       }
       set {
         int badge = value;
         SetProperty<int>(badge, "Badge");
-
         if (PlatformHooks.IsIOS) {
-          // Basically, what we want to achieve here is:
-          // <code>
-          // UnityEngine.iOS.LocalNotification notification = new UnityEngine.iOS.LocalNotification()
-          // notification.applicationIconBadgeNumber = badge;
-          // notification.hasAction = false;
-          // UnityEngine.iOS.NotificationServices.PresentLocalNotificationNow(notification);
-          // </code>
-          // But because we want to support backward compatibility, we're forced to use Reflection.
-          // We need to return to the non-reflection way once Unity 5 is stable on 95% developers use Unity 5.
-
-          // Warning (iOS Only): Unity 5 namespace for iOS notification is under `iOS.LocalNotification`,
-          // while Unity 4.x put them under `LocalNotification`. They're basically the same class.
-          Type localNotificationType = PlatformHooks.GetTypeFromUnityEngine("iOS.LocalNotification");
-          if (localNotificationType == null) {
-            localNotificationType = PlatformHooks.GetTypeFromUnityEngine("LocalNotification");
-          }
-          object localNotification = Activator.CreateInstance(localNotificationType);
-
-          // Warning (iOS Only): We want to access `localNotification.applicationIconBadgeNumber`.
-          PropertyInfo applicationIconBadgeNumberProperty = localNotificationType.GetProperty("applicationIconBadgeNumber");
-          applicationIconBadgeNumberProperty.SetValue(localNotification, badge, null);
-
-          // Warning (iOS Only): We want to access `localNotification.hasAction` of the app.
-          PropertyInfo hasActionProperty = localNotificationType.GetProperty("hasAction");
-          hasActionProperty.SetValue(localNotification, false, null);
-
-          // Warning (iOS Only): Unity 5 namespace for iOS notification is under `iOS.NotificationServices`,
-          // while Unity 4.x put them under `NotificationServices`. They're basically the same class.
-          Type notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("iOS.NotificationServices");
-          if (notificationServicesType == null) {
-            notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("NotificationServices");
-          }
-
-          // Warning (iOS Only): We want to call `NotificationServices.PresentLocalNotificationNow(notification)`.
-          MethodInfo presentLocalNotificationNowMethod = notificationServicesType.GetMethod("PresentLocalNotificationNow");
-          if (presentLocalNotificationNowMethod != null) {
-            presentLocalNotificationNowMethod.Invoke(null, new object[] { localNotification });
-          }
+          PlatformHooks.RunOnMainThread(() => {
+            UnityEngine.iOS.LocalNotification notification = new UnityEngine.iOS.LocalNotification ();
+            notification.applicationIconBadgeNumber = badge;
+            notification.hasAction = false;
+            UnityEngine.iOS.NotificationServices.PresentLocalNotificationNow(notification);
+          });
         }
       }
     }
