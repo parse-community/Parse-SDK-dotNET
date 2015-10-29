@@ -1023,36 +1023,15 @@ namespace Parse {
     /// </summary>
     /// <param name="action">Action to be completed when device token is received.</param>
     internal static void RegisterDeviceTokenRequest(Action<byte[]> action) {
-      // Basically what we want to achieve here is:
-      // <code>
-      // deviceToken = UnityEngine.iOS.NotificationServices.deviceToken
-      // </code>
-      // But because we want to support backward compatibility, we're forced to use Reflection.
-      // We need to return to the non-reflection way once Unity 5 is stable on 95% developers use Unity 5.
-
-      // Warning (iOS Only): Unity 5 namespace for iOS notification is under `iOS.NotificationServices`,
-      // while Unity 4.x put them under `NotificationServices`. They're basically the same class.
-      Type notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("iOS.NotificationServices");
-      if (notificationServicesType == null) {
-        notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("NotificationServices");
-      }
-
-      PropertyInfo deviceTokenProperty = null;
-      if (notificationServicesType != null) {
-        deviceTokenProperty = notificationServicesType.GetProperty("deviceToken");
-      }
-
       RunOnMainThread(() => {
-        if (deviceTokenProperty != null) {
-          byte[] deviceToken = (byte[])deviceTokenProperty.GetValue(null, null);
-          if (deviceToken != null) {
-            action(deviceToken);
-            RegisteriOSPushNotificationListener((payload) => {
-              ParsePush.parsePushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
-            });
-          } else {
-            RegisterDeviceTokenRequest(action);
-          }
+        var deviceToken = UnityEngine.iOS.NotificationServices.deviceToken;
+        if (deviceToken != null) {
+          action(deviceToken);
+          RegisteriOSPushNotificationListener((payload) => {
+            ParsePush.parsePushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
+          });
+        } else {
+          RegisterDeviceTokenRequest(action);
         }
       });
     }
@@ -1062,79 +1041,26 @@ namespace Parse {
     /// </summary>
     /// <param name="action">Action to be completed when push notification is received.</param>
     internal static void RegisteriOSPushNotificationListener(Action<IDictionary<string, object>> action) {
-      // Basically what we want to achieve here is:
-      // <code>
-      // if (UnityEngine.iOS.NotificationServices.remoteNotificationCount > 0) {
-      //   var remoteNotifications = UnityEngine.iOS.NotificationServices.remoteNotifications;
-      //   foreach (var val in remoteNotifications) {
-      //     var userInfo = val.userInfo;
-      //     var payload = new Dictionary<string, object>();
-      //
-      //     foreach (var key in userInfo.Keys) {
-      //       payload[key.ToString()] = userInfo[key];
-      //     }
-      // 
-      //     action(payload);
-      //   }
-      //   UnityEngine.iOS.NotificationServices.ClearRemoteNotifications();
-      // }
-      // </code>
-      // But because we want to support backward compatibility, we're forced to use Reflection.
-      // We need to return to the non-reflection way once Unity 5 is stable on 95% developers use Unity 5.
-
-      // Warning (iOS Only): Unity 5 namespace for iOS notification is under `iOS.NotificationServices`,
-      // while Unity 4.x put them under `NotificationServices`. They're basically the same class.
-      Type notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("iOS.NotificationServices");
-      if (notificationServicesType == null) {
-        notificationServicesType = PlatformHooks.GetTypeFromUnityEngine("NotificationServices");
-      }
-
-      PropertyInfo remoteNotificationCountProperty = null;
-      if (notificationServicesType != null) {
-        remoteNotificationCountProperty = notificationServicesType.GetProperty("remoteNotificationCount");
-      }
-
-      MethodInfo clearRemoteNotificationsMethod = null;
-      PropertyInfo remoteNotificationsProperty = null;
-      if (notificationServicesType != null) {
-        clearRemoteNotificationsMethod = notificationServicesType.GetMethod("ClearRemoteNotifications");
-        remoteNotificationsProperty = notificationServicesType.GetProperty("remoteNotifications");
-      }
-
-      // Warning (iOS Only): Unity 5 namespace for iOS notification is under `iOS.RemoteNotification`,
-      // while Unity 4.x put them under `RemoteNotification`. They're basically the same class.
-      Type remoteNotificationType = PlatformHooks.GetTypeFromUnityEngine("iOS.RemoteNotification");
-      if (remoteNotificationType == null) {
-        remoteNotificationType = PlatformHooks.GetTypeFromUnityEngine("RemoteNotification");
-      }
-
-      PropertyInfo userInfoProperty = null;
-      if (remoteNotificationType != null) {
-        userInfoProperty = remoteNotificationType.GetProperty("userInfo");
-      }
-
       RunOnMainThread(() => {
-        if (remoteNotificationCountProperty != null) {
-          int remoteNotificationCount = (int)remoteNotificationCountProperty.GetValue(null, null);
-          if (remoteNotificationCount > 0) {
-            Array remoteNotifications = (Array)remoteNotificationsProperty.GetValue(null, null);
-            IEnumerator enumerator = remoteNotifications.GetEnumerator();
-            while (enumerator.MoveNext()) {
-              var userInfo = (IDictionary)userInfoProperty.GetValue(enumerator.Current, null);
-              var payload = new Dictionary<string, object>();
-              foreach (var key in userInfo.Keys) {
-                payload[key.ToString()] = userInfo[key];
-              }
-
-              // Finally, do the action for each remote notification payload.
-              action(payload);
+        int remoteNotificationCount = UnityEngine.iOS.NotificationServices.remoteNotificationCount;
+        if (remoteNotificationCount > 0) {
+          var remoteNotifications = UnityEngine.iOS.NotificationServices.remoteNotifications;
+          foreach (var val in remoteNotifications) {
+            var userInfo = val.userInfo;
+            var payload = new Dictionary<string, object>();
+            foreach (var key in userInfo.Keys) {
+              payload[key.ToString()] = userInfo[key];
             }
 
-            clearRemoteNotificationsMethod.Invoke(null, null);
+            // Finally, do the action for each remote notification payload.
+            action(payload);
           }
-          // Check in every frame.
-          RegisteriOSPushNotificationListener(action);
+
+          UnityEngine.iOS.NotificationServices.ClearRemoteNotifications();
         }
+
+        // Check in every frame.
+        RegisteriOSPushNotificationListener(action);
       });
     }
 
@@ -1203,26 +1129,9 @@ namespace Parse {
       // from main thread.
       isWebPlayer = Application.isWebPlayer;
       osVersion = SystemInfo.deviceModel;
-      // Unity 5 has `Application.version`, but will compile-error in earlier version.
-      // Reflection is the best way we can do for now.
-      PropertyInfo appVersionProp = typeof(Application).GetProperty("version");
-      if (appVersionProp != null) {
-        appBuildVersion = (string)appVersionProp.GetValue(null, null);
-      }
-
-      // Unity 5 has `Application.bundleIdentifier`, but will compile error in earlier version.
-      // Reflection is the best way we can do for now.
-      PropertyInfo bundleIdProp = typeof(Application).GetProperty("bundleIdentifier");
-      if (bundleIdProp != null) {
-        appDisplayVersion = (string)bundleIdProp.GetValue(null, null);
-      }
-
-      // Unity 5 has `Application.productName`, but will compile error in earlier version.
-      // Reflection is the best way we can do for now.
-      PropertyInfo productNameProp = typeof(Application).GetProperty("productName");
-      if (productNameProp != null) {
-        appName = (string)productNameProp.GetValue(null, null);
-      }
+      appBuildVersion = Application.version;
+      appDisplayVersion = Application.bundleIdentifier;
+      appName = Application.productName;
 
       settings = SettingsWrapper.Wrapper;
 
