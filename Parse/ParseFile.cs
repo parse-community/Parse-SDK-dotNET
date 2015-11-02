@@ -111,7 +111,7 @@ namespace Parse {
     [ParseFieldName("url")]
     public Uri Url {
       get {
-        return state.Url;
+        return state.SecureUrl;
       }
     }
 

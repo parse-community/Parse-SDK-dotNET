@@ -84,6 +84,7 @@
     <Compile Include="DecoderTests.cs" />
     <Compile Include="EncoderTests.cs" />
     <Compile Include="FileControllerTests.cs" />
+    <Compile Include="FileStateTests.cs" />
     <Compile Include="FileTests.cs" />
     <Compile Include="ProgressTests.cs" />
     <Compile Include="GeoPointTests.cs" />
