@@ -29,6 +29,12 @@ namespace Parse {
       this.targetClassName = targetClassName;
     }
 
+    internal static IObjectSubclassingController SubclassingController {
+      get {
+        return ParseCorePlugins.Instance.SubclassingController;
+      }
+    }
+
     internal void EnsureParentAndKey(ParseObject parent, string key) {
       this.parent = this.parent ?? parent;
       this.key = this.key ?? key;
@@ -85,28 +91,18 @@ namespace Parse {
 #if UNITY
       if (PlatformHooks.IsCompiledByIL2CPP) {
         return CreateRelation<ParseObject>(parent, key, targetClassName);
-      } else {
-        var targetType = ParseObject.GetType(targetClassName);
-        Expression<Func<ParseRelation<ParseObject>>> createRelationExpr =
-            () => CreateRelation<ParseObject>(parent, key, targetClassName);
-        var createRelationMethod =
-            ((MethodCallExpression)createRelationExpr.Body)
-            .Method
-            .GetGenericMethodDefinition()
-            .MakeGenericMethod(targetType);
-        return (ParseRelationBase)createRelationMethod.Invoke(null, new object[] { parent, key, targetClassName });
       }
-#else
-        var targetType = ParseObject.GetType(targetClassName);
-        Expression<Func<ParseRelation<ParseObject>>> createRelationExpr =
-            () => CreateRelation<ParseObject>(parent, key, targetClassName);
-        var createRelationMethod =
-            ((MethodCallExpression)createRelationExpr.Body)
-            .Method
-            .GetGenericMethodDefinition()
-            .MakeGenericMethod(targetType);
-        return (ParseRelationBase)createRelationMethod.Invoke(null, new object[] { parent, key, targetClassName });
 #endif
+      var targetType = SubclassingController.GetType(targetClassName) ?? typeof(ParseObject);
+
+      Expression<Func<ParseRelation<ParseObject>>> createRelationExpr =
+          () => CreateRelation<ParseObject>(parent, key, targetClassName);
+      var createRelationMethod =
+          ((MethodCallExpression)createRelationExpr.Body)
+          .Method
+          .GetGenericMethodDefinition()
+          .MakeGenericMethod(targetType);
+      return (ParseRelationBase)createRelationMethod.Invoke(null, new object[] { parent, key, targetClassName });
     }
 
     private static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName)

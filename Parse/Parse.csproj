@@ -66,6 +66,9 @@
     <Compile Include="Internal\Object\Controller\ParseObjectController.cs" />
     <Compile Include="Internal\Object\State\IObjectState.cs" />
     <Compile Include="Internal\Object\State\MutableObjectState.cs" />
+    <Compile Include="Internal\Object\Subclassing\IObjectSubclassingController.cs" />
+    <Compile Include="Internal\Object\Subclassing\ObjectSubclassInfo.cs" />
+    <Compile Include="Internal\Object\Subclassing\ObjectSubclassingController.cs" />
     <Compile Include="Internal\ParseAddOperation.cs" />
     <Compile Include="Internal\ParseAddUniqueOperation.cs" />
     <Compile Include="Internal\Analytics\Controller\IParseAnalyticsController.cs" />

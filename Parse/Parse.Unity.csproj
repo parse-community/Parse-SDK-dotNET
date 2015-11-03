@@ -56,6 +56,7 @@
     <Compile Include="Compat\Progress.cs" />
     <Compile Include="Compat\ThreadLocal.cs" />
     <Compile Include="Compat\Tuple.cs" />
+    <Compile Include="Compat\Type.cs" />
     <Compile Include="Internal\Analytics\Controller\IParseAnalyticsController.cs" />
     <Compile Include="Internal\Analytics\Controller\ParseAnalyticsController.cs" />
     <Compile Include="Internal\Cloud\Controller\IParseCloudCodeController.cs" />
@@ -90,6 +91,9 @@
     <Compile Include="Internal\Object\Controller\ParseObjectController.cs" />
     <Compile Include="Internal\Object\State\IObjectState.cs" />
     <Compile Include="Internal\Object\State\MutableObjectState.cs" />
+    <Compile Include="Internal\Object\Subclassing\IObjectSubclassingController.cs" />
+    <Compile Include="Internal\Object\Subclassing\ObjectSubclassInfo.cs" />
+    <Compile Include="Internal\Object\Subclassing\ObjectSubclassingController.cs" />
     <Compile Include="Internal\ParseAddOperation.cs" />
     <Compile Include="Internal\ParseAddUniqueOperation.cs" />
     <Compile Include="Internal\ParseCorePlugins.cs" />

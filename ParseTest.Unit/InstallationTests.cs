@@ -21,7 +21,7 @@ namespace ParseTest {
       ParseCorePlugins.Instance.ObjectController = null;
       ParseCorePlugins.Instance.CurrentInstallationController = null;
       ParseCorePlugins.Instance.CurrentUserController = null;
-      ParseObject.UnregisterSubclass("_Installation");
+      ParseObject.UnregisterSubclass<ParseInstallation>();
     }
 
     [Test]

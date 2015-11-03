@@ -29,6 +29,7 @@ namespace Parse.Internal {
     private IParseUserController userController;
     private IParsePushController pushController;
     private IParsePushChannelsController pushChannelsController;
+    private IObjectSubclassingController subclassingController;
 
     #endregion
 
@@ -240,6 +241,25 @@ namespace Parse.Internal {
       internal set {
         lock (mutex) {
           currentUserController = value;
+        }
+      }
+    }
+
+    public IObjectSubclassingController SubclassingController {
+      get {
+        lock (mutex) {
+          subclassingController = subclassingController ?? new ObjectSubclassingController(new Dictionary<Type, Action> {
+            // Do these as explicit closures instead of method references,
+            // as we should still lazy-load the controllers.
+            { typeof(ParseUser), () => CurrentUserController.ClearFromMemory() },
+            { typeof(ParseInstallation), () => CurrentInstallationController.ClearFromMemory() }
+          });
+          return subclassingController;
+        }
+      }
+      internal set {
+        lock (mutex) {
+          subclassingController = value;
         }
       }
     }

@@ -23,8 +23,8 @@ namespace ParseTest {
       ParseCorePlugins.Instance.CurrentUserController = null;
       ParseCorePlugins.Instance.SessionController = null;
       ParseCorePlugins.Instance.ObjectController = null;
-      ParseObject.UnregisterSubclass("_User");
-      ParseObject.UnregisterSubclass("_Session");
+      ParseObject.UnregisterSubclass<ParseUser>();
+      ParseObject.UnregisterSubclass<ParseSession>();
     }
 
     [Test]

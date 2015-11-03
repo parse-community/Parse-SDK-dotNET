@@ -17,7 +17,7 @@ namespace ParseTest {
 
     [TearDown]
     public void TearDown() {
-      ParseObject.UnregisterSubclass(ParseObject.GetClassName(typeof(ParseUser)));
+      ParseObject.UnregisterSubclass<ParseUser>();
     }
 
     [Test]

@@ -73,6 +73,9 @@
     <Compile Include="Internal\Object\Controller\ParseObjectController.cs" />
     <Compile Include="Internal\Object\State\IObjectState.cs" />
     <Compile Include="Internal\Object\State\MutableObjectState.cs" />
+    <Compile Include="Internal\Object\Subclassing\IObjectSubclassingController.cs" />
+    <Compile Include="Internal\Object\Subclassing\ObjectSubclassInfo.cs" />
+    <Compile Include="Internal\Object\Subclassing\ObjectSubclassingController.cs" />
     <Compile Include="Internal\ParseCorePlugins.cs" />
     <Compile Include="Internal\ParseDecoder.cs" />
     <Compile Include="Internal\ParseEncoder.cs" />
