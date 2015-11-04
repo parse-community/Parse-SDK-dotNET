@@ -49,5 +49,21 @@ namespace ParseTest {
         Assert.False(file.IsDirty);
       });
     }
+
+    [Test]
+    public void TestSecureUrl() {
+      Uri unsecureUri = new Uri("http://files.parsetfss.com/yolo.txt");
+      Uri secureUri = new Uri("https://files.parsetfss.com/yolo.txt");
+      Uri randomUri = new Uri("http://random.server.local/file.foo");
+
+      ParseFile file = new ParseFile("Foo", unsecureUri);
+      Assert.AreEqual(secureUri, file.Url);
+
+      file = new ParseFile("Bar", secureUri);
+      Assert.AreEqual(secureUri, file.Url);
+
+      file = new ParseFile("Baz", randomUri);
+      Assert.AreEqual(randomUri, file.Url);
+    }
   }
 }
