@@ -98,7 +98,6 @@
     <Compile Include="Internal\ParseEncoder.cs" />
     <Compile Include="Internal\ParseFieldOperations.cs" />
     <Compile Include="Internal\ParseIncrementOperation.cs" />
-    <Compile Include="Internal\ParseJSONCacheItem.cs" />
     <Compile Include="Internal\ParseObjectCoder.cs" />
     <Compile Include="Internal\ParseRelationOperation.cs" />
     <Compile Include="Internal\ParseRemoveOperation.cs" />

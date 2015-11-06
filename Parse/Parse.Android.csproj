@@ -109,7 +109,6 @@
     <Compile Include="Internal\ParseDeleteOperation.cs" />
     <Compile Include="Internal\ParseFieldOperations.cs" />
     <Compile Include="Internal\ParseIncrementOperation.cs" />
-    <Compile Include="Internal\ParseJSONCacheItem.cs" />
     <Compile Include="Internal\ParseRelationOperation.cs" />
     <Compile Include="Internal\ParseRemoveOperation.cs" />
     <Compile Include="Internal\ParseSetOperation.cs" />

@@ -91,7 +91,6 @@
     <Compile Include="ParseFieldNameAttribute.cs" />
     <Compile Include="Internal\ParseFieldOperations.cs" />
     <Compile Include="Internal\ParseIncrementOperation.cs" />
-    <Compile Include="Internal\ParseJSONCacheItem.cs" />
     <Compile Include="Internal\ParseRelationOperation.cs" />
     <Compile Include="Internal\ParseRemoveOperation.cs" />
     <Compile Include="Internal\ParseSetOperation.cs" />
@@ -142,9 +141,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Internal\Config\" />
-    <Folder Include="Internal\Push\State\" />
-    <Folder Include="Internal\Push\Coder\" />
-  </ItemGroup>
 </Project>

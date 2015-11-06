@@ -41,8 +41,6 @@ namespace Parse {
     private readonly LinkedList<IDictionary<string, IParseFieldOperation>> operationSetQueue =
         new LinkedList<IDictionary<string, IParseFieldOperation>>();
     private readonly IDictionary<string, object> estimatedData = new Dictionary<string, object>();
-    private readonly IDictionary<object, ParseJSONCacheItem> hashedObjects =
-        new Dictionary<object, ParseJSONCacheItem>();
 
     private static readonly ThreadLocal<bool> isCreatingPointer = new ThreadLocal<bool>(() => false);
 
@@ -430,10 +428,7 @@ string propertyName
 
         foreach (var pair in serverState) {
           var value = pair.Value;
-          if (ParseClient.IsContainerObject(value)) {
-            // Fill in the cache.
-            AddToHashedObjects(value);
-          } else if (value is ParseObject) {
+          if (value is ParseObject) {
             // Resolve fetched object.
             var parseObject = value as ParseObject;
             if (fetchedObject.ContainsKey(parseObject.ObjectId)) {
@@ -481,58 +476,6 @@ string propertyName
       get {
         lock (mutex) {
           return FindUnsavedChildren().FirstOrDefault() != null;
-        }
-      }
-    }
-
-    /// <summary>
-    /// Updates the JSON cache value for the given object.
-    /// </summary>
-    private void CheckpointMutableContainer(object obj) {
-      lock (mutex) {
-        if (ParseClient.IsContainerObject(obj)) {
-          hashedObjects[obj] = new ParseJSONCacheItem(obj);
-        }
-      }
-    }
-
-    /// <summary>
-    /// Inspects to see if a given mutable container owned by this object has
-    /// been mutated, and treats any mutation as a new "set" operation.
-    /// </summary>
-    private void CheckForChangesToMutableContainer(string key, object obj) {
-      lock (mutex) {
-        if (ParseClient.IsContainerObject(obj)) {
-          ParseJSONCacheItem oldCacheItem;
-          hashedObjects.TryGetValue(obj, out oldCacheItem);
-          if (oldCacheItem == null) {
-            throw new ArgumentException("ParseObjects contains container item that isn't cached.");
-          }
-          var newCacheItem = new ParseJSONCacheItem(obj);
-          if (!oldCacheItem.Equals(newCacheItem)) {
-            // A mutable container changed out from under us. Treat it as a set operation.
-            PerformOperation(key, new ParseSetOperation(obj));
-          }
-        } else {
-          if (obj != null) {
-            hashedObjects.Remove(obj);
-          }
-        }
-      }
-    }
-
-    /// <summary>
-    /// Inspects to see if any mutable container owned by this object has been mutated, and
-    /// treats any mutation as a new 'Set' operation.
-    /// </summary>
-    internal void CheckForChangesToMutableContainers() {
-      lock (mutex) {
-        foreach (var pair in new Dictionary<string, object>(estimatedData)) {
-          CheckForChangesToMutableContainer(pair.Key, pair.Value);
-        }
-        var toRemove = hashedObjects.Keys.Except(estimatedData.Values).ToArray();
-        foreach (var key in toRemove) {
-          hashedObjects.Remove(key);
         }
       }
     }
@@ -1149,10 +1092,6 @@ string propertyName
         foreach (var operations in operationSetQueue) {
           ApplyOperations(operations, estimatedData);
         }
-        hashedObjects.Clear();
-        foreach (var pair in estimatedData) {
-          CheckpointMutableContainer(pair.Value);
-        }
         // We've just applied a bunch of operations to estimatedData which
         // may have changed all of its keys. Notify of all keys and properties
         // mapped to keys being changed.
@@ -1184,7 +1123,6 @@ string propertyName
           OnPropertyChanged("IsDirty");
         }
 
-        CheckpointMutableContainer(newValue);
         OnFieldsChanged(new[] { key });
       }
     }
@@ -1493,12 +1431,6 @@ string propertyName
       }
     }
 
-    internal void AddToHashedObjects(object obj) {
-      lock (mutex) {
-        hashedObjects[obj] = new ParseJSONCacheItem(obj);
-      }
-    }
-
     /// <summary>
     /// Gets or sets the ParseACL governing this object.
     /// </summary>
@@ -1588,7 +1520,6 @@ string propertyName
 
     private bool CheckIsDirty(bool considerChildren) {
       lock (mutex) {
-        CheckForChangesToMutableContainers();
         return (dirty || CurrentOperations.Count > 0 || (considerChildren && HasDirtyChildren));
       }
     }

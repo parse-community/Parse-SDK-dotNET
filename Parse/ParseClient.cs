@@ -105,13 +105,6 @@ namespace Parse {
       }
     }
 
-    internal static bool IsContainerObject(object value) {
-      return value is ParseACL ||
-          value is ParseGeoPoint ||
-          ConvertTo<IDictionary<string, object>>(value) is IDictionary<string, object> ||
-          ConvertTo<IList<object>>(value) is IList<object>;
-    }
-
     /// <summary>
     /// Performs a ConvertTo, but returns null if the object can't be
     /// converted to that type.
