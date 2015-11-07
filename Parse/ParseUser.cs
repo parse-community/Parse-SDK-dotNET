@@ -558,6 +558,7 @@ namespace Parse {
           authData = AuthData = new Dictionary<string, IDictionary<string, object>>();
         }
         authData[authType] = data;
+        AuthData = authData;
         return SaveAsync(cancellationToken);
       }, cancellationToken);
     }
