@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Internal;
+using Parse.Utilities;
 
 namespace Parse {
   /// <summary>
@@ -77,7 +78,7 @@ namespace Parse {
     /// <exception cref="System.FormatException">The property under this <paramref name="key"/>
     /// key was found, but of a different type.</exception>
     public T Get<T>(string key) {
-      return (T)ParseClient.ConvertTo<T>(this.properties[key]);
+      return (T)Conversion.ConvertTo<T>(this.properties[key]);
     }
 
     /// <summary>
@@ -90,7 +91,7 @@ namespace Parse {
     /// <returns>true if the lookup and conversion succeeded, otherwise false.</returns>
     public bool TryGetValue<T>(string key, out T result) {
       if (this.properties.ContainsKey(key)) {
-        var temp = ParseClient.ConvertTo<T>(this.properties[key]);
+        var temp = Conversion.ConvertTo<T>(this.properties[key]);
         if (temp is T ||
           (temp == null &&
             (!typeof(T).GetTypeInfo().IsValueType || ReflectionHelpers.IsNullable(typeof(T))))

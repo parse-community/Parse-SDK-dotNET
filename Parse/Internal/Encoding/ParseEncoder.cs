@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Parse.Utilities;
 
 namespace Parse.Internal {
   /// <summary>
@@ -23,8 +24,8 @@ namespace Parse.Internal {
           value is ParseRelationBase ||
           value is DateTime ||
           value is byte[] ||
-          ParseClient.ConvertTo<IDictionary<string, object>>(value) is IDictionary<string, object> ||
-          ParseClient.ConvertTo<IList<object>>(value) is IList<object>;
+          Conversion.ConvertTo<IDictionary<string, object>>(value) is IDictionary<string, object> ||
+          Conversion.ConvertTo<IList<object>>(value) is IList<object>;
     }
 
     public object Encode(object value) {
@@ -55,7 +56,7 @@ namespace Parse.Internal {
         return jsonConvertible.ToJSON();
       }
 
-      var dict = ParseClient.ConvertTo<IDictionary<string, object>>(value) as IDictionary<string, object>;
+      var dict = Conversion.ConvertTo<IDictionary<string, object>>(value) as IDictionary<string, object>;
       if (dict != null) {
         var json = new Dictionary<string, object>();
         foreach (var pair in dict) {
@@ -64,7 +65,7 @@ namespace Parse.Internal {
         return json;
       }
 
-      var list = ParseClient.ConvertTo<IList<object>>(value) as IList<object>;
+      var list = Conversion.ConvertTo<IList<object>>(value) as IList<object>;
       if (list != null) {
         return EncodeList(list);
       }

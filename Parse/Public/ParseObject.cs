@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using Parse.Internal;
+using Parse.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -448,11 +449,11 @@ string propertyName
 #else
       var itemsToVisit = (IEnumerable<object>)null;
 #endif
-      var dict = ParseClient.As<IDictionary<string, object>>(root);
+      var dict = Conversion.As<IDictionary<string, object>>(root);
       if (dict != null) {
         itemsToVisit = dict.Values;
       } else {
-        var list = ParseClient.As<IList<object>>(root);
+        var list = Conversion.As<IList<object>>(root);
         if (list != null) {
           itemsToVisit = list;
         } else if (traverseParseObjects) {
@@ -1263,7 +1264,7 @@ string propertyName
     /// retrieved and <paramref name="key"/> is not found.</exception>
     /// </summary>
     public T Get<T>(string key) {
-      return (T)ParseClient.ConvertTo<T>(this[key]);
+      return (T)Conversion.ConvertTo<T>(this[key]);
     }
 
     /// <summary>
@@ -1291,7 +1292,7 @@ string propertyName
     public bool TryGetValue<T>(string key, out T result) {
       lock (mutex) {
         if (ContainsKey(key)) {
-          var temp = ParseClient.ConvertTo<T>(this[key]);
+          var temp = Conversion.ConvertTo<T>(this[key]);
           if (temp is T || (temp == null && (!typeof(T).GetTypeInfo().IsValueType || ReflectionHelpers.IsNullable(typeof(T))))) {
             result = (T)temp;
             return true;

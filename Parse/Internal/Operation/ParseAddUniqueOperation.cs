@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Parse.Utilities;
 
 namespace Parse.Internal {
   class ParseAddUniqueOperation : IParseFieldOperation {
@@ -28,7 +29,7 @@ namespace Parse.Internal {
       }
       if (previous is ParseSetOperation) {
         var setOp = (ParseSetOperation)previous;
-        var oldList = (IList<object>)ParseClient.ConvertTo<IList<object>>(setOp.Value);
+        var oldList = (IList<object>)Conversion.ConvertTo<IList<object>>(setOp.Value);
         var result = this.Apply(oldList, null);
         return new ParseSetOperation(result);
       }
@@ -43,7 +44,7 @@ namespace Parse.Internal {
       if (oldValue == null) {
         return objects.ToList();
       }
-      var newList = ((IList<object>)ParseClient.ConvertTo<IList<object>>(oldValue)).ToList();
+      var newList = ((IList<object>)Conversion.ConvertTo<IList<object>>(oldValue)).ToList();
       var comparer = ParseFieldOperations.ParseObjectComparer;
       foreach (var objToAdd in objects) {
         if (objToAdd is ParseObject) {

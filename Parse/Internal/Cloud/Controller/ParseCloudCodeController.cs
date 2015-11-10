@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Utilities;
 
 namespace Parse.Internal {
   internal class ParseCloudCodeController : IParseCloudCodeController {
@@ -27,7 +28,7 @@ namespace Parse.Internal {
         if (!decoded.ContainsKey("result")) {
           return default(T);
         }
-        return (T)ParseClient.ConvertTo<T>(decoded["result"]);
+        return (T)Conversion.ConvertTo<T>(decoded["result"]);
       });
     }
   }
