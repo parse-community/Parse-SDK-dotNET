@@ -56,8 +56,14 @@ namespace Parse {
     }
 
     internal ParseQuery<T> GetQuery<T>() where T : ParseObject {
-      return new ParseQuery<T>(targetClassName)
-            .WhereRelatedTo(parent, key);
+      if (targetClassName != null) {
+        return new ParseQuery<T>(targetClassName)
+          .WhereRelatedTo(parent, key);
+      }
+
+      return new ParseQuery<T>(parent.ClassName)
+        .RedirectClassName(key)
+        .WhereRelatedTo(parent, key);
     }
 
     internal string TargetClassName {
