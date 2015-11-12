@@ -96,6 +96,7 @@
     <Compile Include="PushEncoderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="InstallationTests.cs" />
+    <Compile Include="RelationTests.cs" />
     <Compile Include="SessionTests.cs" />
     <Compile Include="SessionControllerTests.cs" />
     <Compile Include="ObjectControllerTests.cs" />

@@ -50,6 +50,7 @@ namespace Parse {
     private readonly ReadOnlyCollection<string> orderBy;
     private readonly ReadOnlyCollection<string> includes;
     private readonly ReadOnlyCollection<string> selectedKeys;
+    private readonly String redirectClassNameForKey;
     private readonly int? skip;
     private readonly int? limit;
 
@@ -73,7 +74,8 @@ namespace Parse {
         int? skip = null,
         int? limit = null,
         IEnumerable<string> includes = null,
-        IEnumerable<string> selectedKeys = null) {
+        IEnumerable<string> selectedKeys = null,
+        String redirectClassNameForKey = null) {
       if (source == null) {
         throw new ArgumentNullException("source");
       }
@@ -85,6 +87,7 @@ namespace Parse {
       this.limit = source.limit;
       this.includes = source.includes;
       this.selectedKeys = source.selectedKeys;
+      this.redirectClassNameForKey = source.redirectClassNameForKey;
 
       if (where != null) {
         var newWhere = MergeWhereClauses(where);
@@ -126,6 +129,10 @@ namespace Parse {
       if (selectedKeys != null) {
         var newSelectedKeys = MergeSelectedKeys(selectedKeys);
         this.selectedKeys = new ReadOnlyCollection<string>(newSelectedKeys.ToList());
+      }
+
+      if (redirectClassNameForKey != null) {
+        this.redirectClassNameForKey = redirectClassNameForKey;
       }
     }
 
@@ -324,6 +331,10 @@ namespace Parse {
     /// <returns>A new query with the additional constraint.</returns>
     public ParseQuery<T> Limit(int count) {
       return new ParseQuery<T>(this, limit: count);
+    }
+
+    internal ParseQuery<T> RedirectClassName(String key) {
+      return new ParseQuery<T>(this, redirectClassNameForKey: key);
     }
 
     #region Where
@@ -847,6 +858,9 @@ namespace Parse {
       }
       if (includeClassName) {
         result["className"] = className;
+      }
+      if (redirectClassNameForKey != null) {
+        result["redirectClassNameForKey"] = redirectClassNameForKey;
       }
       return result;
     }
