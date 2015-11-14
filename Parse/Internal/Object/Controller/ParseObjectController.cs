@@ -17,7 +17,7 @@ namespace Parse.Internal {
     public Task<IObjectState> FetchAsync(IObjectState state,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("/1/classes/{0}/{1}",
+      var command = new ParseCommand(string.Format("classes/{0}/{1}",
               Uri.EscapeDataString(state.ClassName),
               Uri.EscapeDataString(state.ObjectId)),
           method: "GET",
@@ -36,8 +36,8 @@ namespace Parse.Internal {
       var objectJSON = ParseObject.ToJSONObjectForSaving(operations);
 
       var command = new ParseCommand((state.ObjectId == null ?
-              string.Format("/1/classes/{0}", Uri.EscapeDataString(state.ClassName)) :
-              string.Format("/1/classes/{0}/{1}", Uri.EscapeDataString(state.ClassName), state.ObjectId)),
+              string.Format("classes/{0}", Uri.EscapeDataString(state.ClassName)) :
+              string.Format("classes/{0}/{1}", Uri.EscapeDataString(state.ClassName), state.ObjectId)),
           method: (state.ObjectId == null ? "POST" : "PUT"),
           sessionToken: sessionToken,
           data: objectJSON);
@@ -78,7 +78,7 @@ namespace Parse.Internal {
     public Task DeleteAsync(IObjectState state,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("/1/classes/{0}/{1}",
+      var command = new ParseCommand(string.Format("classes/{0}/{1}",
               state.ClassName, state.ObjectId),
           method: "DELETE",
           sessionToken: sessionToken,

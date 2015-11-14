@@ -30,7 +30,7 @@ namespace Parse.Internal {
       }
 
       var oldPosition = dataStream.Position;
-      var command = new ParseCommand("/1/files/" + state.Name,
+      var command = new ParseCommand("files/" + state.Name,
           method: "POST",
           sessionToken: sessionToken,
           contentType: state.MimeType,

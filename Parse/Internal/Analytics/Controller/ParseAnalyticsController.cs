@@ -24,7 +24,7 @@ namespace Parse.Internal {
         data["dimensions"] = dimensions;
       }
 
-      var command = new ParseCommand("/1/events/" + name,
+      var command = new ParseCommand("events/" + name,
           method: "POST",
           sessionToken: sessionToken,
           data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);
@@ -42,7 +42,7 @@ namespace Parse.Internal {
         data["push_hash"] = pushHash;
       }
 
-      var command = new ParseCommand("/1/events/AppOpened",
+      var command = new ParseCommand("events/AppOpened",
           method: "POST",
           sessionToken: sessionToken,
           data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);

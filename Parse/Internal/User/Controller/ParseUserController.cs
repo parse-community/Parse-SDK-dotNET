@@ -18,7 +18,7 @@ namespace Parse.Internal {
         CancellationToken cancellationToken) {
       var objectJSON = ParseObject.ToJSONObjectForSaving(operations);
 
-      var command = new ParseCommand("/1/classes/_User",
+      var command = new ParseCommand("classes/_User",
           method: "POST",
           data: objectJSON);
 
@@ -39,7 +39,7 @@ namespace Parse.Internal {
         {"password", password}
       };
 
-      var command = new ParseCommand(string.Format("/1/login?{0}", ParseClient.BuildQueryString(data)),
+      var command = new ParseCommand(string.Format("login?{0}", ParseClient.BuildQueryString(data)),
           method: "GET",
           data: null);
 
@@ -58,7 +58,7 @@ namespace Parse.Internal {
       var authData = new Dictionary<string, object>();
       authData[authType] = data;
 
-      var command = new ParseCommand("/1/users",
+      var command = new ParseCommand("users",
           method: "POST",
           data: new Dictionary<string, object> {
             {"authData", authData}
@@ -74,7 +74,7 @@ namespace Parse.Internal {
     }
 
     public Task<IObjectState> GetUserAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("/1/users/me",
+      var command = new ParseCommand("users/me",
           method: "GET",
           sessionToken: sessionToken,
           data: null);
@@ -85,7 +85,7 @@ namespace Parse.Internal {
     }
 
     public Task RequestPasswordResetAsync(string email, CancellationToken cancellationToken) {
-      var command = new ParseCommand("/1/requestPasswordReset",
+      var command = new ParseCommand("requestPasswordReset",
           method: "POST",
           data: new Dictionary<string, object> {
             {"email", email}

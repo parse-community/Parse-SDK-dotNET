@@ -15,7 +15,7 @@ namespace ParseTest {
   public class SessionControllerTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.HostName = new Uri("http://parse.com");
+      ParseClient.HostName = new Uri("http://api.parse.local/1/");
     }
 
     [TearDown]

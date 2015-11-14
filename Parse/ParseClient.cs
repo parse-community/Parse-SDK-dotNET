@@ -82,7 +82,7 @@ namespace Parse {
     /// </param>
     public static void Initialize(string applicationId, string dotnetKey) {
       lock (mutex) {
-        HostName = HostName ?? new Uri("https://api.parse.com/");
+        HostName = HostName ?? new Uri("https://api.parse.com/1/");
         ApplicationId = applicationId;
         WindowsKey = dotnetKey;
 

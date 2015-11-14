@@ -14,7 +14,7 @@ namespace Parse.Internal {
     }
 
     public Task<IObjectState> GetSessionAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("/1/sessions/me",
+      var command = new ParseCommand("sessions/me",
           method: "GET",
           sessionToken: sessionToken,
           data: null);
@@ -25,7 +25,7 @@ namespace Parse.Internal {
     }
 
     public Task RevokeAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("/1/logout",
+      var command = new ParseCommand("logout",
           method: "POST",
           sessionToken: sessionToken,
           data: new Dictionary<string, object>());
@@ -34,7 +34,7 @@ namespace Parse.Internal {
     }
 
     public Task<IObjectState> UpgradeToRevocableSessionAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("/1/upgradeToRevocableSession",
+      var command = new ParseCommand("upgradeToRevocableSession",
           method: "POST",
           sessionToken: sessionToken,
           data: new Dictionary<string, object>());
