@@ -13,6 +13,20 @@ namespace Parse.Internal {
   internal class ParseCommand : HttpRequest {
     private const string revocableSessionTokenTrueValue = "1";
 
+    public IDictionary<string, object> DataObject { get; private set; }
+    public override Stream Data {
+      get {
+        if (base.Data != null) {
+          return base.Data;
+        }
+
+        return base.Data = DataObject != null
+          ? new MemoryStream(Encoding.UTF8.GetBytes(Json.Encode(DataObject)))
+          : null;
+      }
+      internal set { base.Data = value; }
+    }
+
     public ParseCommand(string relativeUri,
         string method,
         string sessionToken = null,
@@ -21,8 +35,9 @@ namespace Parse.Internal {
             method: method,
             sessionToken: sessionToken,
             headers: headers,
-            stream: data != null ? new MemoryStream(UTF8Encoding.UTF8.GetBytes(Json.Encode(data))) : null,
+            stream: null,
             contentType: data != null ? "application/json" : null) {
+      DataObject = data;
     }
 
     public ParseCommand(string relativeUri,

@@ -3,9 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Parse.Internal {
   /// <summary>
@@ -18,7 +15,7 @@ namespace Parse.Internal {
     /// <summary>
     /// Data stream to be uploaded.
     /// </summary>
-    public Stream Data { get; internal set; }
+    public virtual Stream Data { get; internal set; }
 
     /// <summary>
     /// HTTP method. One of <c>DELETE</c>, <c>GET</c>, <c>HEAD</c>, <c>POST</c> or <c>PUT</c>
