@@ -19,7 +19,7 @@ namespace Parse.Internal {
     public IParseCurrentConfigController CurrentConfigController { get; internal set; }
 
     public Task<ParseConfig> FetchConfigAsync(String sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("/1/config",
+      var command = new ParseCommand("config",
           method: "GET",
           sessionToken: sessionToken,
           data: null);

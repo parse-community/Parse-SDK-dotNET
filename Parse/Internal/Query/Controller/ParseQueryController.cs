@@ -59,7 +59,7 @@ namespace Parse.Internal {
         IDictionary<string, object> parameters,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("/1/classes/{0}?{1}",
+      var command = new ParseCommand(string.Format("classes/{0}?{1}",
               Uri.EscapeDataString(className),
               ParseClient.BuildQueryString(parameters)),
           method: "GET",

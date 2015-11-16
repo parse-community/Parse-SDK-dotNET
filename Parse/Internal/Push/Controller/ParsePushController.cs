@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace Parse.Internal {
   internal class ParsePushController : IParsePushController {
     public Task SendPushNotificationAsync(IPushState state, String sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("/1/push",
+      var command = new ParseCommand("push",
           method: "POST",
           sessionToken: sessionToken,
           data: ParsePushEncoder.Instance.Encode(state));

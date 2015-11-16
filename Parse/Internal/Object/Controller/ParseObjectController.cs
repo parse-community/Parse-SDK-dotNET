@@ -17,7 +17,7 @@ namespace Parse.Internal {
     public Task<IObjectState> FetchAsync(IObjectState state,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("/1/classes/{0}/{1}",
+      var command = new ParseCommand(string.Format("classes/{0}/{1}",
               Uri.EscapeDataString(state.ClassName),
               Uri.EscapeDataString(state.ObjectId)),
           method: "GET",
@@ -36,8 +36,8 @@ namespace Parse.Internal {
       var objectJSON = ParseObject.ToJSONObjectForSaving(operations);
 
       var command = new ParseCommand((state.ObjectId == null ?
-              string.Format("/1/classes/{0}", Uri.EscapeDataString(state.ClassName)) :
-              string.Format("/1/classes/{0}/{1}", Uri.EscapeDataString(state.ClassName), state.ObjectId)),
+              string.Format("classes/{0}", Uri.EscapeDataString(state.ClassName)) :
+              string.Format("classes/{0}/{1}", Uri.EscapeDataString(state.ClassName), state.ObjectId)),
           method: (state.ObjectId == null ? "POST" : "PUT"),
           sessionToken: sessionToken,
           data: objectJSON);
@@ -55,14 +55,15 @@ namespace Parse.Internal {
         IList<IDictionary<string, IParseFieldOperation>> operationsList,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var requests = states.Zip(operationsList, (item, ops) => new Dictionary<string, object> {
-        { "method", (item.ObjectId == null ? "POST" : "PUT") },
-        { "path",  (item.ObjectId == null ?
-            string.Format("/1/classes/{0}", Uri.EscapeDataString(item.ClassName)) :
-            string.Format("/1/classes/{0}/{1}", Uri.EscapeDataString(item.ClassName),
-                Uri.EscapeDataString(item.ObjectId))) },
-        { "body", ParseObject.ToJSONObjectForSaving(ops) }
-      }).Cast<object>().ToList();
+
+      var requests = states
+        .Zip(operationsList, (item, ops) => new ParseCommand(
+          item.ObjectId == null
+            ? string.Format("classes/{0}", Uri.EscapeDataString(item.ClassName))
+            : string.Format("classes/{0}/{1}", Uri.EscapeDataString(item.ClassName), Uri.EscapeDataString(item.ObjectId)),
+          method: item.ObjectId == null ? "POST" : "PUT",
+          data: ParseObject.ToJSONObjectForSaving(ops)))
+        .ToList();
 
       var batchTasks = ExecuteBatchRequests(requests, sessionToken, cancellationToken);
       var stateTasks = new List<Task<IObjectState>>();
@@ -78,7 +79,7 @@ namespace Parse.Internal {
     public Task DeleteAsync(IObjectState state,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("/1/classes/{0}/{1}",
+      var command = new ParseCommand(string.Format("classes/{0}/{1}",
               state.ClassName, state.ObjectId),
           method: "DELETE",
           sessionToken: sessionToken,
@@ -90,24 +91,25 @@ namespace Parse.Internal {
     public IList<Task> DeleteAllAsync(IList<IObjectState> states,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var requests = states.Where(item => item.ObjectId != null).Select(item => new Dictionary<string, object> {
-        { "method", "DELETE" },
-        { "path", string.Format("/1/classes/{0}/{1}", Uri.EscapeDataString(item.ClassName),
-            Uri.EscapeDataString(item.ObjectId)) }
-      }).Cast<object>().ToList();
-
+      var requests = states
+        .Where(item => item.ObjectId != null)
+        .Select(item => new ParseCommand(
+          string.Format("classes/{0}/{1}", Uri.EscapeDataString(item.ClassName), Uri.EscapeDataString(item.ObjectId)),
+            method: "DELETE",
+            data: null))
+        .ToList();
       return ExecuteBatchRequests(requests, sessionToken, cancellationToken).Cast<Task>().ToList();
     }
 
     // TODO (hallucinogen): move this out to a class to be used by Analytics
     private const int MaximumBatchSize = 50;
-    internal IList<Task<IDictionary<string, object>>> ExecuteBatchRequests(IList<object> requests,
+    internal IList<Task<IDictionary<string, object>>> ExecuteBatchRequests(IList<ParseCommand> requests,
         string sessionToken,
         CancellationToken cancellationToken) {
       var tasks = new List<Task<IDictionary<string, object>>>();
       int batchSize = requests.Count;
 
-      IEnumerable<object> remaining = requests;
+      IEnumerable<ParseCommand> remaining = requests;
       while (batchSize > MaximumBatchSize) {
         var process = remaining.Take(MaximumBatchSize).ToList();
         remaining = remaining.Skip(MaximumBatchSize);
@@ -121,7 +123,7 @@ namespace Parse.Internal {
       return tasks;
     }
 
-    private IList<Task<IDictionary<string, object>>> ExecuteBatchRequest(IList<object> requests,
+    private IList<Task<IDictionary<string, object>>> ExecuteBatchRequest(IList<ParseCommand> requests,
         string sessionToken,
         CancellationToken cancellationToken) {
       var tasks = new List<Task<IDictionary<string, object>>>();
@@ -133,10 +135,21 @@ namespace Parse.Internal {
         tasks.Add(tcs.Task);
       }
 
-      var command = new ParseCommand("/1/batch",
+      var encodedRequests = requests.Select(r => {
+        var results = new Dictionary<string, object> {
+          { "method", r.Method },
+          { "path", r.Uri.AbsolutePath },
+        };
+
+        if (r.DataObject != null) {
+          results["body"] = r.DataObject;
+        }
+        return results;
+      }).Cast<object>().ToList();
+      var command = new ParseCommand("batch",
         method: "POST",
         sessionToken: sessionToken,
-        data: new Dictionary<string, object> { { "requests", requests } });
+        data: new Dictionary<string, object> { { "requests", encodedRequests } });
 
       commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).ContinueWith(t => {
         if (t.IsFaulted || t.IsCanceled) {

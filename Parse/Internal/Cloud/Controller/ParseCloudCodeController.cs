@@ -17,7 +17,7 @@ namespace Parse.Internal {
         IDictionary<string, object> parameters,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("/1/functions/{0}", Uri.EscapeUriString(name)),
+      var command = new ParseCommand(string.Format("functions/{0}", Uri.EscapeUriString(name)),
           method: "POST",
           sessionToken: sessionToken,
           data: NoObjectsEncoder.Instance.Encode(parameters) as IDictionary<string, object>);

@@ -15,7 +15,7 @@ namespace ParseTest {
   public class CommandTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.HostName = new Uri("http://parse.com");
+      ParseClient.HostName = new Uri("http://api.parse.local/1/");
     }
 
     [TearDown]
@@ -26,7 +26,7 @@ namespace ParseTest {
 
     [Test]
     public void TestMakeCommand() {
-      ParseCommand command = new ParseCommand("/1/endpoint",
+      ParseCommand command = new ParseCommand("endpoint",
           method: "GET",
           sessionToken: "abcd",
           headers: null,
@@ -49,7 +49,7 @@ namespace ParseTest {
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object);
-      var command = new ParseCommand("/1/endpoint", method: "GET", data: null);
+      var command = new ParseCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.False(t.IsFaulted);
         Assert.False(t.IsCanceled);
@@ -69,7 +69,7 @@ namespace ParseTest {
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object);
-      var command = new ParseCommand("/1/endpoint", method: "GET", data: null);
+      var command = new ParseCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.False(t.IsFaulted);
         Assert.False(t.IsCanceled);
@@ -91,7 +91,7 @@ namespace ParseTest {
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object);
-      var command = new ParseCommand("/1/endpoint", method: "GET", data: null);
+      var command = new ParseCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.True(t.IsFaulted);
         Assert.False(t.IsCanceled);
@@ -112,7 +112,7 @@ namespace ParseTest {
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object);
-      var command = new ParseCommand("/1/endpoint", method: "GET", data: null);
+      var command = new ParseCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.True(t.IsFaulted);
         Assert.False(t.IsCanceled);
@@ -134,7 +134,7 @@ namespace ParseTest {
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object);
-      var command = new ParseCommand("/1/endpoint", method: "GET", data: null);
+      var command = new ParseCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.True(t.IsFaulted);
         Assert.False(t.IsCanceled);
