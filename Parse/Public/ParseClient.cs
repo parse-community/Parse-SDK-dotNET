@@ -28,6 +28,20 @@ namespace Parse {
       "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'f'Z'",
     };
 
+    /// <summary>
+    /// Represents the configuration of the Parse SDK.
+    /// </summary>
+    public struct Configuration {
+      /// <summary>
+      /// The Parse.com application ID of your app.
+      /// </summary>
+      public String ApplicationId { get; set; }
+
+      /// <summary>
+      /// The Parse.com .NET key for your app.
+      /// </summary>
+      public String WindowsKey { get; set; }
+    }
 
     private static readonly object mutex = new object();
     private static readonly string[] assemblyNames = {
@@ -60,10 +74,12 @@ namespace Parse {
     private static readonly IParseCommandRunner commandRunner;
     internal static IParseCommandRunner ParseCommandRunner { get { return commandRunner; } }
 
+    /// <summary>
+    /// The current configuration that parse has been initialized with.
+    /// </summary>
+    public static Configuration CurrentConfiguration { get; internal set; }
     internal static Uri HostName { get; set; }
     internal static string MasterKey { get; set; }
-    internal static string ApplicationId { get; set; }
-    internal static string WindowsKey { get; set; }
 
     internal static Version Version {
       get {
@@ -90,10 +106,24 @@ namespace Parse {
     /// <param name="dotnetKey">The .NET API Key provided in the Parse dashboard.
     /// </param>
     public static void Initialize(string applicationId, string dotnetKey) {
+      Initialize(new Configuration {
+        ApplicationId = applicationId,
+        WindowsKey = dotnetKey
+      });
+    }
+
+    /// <summary>
+    /// Authenticates this client as belonging to your application. This must be
+    /// called before your application can use the Parse library. The recommended
+    /// way is to put a call to <c>ParseFramework.Initialize</c> in your
+    /// Application startup.
+    /// </summary>
+    /// <param name="configuration">The configuration to initialze Parse with.
+    /// </param>
+    public static void Initialize(Configuration configuration) {
       lock (mutex) {
         HostName = HostName ?? new Uri("https://api.parse.com/1/");
-        ApplicationId = applicationId;
-        WindowsKey = dotnetKey;
+        CurrentConfiguration = configuration;
 
         ParseObject.RegisterSubclass<ParseUser>();
         ParseObject.RegisterSubclass<ParseInstallation>();
