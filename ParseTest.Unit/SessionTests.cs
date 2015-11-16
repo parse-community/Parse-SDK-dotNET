@@ -21,8 +21,8 @@ namespace ParseTest {
     public void TearDown() {
       ParseCorePlugins.Instance.SessionController = null;
       ParseCorePlugins.Instance.CurrentUserController = null;
-      ParseObject.UnregisterSubclass("_Session");
-      ParseObject.UnregisterSubclass("_User");
+      ParseObject.UnregisterSubclass<ParseSession>();
+      ParseObject.UnregisterSubclass<ParseUser>();
     }
 
     [Test]

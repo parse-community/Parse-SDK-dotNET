@@ -51,7 +51,8 @@ namespace Parse.Internal {
 #if UNITY
       return type.GetConstructors();
 #else
-      return type.GetTypeInfo().DeclaredConstructors;
+      return type.GetTypeInfo().DeclaredConstructors
+        .Where(c => (c.Attributes & MethodAttributes.Static) == 0);
 #endif
     }
 
@@ -78,7 +79,7 @@ namespace Parse.Internal {
         let types = from p in parameters select p.ParameterType
         where types.SequenceEqual(parameterTypes)
         select constructor;
-      return constructors.Single();
+      return constructors.SingleOrDefault();
     }
 
     internal static PropertyInfo GetProperty(this Type type, string name) {

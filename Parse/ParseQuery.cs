@@ -62,6 +62,12 @@ namespace Parse {
       }
     }
 
+    internal static IObjectSubclassingController SubclassingController {
+      get {
+        return ParseCorePlugins.Instance.SubclassingController;
+      }
+    }
+
     /// <summary>
     /// Private constructor for composition of queries. A source query is required,
     /// but the remaining values can be null if they won't be changed in this
@@ -189,7 +195,7 @@ namespace Parse {
     /// Constructs a query based upon the ParseObject subclass used as the generic parameter for the ParseQuery.
     /// </summary>
     public ParseQuery()
-      : this(ParseObject.GetClassName(typeof(T))) {
+      : this(SubclassingController.GetClassName(typeof(T))) {
     }
 
     /// <summary>
