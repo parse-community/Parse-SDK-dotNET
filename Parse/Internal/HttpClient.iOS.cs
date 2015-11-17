@@ -67,8 +67,7 @@ namespace Parse.Internal {
 
         uploadTask = copyTask.Safe().ContinueWith(_ => {
           return request.GetRequestStreamAsync();
-        }).Unwrap()
-        .OnSuccess(t => {
+        }).Unwrap().OnSuccess(t => {
           var requestStream = t.Result;
 
           int bufferSize = 4096;
@@ -90,14 +89,14 @@ namespace Parse.Internal {
             });
           }).ContinueWith(_ => {
             requestStream.Close();
-          });
+            return _;
+          }).Unwrap();
         }).Unwrap();
       }
 
-      return uploadTask.Safe().ContinueWith(_ => {
+      return uploadTask.Safe().OnSuccess(_ => {
         return request.GetResponseAsync();
-      }).Unwrap()
-      .ContinueWith(t => {
+      }).Unwrap().OnSuccess(t => {
         // Handle canceled
         cancellationToken.ThrowIfCancellationRequested();
 
