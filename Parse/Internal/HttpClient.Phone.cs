@@ -94,7 +94,8 @@ namespace Parse.Internal {
             });
           }).ContinueWith(_ => {
             requestStream.Close();
-          });
+            return _;
+          }).Unwrap();
         }).Unwrap();
       }
 

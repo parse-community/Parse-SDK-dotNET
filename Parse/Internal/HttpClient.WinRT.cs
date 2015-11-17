@@ -65,8 +65,7 @@ namespace Parse.Internal {
 
         uploadTask = copyTask.Safe().ContinueWith(_ => {
           return request.GetRequestStreamAsync();
-        }).Unwrap()
-        .OnSuccess(t => {
+        }).Unwrap().OnSuccess(t => {
           var requestStream = t.Result;
 
           int bufferSize = 4096;
@@ -89,14 +88,14 @@ namespace Parse.Internal {
           }).ContinueWith(_ => {
             //requestStream.Flush();
             requestStream.Dispose();
-          });
+            return _;
+          }).Unwrap();
         }).Unwrap();
       }
 
-      return uploadTask.Safe().ContinueWith(_ => {
+      return uploadTask.Safe().OnSuccess(_ => {
         return request.GetResponseAsync();
-      }).Unwrap()
-      .ContinueWith(t => {
+      }).Unwrap().OnSuccess(t => {
         // Handle canceled
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -147,7 +146,8 @@ namespace Parse.Internal {
           });
         }).ContinueWith(_ => {
           responseStream.Dispose();
-
+          return _;
+        }).Unwrap().OnSuccess(_ => {
           // If getting stream size is not supported, then report download only once.
           if (totalLength == -1) {
             downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1.0 });
