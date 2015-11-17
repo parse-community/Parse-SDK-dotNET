@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,10 +35,10 @@ namespace Parse.Internal {
             var data = user.ServerDataToJSONObjectForSerialization();
             data["objectId"] = user.ObjectId;
             if (user.CreatedAt != null) {
-              data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatString);
+              data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First());
             }
             if (user.UpdatedAt != null) {
-              data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatString);
+              data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First());
             }
 
             ParseClient.ApplicationSettings["CurrentUser"] = Json.Encode(data);

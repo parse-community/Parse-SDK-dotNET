@@ -18,7 +18,16 @@ namespace Parse {
   /// configuration for the Parse library.
   /// </summary>
   public static partial class ParseClient {
-    internal const string DateFormatString = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'";
+    internal static readonly string[] DateFormatStrings = {
+      // Official ISO format
+      "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'",
+
+      // It's possible that the string converter server-side may trim trailing zeroes,
+      // so these two formats cover ourselves from that.
+      "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'ff'Z'",
+      "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'f'Z'",
+    };
+
 
     private static readonly object mutex = new object();
     private static readonly string[] assemblyNames = {

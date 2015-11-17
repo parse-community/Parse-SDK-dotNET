@@ -57,6 +57,38 @@ namespace ParseTest {
     }
 
     [Test]
+    public void TestDecodeImproperDate() {
+      IDictionary<string, object> value = new Dictionary<string, object>() {
+        { "__type", "Date" },
+        { "iso", "1990-08-30T12:03:59.0Z" }
+      };
+
+      DateTime dateTime = (DateTime)ParseDecoder.Instance.Decode(value);
+      Assert.AreEqual(1990, dateTime.Year);
+      Assert.AreEqual(8, dateTime.Month);
+      Assert.AreEqual(30, dateTime.Day);
+      Assert.AreEqual(12, dateTime.Hour);
+      Assert.AreEqual(3, dateTime.Minute);
+      Assert.AreEqual(59, dateTime.Second);
+      Assert.AreEqual(0, dateTime.Millisecond);
+
+      // Test multiple trailing zeroes
+      value = new Dictionary<string, object>() {
+        { "__type", "Date" },
+        { "iso", "1990-08-30T12:03:59.00Z" }
+      };
+
+      dateTime = (DateTime)ParseDecoder.Instance.Decode(value);
+      Assert.AreEqual(1990, dateTime.Year);
+      Assert.AreEqual(8, dateTime.Month);
+      Assert.AreEqual(30, dateTime.Day);
+      Assert.AreEqual(12, dateTime.Hour);
+      Assert.AreEqual(3, dateTime.Minute);
+      Assert.AreEqual(59, dateTime.Second);
+      Assert.AreEqual(0, dateTime.Millisecond);
+    }
+
+    [Test]
     public void TestDecodeBytes() {
       IDictionary<string, object> value = new Dictionary<string, object>() {
         { "__type", "Bytes" },

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Parse.Internal {
   /// <summary>
@@ -31,7 +32,7 @@ namespace Parse.Internal {
       // encoded object. Otherwise, just return the original object.
       if (value is DateTime) {
         return new Dictionary<string, object> {
-          {"iso", ((DateTime)value).ToString(ParseClient.DateFormatString)},
+          {"iso", ((DateTime)value).ToString(ParseClient.DateFormatStrings.First())},
           {"__type", "Date"}
         };
       }
