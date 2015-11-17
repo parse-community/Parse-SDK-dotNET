@@ -13,7 +13,7 @@ namespace Parse.Internal {
     public Uri SecureUrl {
       get {
         Uri uri = Url;
-        if (uri.Host == ParseFileSecureDomain) {
+        if (uri != null && uri.Host == ParseFileSecureDomain) {
           return new UriBuilder(uri) {
             Scheme = ParseFileSecureScheme,
             Port = -1, // This makes URIBuilder assign the default port for the URL scheme.
