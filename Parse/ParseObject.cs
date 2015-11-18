@@ -1134,7 +1134,7 @@ string propertyName
       bool hasCurrent = TryGetValue<T>(key, out current);
       if (value == null) {
         if (hasCurrent) {
-          Remove(key);
+          PerformOperation(key, ParseDeleteOperation.Instance);
         }
         return;
       }
