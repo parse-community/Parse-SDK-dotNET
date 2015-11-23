@@ -36,6 +36,9 @@ namespace Parse.Internal {
       } else if (state.ExpirationInterval.HasValue) {
         payload["expiration_interval"] = state.ExpirationInterval.Value.TotalSeconds;
       }
+      if (state.PushTime.HasValue) {
+        payload["push_time"] = state.PushTime.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ");
+      }
 
       return payload;
     }

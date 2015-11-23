@@ -82,6 +82,19 @@ namespace Parse {
       }
     }
 
+    public DateTime? PushTime {
+      get { return state.PushTime; }
+      set {
+        MutateState(s => {
+          DateTime now = DateTime.Now;
+          if (value < now || value > now.AddDays(14)) {
+            throw new InvalidOperationException("Cannot set PushTime in the past or more than two weeks later than now");
+          }
+          s.PushTime = value;
+        });
+      }
+    }
+
     /// <summary>
     /// The time from initial schedul when this push will expire. This should not be used in tandem with Expiration.
     /// </summary>
