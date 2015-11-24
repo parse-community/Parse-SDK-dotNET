@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,6 +10,10 @@ using TypeInfo = System.Type;
 
 namespace Parse.Internal {
   internal class ObjectSubclassingController : IObjectSubclassingController {
+    // Class names starting with _ are documented to be reserved. Use this one
+    // here to allow us to 'inherit' certain properties.
+    private static readonly string parseObjectClassName = "_ParseObject";
+
     private readonly ReaderWriterLockSlim mutex;
     private readonly IDictionary<String, ObjectSubclassInfo> registeredSubclasses;
     private IDictionary<String, Action> registerActions;
@@ -18,10 +22,16 @@ namespace Parse.Internal {
       mutex = new ReaderWriterLockSlim();
       registeredSubclasses = new Dictionary<String, ObjectSubclassInfo>();
       registerActions = actions.ToDictionary(p => GetClassName(p.Key), p => p.Value);
+
+      // Register the ParseObject subclass, so we get access to the ACL,
+      // objectId, and other ParseFieldName properties.
+      RegisterSubclass(typeof(ParseObject));
     }
 
     public String GetClassName(Type type) {
-      return ObjectSubclassInfo.GetClassName(type.GetTypeInfo());
+      return type == typeof(ParseObject)
+        ? parseObjectClassName
+        : ObjectSubclassInfo.GetClassName(type.GetTypeInfo());
     }
 
     public Type GetType(String className) {
@@ -49,11 +59,11 @@ namespace Parse.Internal {
 
     public void RegisterSubclass(Type type) {
       TypeInfo typeInfo = type.GetTypeInfo();
-      if (!typeInfo.IsSubclassOf(typeof(ParseObject))) {
+      if (!typeof(ParseObject).GetTypeInfo().IsAssignableFrom(typeInfo)) {
         throw new ArgumentException("Cannot register a type that is not a subclass of ParseObject");
       }
 
-      String className = ObjectSubclassInfo.GetClassName(typeInfo);
+      String className = GetClassName(type);
 
       try {
         // Perform this as a single independent transaction, so we can never get into an
@@ -117,11 +127,12 @@ namespace Parse.Internal {
       ObjectSubclassInfo info = null;
       mutex.EnterReadLock();
       registeredSubclasses.TryGetValue(className, out info);
+      if (info == null) {
+        registeredSubclasses.TryGetValue(parseObjectClassName, out info);
+      }
       mutex.ExitReadLock();
 
-      return info != null
-        ? info.PropertyMappings
-        : null;
+      return info.PropertyMappings;
     }
   }
 }
