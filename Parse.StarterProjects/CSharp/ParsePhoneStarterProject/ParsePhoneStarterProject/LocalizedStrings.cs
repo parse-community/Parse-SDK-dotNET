@@ -1,4 +1,4 @@
-﻿using ParsePhoneStarterProject.Resources;
+using ParsePhoneStarterProject.Resources;
 
 namespace ParsePhoneStarterProject {
   /// <summary>

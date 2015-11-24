@@ -1,4 +1,4 @@
-﻿using Microsoft.Phone.Controls;
+using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using Parse;
 using ParsePhoneStarterProject.Resources;
