@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Parse;
 using Parse.Internal;
 using System.Text;

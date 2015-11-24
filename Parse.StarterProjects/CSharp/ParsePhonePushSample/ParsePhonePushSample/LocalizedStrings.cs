@@ -1,4 +1,4 @@
-﻿using ParsePhonePushSample.Resources;
+using ParsePhonePushSample.Resources;
 
 namespace ParsePhonePushSample {
   /// <summary>

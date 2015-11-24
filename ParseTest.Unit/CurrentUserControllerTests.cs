@@ -1,4 +1,4 @@
-﻿using Parse;
+using Parse;
 using Parse.Internal;
 using System;
 using System.Threading;

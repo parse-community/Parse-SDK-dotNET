@@ -1,4 +1,4 @@
-﻿using Parse;
+using Parse;
 using Parse.Internal;
 using NUnit.Framework;
 using System;

@@ -1,4 +1,4 @@
-﻿using ParsePushSample.Data;
+using ParsePushSample.Data;
 
 using System;
 using System.Collections.Generic;
