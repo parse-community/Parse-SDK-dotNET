@@ -9,6 +9,7 @@ namespace Parse.Internal {
     IEnumerable<string> Channels { get; }
     DateTime? Expiration { get; }
     TimeSpan? ExpirationInterval { get; }
+    DateTime? PushTime { get; }
     IDictionary<string, object> Data { get; }
     String Alert { get; }
 
