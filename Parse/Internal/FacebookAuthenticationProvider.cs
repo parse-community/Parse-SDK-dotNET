@@ -75,7 +75,8 @@ namespace Parse.Internal {
             parameters["fields"] = "id";
 
             var request = new HttpRequest {
-              Uri = new Uri(MeUrl, "?" + ParseClient.BuildQueryString(parameters))
+              Uri = new Uri(MeUrl, "?" + ParseClient.BuildQueryString(parameters)),
+              Method = "GET"
             };
 
             ParseClient.PlatformHooks.HttpClient.ExecuteAsync(request, null, null, CancellationToken.None).OnSuccess(t => {
