@@ -134,7 +134,7 @@ public class ParsePushService extends IntentService {
   protected void onPushNotificationReceived(String pushPayloadString) {
     Log.i(TAG, "Push notification received. Payload: " + pushPayloadString);
     try {
-      if (!ParsePushUnityHelper.isApplicationPaused()) {
+      if (!ParsePushUnityHelper.isApplicationPaused() && pushPayloadString != null) {
         UnityPlayer.UnitySendMessage("ParseInitializeBehaviour",
             "OnPushNotificationReceived",
             pushPayloadString);
