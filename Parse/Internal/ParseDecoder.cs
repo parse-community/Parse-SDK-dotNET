@@ -97,8 +97,9 @@ namespace Parse.Internal {
       // TODO(hallucinogen): Figure out if we should be more flexible with the date formats
       // we accept.
       return DateTime.ParseExact(input,
-          ParseClient.DateFormatString,
-          CultureInfo.InvariantCulture);
+        ParseClient.DateFormatStrings,
+        CultureInfo.InvariantCulture,
+        DateTimeStyles.None);
     }
   }
 }

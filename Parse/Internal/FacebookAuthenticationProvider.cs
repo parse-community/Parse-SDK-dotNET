@@ -56,7 +56,7 @@ namespace Parse.Internal {
       return new Dictionary<string, object> {
         {"id", facebookId},
         {"access_token", accessToken},
-        {"expiration_date", expiration.ToString(ParseClient.DateFormatString)}
+        {"expiration_date", expiration.ToString(ParseClient.DateFormatStrings.First())}
       };
     }
 

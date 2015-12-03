@@ -41,10 +41,10 @@ namespace Parse.Internal {
             var data = installation.ServerDataToJSONObjectForSerialization();
             data["objectId"] = installation.ObjectId;
             if (installation.CreatedAt != null) {
-              data["createdAt"] = installation.CreatedAt.Value.ToString(ParseClient.DateFormatString);
+              data["createdAt"] = installation.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First());
             }
             if (installation.UpdatedAt != null) {
-              data["updatedAt"] = installation.UpdatedAt.Value.ToString(ParseClient.DateFormatString);
+              data["updatedAt"] = installation.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First());
             }
 
             ParseClient.ApplicationSettings["CurrentInstallation"] = Json.Encode(data);
