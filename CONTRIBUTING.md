@@ -49,6 +49,7 @@ Facebook has a [bounty program](https://www.facebook.com/whitehat/) for the safe
 We're still working on providing a more concise code style for your IDE and getting a linter on GitHub, but for now try to keep the following:
 
 * If you're developing on Visual Studio, please use `Parse.vssettings`.
+* We use [editorconfig](https://editorconfig.org) to manage basic editor settings, please install a compatible plugin for your preferred environment.
 * Most importantly, match the existing code style as much as possible.
 * Try to keep lines under 120 characters, if possible.
 
