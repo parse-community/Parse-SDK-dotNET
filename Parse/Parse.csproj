@@ -37,104 +37,29 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Parse.xml</DocumentationFile>
   </PropertyGroup>
+
+  <!-- Used for setting excluded files -->
+  <PropertyGroup>
+      <ExcludedPlatformSpecificSourceFilesString>
+          **\Partial\**;
+          **\Android\**;
+          **\iOS\**;
+          **\Mono\**;
+          **\NetFx45\**;
+          **\Phone\**;
+          **\Unity\**;
+          **\WinRT\**;
+          **\SettingsStorage\**;
+      </ExcludedPlatformSpecificSourceFilesString>
+  </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Internal\Command\IParseCommandRunner.cs" />
-    <Compile Include="Internal\Command\ParseCommand.cs" />
-    <Compile Include="Internal\Command\ParseCommandRunner.cs" />
-    <Compile Include="Internal\FacebookAuthenticationProvider.cs" />
-    <Compile Include="Internal\File\State\FileState.cs" />
-    <Compile Include="Internal\FlexibleDictionaryWrapper.cs" />
-    <Compile Include="Internal\FlexibleListWrapper.cs" />
-    <Compile Include="Internal\IdentityEqualityComparer.cs" />
-    <Compile Include="Internal\IHttpClient.cs" />
-    <Compile Include="Internal\HttpRequest.cs" />
-    <Compile Include="Internal\IJsonConvertible.cs" />
-    <Compile Include="Internal\Installation\Controller\IInstallationIdController.cs" />
-    <Compile Include="Internal\Installation\Controller\InstallationIdController.cs" />
-    <Compile Include="Internal\Installation\Controller\IParseCurrentInstallationController.cs" />
-    <Compile Include="Internal\Installation\Controller\ParseCurrentInstallationController.cs" />
-    <Compile Include="Internal\InternalExtensions.cs" />
-    <Compile Include="Internal\IParseAuthenticationProvider.cs" />
-    <Compile Include="Internal\IParseFieldOperation.cs" />
-    <Compile Include="Internal\File\Controller\IParseFileController.cs" />
-    <Compile Include="Internal\IPlatformHooks.cs" />
-    <Compile Include="Internal\Json.cs" />
-    <Compile Include="Internal\LockSet.cs" />
-    <Compile Include="Internal\NoObjectsEncoder.cs" />
-    <Compile Include="Internal\Object\Controller\IParseObjectController.cs" />
-    <Compile Include="Internal\Object\Controller\IParseObjectCurrentController.cs" />
-    <Compile Include="Internal\Object\Controller\ParseObjectController.cs" />
-    <Compile Include="Internal\Object\State\IObjectState.cs" />
-    <Compile Include="Internal\Object\State\MutableObjectState.cs" />
-    <Compile Include="Internal\Object\Subclassing\IObjectSubclassingController.cs" />
-    <Compile Include="Internal\Object\Subclassing\ObjectSubclassInfo.cs" />
-    <Compile Include="Internal\Object\Subclassing\ObjectSubclassingController.cs" />
-    <Compile Include="Internal\ParseAddOperation.cs" />
-    <Compile Include="Internal\ParseAddUniqueOperation.cs" />
-    <Compile Include="Internal\Analytics\Controller\IParseAnalyticsController.cs" />
-    <Compile Include="Internal\Analytics\Controller\ParseAnalyticsController.cs" />
-    <Compile Include="Internal\Cloud\Controller\IParseCloudCodeController.cs" />
-    <Compile Include="Internal\Cloud\Controller\ParseCloudCodeController.cs" />
-    <Compile Include="Internal\ParseCorePlugins.cs" />
-    <Compile Include="Internal\ParseDecoder.cs" />
-    <Compile Include="Internal\ParseDeleteOperation.cs" />
-    <Compile Include="Internal\ParseEncoder.cs" />
-    <Compile Include="Internal\File\Controller\ParseFileController.cs" />
-    <Compile Include="Internal\ParseObjectCoder.cs" />
-    <Compile Include="Internal\PointerOrLocalIdEncoder.cs" />
-    <Compile Include="Internal\Query\Controller\IParseQueryController.cs" />
-    <Compile Include="Internal\Query\Controller\ParseQueryController.cs" />
-    <Compile Include="Internal\Session\Controller\IParseSessionController.cs" />
-    <Compile Include="Internal\Session\Controller\ParseSessionController.cs" />
-    <Compile Include="Internal\User\Controller\IParseCurrentUserController.cs" />
-    <Compile Include="Internal\User\Controller\IParseUserController.cs" />
-    <Compile Include="Internal\User\Controller\ParseCurrentUserController.cs" />
-    <Compile Include="Internal\User\Controller\ParseUserController.cs" />
-    <Compile Include="ParseConfig.cs" />
-    <Compile Include="ParseFieldNameAttribute.cs" />
-    <Compile Include="Internal\ParseFieldOperations.cs" />
-    <Compile Include="Internal\ParseIncrementOperation.cs" />
-    <Compile Include="Internal\ParseRelationOperation.cs" />
-    <Compile Include="Internal\ParseRemoveOperation.cs" />
-    <Compile Include="Internal\ParseSetOperation.cs" />
-    <Compile Include="Internal\ReflectionHelpers.cs" />
-    <Compile Include="Internal\SynchronizedEventHandler.cs" />
-    <Compile Include="Internal\TaskQueue.cs" />
-    <Compile Include="ParseClassNameAttribute.cs" />
-    <Compile Include="ParseFile.cs" />
-    <Compile Include="ParseDownloadProgressEventArgs.cs" />
-    <Compile Include="ParseInstallation.cs" />
-    <Compile Include="ParsePushNotificationEventArgs.cs" />
-    <Compile Include="ParseQueryExtensions.cs" />
-    <Compile Include="ParseACL.cs" />
-    <Compile Include="ParseClient.cs" />
-    <Compile Include="ParseCloud.cs" />
-    <Compile Include="ParseException.cs" />
-    <Compile Include="ParseExtensions.cs" />
-    <Compile Include="ParseGeoDistance.cs" />
-    <Compile Include="ParseGeoPoint.cs" />
-    <Compile Include="ParseObject.cs" />
-    <Compile Include="ParseQuery.cs" />
-    <Compile Include="ParseRelation.cs" />
-    <Compile Include="ParseRole.cs" />
-    <Compile Include="ParseSession.cs" />
-    <Compile Include="ParseUploadProgressEventArgs.cs" />
-    <Compile Include="ParseUser.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\AssemblyInfo.Portable.cs" />
-    <Compile Include="Properties\SharedAssemblyInfo.cs" />
-    <Compile Include="Internal\Config\Controller\IParseConfigController.cs" />
-    <Compile Include="Internal\Config\Controller\ParseConfigController.cs" />
-    <Compile Include="Internal\Config\Controller\IParseCurrentConfigController.cs" />
-    <Compile Include="Internal\Config\Controller\ParseCurrentConfigController.cs" />
-    <Compile Include="Internal\Push\Controller\IParsePushChannelsController.cs" />
-    <Compile Include="Internal\Push\Controller\IParsePushController.cs" />
-    <Compile Include="Internal\Push\Controller\ParsePushChannelsController.cs" />
-    <Compile Include="Internal\Push\Controller\ParsePushController.cs" />
-    <Compile Include="Internal\Push\State\IPushState.cs" />
-    <Compile Include="Internal\Push\State\MutablePushState.cs" />
-    <Compile Include="Internal\Push\Coder\ParsePushEncoder.cs" />
+      <!-- Assembly info, etc. -->
+      <Compile Include="Properties\*.cs" Exclude="Properties\Settings.Designer.cs" />
+
+      <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+      <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
   </ItemGroup>
+
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" Condition="Exists('$(SolutionDir)\.nuget\nuget.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

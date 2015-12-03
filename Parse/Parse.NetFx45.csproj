@@ -48,12 +48,12 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Internal\HttpClient.NetFx45.cs" />
-    <Compile Include="ParseAnalytics.cs" />
-    <Compile Include="ParseFacebookUtils.cs" />
-    <Compile Include="ParsePush.cs" />
-    <Compile Include="PlatformHooks.NetFx45.cs" />
-    <Compile Include="PlatformHooks.SettingsStorage.cs" />
+    <Compile Include="Internal\**\SettingsStorage\*.cs" />
+    <Compile Include="Internal\**\NetFx45\*.cs" />
+
+    <Compile Include="Public\Partial\*.cs" />
+    <Compile Include="Public\NetFx45\*.cs" Exclude="**\WPF\*.cs" />
+
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.Portable.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -64,7 +64,7 @@
     <Compile Include="Properties\SharedAssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(OS)' != 'Unix' ">
-    <Compile Include="ParseFacebookUtils.NetFx45.cs" />
+    <Compile Include="Public\NetFx45\WPF\*.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">
