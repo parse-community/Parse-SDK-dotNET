@@ -49,7 +49,8 @@ namespace Parse.Internal {
 
     internal static IEnumerable<ConstructorInfo> GetConstructors(this Type type) {
 #if UNITY
-      return type.GetConstructors();
+      BindingFlags searchFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+      return type.GetConstructors(searchFlags);
 #else
       return type.GetTypeInfo().DeclaredConstructors
         .Where(c => (c.Attributes & MethodAttributes.Static) == 0);
