@@ -353,7 +353,7 @@ namespace Parse.Internal {
     }
 
     /// <summary>
-    /// Encodes a list into a JSON string. Suppots values that are
+    /// Encodes a list into a JSON string. Supports values that are
     /// IDictionary&lt;string, object&gt;, IList&lt;object&gt;, strings,
     /// nulls, and any of the primitive types.
     /// </summary>
