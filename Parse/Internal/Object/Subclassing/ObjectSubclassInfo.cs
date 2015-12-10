@@ -16,7 +16,7 @@ namespace Parse.Internal {
       TypeInfo = type.GetTypeInfo();
       ClassName = GetClassName(TypeInfo);
       Constructor = constructor;
-      PropertyMappings = type.GetProperties()
+      PropertyMappings = ReflectionHelpers.GetProperties(type)
         .Select(prop => Tuple.Create(prop, prop.GetCustomAttribute<ParseFieldNameAttribute>(true)))
         .Where(t => t.Item2 != null)
         .Select(t => Tuple.Create(t.Item1, t.Item2.FieldName))

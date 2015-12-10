@@ -1292,7 +1292,7 @@ string propertyName
       lock (mutex) {
         if (ContainsKey(key)) {
           var temp = ParseClient.ConvertTo<T>(this[key]);
-          if (temp is T || (temp == null && (!typeof(T).GetTypeInfo().IsValueType || typeof(T).IsNullable()))) {
+          if (temp is T || (temp == null && (!typeof(T).GetTypeInfo().IsValueType || ReflectionHelpers.IsNullable(typeof(T))))) {
             result = (T)temp;
             return true;
           }

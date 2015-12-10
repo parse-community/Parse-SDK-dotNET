@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Parse.Internal {
   static class ReflectionHelpers {
-    internal static IEnumerable<PropertyInfo> GetProperties(this Type type) {
+    internal static IEnumerable<PropertyInfo> GetProperties(Type type) {
 #if MONO || UNITY
       return type.GetProperties();
 #else
@@ -15,7 +15,7 @@ namespace Parse.Internal {
 #endif
     }
 
-    internal static MethodInfo GetMethod(this Type type, string name, Type[] parameters) {
+    internal static MethodInfo GetMethod(Type type, string name, Type[] parameters) {
 #if MONO || UNITY
       return type.GetMethod(name, parameters);
 #else
@@ -23,7 +23,7 @@ namespace Parse.Internal {
 #endif
     }
 
-    internal static bool IsPrimitive(this Type type) {
+    internal static bool IsPrimitive(Type type) {
 #if MONO
 			return type.IsPrimitive;
 #else
@@ -31,7 +31,7 @@ namespace Parse.Internal {
 #endif
     }
 
-    internal static IEnumerable<Type> GetInterfaces(this Type type) {
+    internal static IEnumerable<Type> GetInterfaces(Type type) {
 #if MONO || UNITY
       return type.GetInterfaces();
 #else
@@ -39,7 +39,7 @@ namespace Parse.Internal {
 #endif
     }
 
-    internal static bool IsConstructedGenericType(this Type type) {
+    internal static bool IsConstructedGenericType(Type type) {
 #if UNITY
       return type.IsGenericType && !type.IsGenericTypeDefinition;
 #else
@@ -47,7 +47,7 @@ namespace Parse.Internal {
 #endif
     }
 
-    internal static IEnumerable<ConstructorInfo> GetConstructors(this Type type) {
+    internal static IEnumerable<ConstructorInfo> GetConstructors(Type type) {
 #if UNITY
       BindingFlags searchFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
       return type.GetConstructors(searchFlags);
@@ -57,11 +57,19 @@ namespace Parse.Internal {
 #endif
     }
 
-    internal static Type[] GetGenericTypeArguments(this Type type) {
+    internal static Type[] GetGenericTypeArguments(Type type) {
 #if UNITY
       return type.GetGenericArguments();
 #else
       return type.GenericTypeArguments;
+#endif
+    }
+
+    internal static PropertyInfo GetProperty(Type type, string name) {
+#if MONO || UNITY
+      return type.GetProperty(name);
+#else
+      return type.GetRuntimeProperty(name);
 #endif
     }
 
@@ -75,7 +83,7 @@ namespace Parse.Internal {
     /// <returns></returns>
     internal static ConstructorInfo FindConstructor(this Type self, params Type[] parameterTypes) {
       var constructors =
-        from constructor in self.GetConstructors()
+        from constructor in GetConstructors(self)
         let parameters = constructor.GetParameters()
         let types = from p in parameters select p.ParameterType
         where types.SequenceEqual(parameterTypes)
@@ -83,15 +91,7 @@ namespace Parse.Internal {
       return constructors.SingleOrDefault();
     }
 
-    internal static PropertyInfo GetProperty(this Type type, string name) {
-#if MONO || UNITY
-      return type.GetProperty(name);
-#else
-      return type.GetRuntimeProperty(name);
-#endif
-    }
-
-    internal static bool IsNullable(this Type t) {
+    internal static bool IsNullable(Type t) {
       bool isGeneric;
 #if UNITY
       isGeneric = t.IsGenericType && !t.IsGenericTypeDefinition;

@@ -93,7 +93,7 @@ namespace Parse {
         var temp = ParseClient.ConvertTo<T>(this.properties[key]);
         if (temp is T ||
           (temp == null &&
-            (!typeof(T).GetTypeInfo().IsValueType || typeof(T).IsNullable()))
+            (!typeof(T).GetTypeInfo().IsValueType || ReflectionHelpers.IsNullable(typeof(T))))
         ) {
           result = (T)temp;
           return true;
