@@ -43,11 +43,13 @@ namespace Parse {
     public int Badge {
       get {
         if (PlatformHooks.IsIOS) {
-				  PlatformHooks.RunOnMainThread(() => {
+#if IOS
+          PlatformHooks.RunOnMainThread(() => {
             if (UnityEngine.iOS.NotificationServices.localNotificationCount > 0) {
               SetProperty<int>(UnityEngine.iOS.NotificationServices.localNotifications[0].applicationIconBadgeNumber, "Badge");
             }
           });
+#endif
         }
         return GetProperty<int>("Badge");
       }
@@ -55,12 +57,14 @@ namespace Parse {
         int badge = value;
         SetProperty<int>(badge, "Badge");
         if (PlatformHooks.IsIOS) {
+#if IOS
           PlatformHooks.RunOnMainThread(() => {
             UnityEngine.iOS.LocalNotification notification = new UnityEngine.iOS.LocalNotification ();
             notification.applicationIconBadgeNumber = badge;
             notification.hasAction = false;
             UnityEngine.iOS.NotificationServices.PresentLocalNotificationNow(notification);
           });
+#endif
         }
       }
     }

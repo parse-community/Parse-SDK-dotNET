@@ -1023,6 +1023,7 @@ namespace Parse {
     /// </summary>
     /// <param name="action">Action to be completed when device token is received.</param>
     internal static void RegisterDeviceTokenRequest(Action<byte[]> action) {
+#if IOS
       RunOnMainThread(() => {
         var deviceToken = UnityEngine.iOS.NotificationServices.deviceToken;
         if (deviceToken != null) {
@@ -1034,6 +1035,7 @@ namespace Parse {
           RegisterDeviceTokenRequest(action);
         }
       });
+#endif
     }
 
     /// <summary>
@@ -1041,6 +1043,7 @@ namespace Parse {
     /// </summary>
     /// <param name="action">Action to be completed when push notification is received.</param>
     internal static void RegisteriOSPushNotificationListener(Action<IDictionary<string, object>> action) {
+#if IOS
       RunOnMainThread(() => {
         int remoteNotificationCount = UnityEngine.iOS.NotificationServices.remoteNotificationCount;
         if (remoteNotificationCount > 0) {
@@ -1062,9 +1065,10 @@ namespace Parse {
         // Check in every frame.
         RegisteriOSPushNotificationListener(action);
       });
+#endif
     }
 
-    #endregion
+#endregion
 
     /// <summary>
     /// Runs things inside of a Unity coroutine (some APIs require that you
