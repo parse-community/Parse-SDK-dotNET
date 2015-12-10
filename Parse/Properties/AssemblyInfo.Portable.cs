@@ -15,13 +15,14 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("ParseTest.Integration.NetFx45")]
 [assembly: InternalsVisibleTo("ParseTest.Integration.Phone")]
 
-[assembly: InternalsVisibleTo("ParseTest.Unit.NetFx45")]
-
-[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
-
 // Internal visibility for sample projects
 [assembly: InternalsVisibleTo("ParsePushSample")]
 [assembly: InternalsVisibleTo("ParsePhonePushSample")]
+
+#if UNIT_TEST
+[assembly: InternalsVisibleTo("ParseTest.Unit.NetFx45")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+#endif
 
 #if MONO
 [assembly: InternalsVisibleTo("ParseTestIntegrationiOS")]
