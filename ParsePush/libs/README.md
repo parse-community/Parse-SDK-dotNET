@@ -1,0 +1,1 @@
+`classes.jar` is a jar that contains Unity3D Android binding helper. For more information about it and where to get it, you can take a look at this documentation: http://docs.unity3d.com/Manual/PluginsForAndroid.html.
