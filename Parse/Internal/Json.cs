@@ -419,7 +419,7 @@ namespace Parse.Internal {
           return "false";
         }
       }
-      if (!obj.GetType().IsPrimitive()) {
+      if (!ReflectionHelpers.IsPrimitive(obj.GetType())) {
         throw new ArgumentException("Unable to encode objects of type " + obj.GetType());
       }
       return Convert.ToString(obj, CultureInfo.InvariantCulture);

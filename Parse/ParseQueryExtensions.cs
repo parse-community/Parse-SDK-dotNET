@@ -406,7 +406,7 @@ namespace Parse {
         var containedIn = GetValue(node.Arguments[0]);
         var queryType = translatedMethod.DeclaringType.GetGenericTypeDefinition()
             .MakeGenericType(typeof(T));
-        translatedMethod = queryType.GetMethod(
+        translatedMethod = ReflectionHelpers.GetMethod(queryType,
             translatedMethod.Name,
             translatedMethod.GetParameters().Select(p => p.ParameterType).ToArray());
         return translatedMethod.Invoke(source, new[] { fieldPath, containedIn }) as ParseQuery<T>;

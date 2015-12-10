@@ -14,7 +14,7 @@ namespace Parse.Internal {
   internal abstract class ParseEncoder {
     public static bool IsValidType(object value) {
       return value == null ||
-          value.GetType().IsPrimitive() ||
+          ReflectionHelpers.IsPrimitive(value.GetType()) ||
           value is string ||
           value is ParseObject ||
           value is ParseACL ||
