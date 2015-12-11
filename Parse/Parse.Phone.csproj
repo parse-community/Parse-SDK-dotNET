@@ -90,14 +90,11 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Internal\HttpClient.Phone.cs" />
-    <Compile Include="ParseAnalytics.cs" />
-    <Compile Include="ParseAnalytics.Phone.cs" />
-    <Compile Include="ParseFacebookUtils.cs" />
-    <Compile Include="ParseFacebookUtils.Phone.cs" />
-    <Compile Include="ParsePush.Phone.cs" />
-    <Compile Include="ParsePush.cs" />
-    <Compile Include="PlatformHooks.Phone.cs" />
+    <Compile Include="Internal\**\Phone\*.cs" />
+
+    <Compile Include="Public\Partial\*.cs" />
+    <Compile Include="Public\Phone\*.cs" />
+
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.Portable.cs" />
     <Compile Include="Properties\SharedAssemblyInfo.cs" />

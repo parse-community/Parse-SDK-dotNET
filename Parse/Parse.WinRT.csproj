@@ -103,19 +103,14 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Internal\HttpClient.WinRT.cs" />
-    <Compile Include="ParseAnalytics.cs" />
-    <Compile Include="ParseAnalytics.WinRT.cs" />
-    <Compile Include="ParsePush.cs" />
-    <Compile Include="ParseFacebookUtils.cs" />
-    <Compile Include="ParsePush.WinRT.cs" />
+    <Compile Include="Internal\**\WinRT\*.cs" />
+
+    <Compile Include="Public\Partial\*.cs" />
+    <Compile Include="Public\WinRT\*.cs" />
+
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.Portable.cs" />
     <Compile Include="Properties\SharedAssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="PlatformHooks.WinRT.cs" />
-    <Compile Include="ParseFacebookUtils.WinRT.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Parse.csproj">
