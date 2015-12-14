@@ -36,7 +36,7 @@ namespace Parse.Internal {
           }
         }
       }
-      // Avoid aggresive caching on Windows Phone 8.1.
+      // Avoid aggressive caching on Windows Phone 8.1.
       request.Headers["Cache-Control"] = "no-cache";
 
       Task uploadTask = null;

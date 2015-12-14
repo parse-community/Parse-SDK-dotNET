@@ -193,7 +193,7 @@ namespace Parse {
 
     /// <summary>
     /// Links a <see cref="ParseUser" /> to a Facebook account, allowing you to use Facebook
-    /// for authentication, and providing access to Facebook datta for the user.
+    /// for authentication, and providing access to Facebook data for the user.
     /// 
     /// The user will be logged in through Facebook's OAuth web flow, so you must supply a
     /// <paramref name="webView"/> that will be navigated to Facebook's authentication pages.
@@ -234,7 +234,7 @@ namespace Parse {
 
     /// <summary>
     /// Links a <see cref="ParseUser" /> to a Facebook account, allowing you to use Facebook
-    /// for authentication, and providing access to Facebook datta for the user.
+    /// for authentication, and providing access to Facebook data for the user.
     /// 
     /// The user will be logged in through Facebook's OAuth web flow, so you must supply a
     /// <paramref name="webView"/> that will be navigated to Facebook's authentication pages.

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Parse {
 
   /// <summary>
-  ///  Represents this app installed on this device. Use this class to track infomation you want
+  ///  Represents this app installed on this device. Use this class to track information you want
   ///  to sample from (i.e. if you update a field on app launch, you can issue a query to see
   ///  the number of devices which were active in the last N hours).
   /// </summary>

@@ -15,7 +15,7 @@ namespace Parse.Internal {
     /// <summary>
     /// Gets current <code>installationId</code> from local storage. Generates a none exists.
     /// </summary>
-    /// <returns>Current <code>installationid</code>.</returns>
+    /// <returns>Current <code>installationId</code>.</returns>
     Guid? Get();
 
     /// <summary>

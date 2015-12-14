@@ -19,7 +19,7 @@ namespace Parse {
     /// channel for each contact and the UI needs to pop up on the right tile). The expansion job
     /// generically has one _Installation field it passes to device-specific code, so we store a map
     /// of tag -> channel URI. Right now, there is only one valid tag and it is automatic.
-    /// Unsed variable warnings are suppressed becaue this const is used in WinRT and WinPhone but not NetFx.
+    /// Unused variable warnings are suppressed because this const is used in WinRT and WinPhone but not NetFx.
     /// </summary>
     static readonly string toastChannelTag = "_Toast";
 
@@ -33,7 +33,7 @@ namespace Parse {
             // Note: We could bind to the ChannelUriUpdated event & automatically save instead of checking
             // whether the channel has changed on demand. This is more seamless but adds API requests for a
             // feature that may not be in use. Maybe we should build an auto-update feature in the future?
-            // Or mabye Push.subscribe calls will always be a save & that should be good enough for us.
+            // Or maybe Push.subscribe calls will always be a save & that should be good enough for us.
             toastChannel.Open();
           }
 

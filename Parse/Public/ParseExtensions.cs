@@ -114,7 +114,7 @@ namespace Parse {
     /// If this ParseObject has not been fetched (i.e. <see cref="ParseObject.IsDataAvailable"/> returns
     /// false), fetches this object with the data from the server.
     /// </summary>
-    /// <param name="obj">The ParseObjhect to fetch.</param>
+    /// <param name="obj">The ParseObject to fetch.</param>
     public static Task<T> FetchIfNeededAsync<T>(this T obj) where T : ParseObject {
       return obj.FetchIfNeededAsyncInternal(CancellationToken.None).OnSuccess(t => (T)t.Result);
     }
