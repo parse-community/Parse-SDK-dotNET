@@ -13,7 +13,7 @@ namespace Parse.Internal {
     IParseCurrentConfigController CurrentConfigController { get; }
 
     /// <summary>
-    /// Fetchs the config from the server asynchrounously.
+    /// Fetches the config from the server asynchronously.
     /// </summary>
     /// <returns>The config async.</returns>
     /// <param name="sessionToken">Session token.</param>

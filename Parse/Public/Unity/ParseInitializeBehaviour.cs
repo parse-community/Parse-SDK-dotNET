@@ -72,7 +72,7 @@ namespace Parse {
 
     /// <summary>
     /// The callback that will be called from the Android Java land via <c>UnityPlayer.UnitySendMessage(string)</c>
-    /// when the device receive a push notificaiton.
+    /// when the device receive a push notification.
     /// </summary>
     /// <param name="pushPayloadString">the push payload as string</param>
     internal void OnPushNotificationReceived(string pushPayloadString) {

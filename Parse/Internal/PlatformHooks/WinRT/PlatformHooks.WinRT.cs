@@ -20,7 +20,7 @@ namespace Parse {
     /// channel for each contact and the UI needs to pop up on the right tile). The expansion job
     /// generically has one _Installation field it passes to device-specific code, so we store a map
     /// of tag -> channel URI. Right now, there is only one valid tag and it is automatic.
-    /// Unsed variable warnings are suppressed because this const is used in WinRT and WinPhone but not NetFx.
+    /// Unused variable warnings are suppressed because this const is used in WinRT and WinPhone but not NetFx.
     /// </summary>
     private static readonly string defaultChannelTag = "_Default";
 

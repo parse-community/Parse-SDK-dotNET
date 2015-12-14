@@ -118,7 +118,7 @@ namespace Parse {
     /// way is to put a call to <c>ParseFramework.Initialize</c> in your
     /// Application startup.
     /// </summary>
-    /// <param name="configuration">The configuration to initialze Parse with.
+    /// <param name="configuration">The configuration to initialize Parse with.
     /// </param>
     public static void Initialize(Configuration configuration) {
       lock (mutex) {

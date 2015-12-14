@@ -534,8 +534,8 @@ namespace Parse {
       return Expression.MakeMemberAccess(obj, expr.Member);
     }
 
-    internal static MemberAssignment Update(this MemberAssignment assgn, Expression expr) {
-      return Expression.Bind(assgn.Member, expr);
+    internal static MemberAssignment Update(this MemberAssignment assign, Expression expr) {
+      return Expression.Bind(assign.Member, expr);
     }
 
     internal static InvocationExpression Update(this InvocationExpression expr,
@@ -695,8 +695,8 @@ namespace Parse {
       return expr.Update(Visit(expr.Expression));
     }
 
-    protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment assgn) {
-      return assgn.Update(Visit(assgn.Expression));
+    protected virtual MemberAssignment VisitMemberAssignment(MemberAssignment assign) {
+      return assign.Update(Visit(assign.Expression));
     }
 
     protected virtual MemberBinding VisitMemberBinding(MemberBinding binding) {

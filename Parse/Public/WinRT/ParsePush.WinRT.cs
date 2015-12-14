@@ -78,7 +78,7 @@ namespace Parse {
 
     /// <summary>
     /// Because the Windows API doesn't allow us to create a PushNotificationReceivedEventArgs, nor is there
-    /// an interface for the class, we cannot test the PushJson(PNREA) method at all. We will isntead try to
+    /// an interface for the class, we cannot test the PushJson(PNREA) method at all. We will instead try to
     /// make it as small as possible and test a method that uses the first class which does allow instantiation.
     /// </summary>
     /// <param name="toast"></param>

@@ -238,7 +238,7 @@ namespace Parse.Internal {
       }
 
       /// <summary>
-      /// Find the first occurences of a character, consuming part of the string.
+      /// Find the first occurrences of a character, consuming part of the string.
       /// </summary>
       private bool Accept(char condition) {
         int step = 0;
@@ -277,7 +277,7 @@ namespace Parse.Internal {
       }
 
       /// <summary>
-      /// Find the first occurences of a string, consuming part of the string.
+      /// Find the first occurrences of a string, consuming part of the string.
       /// </summary>
       private bool Accept(char[] condition) {
         int step = 0;

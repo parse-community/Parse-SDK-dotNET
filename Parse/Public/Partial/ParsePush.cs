@@ -134,7 +134,7 @@ namespace Parse {
     }
 
     /// <summary>
-    /// A conveninence method which sets Data to a dictionary with alert as its only field. Equivalent to
+    /// A convenience method which sets Data to a dictionary with alert as its only field. Equivalent to
     ///
     /// <code>
     /// Data = new Dictionary&lt;string, object&gt; {{"alert", alert}};

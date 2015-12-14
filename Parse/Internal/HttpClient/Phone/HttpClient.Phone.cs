@@ -36,7 +36,7 @@ namespace Parse.Internal {
           }
         }
       }
-      // Avoid aggresive caching on Windows Phone 8.1.
+      // Avoid aggressive caching on Windows Phone 8.1.
       request.Headers[HttpRequestHeader.CacheControl] = "no-cache";
       request.Headers[HttpRequestHeader.IfModifiedSince] = DateTime.UtcNow.ToString();
 
