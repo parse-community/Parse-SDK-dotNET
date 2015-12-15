@@ -59,7 +59,9 @@
       <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
       <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
   </ItemGroup>
-
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" Condition="Exists('$(SolutionDir)\.nuget\nuget.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
