@@ -54,14 +54,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
     <Optimize>True</Optimize>
-    <OutputPath>bin\Release\Parse.iOS\</OutputPath>
+    <OutputPath>bin\Release\iOS\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>False</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
     <AssemblyName>Parse.iOS</AssemblyName>
     <DefineConstants>MONO;IOS</DefineConstants>
-    <DocumentationFile>bin\Release\Parse.iOS\Parse.iOS.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\iOS\Parse.iOS.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>none</DebugType>
@@ -102,7 +102,6 @@
     <WarningLevel>4</WarningLevel>
     <Optimize>false</Optimize>
   </PropertyGroup>
-
   <!-- Used for setting excluded files -->
   <PropertyGroup>
     <ExcludedPlatformSpecificSourceFilesString>
@@ -115,13 +114,11 @@
     </ExcludedPlatformSpecificSourceFilesString>
   </PropertyGroup>
   <ItemGroup>
-   <!-- Assembly info, etc. -->
-   <Compile Include="Properties\*.cs" Exclude="Properties\Settings.Designer.cs" />
-
-   <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
-   <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+    <!-- Assembly info, etc. -->
+    <Compile Include="Properties\*.cs" Exclude="Properties\Settings.Designer.cs" />
+    <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+    <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
