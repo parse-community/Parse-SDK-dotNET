@@ -40,15 +40,15 @@
     <file src="Parse\bin\Release\Parse.xml" target="lib\wpa81" />
 	
 	<!-- Xamarin Android -->
-    <file src="Parse\bin\Release\Parse.Android\Parse.Android.dll" target="lib\MonoAndroid" />
-    <file src="Parse\bin\Release\Parse.Android\Parse.Android.xml" target="lib\MonoAndroid" />
+    <file src="Parse\bin\Release\Android\Parse.Android.dll" target="lib\MonoAndroid" />
+    <file src="Parse\bin\Release\Android\Parse.Android.xml" target="lib\MonoAndroid" />
 	
 	<!-- Xamarin iOS -->
-    <file src="Parse\bin\Release\Parse.iOS\Parse.iOS.dll" target="lib\MonoTouch10" />
-    <file src="Parse\bin\Release\Parse.iOS\Parse.iOS.xml" target="lib\MonoTouch10" />
+    <file src="Parse\bin\Release\iOS\Parse.iOS.dll" target="lib\MonoTouch10" />
+    <file src="Parse\bin\Release\iOS\Parse.iOS.xml" target="lib\MonoTouch10" />
 	
 	<!-- Xamarin iOS Unified -->
-    <file src="Parse\bin\Release\Parse.iOS\Parse.iOS.dll" target="lib\Xamarin.iOS10" />
-    <file src="Parse\bin\Release\Parse.iOS\Parse.iOS.xml" target="lib\Xamarin.iOS10" />
+    <file src="Parse\bin\Release\iOS\Parse.iOS.dll" target="lib\Xamarin.iOS10" />
+    <file src="Parse\bin\Release\iOS\Parse.iOS.xml" target="lib\Xamarin.iOS10" />
   </files>
 </package>
