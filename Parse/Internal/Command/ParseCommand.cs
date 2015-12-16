@@ -53,7 +53,6 @@ namespace Parse.Internal {
       // TODO (richardross): Inject configuration instead of using shared static here.
       Headers = new List<KeyValuePair<string, string>> {
         new KeyValuePair<string, string>("X-Parse-Application-Id", ParseClient.CurrentConfiguration.ApplicationId),
-        new KeyValuePair<string, string>("X-Parse-Windows-Key", ParseClient.CurrentConfiguration.WindowsKey),
         new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.VersionString),
         new KeyValuePair<string, string>("X-Parse-Installation-Id", ParseClient.InstallationId.ToString())
       };

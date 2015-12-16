@@ -95,7 +95,7 @@ namespace Parse.Internal {
 
       return uploadTask.Safe().OnSuccess(_ => {
         return request.GetResponseAsync();
-      }).Unwrap().OnSuccess(t => {
+      }).Unwrap().ContinueWith(t => {
         // Handle canceled
         cancellationToken.ThrowIfCancellationRequested();
 
