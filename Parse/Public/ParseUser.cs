@@ -213,8 +213,7 @@ namespace Parse {
         string password,
         CancellationToken cancellationToken) {
       return UserController.LogInAsync(username, password, cancellationToken).OnSuccess(t => {
-        var user = (ParseUser)ParseObject.CreateWithoutData<ParseUser>(null);
-        user.HandleFetchResult(t.Result);
+        ParseUser user = ParseObject.FromState<ParseUser>(t.Result, "_User");
         return SaveCurrentUserAsync(user).OnSuccess(_ => user);
       }).Unwrap();
     }
@@ -238,8 +237,7 @@ namespace Parse {
     /// <returns>The user if authorization was successful</returns>
     public static Task<ParseUser> BecomeAsync(string sessionToken, CancellationToken cancellationToken) {
       return UserController.GetUserAsync(sessionToken, cancellationToken).OnSuccess(t => {
-        var user = (ParseUser)ParseObject.CreateWithoutData<ParseUser>(null);
-        user.HandleFetchResult(t.Result);
+        ParseUser user = ParseObject.FromState<ParseUser>(t.Result, "_User");
         return SaveCurrentUserAsync(user).OnSuccess(_ => user);
       }).Unwrap();
     }
@@ -592,8 +590,7 @@ namespace Parse {
       ParseUser user = null;
 
       return UserController.LogInAsync(authType, data, cancellationToken).OnSuccess(t => {
-        user = (ParseUser)ParseObject.CreateWithoutData<ParseUser>(null);
-        user.HandleFetchResult(t.Result);
+        user = ParseObject.FromState<ParseUser>(t.Result, "_User");
 
         lock (user.mutex) {
           if (user.AuthData == null) {

@@ -67,8 +67,8 @@ namespace Parse.Internal {
           ParseUser user = null;
           if (userDataString != null) {
             var userData =  Json.Parse(userDataString) as IDictionary<string, object>;
-            user = ParseObject.CreateWithoutData<ParseUser>(null);
-            user.HandleFetchResult(ParseObjectCoder.Instance.Decode(userData, ParseDecoder.Instance));
+            var state = ParseObjectCoder.Instance.Decode(userData, ParseDecoder.Instance);
+            user = ParseObject.FromState<ParseUser>(state, "_User");
           }
 
           CurrentUser = user;

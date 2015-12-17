@@ -70,8 +70,8 @@ namespace Parse.Internal {
           ParseInstallation installation = null;
           if (installationDataString != null) {
             var installationData = ParseClient.DeserializeJsonString(installationDataString);
-            installation = ParseObject.CreateWithoutData<ParseInstallation>(null);
-            installation.HandleFetchResult(ParseObjectCoder.Instance.Decode(installationData, ParseDecoder.Instance));
+            var state = ParseObjectCoder.Instance.Decode(installationData, ParseDecoder.Instance);
+            installation = ParseObject.FromState<ParseInstallation>(state, "_Installation");
           } else {
             installation = ParseObject.Create<ParseInstallation>();
             installation.SetIfDifferent("installationId" , installationIdController.Get().ToString());

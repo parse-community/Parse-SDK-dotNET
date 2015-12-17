@@ -64,9 +64,8 @@ namespace Parse.Internal {
         }
 
         if (typeString == "Object") {
-          var output = ParseObject.CreateWithoutData(dict["className"] as string, null);
-          output.HandleFetchResult(ParseObjectCoder.Instance.Decode(dict, this));
-          return output;
+          var state = ParseObjectCoder.Instance.Decode(dict, this);
+          return ParseObject.FromState<ParseObject>(state, dict["className"] as string);
         }
 
         if (typeString == "Relation") {
