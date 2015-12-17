@@ -67,8 +67,7 @@ namespace Parse {
         }
 
         return SessionController.GetSessionAsync(sessionToken, cancellationToken).OnSuccess(t => {
-          ParseSession session = (ParseSession)ParseObject.CreateWithoutData<ParseSession>(null);
-          session.HandleFetchResult(t.Result);
+          ParseSession session = ParseObject.FromState<ParseSession>(t.Result, "_Session");
           return session;
         });
       }).Unwrap();
@@ -87,8 +86,7 @@ namespace Parse {
       }
 
       return SessionController.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken).OnSuccess(t => {
-        var session = (ParseSession)ParseObject.CreateWithoutData<ParseSession>(null);
-        session.HandleFetchResult(t.Result);
+        ParseSession session = ParseObject.FromState<ParseSession>(t.Result, "_Session");
         return session.SessionToken;
       });
     }
