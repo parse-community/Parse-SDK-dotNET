@@ -104,8 +104,7 @@ namespace Parse.Internal {
             request.BeginGetResponse,
             request.EndGetResponse,
             TaskCreationOptions.None);
-      }).Unwrap()
-      .ContinueWith(t => {
+      }).Unwrap().ContinueWith(t => {
         // Handle canceled
         cancellationToken.ThrowIfCancellationRequested();
 
