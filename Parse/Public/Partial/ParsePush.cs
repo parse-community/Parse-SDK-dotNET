@@ -82,6 +82,9 @@ namespace Parse {
       }
     }
 
+    /// <summary>
+    /// The time at which this push will be sent.
+    /// </summary>
     public DateTime? PushTime {
       get { return state.PushTime; }
       set {

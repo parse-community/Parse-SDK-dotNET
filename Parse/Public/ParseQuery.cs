@@ -903,6 +903,11 @@ namespace Parse {
       }
     }
 
+    /// <summary>
+    /// Determines whether the specified object is equal to the current object.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c></returns>
     public override bool Equals(object obj) {
       if (obj == null || !(obj is ParseQuery<T>)) {
         return false;
@@ -918,6 +923,10 @@ namespace Parse {
              Object.Equals(this.limit, other.limit);
     }
 
+    /// <summary>
+    /// Serves as the default hash function.
+    /// </summary>
+    /// <returns>A hash code for the current object.</returns>
     public override int GetHashCode() {
       // TODO (richardross): Implement this.
       return 0;
