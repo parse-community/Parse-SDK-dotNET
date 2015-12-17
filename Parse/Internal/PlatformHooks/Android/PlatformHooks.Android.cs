@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Text;
 
 using PreserveAttribute = Android.Runtime.PreserveAttribute;
-using System.Threading.Tasks;
 
 namespace Parse {
   [Preserve(AllMembers = true)]

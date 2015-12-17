@@ -49,6 +49,11 @@ namespace Parse {
       }
     }
 
+    /// <summary>
+    /// Delegate function that will be called when the player pauses the game.
+    /// </summary>
+    /// <seealso href="http://docs.unity3d.com/ScriptReference/MonoBehaviour.OnApplicationPause.html"/>
+    /// <param name="paused"><c>true</c> if the application is paused.</param>
     public void OnApplicationPause(bool paused) {
       if (PlatformHooks.IsAndroid) {
         PlatformHooks.CallStaticJavaUnityMethod("com.parse.ParsePushUnityHelper", "setApplicationPaused", new object[] { paused });

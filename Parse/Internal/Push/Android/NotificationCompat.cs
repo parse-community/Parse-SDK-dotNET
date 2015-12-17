@@ -84,7 +84,13 @@ namespace Parse.Internal {
       }
     }
 
-    // TODO (hallucinogen): docs
+    /// <summary>
+    /// Builder class for <see cref="NotificationCompat"/> objects.
+    /// </summary>
+    /// <seealso href="http://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html"/>
+    /// <remarks>
+    /// Allows easier control over all the flags, as well as help constructing the typical notification layouts.
+    /// </remarks>
     public class Builder {
       private const int MaxCharSequenceLength = 5 * 1024;
 
@@ -204,6 +210,9 @@ namespace Parse.Internal {
       }
     }
 
+    /// <summary>
+    /// An object that can apply a rich notification style to a <see cref="NotificationCompat.Builder"/> object.
+    /// </summary>
     public abstract class Style {
       protected Builder builder;
       public ICharSequence BigContentTitle { get; protected set; }
@@ -244,10 +253,10 @@ namespace Parse.Internal {
       }
 
       /// <summary>
-      /// Overrides <see cref="ContentTitle"/> in the big form of the template.
+      /// Overrides <see cref="Builder.ContentTitle"/> in the big form of the template.
       /// </summary>
       /// <remarks>
-      /// This defaults to the value passed to setContentTitle().
+      /// This defaults to the value passed to SetContentTitle().
       /// </remarks>
       /// <param name="title"></param>
       /// <returns></returns>
