@@ -148,6 +148,18 @@ namespace Parse {
     }
 
     /// <summary>
+    /// Returns true if the current platform is tvOS.
+    /// </summary>
+    internal static bool IsTvOS {
+      get {
+        if (settingsPath == null) {
+          throw new InvalidOperationException("Parse must be initialized before making any calls.");
+        }
+        return Application.platform == RuntimePlatform.tvOS;
+      }
+    }
+
+    /// <summary>
     /// Returns true if current running platform is Windows Phone 8.
     /// </summary>
     internal static bool IsWindowsPhone8 {
@@ -230,6 +242,9 @@ namespace Parse {
           try {
             if (IsWebPlayer) {
               return PlayerPrefs.GetString("Parse.settings", null);
+            } else if (IsTvOS) {
+              Debug.Log("Running on TvOS, prefs cannot be loaded.");
+              return null;
             } else {
               using (var fs = new FileStream(settingsPath, FileMode.Open, FileAccess.Read)) {
                 var reader = new StreamReader(fs);
@@ -250,6 +265,8 @@ namespace Parse {
           if (IsWebPlayer) {
             PlayerPrefs.SetString("Parse.settings", ParseClient.SerializeJsonString(data));
             PlayerPrefs.Save();
+          } else if (IsTvOS) {
+            Debug.Log("Running on TvOS, prefs cannot be saved.");
           } else {
             using (var fs = new FileStream(settingsPath, FileMode.Create, FileAccess.Write)) {
               using (var writer = new StreamWriter(fs)) {
