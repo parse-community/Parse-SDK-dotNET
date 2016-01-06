@@ -15,12 +15,14 @@ namespace ParseTest {
   public class CommandTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.HostName = new Uri("http://api.parse.local/1/");
+      ParseClient.Initialize(new ParseClient.Configuration {
+        ApplicationId = "",
+        WindowsKey = ""
+      });
     }
 
     [TearDown]
     public void TearDown() {
-      ParseClient.HostName = null;
       ParseClient.ApplicationSettings.Clear();
     }
 
