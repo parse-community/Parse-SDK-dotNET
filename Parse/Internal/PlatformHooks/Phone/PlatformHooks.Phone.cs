@@ -150,12 +150,17 @@ namespace Parse {
 
     public string DeviceTimeZone {
       get {
-        TimeSpan utcOffset = TimeZoneInfo.Local.BaseUtcOffset;
-        return String.Format("GMT{0}{1}:{2:d2}",
-          offset.TotalSeconds < 0 ? "-" : "+",
-          Math.Abs(offset.Hours),
-          Math.Abs(offset.Minutes)
-        );
+        // We need the system string to be in english so we'll have the proper key in our lookup table.
+        var culture = Thread.CurrentThread.CurrentCulture;
+        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+        string windowsName = TimeZoneInfo.Local.StandardName;
+        Thread.CurrentThread.CurrentCulture = culture;
+
+        if (ParseInstallation.TimeZoneNameMap.ContainsKey(windowsName)) {
+          return ParseInstallation.TimeZoneNameMap[windowsName];
+        } else {
+          return null;
+        }
       }
     }
 
