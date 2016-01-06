@@ -87,12 +87,16 @@ namespace Parse {
 
     public string DeviceTimeZone {
       get {
-        TimeSpan utcOffset = TimeZoneInfo.Local.BaseUtcOffset;
-        return String.Format("GMT{0}{1}:{2:d2}",
-          offset.TotalSeconds < 0 ? "-" : "+",
-          Math.Abs(offset.Hours),
-          Math.Abs(offset.Minutes)
-        );
+        try {
+          string windowsName = TimeZoneInfo.Local.StandardName;
+          if (ParseInstallation.TimeZoneNameMap.ContainsKey(windowsName)) {
+            return ParseInstallation.TimeZoneNameMap[windowsName];
+          } else {
+            return null;
+          }
+        } catch (TimeZoneNotFoundException) {
+          return null;
+        }
       }
     }
 
