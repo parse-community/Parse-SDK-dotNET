@@ -46,7 +46,7 @@ namespace Parse.Internal {
         IList<KeyValuePair<string, string>> headers = null,
         Stream stream = null,
         string contentType = null) {
-      Uri = new Uri(ParseClient.HostName, relativeUri);
+      Uri = new Uri(new Uri(ParseClient.CurrentConfiguration.Server), relativeUri);
       Method = method;
       Data = stream;
 

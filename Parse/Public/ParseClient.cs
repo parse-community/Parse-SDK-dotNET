@@ -38,6 +38,13 @@ namespace Parse {
       public String ApplicationId { get; set; }
 
       /// <summary>
+      /// The Parse.com API server to connect to.
+      /// 
+      /// Only needs to be set if you're using another server than https://api.parse.com/1.
+      /// </summary>
+      public String Server { get; set; }
+
+      /// <summary>
       /// The Parse.com .NET key for your app.
       /// </summary>
       public String WindowsKey { get; set; }
@@ -78,7 +85,6 @@ namespace Parse {
     /// The current configuration that parse has been initialized with.
     /// </summary>
     public static Configuration CurrentConfiguration { get; internal set; }
-    internal static Uri HostName { get; set; }
     internal static string MasterKey { get; set; }
 
     internal static Version Version {
@@ -122,7 +128,7 @@ namespace Parse {
     /// </param>
     public static void Initialize(Configuration configuration) {
       lock (mutex) {
-        HostName = HostName ?? new Uri("https://api.parse.com/1/");
+        configuration.Server = configuration.Server ?? "https://api.parse.com/1/";
         CurrentConfiguration = configuration;
 
         ParseObject.RegisterSubclass<ParseUser>();

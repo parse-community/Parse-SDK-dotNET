@@ -15,12 +15,10 @@ namespace ParseTest {
   public class FileControllerTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.HostName = new Uri("http://parse.com");
-    }
-
-    [TearDown]
-    public void TearDown() {
-      ParseClient.HostName = null;
+      ParseClient.Initialize(new ParseClient.Configuration {
+        ApplicationId = "",
+        WindowsKey = ""
+      });
     }
 
     [Test]
