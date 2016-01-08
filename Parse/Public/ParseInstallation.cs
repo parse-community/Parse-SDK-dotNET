@@ -352,5 +352,26 @@ namespace Parse {
       {"Tonga Standard Time", "Pacific/Tongatapu"},
       {"Samoa Standard Time", "Pacific/Apia"}
     };
+
+    /// <summary>
+    /// This is a mapping of odd TimeZone offsets to their respective IANA codes across the world.
+    /// This list was compiled from painstakingly pouring over the information available at
+    /// https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
+    /// </summary>
+    internal static readonly Dictionary<TimeSpan, String> TimeZoneOffsetMap = new Dictionary<TimeSpan, string>() {
+      { new TimeSpan(12, 45, 0), "Pacific/Chatham" },
+      { new TimeSpan(10, 30, 0), "Australia/Lord_Howe" },
+      { new TimeSpan(9, 30, 0),  "Australia/Adelaide" },
+      { new TimeSpan(8, 45, 0), "Australia/Eucla" },
+      { new TimeSpan(8, 30, 0), "Asia/Pyongyang" }, // Parse in North Korea confirmed.
+      { new TimeSpan(6, 30, 0), "Asia/Rangoon" },
+      { new TimeSpan(5, 45, 0), "Asia/Kathmandu" },
+      { new TimeSpan(5, 30, 0), "Asia/Colombo" },
+      { new TimeSpan(4, 30, 0), "Asia/Kabul" },
+      { new TimeSpan(3, 30, 0), "Asia/Tehran" },
+      { new TimeSpan(-3, 30, 0), "America/St_Johns" },
+      { new TimeSpan(-4, 30, 0), "America/Caracas" },
+      { new TimeSpan(-9, 30, 0), "Pacific/Marquesas" },
+    };
   }
 }
