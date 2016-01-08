@@ -151,16 +151,26 @@ namespace Parse {
     public string DeviceTimeZone {
       get {
         // We need the system string to be in english so we'll have the proper key in our lookup table.
-        var culture = Thread.CurrentThread.CurrentCulture;
-        Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-        string windowsName = TimeZoneInfo.Local.StandardName;
-        Thread.CurrentThread.CurrentCulture = culture;
+        // If it's not in english then we will attempt to fallback to the closest Time Zone we can find.
+        TimeZoneInfo tzInfo = TimeZoneInfo.Local;
 
-        if (ParseInstallation.TimeZoneNameMap.ContainsKey(windowsName)) {
-          return ParseInstallation.TimeZoneNameMap[windowsName];
-        } else {
-          return null;
+        string deviceTimeZone = null;
+        if (ParseInstallation.TimeZoneNameMap.TryGetValue(tzInfo.StandardName, out deviceTimeZone)) {
+          return deviceTimeZone;
         }
+
+        TimeSpan utcOffset = tzInfo.BaseUtcOffset;
+
+        // If we have an offset that is not a round hour, then use our second map to see if we can
+        // convert it or not.
+        if (ParseInstallation.TimeZoneOffsetMap.TryGetValue(utcOffset, out deviceTimeZone)) {
+           return deviceTimeZone;
+        }
+
+        // NOTE: Etc/GMT{+/-} format is inverted from the UTC offset we use as normal people -
+        // a negative value means ahead of UTC, a positive value means behind UTC.
+        bool negativeOffset = utcOffset.Ticks < 0;
+        return String.Format("Etc/GMT{0}{1}", negativeOffset ? "+" : "-", Math.Abs(utcOffset.Hours));
       }
     }
 
