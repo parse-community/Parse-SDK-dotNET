@@ -3,6 +3,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Parse.Utilities;
 
 #if IOS
 using PreserveAttribute = Foundation.PreserveAttribute;
@@ -28,11 +29,11 @@ namespace Parse.Internal {
     }
 
     public int IndexOf(TOut item) {
-      return toWrap.IndexOf((TIn)ParseClient.ConvertTo<TIn>(item));
+      return toWrap.IndexOf((TIn)Conversion.ConvertTo<TIn>(item));
     }
 
     public void Insert(int index, TOut item) {
-      toWrap.Insert(index, (TIn)ParseClient.ConvertTo<TIn>(item));
+      toWrap.Insert(index, (TIn)Conversion.ConvertTo<TIn>(item));
     }
 
     public void RemoveAt(int index) {
@@ -41,15 +42,15 @@ namespace Parse.Internal {
 
     public TOut this[int index] {
       get {
-        return (TOut)ParseClient.ConvertTo<TOut>(toWrap[index]);
+        return (TOut)Conversion.ConvertTo<TOut>(toWrap[index]);
       }
       set {
-        toWrap[index] = (TIn)ParseClient.ConvertTo<TIn>(value);
+        toWrap[index] = (TIn)Conversion.ConvertTo<TIn>(value);
       }
     }
 
     public void Add(TOut item) {
-      toWrap.Add((TIn)ParseClient.ConvertTo<TIn>(item));
+      toWrap.Add((TIn)Conversion.ConvertTo<TIn>(item));
     }
 
     public void Clear() {
@@ -57,11 +58,11 @@ namespace Parse.Internal {
     }
 
     public bool Contains(TOut item) {
-      return toWrap.Contains((TIn)ParseClient.ConvertTo<TIn>(item));
+      return toWrap.Contains((TIn)Conversion.ConvertTo<TIn>(item));
     }
 
     public void CopyTo(TOut[] array, int arrayIndex) {
-      toWrap.Select(item => (TOut)ParseClient.ConvertTo<TOut>(item))
+      toWrap.Select(item => (TOut)Conversion.ConvertTo<TOut>(item))
           .ToList().CopyTo(array, arrayIndex);
     }
 
@@ -74,12 +75,12 @@ namespace Parse.Internal {
     }
 
     public bool Remove(TOut item) {
-      return toWrap.Remove((TIn)ParseClient.ConvertTo<TIn>(item));
+      return toWrap.Remove((TIn)Conversion.ConvertTo<TIn>(item));
     }
 
     public IEnumerator<TOut> GetEnumerator() {
       foreach (var item in (IEnumerable)toWrap) {
-        yield return (TOut)ParseClient.ConvertTo<TOut>(item);
+        yield return (TOut)Conversion.ConvertTo<TOut>(item);
       }
     }
 

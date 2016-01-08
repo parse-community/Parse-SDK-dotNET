@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Utilities;
 
 namespace Parse.Internal {
   internal class ParseObjectController : IParseObjectController {
@@ -163,7 +164,7 @@ namespace Parse.Internal {
           return;
         }
 
-        var resultsArray = ParseClient.As<IList<object>>(t.Result.Item2["results"]);
+        var resultsArray = Conversion.As<IList<object>>(t.Result.Item2["results"]);
         int resultLength = resultsArray.Count;
         if (resultLength != batchSize) {
           foreach (var tcs in tcss) {

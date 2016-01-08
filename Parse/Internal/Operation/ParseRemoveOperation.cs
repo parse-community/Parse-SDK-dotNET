@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using Parse.Utilities;
+
 namespace Parse.Internal {
   class ParseRemoveOperation : IParseFieldOperation {
     private ReadOnlyCollection<object> objects;
@@ -28,7 +30,7 @@ namespace Parse.Internal {
       }
       if (previous is ParseSetOperation) {
         var setOp = (ParseSetOperation)previous;
-        var oldList = (IList<object>)ParseClient.ConvertTo<IList<object>>(setOp.Value);
+        var oldList = Conversion.As<IList<object>>(setOp.Value);
         return new ParseSetOperation(this.Apply(oldList, null));
       }
       if (previous is ParseRemoveOperation) {
@@ -42,7 +44,7 @@ namespace Parse.Internal {
       if (oldValue == null) {
         return new List<object>();
       }
-      var oldList = (IList<object>)ParseClient.ConvertTo<IList<object>>(oldValue);
+      var oldList = Conversion.As<IList<object>>(oldValue);
       return oldList.Except(objects, ParseFieldOperations.ParseObjectComparer).ToList();
     }
 

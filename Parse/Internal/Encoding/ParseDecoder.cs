@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using Parse.Utilities;
 
 namespace Parse.Internal {
   internal class ParseDecoder {
@@ -59,8 +60,8 @@ namespace Parse.Internal {
         }
 
         if (typeString == "GeoPoint") {
-          return new ParseGeoPoint((double)ParseClient.ConvertTo<double>(dict["latitude"]),
-              (double)ParseClient.ConvertTo<double>(dict["longitude"]));
+          return new ParseGeoPoint((double)Conversion.ConvertTo<double>(dict["latitude"]),
+              (double)Conversion.ConvertTo<double>(dict["longitude"]));
         }
 
         if (typeString == "Object") {
