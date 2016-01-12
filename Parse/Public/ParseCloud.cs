@@ -54,10 +54,9 @@ namespace Parse {
     /// ParseObjects themselves.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The result of the cloud call.</returns>
-    public static Task<T> CallFunctionAsync<T>(
-      String name, IDictionary<string, object> parameters, CancellationToken cancellationToken) {
-        return CloudCodeController.CallFunctionAsync<T>(
-          name,
+    public static Task<T> CallFunctionAsync<T>(String name,
+        IDictionary<string, object> parameters, CancellationToken cancellationToken) {
+      return CloudCodeController.CallFunctionAsync<T>(name,
           parameters,
           ParseUser.CurrentSessionToken,
           cancellationToken);
