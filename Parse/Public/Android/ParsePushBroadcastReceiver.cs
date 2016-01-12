@@ -28,7 +28,7 @@ namespace Parse {
   /// </code>
   /// </remarks>
   [Register("parse.ParsePushBroadcastReceiver")]
-  public sealed class ParsePushBroadcastReceiver : BroadcastReceiver {
+  public class ParsePushBroadcastReceiver : BroadcastReceiver {
     /// <summary>
     /// The name of the Intent extra which contains the JSON payload of the Notification.
     /// </summary>
@@ -54,7 +54,7 @@ namespace Parse {
     /// <seealso cref="ParsePushService"/>
     /// <param name="context"></param>
     /// <param name="intent"></param>
-    public override sealed void OnReceive(Context context, Intent intent) {
+    public override void OnReceive(Context context, Intent intent) {
       intent.SetClass(context, typeof(ParsePushService));
       ParseWakefulHelper.StartWakefulService(context, intent);
     }
