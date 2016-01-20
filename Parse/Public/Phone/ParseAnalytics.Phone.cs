@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Parse.Internal.Analytics.Controller;
 
 namespace Parse {
   public partial class ParseAnalytics {
@@ -39,9 +40,10 @@ namespace Parse {
           return;
         }
         var json = ParsePush.PushJson(args.Uri.ToString());
-        object hash = null;
-        if (json.TryGetValue("push_hash", out hash) || alwaysReport) {
-          await TrackAppOpenedWithPushHashAsync((string)hash);
+		object alert = null;
+		if(json.TryGetValue("alert", out alert) || alwaysReport) {  
+		  string pushHash = ParseAnalyticsUtilities.MD5DigestFromPushPayload(alert);
+          await TrackAppOpenedWithPushHashAsync(pushHash);
         }
       };
     }
