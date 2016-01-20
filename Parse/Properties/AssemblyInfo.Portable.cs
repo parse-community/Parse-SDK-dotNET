@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 
 // Internal visibility for platform-specific libraries.
 [assembly: InternalsVisibleTo("Parse.WinRT")]
+[assembly: InternalsVisibleTo("Parse.UWP")]
 [assembly: InternalsVisibleTo("Parse.NetFx45")]
 [assembly: InternalsVisibleTo("Parse.Phone")]
 

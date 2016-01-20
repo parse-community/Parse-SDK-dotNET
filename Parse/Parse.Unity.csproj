@@ -52,15 +52,16 @@
   <!-- Used for setting excluded files -->
   <PropertyGroup>
       <ExcludedPlatformSpecificSourceFilesString>
-          **\Android\**;
-          **\iOS\**;
-          **\Mono\**;
-          **\NetFx45\**;
-          **\Phone\**;
-          **\WinRT\**;
-          **\SettingsStorage\**;
-          **\ParseQueryExtensions.cs;
-      </ExcludedPlatformSpecificSourceFilesString>
+		  **\Android\**;
+		  **\iOS\**;
+		  **\Mono\**;
+		  **\NetFx45\**;
+		  **\Phone\**;
+		  **\WinRT\**;
+		  **\SettingsStorage\**;
+		  **\ParseQueryExtensions.cs;
+		  **\UWP\**;
+	  </ExcludedPlatformSpecificSourceFilesString>
   </PropertyGroup>
   <ItemGroup>
     <!-- Assembly info, etc. -->

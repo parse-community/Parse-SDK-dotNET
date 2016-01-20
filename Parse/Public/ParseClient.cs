@@ -52,7 +52,7 @@ namespace Parse {
 
     private static readonly object mutex = new object();
     private static readonly string[] assemblyNames = {
-      "Parse.Phone", "Parse.WinRT", "Parse.NetFx45", "Parse.iOS", "Parse.Android", "Parse.Unity"
+      "Parse.Phone", "Parse.WinRT", "Parse.UWP", "Parse.NetFx45", "Parse.iOS", "Parse.Android", "Parse.Unity"
     };
 
     static ParseClient() {

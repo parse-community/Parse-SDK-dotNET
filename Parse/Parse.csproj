@@ -50,6 +50,7 @@
           **\Unity\**;
           **\WinRT\**;
           **\SettingsStorage\**;
+		  **\UWP\**;
       </ExcludedPlatformSpecificSourceFilesString>
   </PropertyGroup>
   <ItemGroup>
