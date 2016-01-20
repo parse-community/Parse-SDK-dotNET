@@ -9,6 +9,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
+using Parse.Internal.Analytics.Controller;
 
 using Parse.Internal;
 
@@ -31,10 +32,13 @@ namespace Parse {
                 return ((Task)null).Safe();
             }
 
-            object pushHash;
             IDictionary<string, object> contentJson = ParsePush.PushJson(launchArgs);
-            contentJson.TryGetValue("push_hash", out pushHash);
-            return ParseAnalytics.TrackAppOpenedWithPushHashAsync((string)pushHash);
+            object alert;
+            string pushHash = null;
+            if(contentJson.TryGetValue("alert", out alert)) {
+                pushHash = ParseAnalyticsUtilities.MD5DigestFromPushPayload(alert);
+            }
+            return ParseAnalytics.TrackAppOpenedWithPushHashAsync(pushHash);
         }
     }
 }
