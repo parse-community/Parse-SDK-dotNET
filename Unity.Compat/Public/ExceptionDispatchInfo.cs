@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace System.Runtime.ExceptionServices {
-  internal class ExceptionDispatchInfo {
+  public class ExceptionDispatchInfo {
     public static ExceptionDispatchInfo Capture(Exception ex) {
       return new ExceptionDispatchInfo(ex);
     }

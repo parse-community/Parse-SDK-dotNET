@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Parse.Internal;
+using Unity.Tasks.Internal;
 
 namespace System.Threading.Tasks {
   /// <summary>
@@ -35,7 +35,7 @@ namespace System.Threading.Tasks {
     internal Task() {
     }
 
-    internal static TaskFactory Factory {
+    public static TaskFactory Factory {
       get {
         return new TaskFactory();
       }

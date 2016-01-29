@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace System.Runtime.CompilerServices {
-  internal class ConditionalWeakTable<TKey, TValue>
+  // TODO: (richardross) make this thread-safe.
+  public class ConditionalWeakTable<TKey, TValue>
     where TKey : class
     where TValue : class {
 

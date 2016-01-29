@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 
 namespace System.Threading.Tasks {
-  internal class TaskScheduler {
+  public class TaskScheduler {
     private static SynchronizationContext defaultContext = new SynchronizationContext();
     private SynchronizationContext context;
     public TaskScheduler(SynchronizationContext context) {

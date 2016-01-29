@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 
 namespace System.Threading.Tasks {
-  internal enum TaskCreationOptions {
-    None
+  public enum TaskContinuationOptions {
+    None,
+    ExecuteSynchronously = 524288
   }
 }

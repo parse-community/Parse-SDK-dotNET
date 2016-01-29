@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 
 namespace System {
   /// <summary>
@@ -10,9 +11,13 @@ namespace System {
   /// This class simply implements some of the simple missing methods on Type to make it as API-compatible
   /// as possible to TypeInfo.
   /// </summary>
-  internal static class TypeExtensions {
+  public static class TypeExtensions {
     public static Type AsType(this Type type) {
       return type;
+    }
+
+    public static TypeInfo GetTypeInfo(this Type type) {
+      return TypeInfo.FromType(type);
     }
   }
 }

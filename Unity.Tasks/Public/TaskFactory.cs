@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace System.Threading.Tasks {
-  internal class TaskFactory {
+  public class TaskFactory {
     private readonly TaskScheduler scheduler;
     private readonly CancellationToken cancellationToken;
 

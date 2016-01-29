@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 
 namespace System.Threading {
-  internal class ThreadLocal<T> : IDisposable {
+  public class ThreadLocal<T> : IDisposable {
     private static long lastId = -1;
     [ThreadStatic]
     private static IDictionary<long, T> threadLocalData;
