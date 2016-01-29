@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>AssemblyLister</id>
+    <version>1.0.0</version>
+    <authors>Parse</authors>
+    <owners>Parse</owners>
+    <projectUrl>http://www.parse.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A helper utility for listing the assemblies referenced of a program.</description>
+    <copyright>Copyright 2016</copyright>
+    <tags>TODO FILLME</tags>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- Portable -->
+    <file src="AssemblyLister.Portable\bin\Release\AssemblyLister.dll" target="lib\portable-net45+win+wp80+MonoAndroid10+MonoTouch10" />
+
+    <!-- WinRT, WP8, WP8.1, etc. -->
+    <file src="AssemblyLister.UWP\bin\Release\AssemblyLister.dll" target="lib\netcore45" />
+    <file src="AssemblyLister.UWP\bin\Release\AssemblyLister.dll" target="lib\wpa81" />
+    <file src="AssemblyLister.UWP\bin\Release\AssemblyLister.dll" target="lib\wp8" />
+
+    <!-- NetFx, Xamarin, etc. -->
+    <file src="AssemblyLister.NetFx\bin\Release\AssemblyLister.dll"  target="lib\net45" />
+    <file src="AssemblyLister.NetFx\bin\Release\AssemblyLister.dll"  target="lib\MonoAndroid10" />
+    <file src="AssemblyLister.NetFx\bin\Release\AssemblyLister.dll"  target="lib\MonoTouch10" />
+    <file src="AssemblyLister.NetFx\bin\Release\AssemblyLister.dll"  target="lib\Xamarin.iOS10" />
+  </files>
+</package>

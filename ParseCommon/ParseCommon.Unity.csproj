@@ -39,9 +39,6 @@
     <DocumentationFile>bin\Release\Unity\Parse.Common.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssemblyLister">
-      <HintPath>..\..\..\..\AssemblyLister\AssemblyLister.Unity\bin\Release\AssemblyLister.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -72,6 +69,10 @@
   </Target>
   -->
   <ItemGroup>
+    <ProjectReference Include="..\AssemblyLister\AssemblyLister.Unity\AssemblyLister.Unity.csproj">
+      <Project>{693a621e-ff3c-400f-b69d-382acd50eda7}</Project>
+      <Name>AssemblyLister.Unity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Unity.Compat\Unity.Compat.csproj">
       <Project>{8473bef6-7086-4414-aad6-264967a7fe75}</Project>
       <Name>Unity.Compat</Name>

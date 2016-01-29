@@ -40,10 +40,6 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssemblyLister, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\AssemblyLister.1.0.0\lib\net45\AssemblyLister.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
@@ -104,11 +100,16 @@
     <Compile Include="PushTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\AssemblyLister\AssemblyLister.NetFx\AssemblyLister.NetFx.csproj">
+      <Project>{4bbce4f8-c097-4680-8b07-b69d567eaa5b}</Project>
+      <Name>AssemblyLister.NetFx</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ParseCommon\ParseCommon.Portable.csproj">
       <Project>{de07a443-9619-4bd7-b540-41296f8a2959}</Project>
       <Name>ParseCommon.Portable</Name>
