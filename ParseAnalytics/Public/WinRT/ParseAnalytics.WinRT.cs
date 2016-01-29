@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
+using Parse.Common.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,8 +10,6 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
-
-using Parse.Internal;
 
 namespace Parse {
     public static partial class ParseAnalytics {
@@ -32,9 +31,33 @@ namespace Parse {
             }
 
             object pushHash;
-            IDictionary<string, object> contentJson = ParsePush.PushJson(launchArgs);
+            IDictionary<string, object> contentJson = PushJson(launchArgs);
             contentJson.TryGetValue("push_hash", out pushHash);
             return ParseAnalytics.TrackAppOpenedWithPushHashAsync((string)pushHash);
+        }
+
+        /// <summary>
+        /// Helper method to extract the full Push JSON provided to Parse, including any
+        /// non-visual custom information. Overloads exist for all data types which may be
+        /// provided by Windows, I.E. LaunchActivatedEventArgs and PushNotificationReceivedEventArgs.
+        /// Returns an empty dictionary if this push type cannot include non-visual data or
+        /// this event was not triggered by a push.
+        /// </summary>
+        private static IDictionary<string, object> PushJson(ILaunchActivatedEventArgs eventArgs) {
+          if (eventArgs == null ||
+              eventArgs.Kind != ActivationKind.Launch ||
+              eventArgs.Arguments == null) {
+            return new Dictionary<string, object>();
+          }
+          return PushJson(eventArgs.Arguments);
+        }
+
+        private static IDictionary<string, object> PushJson(string jsonString) {
+          try {
+            return Json.Parse(jsonString) as IDictionary<string, object> ?? new Dictionary<string, object>();
+          } catch (Exception) {
+            return new Dictionary<string, object>();
+          }
         }
     }
 }

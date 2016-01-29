@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-namespace Parse.Internal {
-  internal class ParseAnalyticsController : IParseAnalyticsController {
+using Parse.Core.Internal;
+
+namespace Parse.Analytics.Internal {
+  public class ParseAnalyticsController : IParseAnalyticsController {
     private readonly IParseCommandRunner commandRunner;
 
-    internal ParseAnalyticsController(IParseCommandRunner commandRunner) {
+    public ParseAnalyticsController(IParseCommandRunner commandRunner) {
       this.commandRunner = commandRunner;
     }
 

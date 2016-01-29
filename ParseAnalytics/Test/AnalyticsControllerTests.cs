@@ -1,13 +1,18 @@
 using Moq;
 using NUnit.Framework;
 using Parse;
-using Parse.Internal;
+using Parse.Analytics.Internal;
+using Parse.Core.Internal;
+using Parse.Common.Internal;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Reflection;
+using System.Linq;
+using AssemblyLister;
 
 namespace ParseTest {
   [TestFixture]

@@ -2,21 +2,29 @@
 
 using System;
 using System.Collections.Generic;
-using Parse.Internal;
 using System.Threading.Tasks;
 using System.Threading;
+using Parse.Common.Internal;
+using Parse.Analytics.Internal;
+using Parse.Core.Internal;
 
 namespace Parse {
   /// <summary>
   /// Provides an interface to Parse's logging and analytics backend.
-  /// 
+  ///
   /// Methods will return immediately and cache requests (along with timestamps)
-  /// to be handled in the background. 
+  /// to be handled in the background.
   /// </summary>
   public partial class ParseAnalytics {
     internal static IParseAnalyticsController AnalyticsController {
       get {
-        return ParseCorePlugins.Instance.AnalyticsController;
+        return ParseAnalyticsPlugins.Instance.AnalyticsController;
+      }
+    }
+
+    internal static IParseCurrentUserController CurrentUserController {
+      get {
+        return ParseAnalyticsPlugins.Instance.CorePlugins.CurrentUserController;
       }
     }
 
@@ -87,10 +95,13 @@ namespace Parse {
         throw new ArgumentException("A name for the custom event must be provided.");
       }
 
-      return AnalyticsController.TrackEventAsync(name,
+      return CurrentUserController.GetCurrentSessionTokenAsync(CancellationToken.None)
+        .OnSuccess(t => {
+          return AnalyticsController.TrackEventAsync(name,
           dimensions,
-          ParseUser.CurrentSessionToken,
+          t.Result,
           CancellationToken.None);
+        }).Unwrap();
     }
 
     /// <summary>
@@ -101,9 +112,12 @@ namespace Parse {
     /// passed down from the server.</param>
     /// <returns>An Async Task that can be waited on or ignored.</returns>
     private static Task TrackAppOpenedWithPushHashAsync(string pushHash = null) {
-      return AnalyticsController.TrackAppOpenedAsync(pushHash,
-          ParseUser.CurrentSessionToken,
-          CancellationToken.None);
+      return CurrentUserController.GetCurrentSessionTokenAsync(CancellationToken.None)
+        .OnSuccess(t => {
+          return AnalyticsController.TrackAppOpenedAsync(pushHash,
+            t.Result,
+            CancellationToken.None);
+        }).Unwrap();
     }
   }
 }

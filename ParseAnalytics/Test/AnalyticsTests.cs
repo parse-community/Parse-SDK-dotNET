@@ -1,7 +1,8 @@
 using Moq;
 using NUnit.Framework;
 using Parse;
-using Parse.Internal;
+using Parse.Analytics.Internal;
+using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -13,17 +14,28 @@ namespace ParseTest {
   public class AnalyticsTests {
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance.AnalyticsController = null;
-      ParseCorePlugins.Instance.CurrentUserController = null;
+      ParseAnalyticsPlugins.Instance.Reset();
     }
 
     [Test]
     [AsyncStateMachine(typeof(AnalyticsTests))]
     public Task TestTrackEvent() {
       var mockController = new Mock<IParseAnalyticsController>();
+      var mockCorePlugins = new Mock<IParseCorePlugins>();
       var mockCurrentUserController = new Mock<IParseCurrentUserController>();
-      ParseCorePlugins.Instance.AnalyticsController = mockController.Object;
-      ParseCorePlugins.Instance.CurrentUserController = mockCurrentUserController.Object;
+
+      mockCorePlugins
+        .Setup(corePlugins => corePlugins.CurrentUserController)
+        .Returns(mockCurrentUserController.Object);
+
+      mockCurrentUserController
+        .Setup(controller => controller.GetCurrentSessionTokenAsync(It.IsAny<CancellationToken>()))
+        .Returns(Task.FromResult("sessionToken"));
+
+      ParseAnalyticsPlugins plugins = new ParseAnalyticsPlugins();
+      plugins.AnalyticsController = mockController.Object;
+      plugins.CorePlugins = mockCorePlugins.Object;
+      ParseAnalyticsPlugins.Instance = plugins;
 
       return ParseAnalytics.TrackEventAsync("SomeEvent").ContinueWith(t => {
         Assert.IsFalse(t.IsFaulted);
@@ -39,12 +51,25 @@ namespace ParseTest {
     [AsyncStateMachine(typeof(AnalyticsTests))]
     public Task TestTrackEventWithDimension() {
       var mockController = new Mock<IParseAnalyticsController>();
+      var mockCorePlugins = new Mock<IParseCorePlugins>();
       var mockCurrentUserController = new Mock<IParseCurrentUserController>();
+
+      mockCorePlugins
+        .Setup(corePlugins => corePlugins.CurrentUserController)
+        .Returns(mockCurrentUserController.Object);
+
+      mockCurrentUserController
+        .Setup(controller => controller.GetCurrentSessionTokenAsync(It.IsAny<CancellationToken>()))
+        .Returns(Task.FromResult("sessionToken"));
+
+      ParseAnalyticsPlugins plugins = new ParseAnalyticsPlugins();
+      plugins.AnalyticsController = mockController.Object;
+      plugins.CorePlugins = mockCorePlugins.Object;
+      ParseAnalyticsPlugins.Instance = plugins;
+
       var dimensions = new Dictionary<string, string>() {
         { "facebook", "hq" }
       };
-      ParseCorePlugins.Instance.AnalyticsController = mockController.Object;
-      ParseCorePlugins.Instance.CurrentUserController = mockCurrentUserController.Object;
 
       return ParseAnalytics.TrackEventAsync("SomeEvent", dimensions).ContinueWith(t => {
         Assert.IsFalse(t.IsFaulted);
@@ -60,9 +85,21 @@ namespace ParseTest {
     [AsyncStateMachine(typeof(AnalyticsTests))]
     public Task TestTrackAppOpened() {
       var mockController = new Mock<IParseAnalyticsController>();
+      var mockCorePlugins = new Mock<IParseCorePlugins>();
       var mockCurrentUserController = new Mock<IParseCurrentUserController>();
-      ParseCorePlugins.Instance.AnalyticsController = mockController.Object;
-      ParseCorePlugins.Instance.CurrentUserController = mockCurrentUserController.Object;
+
+      mockCorePlugins
+        .Setup(corePlugins => corePlugins.CurrentUserController)
+        .Returns(mockCurrentUserController.Object);
+
+      mockCurrentUserController
+        .Setup(controller => controller.GetCurrentSessionTokenAsync(It.IsAny<CancellationToken>()))
+        .Returns(Task.FromResult("sessionToken"));
+
+      ParseAnalyticsPlugins plugins = new ParseAnalyticsPlugins();
+      plugins.AnalyticsController = mockController.Object;
+      plugins.CorePlugins = mockCorePlugins.Object;
+      ParseAnalyticsPlugins.Instance = plugins;
 
       return ParseAnalytics.TrackAppOpenedAsync().ContinueWith(t => {
         Assert.IsFalse(t.IsFaulted);

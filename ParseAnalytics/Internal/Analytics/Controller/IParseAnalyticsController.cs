@@ -3,8 +3,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-namespace Parse.Internal {
-  interface IParseAnalyticsController {
+
+namespace Parse.Analytics.Internal {
+  public interface IParseAnalyticsController {
     Task TrackEventAsync(string name,
         IDictionary<string, string> dimensions,
         string sessionToken,
