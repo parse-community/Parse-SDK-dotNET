@@ -11,9 +11,24 @@ using System.Linq;
 
 using NetHttpClient = System.Net.Http.HttpClient;
 using System.Net.Http.Headers;
+using System.Collections.Generic;
 
 namespace Parse.Common.Internal {
   public class HttpClient : IHttpClient {
+    private static HashSet<string> HttpContentHeaders = new HashSet<string> {
+      { "Allow" },
+      { "Content-Disposition" },
+      { "Content-Encoding" },
+      { "Content-Language" },
+      { "Content-Length" },
+      { "Content-Location" },
+      { "Content-MD5" },
+      { "Content-Range" },
+      { "Content-Type" },
+      { "Expires" },
+      { "Last-Modified" }
+    };
+
     public HttpClient(): this(new NetHttpClient()) {
     }
 
@@ -43,7 +58,11 @@ namespace Parse.Common.Internal {
 
       if (httpRequest.Headers != null) {
         foreach (var header in httpRequest.Headers) {
-          message.Headers.Add(header.Key, header.Value);
+          if (HttpContentHeaders.Contains(header.Key)) {
+            message.Content.Headers.Add(header.Key, header.Value);
+          } else {
+            message.Headers.Add(header.Key, header.Value);
+          }
         }
       }
 
@@ -60,7 +79,7 @@ namespace Parse.Common.Internal {
 
           uploadProgress.Report(new ParseUploadProgressEventArgs { Progress = 1 });
 
-          return message.Content.ReadAsStreamAsync().ContinueWith(streamTask => {
+          return response.Content.ReadAsStreamAsync().ContinueWith(streamTask => {
             var resultStream = new MemoryStream();
             var responseStream = streamTask.Result;
 
