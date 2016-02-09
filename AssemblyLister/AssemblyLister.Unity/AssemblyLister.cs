@@ -4,7 +4,13 @@ using System.Reflection;
 using System.Linq;
 
 namespace AssemblyLister {
+  /// <summary>
+  /// A class that lets you list all loaded assemblies in a PCL-compliant way.
+  /// </summary>
   public static class Lister {
+    /// <summary>
+    /// Get all of the assemblies used by this application.
+    /// </summary>
     public static IEnumerable<Assembly> AllAssemblies {
       get {
         // For each of the loaded assemblies, deeply walk all of their references.
