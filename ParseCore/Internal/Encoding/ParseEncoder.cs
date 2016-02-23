@@ -40,7 +40,7 @@ namespace Parse.Core.Internal {
       // encoded object. Otherwise, just return the original object.
       if (value is DateTime) {
         return new Dictionary<string, object> {
-          {"iso", ((DateTime)value).ToString(ParseClient.DateFormatStrings.First())},
+          {"iso", ((DateTime)value).ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture)},
           {"__type", "Date"}
         };
       }

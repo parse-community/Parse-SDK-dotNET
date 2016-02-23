@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Common.Internal;
@@ -46,10 +47,12 @@ namespace Parse.Core.Internal {
             var data = user.ServerDataToJSONObjectForSerialization();
             data["objectId"] = user.ObjectId;
             if (user.CreatedAt != null) {
-              data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First());
+              data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First(),
+                CultureInfo.InvariantCulture);
             }
             if (user.UpdatedAt != null) {
-              data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First());
+              data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First(),
+                CultureInfo.InvariantCulture);
             }
 
             saveTask = storageController
