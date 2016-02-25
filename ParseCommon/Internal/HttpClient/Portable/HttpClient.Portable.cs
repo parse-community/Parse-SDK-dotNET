@@ -54,7 +54,9 @@ namespace Parse.Common.Internal {
         data = new MemoryStream(new byte[0]);
       }
 
-      message.Content = new StreamContent(data);
+      if (data != null) {
+        message.Content = new StreamContent(data);
+      }
 
       if (httpRequest.Headers != null) {
         foreach (var header in httpRequest.Headers) {
