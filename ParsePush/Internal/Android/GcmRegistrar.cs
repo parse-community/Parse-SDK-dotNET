@@ -35,10 +35,10 @@ namespace Parse {
     }
 
     private string getActualSenderIdFromExtra(Object senderIdExtra) {
-      if (!(senderIdExtra is string)) {
+      if (senderIdExtra == null) {
         return null;
       }
-      string senderId = senderIdExtra as string;
+      string senderId = senderIdExtra.ToString();
       if (!senderId.StartsWith("id:")) {
         return null;
       }
@@ -62,7 +62,7 @@ namespace Parse {
             string senderId = getActualSenderIdFromExtra(senderIdExtra);
 
             if (senderId != null) {
-              senderIds += "," + senderIdExtra;
+              senderIds += "," + senderId;
             } else {
               Android.Util.Log.Error("parse.GcmRegistrar", "Found " + ExtraSenderId + " <meta-data> element with value \""
                 + senderIdExtra.ToString() + "\", but the value is missing the expected \"id:\" prefix");
