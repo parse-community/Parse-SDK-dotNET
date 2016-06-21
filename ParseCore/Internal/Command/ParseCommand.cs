@@ -46,7 +46,7 @@ namespace Parse.Core.Internal {
         IList<KeyValuePair<string, string>> headers = null,
         Stream stream = null,
         string contentType = null) {
-      Uri = new Uri(new Uri(ParseClient.CurrentConfiguration.Server), relativeUri);
+      Uri = new Uri(new Uri(ParseClient.CurrentConfiguration.Server), ParseClient.CurrentConfiguration.Server.AbsolutePath + "/" + relativeUri);
       Method = method;
       Data = stream;
       Headers = new List<KeyValuePair<string, string>>(headers ?? Enumerable.Empty<KeyValuePair<string, string>>());
