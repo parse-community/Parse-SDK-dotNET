@@ -89,7 +89,7 @@ public class ParsePushService extends IntentService {
     }
 
     String senderId = (String)senderIdExtra;
-    if (senderId.startsWith("id:")) {
+    if (!senderId.startsWith("id:")) {
       Log.e(TAG, "Found " + EXTRA_SENDER_ID + " <meta-data> element with value \"" +
           senderIdExtra.toString() + "\", but the value is missing the expected \"id:\" " +
           "prefix.");
