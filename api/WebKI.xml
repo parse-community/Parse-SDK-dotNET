@@ -1,0 +1,749 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpKI>
+  <HelpKINode Title="AccessToken property" Url="html/P_Parse_ParseFacebookUtils_AccessToken.htm" />
+  <HelpKINode Title="AccountAlreadyLinked enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="ACL property" Url="html/P_Parse_ParseObject_ACL.htm" />
+  <HelpKINode Title="Add method">
+    <HelpKINode Title="ParseObject.Add Method " Url="html/M_Parse_ParseObject_Add.htm" />
+    <HelpKINode Title="ParseRelation(T).Add Method " Url="html/M_Parse_ParseRelation_1_Add.htm" />
+  </HelpKINode>
+  <HelpKINode Title="AddRangeToList(Of T) method" Url="html/M_Parse_ParseObject_AddRangeToList__1.htm" />
+  <HelpKINode Title="AddRangeToList&lt;T&gt; method" Url="html/M_Parse_ParseObject_AddRangeToList__1.htm" />
+  <HelpKINode Title="AddRangeUniqueToList(Of T) method" Url="html/M_Parse_ParseObject_AddRangeUniqueToList__1.htm" />
+  <HelpKINode Title="AddRangeUniqueToList&lt;T&gt; method" Url="html/M_Parse_ParseObject_AddRangeUniqueToList__1.htm" />
+  <HelpKINode Title="AddToList method" Url="html/M_Parse_ParseObject_AddToList.htm" />
+  <HelpKINode Title="AddUniqueToList method" Url="html/M_Parse_ParseObject_AddUniqueToList.htm" />
+  <HelpKINode Title="Alert property" Url="html/P_Parse_ParsePush_Alert.htm" />
+  <HelpKINode Title="AppIdentifier property" Url="html/P_Parse_ParseInstallation_AppIdentifier.htm" />
+  <HelpKINode Title="ApplicationId property" Url="html/P_Parse_ParseFacebookUtils_ApplicationId.htm" />
+  <HelpKINode Title="AppName property" Url="html/P_Parse_ParseInstallation_AppName.htm" />
+  <HelpKINode Title="AppVersion property" Url="html/P_Parse_ParseInstallation_AppVersion.htm" />
+  <HelpKINode Title="BecomeAsync method" Url="html/Overload_Parse_ParseUser_BecomeAsync.htm" />
+  <HelpKINode Title="CacheMiss enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="CallFunctionAsync method" Url="html/Overload_Parse_ParseCloud_CallFunctionAsync.htm" />
+  <HelpKINode Title="Channels property">
+    <HelpKINode Title="ParseInstallation.Channels Property " Url="html/P_Parse_ParseInstallation_Channels.htm" />
+    <HelpKINode Title="ParsePush.Channels Property " Url="html/P_Parse_ParsePush_Channels.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ClassName property">
+    <HelpKINode Title="ParseClassNameAttribute.ClassName Property " Url="html/P_Parse_ParseClassNameAttribute_ClassName.htm" />
+    <HelpKINode Title="ParseObject.ClassName Property " Url="html/P_Parse_ParseObject_ClassName.htm" />
+  </HelpKINode>
+  <HelpKINode Title="Code property" Url="html/P_Parse_ParseException_Code.htm" />
+  <HelpKINode Title="CommandUnavailable enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="ConnectionFailed enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="ContainsKey method" Url="html/M_Parse_ParseObject_ContainsKey.htm" />
+  <HelpKINode Title="CountAsync method" Url="html/Overload_Parse_ParseQuery_1_CountAsync.htm" />
+  <HelpKINode Title="Create method" Url="html/Overload_Parse_ParseObject_Create.htm" />
+  <HelpKINode Title="CreatedAt property" Url="html/P_Parse_ParseObject_CreatedAt.htm" />
+  <HelpKINode Title="CreateWithoutData method" Url="html/Overload_Parse_ParseObject_CreateWithoutData.htm" />
+  <HelpKINode Title="CurrentConfig property" Url="html/P_Parse_ParseConfig_CurrentConfig.htm" />
+  <HelpKINode Title="CurrentInstallation property" Url="html/P_Parse_ParseInstallation_CurrentInstallation.htm" />
+  <HelpKINode Title="CurrentUser property" Url="html/P_Parse_ParseUser_CurrentUser.htm" />
+  <HelpKINode Title="Data property" Url="html/P_Parse_ParsePush_Data.htm" />
+  <HelpKINode Title="DeleteAllAsync method" Url="html/Overload_Parse_ParseObject_DeleteAllAsync.htm" />
+  <HelpKINode Title="DeleteAsync method" Url="html/Overload_Parse_ParseObject_DeleteAsync.htm" />
+  <HelpKINode Title="DeviceType property" Url="html/P_Parse_ParseInstallation_DeviceType.htm" />
+  <HelpKINode Title="DistanceTo method" Url="html/M_Parse_ParseGeoPoint_DistanceTo.htm" />
+  <HelpKINode Title="DuplicateValue enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Email property" Url="html/P_Parse_ParseUser_Email.htm" />
+  <HelpKINode Title="EmailMissing enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="EmailNotFound enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="EmailTaken enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="EnableRevocableSessionAsync method" Url="html/Overload_Parse_ParseUser_EnableRevocableSessionAsync.htm" />
+  <HelpKINode Title="ExceededQuota enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Expiration property" Url="html/P_Parse_ParsePush_Expiration.htm" />
+  <HelpKINode Title="ExpirationInterval property" Url="html/P_Parse_ParsePush_ExpirationInterval.htm" />
+  <HelpKINode Title="FetchAllAsync method">
+    <HelpKINode Title="ParseExtensions.FetchAllAsync Method " Url="html/Overload_Parse_ParseExtensions_FetchAllAsync.htm" />
+    <HelpKINode Title="ParseObject.FetchAllAsync Method " Url="html/Overload_Parse_ParseObject_FetchAllAsync.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FetchAllIfNeededAsync method">
+    <HelpKINode Title="ParseExtensions.FetchAllIfNeededAsync Method " Url="html/Overload_Parse_ParseExtensions_FetchAllIfNeededAsync.htm" />
+    <HelpKINode Title="ParseObject.FetchAllIfNeededAsync Method " Url="html/Overload_Parse_ParseObject_FetchAllIfNeededAsync.htm" />
+  </HelpKINode>
+  <HelpKINode Title="FetchAsync method" Url="html/Overload_Parse_ParseExtensions_FetchAsync.htm" />
+  <HelpKINode Title="FetchIfNeededAsync method" Url="html/Overload_Parse_ParseExtensions_FetchIfNeededAsync.htm" />
+  <HelpKINode Title="FieldName property" Url="html/P_Parse_ParseFieldNameAttribute_FieldName.htm" />
+  <HelpKINode Title="FileDeleteFailed enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="FindAsync method" Url="html/Overload_Parse_ParseQuery_1_FindAsync.htm" />
+  <HelpKINode Title="FirstAsync method" Url="html/Overload_Parse_ParseQuery_1_FirstAsync.htm" />
+  <HelpKINode Title="FirstOrDefaultAsync method" Url="html/Overload_Parse_ParseQuery_1_FirstOrDefaultAsync.htm" />
+  <HelpKINode Title="FromKilometers method" Url="html/M_Parse_ParseGeoDistance_FromKilometers.htm" />
+  <HelpKINode Title="FromMiles method" Url="html/M_Parse_ParseGeoDistance_FromMiles.htm" />
+  <HelpKINode Title="FromRadians method" Url="html/M_Parse_ParseGeoDistance_FromRadians.htm" />
+  <HelpKINode Title="Get(Of T) method">
+    <HelpKINode Title="ParseConfig.Get(T) Method " Url="html/M_Parse_ParseConfig_Get__1.htm" />
+    <HelpKINode Title="ParseObject.Get(T) Method " Url="html/M_Parse_ParseObject_Get__1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="Get&lt;T&gt; method">
+    <HelpKINode Title="ParseConfig.Get(T) Method " Url="html/M_Parse_ParseConfig_Get__1.htm" />
+    <HelpKINode Title="ParseObject.Get(T) Method " Url="html/M_Parse_ParseObject_Get__1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetAsync method">
+    <HelpKINode Title="ParseConfig.GetAsync Method " Url="html/Overload_Parse_ParseConfig_GetAsync.htm" />
+    <HelpKINode Title="ParseQuery(T).GetAsync Method " Url="html/Overload_Parse_ParseQuery_1_GetAsync.htm" />
+  </HelpKINode>
+  <HelpKINode Title="GetCurrentSessionAsync method" Url="html/Overload_Parse_ParseSession_GetCurrentSessionAsync.htm" />
+  <HelpKINode Title="GetProperty method" Url="html/Overload_Parse_ParseObject_GetProperty.htm" />
+  <HelpKINode Title="GetQuery method" Url="html/M_Parse_ParseObject_GetQuery.htm" />
+  <HelpKINode Title="GetReadAccess method" Url="html/Overload_Parse_ParseACL_GetReadAccess.htm" />
+  <HelpKINode Title="GetRelation(Of T) method" Url="html/M_Parse_ParseObject_GetRelation__1.htm" />
+  <HelpKINode Title="GetRelation&lt;T&gt; method" Url="html/M_Parse_ParseObject_GetRelation__1.htm" />
+  <HelpKINode Title="GetRelationProperty(Of T) method" Url="html/M_Parse_ParseObject_GetRelationProperty__1.htm" />
+  <HelpKINode Title="GetRelationProperty&lt;T&gt; method" Url="html/M_Parse_ParseObject_GetRelationProperty__1.htm" />
+  <HelpKINode Title="GetRoleReadAccess method" Url="html/Overload_Parse_ParseACL_GetRoleReadAccess.htm" />
+  <HelpKINode Title="GetRoleWriteAccess method" Url="html/Overload_Parse_ParseACL_GetRoleWriteAccess.htm" />
+  <HelpKINode Title="GetWriteAccess method" Url="html/Overload_Parse_ParseACL_GetWriteAccess.htm" />
+  <HelpKINode Title="HasSameId method" Url="html/M_Parse_ParseObject_HasSameId.htm" />
+  <HelpKINode Title="Include method" Url="html/M_Parse_ParseQuery_1_Include.htm" />
+  <HelpKINode Title="IncorrectType enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Increment method" Url="html/Overload_Parse_ParseObject_Increment.htm" />
+  <HelpKINode Title="Initialize method">
+    <HelpKINode Title="ParseClient.Initialize Method " Url="html/M_Parse_ParseClient_Initialize.htm" />
+    <HelpKINode Title="ParseFacebookUtils.Initialize Method " Url="html/M_Parse_ParseFacebookUtils_Initialize.htm" />
+  </HelpKINode>
+  <HelpKINode Title="InstallationId property" Url="html/P_Parse_ParseInstallation_InstallationId.htm" />
+  <HelpKINode Title="InternalServerError enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidACL enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidChannelName enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidClassName enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidEmailAddress enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidEventName enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidFileName enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidJSON enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidKeyName enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidLinkedSession enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidNestedKey enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidPointer enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidQuery enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidRoleName enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="InvalidSessionToken enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="IsAuthenticated property" Url="html/P_Parse_ParseUser_IsAuthenticated.htm" />
+  <HelpKINode Title="IsDataAvailable property" Url="html/P_Parse_ParseObject_IsDataAvailable.htm" />
+  <HelpKINode Title="IsDirty property">
+    <HelpKINode Title="ParseFile.IsDirty Property " Url="html/P_Parse_ParseFile_IsDirty.htm" />
+    <HelpKINode Title="ParseObject.IsDirty Property " Url="html/P_Parse_ParseObject_IsDirty.htm" />
+  </HelpKINode>
+  <HelpKINode Title="IsKeyDirty method" Url="html/M_Parse_ParseObject_IsKeyDirty.htm" />
+  <HelpKINode Title="IsLinked method" Url="html/M_Parse_ParseFacebookUtils_IsLinked.htm" />
+  <HelpKINode Title="IsNew property" Url="html/P_Parse_ParseObject_IsNew.htm" />
+  <HelpKINode Title="Item property">
+    <HelpKINode Title="ParseConfig.Item Property " Url="html/P_Parse_ParseConfig_Item.htm" />
+    <HelpKINode Title="ParseObject.Item Property " Url="html/P_Parse_ParseObject_Item.htm" />
+  </HelpKINode>
+  <HelpKINode Title="Join(Of TOuter, TInner, TKey, TResult) method" Url="html/M_Parse_ParseQueryExtensions_Join__4.htm" />
+  <HelpKINode Title="Join&lt;TOuter, TInner, TKey, TResult&gt; method" Url="html/M_Parse_ParseQueryExtensions_Join__4.htm" />
+  <HelpKINode Title="Keys property" Url="html/P_Parse_ParseObject_Keys.htm" />
+  <HelpKINode Title="Kilometers property" Url="html/P_Parse_ParseGeoDistance_Kilometers.htm" />
+  <HelpKINode Title="Latitude property" Url="html/P_Parse_ParseGeoPoint_Latitude.htm" />
+  <HelpKINode Title="Limit method" Url="html/M_Parse_ParseQuery_1_Limit.htm" />
+  <HelpKINode Title="LinkAsync method" Url="html/Overload_Parse_ParseFacebookUtils_LinkAsync.htm" />
+  <HelpKINode Title="LinkedIdMissing enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="LocaleIdentifier property" Url="html/P_Parse_ParseInstallation_LocaleIdentifier.htm" />
+  <HelpKINode Title="LogInAsync method">
+    <HelpKINode Title="ParseFacebookUtils.LogInAsync Method " Url="html/Overload_Parse_ParseFacebookUtils_LogInAsync.htm" />
+    <HelpKINode Title="ParseUser.LogInAsync Method " Url="html/Overload_Parse_ParseUser_LogInAsync.htm" />
+  </HelpKINode>
+  <HelpKINode Title="LogOut method" Url="html/M_Parse_ParseUser_LogOut.htm" />
+  <HelpKINode Title="LogOutAsync method" Url="html/Overload_Parse_ParseUser_LogOutAsync.htm" />
+  <HelpKINode Title="Longitude property" Url="html/P_Parse_ParseGeoPoint_Longitude.htm" />
+  <HelpKINode Title="Miles property" Url="html/P_Parse_ParseGeoDistance_Miles.htm" />
+  <HelpKINode Title="MimeType property" Url="html/P_Parse_ParseFile_MimeType.htm" />
+  <HelpKINode Title="MissingObjectId enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="MustCreateUserThroughSignup enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Name property">
+    <HelpKINode Title="ParseFile.Name Property " Url="html/P_Parse_ParseFile_Name.htm" />
+    <HelpKINode Title="ParseRole.Name Property " Url="html/P_Parse_ParseRole_Name.htm" />
+  </HelpKINode>
+  <HelpKINode Title="NotInitialized enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="ObjectId property" Url="html/P_Parse_ParseObject_ObjectId.htm" />
+  <HelpKINode Title="ObjectNotFound enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="ObjectTooLarge enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="OnFieldsChanged method" Url="html/M_Parse_ParseObject_OnFieldsChanged.htm" />
+  <HelpKINode Title="OnPropertyChanged method" Url="html/M_Parse_ParseObject_OnPropertyChanged.htm" />
+  <HelpKINode Title="OperationForbidden enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Or method" Url="html/M_Parse_ParseQuery_1_Or.htm" />
+  <HelpKINode Title="Or(Of T) method" Url="html/M_Parse_ParseExtensions_Or__1.htm" />
+  <HelpKINode Title="Or&lt;T&gt; method" Url="html/M_Parse_ParseExtensions_Or__1.htm" />
+  <HelpKINode Title="OrderBy method" Url="html/M_Parse_ParseQuery_1_OrderBy.htm" />
+  <HelpKINode Title="OrderBy(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_OrderBy__2.htm" />
+  <HelpKINode Title="OrderBy&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_OrderBy__2.htm" />
+  <HelpKINode Title="OrderByDescending method" Url="html/M_Parse_ParseQuery_1_OrderByDescending.htm" />
+  <HelpKINode Title="OrderByDescending(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_OrderByDescending__2.htm" />
+  <HelpKINode Title="OrderByDescending&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_OrderByDescending__2.htm" />
+  <HelpKINode Title="OtherCause enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Parse namespace" Url="html/N_Parse.htm" />
+  <HelpKINode Title="Parse.ParseACL class" Url="html/T_Parse_ParseACL.htm" />
+  <HelpKINode Title="Parse.ParseAnalytics class" Url="html/T_Parse_ParseAnalytics.htm" />
+  <HelpKINode Title="Parse.ParseClassNameAttribute class" Url="html/T_Parse_ParseClassNameAttribute.htm" />
+  <HelpKINode Title="Parse.ParseClient class" Url="html/T_Parse_ParseClient.htm" />
+  <HelpKINode Title="Parse.ParseCloud class" Url="html/T_Parse_ParseCloud.htm" />
+  <HelpKINode Title="Parse.ParseConfig class" Url="html/T_Parse_ParseConfig.htm" />
+  <HelpKINode Title="Parse.ParseException class" Url="html/T_Parse_ParseException.htm" />
+  <HelpKINode Title="Parse.ParseException.ErrorCode enumeration" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Parse.ParseExtensions class" Url="html/T_Parse_ParseExtensions.htm" />
+  <HelpKINode Title="Parse.ParseFacebookUtils class" Url="html/T_Parse_ParseFacebookUtils.htm" />
+  <HelpKINode Title="Parse.ParseFieldNameAttribute class" Url="html/T_Parse_ParseFieldNameAttribute.htm" />
+  <HelpKINode Title="Parse.ParseFile class" Url="html/T_Parse_ParseFile.htm" />
+  <HelpKINode Title="Parse.ParseGeoDistance structure" Url="html/T_Parse_ParseGeoDistance.htm" />
+  <HelpKINode Title="Parse.ParseGeoPoint structure" Url="html/T_Parse_ParseGeoPoint.htm" />
+  <HelpKINode Title="Parse.ParseInstallation class" Url="html/T_Parse_ParseInstallation.htm" />
+  <HelpKINode Title="Parse.ParseObject class" Url="html/T_Parse_ParseObject.htm" />
+  <HelpKINode Title="Parse.ParsePush class" Url="html/T_Parse_ParsePush.htm" />
+  <HelpKINode Title="Parse.ParsePushNotificationEventArgs class" Url="html/T_Parse_ParsePushNotificationEventArgs.htm" />
+  <HelpKINode Title="Parse.ParseQuery(Of T) class" Url="html/T_Parse_ParseQuery_1.htm" />
+  <HelpKINode Title="Parse.ParseQuery&lt;T&gt; class" Url="html/T_Parse_ParseQuery_1.htm" />
+  <HelpKINode Title="Parse.ParseQueryExtensions class" Url="html/T_Parse_ParseQueryExtensions.htm" />
+  <HelpKINode Title="Parse.ParseRelation(Of T) class" Url="html/T_Parse_ParseRelation_1.htm" />
+  <HelpKINode Title="Parse.ParseRelation&lt;T&gt; class" Url="html/T_Parse_ParseRelation_1.htm" />
+  <HelpKINode Title="Parse.ParseRole class" Url="html/T_Parse_ParseRole.htm" />
+  <HelpKINode Title="Parse.ParseSession class" Url="html/T_Parse_ParseSession.htm" />
+  <HelpKINode Title="Parse.ParseUploadProgressEventArgs class" Url="html/T_Parse_ParseUploadProgressEventArgs.htm" />
+  <HelpKINode Title="Parse.ParseUser class" Url="html/T_Parse_ParseUser.htm" />
+  <HelpKINode Title="ParseACL class">
+    <HelpKINode Title="ParseACL Class" Url="html/T_Parse_ParseACL.htm" />
+    <HelpKINode Title="about ParseACL class" Url="html/T_Parse_ParseACL.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload_Parse_ParseACL__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseACL.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseACL.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseACL.GetReadAccess method" Url="html/Overload_Parse_ParseACL_GetReadAccess.htm" />
+  <HelpKINode Title="ParseACL.GetRoleReadAccess method" Url="html/Overload_Parse_ParseACL_GetRoleReadAccess.htm" />
+  <HelpKINode Title="ParseACL.GetRoleWriteAccess method" Url="html/Overload_Parse_ParseACL_GetRoleWriteAccess.htm" />
+  <HelpKINode Title="ParseACL.GetWriteAccess method" Url="html/Overload_Parse_ParseACL_GetWriteAccess.htm" />
+  <HelpKINode Title="ParseACL.ParseACL constructor" Url="html/Overload_Parse_ParseACL__ctor.htm" />
+  <HelpKINode Title="ParseACL.PublicReadAccess property" Url="html/P_Parse_ParseACL_PublicReadAccess.htm" />
+  <HelpKINode Title="ParseACL.PublicWriteAccess property" Url="html/P_Parse_ParseACL_PublicWriteAccess.htm" />
+  <HelpKINode Title="ParseACL.SetReadAccess method" Url="html/Overload_Parse_ParseACL_SetReadAccess.htm" />
+  <HelpKINode Title="ParseACL.SetRoleReadAccess method" Url="html/Overload_Parse_ParseACL_SetRoleReadAccess.htm" />
+  <HelpKINode Title="ParseACL.SetRoleWriteAccess method" Url="html/Overload_Parse_ParseACL_SetRoleWriteAccess.htm" />
+  <HelpKINode Title="ParseACL.SetWriteAccess method" Url="html/Overload_Parse_ParseACL_SetWriteAccess.htm" />
+  <HelpKINode Title="ParseAnalytics class">
+    <HelpKINode Title="ParseAnalytics Class" Url="html/T_Parse_ParseAnalytics.htm" />
+    <HelpKINode Title="about ParseAnalytics class" Url="html/T_Parse_ParseAnalytics.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseAnalytics.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseAnalytics.TrackAppOpenedAsync method" Url="html/Overload_Parse_ParseAnalytics_TrackAppOpenedAsync.htm" />
+  <HelpKINode Title="ParseAnalytics.TrackEventAsync method" Url="html/Overload_Parse_ParseAnalytics_TrackEventAsync.htm" />
+  <HelpKINode Title="ParseClassNameAttribute class">
+    <HelpKINode Title="ParseClassNameAttribute Class" Url="html/T_Parse_ParseClassNameAttribute.htm" />
+    <HelpKINode Title="about ParseClassNameAttribute class" Url="html/T_Parse_ParseClassNameAttribute.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParseClassNameAttribute__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseClassNameAttribute.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseClassNameAttribute.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseClassNameAttribute.ClassName property" Url="html/P_Parse_ParseClassNameAttribute_ClassName.htm" />
+  <HelpKINode Title="ParseClassNameAttribute.ParseClassNameAttribute constructor" Url="html/M_Parse_ParseClassNameAttribute__ctor.htm" />
+  <HelpKINode Title="ParseClient class">
+    <HelpKINode Title="ParseClient Class" Url="html/T_Parse_ParseClient.htm" />
+    <HelpKINode Title="about ParseClient class" Url="html/T_Parse_ParseClient.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseClient.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseClient.Initialize method" Url="html/M_Parse_ParseClient_Initialize.htm" />
+  <HelpKINode Title="ParseCloud class">
+    <HelpKINode Title="ParseCloud Class" Url="html/T_Parse_ParseCloud.htm" />
+    <HelpKINode Title="about ParseCloud class" Url="html/T_Parse_ParseCloud.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseCloud.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseCloud.CallFunctionAsync method" Url="html/Overload_Parse_ParseCloud_CallFunctionAsync.htm" />
+  <HelpKINode Title="ParseConfig class">
+    <HelpKINode Title="ParseConfig Class" Url="html/T_Parse_ParseConfig.htm" />
+    <HelpKINode Title="about ParseConfig class" Url="html/T_Parse_ParseConfig.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseConfig.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseConfig.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseConfig.CurrentConfig property" Url="html/P_Parse_ParseConfig_CurrentConfig.htm" />
+  <HelpKINode Title="ParseConfig.Get(Of T) method" Url="html/M_Parse_ParseConfig_Get__1.htm" />
+  <HelpKINode Title="ParseConfig.Get&lt;T&gt; method" Url="html/M_Parse_ParseConfig_Get__1.htm" />
+  <HelpKINode Title="ParseConfig.GetAsync method" Url="html/Overload_Parse_ParseConfig_GetAsync.htm" />
+  <HelpKINode Title="ParseConfig.Item property" Url="html/P_Parse_ParseConfig_Item.htm" />
+  <HelpKINode Title="ParseConfig.TryGetValue(Of T) method" Url="html/M_Parse_ParseConfig_TryGetValue__1.htm" />
+  <HelpKINode Title="ParseConfig.TryGetValue&lt;T&gt; method" Url="html/M_Parse_ParseConfig_TryGetValue__1.htm" />
+  <HelpKINode Title="ParseException class">
+    <HelpKINode Title="ParseException Class" Url="html/T_Parse_ParseException.htm" />
+    <HelpKINode Title="about ParseException class" Url="html/T_Parse_ParseException.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseException.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseException.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseException.Code property" Url="html/P_Parse_ParseException_Code.htm" />
+  <HelpKINode Title="ParseException.ErrorCode enumeration" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="ParseExtensions class">
+    <HelpKINode Title="ParseExtensions Class" Url="html/T_Parse_ParseExtensions.htm" />
+    <HelpKINode Title="about ParseExtensions class" Url="html/T_Parse_ParseExtensions.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseExtensions.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseExtensions.FetchAllAsync method" Url="html/Overload_Parse_ParseExtensions_FetchAllAsync.htm" />
+  <HelpKINode Title="ParseExtensions.FetchAllIfNeededAsync method" Url="html/Overload_Parse_ParseExtensions_FetchAllIfNeededAsync.htm" />
+  <HelpKINode Title="ParseExtensions.FetchAsync method" Url="html/Overload_Parse_ParseExtensions_FetchAsync.htm" />
+  <HelpKINode Title="ParseExtensions.FetchIfNeededAsync method" Url="html/Overload_Parse_ParseExtensions_FetchIfNeededAsync.htm" />
+  <HelpKINode Title="ParseExtensions.Or(Of T) method" Url="html/M_Parse_ParseExtensions_Or__1.htm" />
+  <HelpKINode Title="ParseExtensions.Or&lt;T&gt; method" Url="html/M_Parse_ParseExtensions_Or__1.htm" />
+  <HelpKINode Title="ParseExtensions.SaveAllAsync method" Url="html/Overload_Parse_ParseExtensions_SaveAllAsync.htm" />
+  <HelpKINode Title="ParseFacebookUtils class">
+    <HelpKINode Title="ParseFacebookUtils Class" Url="html/T_Parse_ParseFacebookUtils.htm" />
+    <HelpKINode Title="about ParseFacebookUtils class" Url="html/T_Parse_ParseFacebookUtils.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseFacebookUtils.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseFacebookUtils.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseFacebookUtils.AccessToken property" Url="html/P_Parse_ParseFacebookUtils_AccessToken.htm" />
+  <HelpKINode Title="ParseFacebookUtils.ApplicationId property" Url="html/P_Parse_ParseFacebookUtils_ApplicationId.htm" />
+  <HelpKINode Title="ParseFacebookUtils.Initialize method" Url="html/M_Parse_ParseFacebookUtils_Initialize.htm" />
+  <HelpKINode Title="ParseFacebookUtils.IsLinked method" Url="html/M_Parse_ParseFacebookUtils_IsLinked.htm" />
+  <HelpKINode Title="ParseFacebookUtils.LinkAsync method" Url="html/Overload_Parse_ParseFacebookUtils_LinkAsync.htm" />
+  <HelpKINode Title="ParseFacebookUtils.LogInAsync method" Url="html/Overload_Parse_ParseFacebookUtils_LogInAsync.htm" />
+  <HelpKINode Title="ParseFacebookUtils.UnlinkAsync method" Url="html/Overload_Parse_ParseFacebookUtils_UnlinkAsync.htm" />
+  <HelpKINode Title="ParseFieldNameAttribute class">
+    <HelpKINode Title="ParseFieldNameAttribute Class" Url="html/T_Parse_ParseFieldNameAttribute.htm" />
+    <HelpKINode Title="about ParseFieldNameAttribute class" Url="html/T_Parse_ParseFieldNameAttribute.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParseFieldNameAttribute__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseFieldNameAttribute.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseFieldNameAttribute.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseFieldNameAttribute.FieldName property" Url="html/P_Parse_ParseFieldNameAttribute_FieldName.htm" />
+  <HelpKINode Title="ParseFieldNameAttribute.ParseFieldNameAttribute constructor" Url="html/M_Parse_ParseFieldNameAttribute__ctor.htm" />
+  <HelpKINode Title="ParseFile class">
+    <HelpKINode Title="ParseFile Class" Url="html/T_Parse_ParseFile.htm" />
+    <HelpKINode Title="about ParseFile class" Url="html/T_Parse_ParseFile.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload_Parse_ParseFile__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseFile.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseFile.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseFile.IsDirty property" Url="html/P_Parse_ParseFile_IsDirty.htm" />
+  <HelpKINode Title="ParseFile.MimeType property" Url="html/P_Parse_ParseFile_MimeType.htm" />
+  <HelpKINode Title="ParseFile.Name property" Url="html/P_Parse_ParseFile_Name.htm" />
+  <HelpKINode Title="ParseFile.ParseFile constructor" Url="html/Overload_Parse_ParseFile__ctor.htm" />
+  <HelpKINode Title="ParseFile.SaveAsync method" Url="html/Overload_Parse_ParseFile_SaveAsync.htm" />
+  <HelpKINode Title="ParseFile.Url property" Url="html/P_Parse_ParseFile_Url.htm" />
+  <HelpKINode Title="ParseGeoDistance structure">
+    <HelpKINode Title="ParseGeoDistance Structure" Url="html/T_Parse_ParseGeoDistance.htm" />
+    <HelpKINode Title="about ParseGeoDistance structure" Url="html/T_Parse_ParseGeoDistance.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParseGeoDistance__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseGeoDistance.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseGeoDistance.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseGeoDistance.FromKilometers method" Url="html/M_Parse_ParseGeoDistance_FromKilometers.htm" />
+  <HelpKINode Title="ParseGeoDistance.FromMiles method" Url="html/M_Parse_ParseGeoDistance_FromMiles.htm" />
+  <HelpKINode Title="ParseGeoDistance.FromRadians method" Url="html/M_Parse_ParseGeoDistance_FromRadians.htm" />
+  <HelpKINode Title="ParseGeoDistance.Kilometers property" Url="html/P_Parse_ParseGeoDistance_Kilometers.htm" />
+  <HelpKINode Title="ParseGeoDistance.Miles property" Url="html/P_Parse_ParseGeoDistance_Miles.htm" />
+  <HelpKINode Title="ParseGeoDistance.ParseGeoDistance constructor" Url="html/M_Parse_ParseGeoDistance__ctor.htm" />
+  <HelpKINode Title="ParseGeoDistance.Radians property" Url="html/P_Parse_ParseGeoDistance_Radians.htm" />
+  <HelpKINode Title="ParseGeoPoint structure">
+    <HelpKINode Title="ParseGeoPoint Structure" Url="html/T_Parse_ParseGeoPoint.htm" />
+    <HelpKINode Title="about ParseGeoPoint structure" Url="html/T_Parse_ParseGeoPoint.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParseGeoPoint__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseGeoPoint.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseGeoPoint.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseGeoPoint.DistanceTo method" Url="html/M_Parse_ParseGeoPoint_DistanceTo.htm" />
+  <HelpKINode Title="ParseGeoPoint.Latitude property" Url="html/P_Parse_ParseGeoPoint_Latitude.htm" />
+  <HelpKINode Title="ParseGeoPoint.Longitude property" Url="html/P_Parse_ParseGeoPoint_Longitude.htm" />
+  <HelpKINode Title="ParseGeoPoint.ParseGeoPoint constructor" Url="html/M_Parse_ParseGeoPoint__ctor.htm" />
+  <HelpKINode Title="ParseInstallation class">
+    <HelpKINode Title="ParseInstallation Class" Url="html/T_Parse_ParseInstallation.htm" />
+    <HelpKINode Title="about ParseInstallation class" Url="html/T_Parse_ParseInstallation.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParseInstallation__ctor.htm" />
+    <HelpKINode Title="events" Url="html/Events_T_Parse_ParseInstallation.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseInstallation.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseInstallation.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseInstallation.AppIdentifier property" Url="html/P_Parse_ParseInstallation_AppIdentifier.htm" />
+  <HelpKINode Title="ParseInstallation.AppName property" Url="html/P_Parse_ParseInstallation_AppName.htm" />
+  <HelpKINode Title="ParseInstallation.AppVersion property" Url="html/P_Parse_ParseInstallation_AppVersion.htm" />
+  <HelpKINode Title="ParseInstallation.Channels property" Url="html/P_Parse_ParseInstallation_Channels.htm" />
+  <HelpKINode Title="ParseInstallation.CurrentInstallation property" Url="html/P_Parse_ParseInstallation_CurrentInstallation.htm" />
+  <HelpKINode Title="ParseInstallation.DeviceType property" Url="html/P_Parse_ParseInstallation_DeviceType.htm" />
+  <HelpKINode Title="ParseInstallation.InstallationId property" Url="html/P_Parse_ParseInstallation_InstallationId.htm" />
+  <HelpKINode Title="ParseInstallation.LocaleIdentifier property" Url="html/P_Parse_ParseInstallation_LocaleIdentifier.htm" />
+  <HelpKINode Title="ParseInstallation.ParseInstallation constructor" Url="html/M_Parse_ParseInstallation__ctor.htm" />
+  <HelpKINode Title="ParseInstallation.ParseVersion property" Url="html/P_Parse_ParseInstallation_ParseVersion.htm" />
+  <HelpKINode Title="ParseInstallation.Query property" Url="html/P_Parse_ParseInstallation_Query.htm" />
+  <HelpKINode Title="ParseInstallation.TimeZone property" Url="html/P_Parse_ParseInstallation_TimeZone.htm" />
+  <HelpKINode Title="ParseObject class">
+    <HelpKINode Title="ParseObject Class" Url="html/T_Parse_ParseObject.htm" />
+    <HelpKINode Title="about ParseObject class" Url="html/T_Parse_ParseObject.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload_Parse_ParseObject__ctor.htm" />
+    <HelpKINode Title="events" Url="html/Events_T_Parse_ParseObject.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseObject.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseObject.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseObject.ACL property" Url="html/P_Parse_ParseObject_ACL.htm" />
+  <HelpKINode Title="ParseObject.Add method" Url="html/M_Parse_ParseObject_Add.htm" />
+  <HelpKINode Title="ParseObject.AddRangeToList(Of T) method" Url="html/M_Parse_ParseObject_AddRangeToList__1.htm" />
+  <HelpKINode Title="ParseObject.AddRangeToList&lt;T&gt; method" Url="html/M_Parse_ParseObject_AddRangeToList__1.htm" />
+  <HelpKINode Title="ParseObject.AddRangeUniqueToList(Of T) method" Url="html/M_Parse_ParseObject_AddRangeUniqueToList__1.htm" />
+  <HelpKINode Title="ParseObject.AddRangeUniqueToList&lt;T&gt; method" Url="html/M_Parse_ParseObject_AddRangeUniqueToList__1.htm" />
+  <HelpKINode Title="ParseObject.AddToList method" Url="html/M_Parse_ParseObject_AddToList.htm" />
+  <HelpKINode Title="ParseObject.AddUniqueToList method" Url="html/M_Parse_ParseObject_AddUniqueToList.htm" />
+  <HelpKINode Title="ParseObject.ClassName property" Url="html/P_Parse_ParseObject_ClassName.htm" />
+  <HelpKINode Title="ParseObject.ContainsKey method" Url="html/M_Parse_ParseObject_ContainsKey.htm" />
+  <HelpKINode Title="ParseObject.Create method" Url="html/Overload_Parse_ParseObject_Create.htm" />
+  <HelpKINode Title="ParseObject.CreatedAt property" Url="html/P_Parse_ParseObject_CreatedAt.htm" />
+  <HelpKINode Title="ParseObject.CreateWithoutData method" Url="html/Overload_Parse_ParseObject_CreateWithoutData.htm" />
+  <HelpKINode Title="ParseObject.DeleteAllAsync method" Url="html/Overload_Parse_ParseObject_DeleteAllAsync.htm" />
+  <HelpKINode Title="ParseObject.DeleteAsync method" Url="html/Overload_Parse_ParseObject_DeleteAsync.htm" />
+  <HelpKINode Title="ParseObject.FetchAllAsync method" Url="html/Overload_Parse_ParseObject_FetchAllAsync.htm" />
+  <HelpKINode Title="ParseObject.FetchAllIfNeededAsync method" Url="html/Overload_Parse_ParseObject_FetchAllIfNeededAsync.htm" />
+  <HelpKINode Title="ParseObject.Get(Of T) method" Url="html/M_Parse_ParseObject_Get__1.htm" />
+  <HelpKINode Title="ParseObject.Get&lt;T&gt; method" Url="html/M_Parse_ParseObject_Get__1.htm" />
+  <HelpKINode Title="ParseObject.GetProperty method" Url="html/Overload_Parse_ParseObject_GetProperty.htm" />
+  <HelpKINode Title="ParseObject.GetQuery method" Url="html/M_Parse_ParseObject_GetQuery.htm" />
+  <HelpKINode Title="ParseObject.GetRelation(Of T) method" Url="html/M_Parse_ParseObject_GetRelation__1.htm" />
+  <HelpKINode Title="ParseObject.GetRelation&lt;T&gt; method" Url="html/M_Parse_ParseObject_GetRelation__1.htm" />
+  <HelpKINode Title="ParseObject.GetRelationProperty(Of T) method" Url="html/M_Parse_ParseObject_GetRelationProperty__1.htm" />
+  <HelpKINode Title="ParseObject.GetRelationProperty&lt;T&gt; method" Url="html/M_Parse_ParseObject_GetRelationProperty__1.htm" />
+  <HelpKINode Title="ParseObject.HasSameId method" Url="html/M_Parse_ParseObject_HasSameId.htm" />
+  <HelpKINode Title="ParseObject.Increment method" Url="html/Overload_Parse_ParseObject_Increment.htm" />
+  <HelpKINode Title="ParseObject.IsDataAvailable property" Url="html/P_Parse_ParseObject_IsDataAvailable.htm" />
+  <HelpKINode Title="ParseObject.IsDirty property" Url="html/P_Parse_ParseObject_IsDirty.htm" />
+  <HelpKINode Title="ParseObject.IsKeyDirty method" Url="html/M_Parse_ParseObject_IsKeyDirty.htm" />
+  <HelpKINode Title="ParseObject.IsNew property" Url="html/P_Parse_ParseObject_IsNew.htm" />
+  <HelpKINode Title="ParseObject.Item property" Url="html/P_Parse_ParseObject_Item.htm" />
+  <HelpKINode Title="ParseObject.Keys property" Url="html/P_Parse_ParseObject_Keys.htm" />
+  <HelpKINode Title="ParseObject.ObjectId property" Url="html/P_Parse_ParseObject_ObjectId.htm" />
+  <HelpKINode Title="ParseObject.OnFieldsChanged method" Url="html/M_Parse_ParseObject_OnFieldsChanged.htm" />
+  <HelpKINode Title="ParseObject.OnPropertyChanged method" Url="html/M_Parse_ParseObject_OnPropertyChanged.htm" />
+  <HelpKINode Title="ParseObject.ParseObject constructor" Url="html/Overload_Parse_ParseObject__ctor.htm" />
+  <HelpKINode Title="ParseObject.PropertyChanged event" Url="html/E_Parse_ParseObject_PropertyChanged.htm" />
+  <HelpKINode Title="ParseObject.RegisterSubclass(Of T) method" Url="html/M_Parse_ParseObject_RegisterSubclass__1.htm" />
+  <HelpKINode Title="ParseObject.RegisterSubclass&lt;T&gt; method" Url="html/M_Parse_ParseObject_RegisterSubclass__1.htm" />
+  <HelpKINode Title="ParseObject.Remove method" Url="html/M_Parse_ParseObject_Remove.htm" />
+  <HelpKINode Title="ParseObject.RemoveAllFromList(Of T) method" Url="html/M_Parse_ParseObject_RemoveAllFromList__1.htm" />
+  <HelpKINode Title="ParseObject.RemoveAllFromList&lt;T&gt; method" Url="html/M_Parse_ParseObject_RemoveAllFromList__1.htm" />
+  <HelpKINode Title="ParseObject.Revert method" Url="html/M_Parse_ParseObject_Revert.htm" />
+  <HelpKINode Title="ParseObject.SaveAllAsync method" Url="html/Overload_Parse_ParseObject_SaveAllAsync.htm" />
+  <HelpKINode Title="ParseObject.SaveAsync method" Url="html/Overload_Parse_ParseObject_SaveAsync.htm" />
+  <HelpKINode Title="ParseObject.SetProperty(Of T) method" Url="html/M_Parse_ParseObject_SetProperty__1.htm" />
+  <HelpKINode Title="ParseObject.SetProperty&lt;T&gt; method" Url="html/M_Parse_ParseObject_SetProperty__1.htm" />
+  <HelpKINode Title="ParseObject.TryGetValue(Of T) method" Url="html/M_Parse_ParseObject_TryGetValue__1.htm" />
+  <HelpKINode Title="ParseObject.TryGetValue&lt;T&gt; method" Url="html/M_Parse_ParseObject_TryGetValue__1.htm" />
+  <HelpKINode Title="ParseObject.UpdatedAt property" Url="html/P_Parse_ParseObject_UpdatedAt.htm" />
+  <HelpKINode Title="ParsePush class">
+    <HelpKINode Title="ParsePush Class" Url="html/T_Parse_ParsePush.htm" />
+    <HelpKINode Title="about ParsePush class" Url="html/T_Parse_ParsePush.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParsePush__ctor.htm" />
+    <HelpKINode Title="events" Url="html/Events_T_Parse_ParsePush.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParsePush.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParsePush.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParsePush.Alert property" Url="html/P_Parse_ParsePush_Alert.htm" />
+  <HelpKINode Title="ParsePush.Channels property" Url="html/P_Parse_ParsePush_Channels.htm" />
+  <HelpKINode Title="ParsePush.Data property" Url="html/P_Parse_ParsePush_Data.htm" />
+  <HelpKINode Title="ParsePush.Expiration property" Url="html/P_Parse_ParsePush_Expiration.htm" />
+  <HelpKINode Title="ParsePush.ExpirationInterval property" Url="html/P_Parse_ParsePush_ExpirationInterval.htm" />
+  <HelpKINode Title="ParsePush.ParsePush constructor" Url="html/M_Parse_ParsePush__ctor.htm" />
+  <HelpKINode Title="ParsePush.ParsePushNotificationReceived event" Url="html/E_Parse_ParsePush_ParsePushNotificationReceived.htm" />
+  <HelpKINode Title="ParsePush.PushJson method" Url="html/Overload_Parse_ParsePush_PushJson.htm" />
+  <HelpKINode Title="ParsePush.PushNotificationReceived event" Url="html/E_Parse_ParsePush_PushNotificationReceived.htm" />
+  <HelpKINode Title="ParsePush.Query property" Url="html/P_Parse_ParsePush_Query.htm" />
+  <HelpKINode Title="ParsePush.SendAlertAsync method" Url="html/Overload_Parse_ParsePush_SendAlertAsync.htm" />
+  <HelpKINode Title="ParsePush.SendAsync method" Url="html/Overload_Parse_ParsePush_SendAsync.htm" />
+  <HelpKINode Title="ParsePush.SendDataAsync method" Url="html/Overload_Parse_ParsePush_SendDataAsync.htm" />
+  <HelpKINode Title="ParsePush.SubscribeAsync method" Url="html/Overload_Parse_ParsePush_SubscribeAsync.htm" />
+  <HelpKINode Title="ParsePush.ToastNotificationReceived event" Url="html/E_Parse_ParsePush_ToastNotificationReceived.htm" />
+  <HelpKINode Title="ParsePush.UnsubscribeAsync method" Url="html/Overload_Parse_ParsePush_UnsubscribeAsync.htm" />
+  <HelpKINode Title="ParsePushNotificationEventArgs class">
+    <HelpKINode Title="ParsePushNotificationEventArgs Class" Url="html/T_Parse_ParsePushNotificationEventArgs.htm" />
+    <HelpKINode Title="about ParsePushNotificationEventArgs class" Url="html/T_Parse_ParsePushNotificationEventArgs.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParsePushNotificationEventArgs.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParsePushNotificationEventArgs.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParsePushNotificationEventArgs.Payload property" Url="html/P_Parse_ParsePushNotificationEventArgs_Payload.htm" />
+  <HelpKINode Title="ParsePushNotificationEventArgs.StringPayload property" Url="html/P_Parse_ParsePushNotificationEventArgs_StringPayload.htm" />
+  <HelpKINode Title="ParsePushNotificationReceived event" Url="html/E_Parse_ParsePush_ParsePushNotificationReceived.htm" />
+  <HelpKINode Title="ParseQuery(Of T) class">
+    <HelpKINode Title="ParseQuery(T) Class" Url="html/T_Parse_ParseQuery_1.htm" />
+    <HelpKINode Title="about ParseQuery(Of T) class" Url="html/T_Parse_ParseQuery_1.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload_Parse_ParseQuery_1__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseQuery_1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseQuery(Of T).CountAsync method" Url="html/Overload_Parse_ParseQuery_1_CountAsync.htm" />
+  <HelpKINode Title="ParseQuery(Of T).FindAsync method" Url="html/Overload_Parse_ParseQuery_1_FindAsync.htm" />
+  <HelpKINode Title="ParseQuery(Of T).FirstAsync method" Url="html/Overload_Parse_ParseQuery_1_FirstAsync.htm" />
+  <HelpKINode Title="ParseQuery(Of T).FirstOrDefaultAsync method" Url="html/Overload_Parse_ParseQuery_1_FirstOrDefaultAsync.htm" />
+  <HelpKINode Title="ParseQuery(Of T).GetAsync method" Url="html/Overload_Parse_ParseQuery_1_GetAsync.htm" />
+  <HelpKINode Title="ParseQuery(Of T).Include method" Url="html/M_Parse_ParseQuery_1_Include.htm" />
+  <HelpKINode Title="ParseQuery(Of T).Limit method" Url="html/M_Parse_ParseQuery_1_Limit.htm" />
+  <HelpKINode Title="ParseQuery(Of T).Or method" Url="html/M_Parse_ParseQuery_1_Or.htm" />
+  <HelpKINode Title="ParseQuery(Of T).OrderBy method" Url="html/M_Parse_ParseQuery_1_OrderBy.htm" />
+  <HelpKINode Title="ParseQuery(Of T).OrderByDescending method" Url="html/M_Parse_ParseQuery_1_OrderByDescending.htm" />
+  <HelpKINode Title="ParseQuery(Of T).ParseQuery constructor" Url="html/Overload_Parse_ParseQuery_1__ctor.htm" />
+  <HelpKINode Title="ParseQuery(Of T).Select method" Url="html/M_Parse_ParseQuery_1_Select.htm" />
+  <HelpKINode Title="ParseQuery(Of T).Skip method" Url="html/M_Parse_ParseQuery_1_Skip.htm" />
+  <HelpKINode Title="ParseQuery(Of T).ThenBy method" Url="html/M_Parse_ParseQuery_1_ThenBy.htm" />
+  <HelpKINode Title="ParseQuery(Of T).ThenByDescending method" Url="html/M_Parse_ParseQuery_1_ThenByDescending.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereContainedIn(Of TIn) method" Url="html/M_Parse_ParseQuery_1_WhereContainedIn__1.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereContains method" Url="html/M_Parse_ParseQuery_1_WhereContains.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereContainsAll(Of TIn) method" Url="html/M_Parse_ParseQuery_1_WhereContainsAll__1.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereDoesNotExist method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotExist.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereDoesNotMatchesKeyInQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereDoesNotMatchQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchQuery__1.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereEndsWith method" Url="html/M_Parse_ParseQuery_1_WhereEndsWith.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereEqualTo.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereExists method" Url="html/M_Parse_ParseQuery_1_WhereExists.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereGreaterThan method" Url="html/M_Parse_ParseQuery_1_WhereGreaterThan.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereGreaterThanOrEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereGreaterThanOrEqualTo.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereLessThan method" Url="html/M_Parse_ParseQuery_1_WhereLessThan.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereLessThanOrEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereLessThanOrEqualTo.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereMatches method" Url="html/Overload_Parse_ParseQuery_1_WhereMatches.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereMatchesKeyInQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereMatchesQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereMatchesQuery__1.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereNear method" Url="html/M_Parse_ParseQuery_1_WhereNear.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereNotContainedIn(Of TIn) method" Url="html/M_Parse_ParseQuery_1_WhereNotContainedIn__1.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereNotEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereNotEqualTo.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereStartsWith method" Url="html/M_Parse_ParseQuery_1_WhereStartsWith.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereWithinDistance method" Url="html/M_Parse_ParseQuery_1_WhereWithinDistance.htm" />
+  <HelpKINode Title="ParseQuery(Of T).WhereWithinGeoBox method" Url="html/M_Parse_ParseQuery_1_WhereWithinGeoBox.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt; class">
+    <HelpKINode Title="ParseQuery(T) Class" Url="html/T_Parse_ParseQuery_1.htm" />
+    <HelpKINode Title="about ParseQuery&lt;T&gt; class" Url="html/T_Parse_ParseQuery_1.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload_Parse_ParseQuery_1__ctor.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseQuery_1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseQuery&lt;T&gt;.CountAsync method" Url="html/Overload_Parse_ParseQuery_1_CountAsync.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.FindAsync method" Url="html/Overload_Parse_ParseQuery_1_FindAsync.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.FirstAsync method" Url="html/Overload_Parse_ParseQuery_1_FirstAsync.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.FirstOrDefaultAsync method" Url="html/Overload_Parse_ParseQuery_1_FirstOrDefaultAsync.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.GetAsync method" Url="html/Overload_Parse_ParseQuery_1_GetAsync.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.Include method" Url="html/M_Parse_ParseQuery_1_Include.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.Limit method" Url="html/M_Parse_ParseQuery_1_Limit.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.Or method" Url="html/M_Parse_ParseQuery_1_Or.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.OrderBy method" Url="html/M_Parse_ParseQuery_1_OrderBy.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.OrderByDescending method" Url="html/M_Parse_ParseQuery_1_OrderByDescending.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.ParseQuery constructor" Url="html/Overload_Parse_ParseQuery_1__ctor.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.Select method" Url="html/M_Parse_ParseQuery_1_Select.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.Skip method" Url="html/M_Parse_ParseQuery_1_Skip.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.ThenBy method" Url="html/M_Parse_ParseQuery_1_ThenBy.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.ThenByDescending method" Url="html/M_Parse_ParseQuery_1_ThenByDescending.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereContainedIn&lt;TIn&gt; method" Url="html/M_Parse_ParseQuery_1_WhereContainedIn__1.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereContains method" Url="html/M_Parse_ParseQuery_1_WhereContains.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereContainsAll&lt;TIn&gt; method" Url="html/M_Parse_ParseQuery_1_WhereContainsAll__1.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereDoesNotExist method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotExist.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereDoesNotMatchesKeyInQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereDoesNotMatchQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchQuery__1.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereEndsWith method" Url="html/M_Parse_ParseQuery_1_WhereEndsWith.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereEqualTo.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereExists method" Url="html/M_Parse_ParseQuery_1_WhereExists.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereGreaterThan method" Url="html/M_Parse_ParseQuery_1_WhereGreaterThan.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereGreaterThanOrEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereGreaterThanOrEqualTo.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereLessThan method" Url="html/M_Parse_ParseQuery_1_WhereLessThan.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereLessThanOrEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereLessThanOrEqualTo.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereMatches method" Url="html/Overload_Parse_ParseQuery_1_WhereMatches.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereMatchesKeyInQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereMatchesQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereMatchesQuery__1.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereNear method" Url="html/M_Parse_ParseQuery_1_WhereNear.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereNotContainedIn&lt;TIn&gt; method" Url="html/M_Parse_ParseQuery_1_WhereNotContainedIn__1.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereNotEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereNotEqualTo.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereStartsWith method" Url="html/M_Parse_ParseQuery_1_WhereStartsWith.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereWithinDistance method" Url="html/M_Parse_ParseQuery_1_WhereWithinDistance.htm" />
+  <HelpKINode Title="ParseQuery&lt;T&gt;.WhereWithinGeoBox method" Url="html/M_Parse_ParseQuery_1_WhereWithinGeoBox.htm" />
+  <HelpKINode Title="ParseQueryExtensions class">
+    <HelpKINode Title="ParseQueryExtensions Class" Url="html/T_Parse_ParseQueryExtensions.htm" />
+    <HelpKINode Title="about ParseQueryExtensions class" Url="html/T_Parse_ParseQueryExtensions.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseQueryExtensions.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseQueryExtensions.Join(Of TOuter, TInner, TKey, TResult) method" Url="html/M_Parse_ParseQueryExtensions_Join__4.htm" />
+  <HelpKINode Title="ParseQueryExtensions.Join&lt;TOuter, TInner, TKey, TResult&gt; method" Url="html/M_Parse_ParseQueryExtensions_Join__4.htm" />
+  <HelpKINode Title="ParseQueryExtensions.OrderBy(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_OrderBy__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.OrderBy&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_OrderBy__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.OrderByDescending(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_OrderByDescending__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.OrderByDescending&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_OrderByDescending__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.ThenBy(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_ThenBy__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.ThenBy&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_ThenBy__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.ThenByDescending(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_ThenByDescending__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.ThenByDescending&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_ThenByDescending__2.htm" />
+  <HelpKINode Title="ParseQueryExtensions.Where(Of TSource) method" Url="html/M_Parse_ParseQueryExtensions_Where__1.htm" />
+  <HelpKINode Title="ParseQueryExtensions.Where&lt;TSource&gt; method" Url="html/M_Parse_ParseQueryExtensions_Where__1.htm" />
+  <HelpKINode Title="ParseRelation(Of T) class">
+    <HelpKINode Title="ParseRelation(T) Class" Url="html/T_Parse_ParseRelation_1.htm" />
+    <HelpKINode Title="about ParseRelation(Of T) class" Url="html/T_Parse_ParseRelation_1.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseRelation_1.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseRelation_1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseRelation(Of T).Add method" Url="html/M_Parse_ParseRelation_1_Add.htm" />
+  <HelpKINode Title="ParseRelation(Of T).Query property" Url="html/P_Parse_ParseRelation_1_Query.htm" />
+  <HelpKINode Title="ParseRelation(Of T).Remove method" Url="html/M_Parse_ParseRelation_1_Remove.htm" />
+  <HelpKINode Title="ParseRelation&lt;T&gt; class">
+    <HelpKINode Title="ParseRelation(T) Class" Url="html/T_Parse_ParseRelation_1.htm" />
+    <HelpKINode Title="about ParseRelation&lt;T&gt; class" Url="html/T_Parse_ParseRelation_1.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseRelation_1.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseRelation_1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseRelation&lt;T&gt;.Add method" Url="html/M_Parse_ParseRelation_1_Add.htm" />
+  <HelpKINode Title="ParseRelation&lt;T&gt;.Query property" Url="html/P_Parse_ParseRelation_1_Query.htm" />
+  <HelpKINode Title="ParseRelation&lt;T&gt;.Remove method" Url="html/M_Parse_ParseRelation_1_Remove.htm" />
+  <HelpKINode Title="ParseRole class">
+    <HelpKINode Title="ParseRole Class" Url="html/T_Parse_ParseRole.htm" />
+    <HelpKINode Title="about ParseRole class" Url="html/T_Parse_ParseRole.htm" />
+    <HelpKINode Title="constructor" Url="html/Overload_Parse_ParseRole__ctor.htm" />
+    <HelpKINode Title="events" Url="html/Events_T_Parse_ParseRole.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseRole.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseRole.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseRole.Name property" Url="html/P_Parse_ParseRole_Name.htm" />
+  <HelpKINode Title="ParseRole.ParseRole constructor" Url="html/Overload_Parse_ParseRole__ctor.htm" />
+  <HelpKINode Title="ParseRole.Query property" Url="html/P_Parse_ParseRole_Query.htm" />
+  <HelpKINode Title="ParseRole.Roles property" Url="html/P_Parse_ParseRole_Roles.htm" />
+  <HelpKINode Title="ParseRole.Users property" Url="html/P_Parse_ParseRole_Users.htm" />
+  <HelpKINode Title="ParseSession class">
+    <HelpKINode Title="ParseSession Class" Url="html/T_Parse_ParseSession.htm" />
+    <HelpKINode Title="about ParseSession class" Url="html/T_Parse_ParseSession.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParseSession__ctor.htm" />
+    <HelpKINode Title="events" Url="html/Events_T_Parse_ParseSession.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseSession.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseSession.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseSession.GetCurrentSessionAsync method" Url="html/Overload_Parse_ParseSession_GetCurrentSessionAsync.htm" />
+  <HelpKINode Title="ParseSession.ParseSession constructor" Url="html/M_Parse_ParseSession__ctor.htm" />
+  <HelpKINode Title="ParseSession.Query property" Url="html/P_Parse_ParseSession_Query.htm" />
+  <HelpKINode Title="ParseSession.SessionToken property" Url="html/P_Parse_ParseSession_SessionToken.htm" />
+  <HelpKINode Title="ParseUploadProgressEventArgs class">
+    <HelpKINode Title="ParseUploadProgressEventArgs Class" Url="html/T_Parse_ParseUploadProgressEventArgs.htm" />
+    <HelpKINode Title="about ParseUploadProgressEventArgs class" Url="html/T_Parse_ParseUploadProgressEventArgs.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseUploadProgressEventArgs.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseUploadProgressEventArgs.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseUploadProgressEventArgs.Progress property" Url="html/P_Parse_ParseUploadProgressEventArgs_Progress.htm" />
+  <HelpKINode Title="ParseUser class">
+    <HelpKINode Title="ParseUser Class" Url="html/T_Parse_ParseUser.htm" />
+    <HelpKINode Title="about ParseUser class" Url="html/T_Parse_ParseUser.htm" />
+    <HelpKINode Title="constructor" Url="html/M_Parse_ParseUser__ctor.htm" />
+    <HelpKINode Title="events" Url="html/Events_T_Parse_ParseUser.htm" />
+    <HelpKINode Title="methods" Url="html/Methods_T_Parse_ParseUser.htm" />
+    <HelpKINode Title="properties" Url="html/Properties_T_Parse_ParseUser.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ParseUser.BecomeAsync method" Url="html/Overload_Parse_ParseUser_BecomeAsync.htm" />
+  <HelpKINode Title="ParseUser.CurrentUser property" Url="html/P_Parse_ParseUser_CurrentUser.htm" />
+  <HelpKINode Title="ParseUser.Email property" Url="html/P_Parse_ParseUser_Email.htm" />
+  <HelpKINode Title="ParseUser.EnableRevocableSessionAsync method" Url="html/Overload_Parse_ParseUser_EnableRevocableSessionAsync.htm" />
+  <HelpKINode Title="ParseUser.IsAuthenticated property" Url="html/P_Parse_ParseUser_IsAuthenticated.htm" />
+  <HelpKINode Title="ParseUser.LogInAsync method" Url="html/Overload_Parse_ParseUser_LogInAsync.htm" />
+  <HelpKINode Title="ParseUser.LogOut method" Url="html/M_Parse_ParseUser_LogOut.htm" />
+  <HelpKINode Title="ParseUser.LogOutAsync method" Url="html/Overload_Parse_ParseUser_LogOutAsync.htm" />
+  <HelpKINode Title="ParseUser.ParseUser constructor" Url="html/M_Parse_ParseUser__ctor.htm" />
+  <HelpKINode Title="ParseUser.Password property" Url="html/P_Parse_ParseUser_Password.htm" />
+  <HelpKINode Title="ParseUser.Query property" Url="html/P_Parse_ParseUser_Query.htm" />
+  <HelpKINode Title="ParseUser.Remove method" Url="html/M_Parse_ParseUser_Remove.htm" />
+  <HelpKINode Title="ParseUser.RequestPasswordResetAsync method" Url="html/Overload_Parse_ParseUser_RequestPasswordResetAsync.htm" />
+  <HelpKINode Title="ParseUser.SignUpAsync method" Url="html/Overload_Parse_ParseUser_SignUpAsync.htm" />
+  <HelpKINode Title="ParseUser.Username property" Url="html/P_Parse_ParseUser_Username.htm" />
+  <HelpKINode Title="ParseVersion property" Url="html/P_Parse_ParseInstallation_ParseVersion.htm" />
+  <HelpKINode Title="Password property" Url="html/P_Parse_ParseUser_Password.htm" />
+  <HelpKINode Title="PasswordMissing enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Payload property" Url="html/P_Parse_ParsePushNotificationEventArgs_Payload.htm" />
+  <HelpKINode Title="Progress property" Url="html/P_Parse_ParseUploadProgressEventArgs_Progress.htm" />
+  <HelpKINode Title="PropertyChanged event" Url="html/E_Parse_ParseObject_PropertyChanged.htm" />
+  <HelpKINode Title="PublicReadAccess property" Url="html/P_Parse_ParseACL_PublicReadAccess.htm" />
+  <HelpKINode Title="PublicWriteAccess property" Url="html/P_Parse_ParseACL_PublicWriteAccess.htm" />
+  <HelpKINode Title="PushJson method" Url="html/Overload_Parse_ParsePush_PushJson.htm" />
+  <HelpKINode Title="PushMisconfigured enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="PushNotificationReceived event" Url="html/E_Parse_ParsePush_PushNotificationReceived.htm" />
+  <HelpKINode Title="Query property">
+    <HelpKINode Title="ParseInstallation.Query Property " Url="html/P_Parse_ParseInstallation_Query.htm" />
+    <HelpKINode Title="ParsePush.Query Property " Url="html/P_Parse_ParsePush_Query.htm" />
+    <HelpKINode Title="ParseRelation(T).Query Property " Url="html/P_Parse_ParseRelation_1_Query.htm" />
+    <HelpKINode Title="ParseRole.Query Property " Url="html/P_Parse_ParseRole_Query.htm" />
+    <HelpKINode Title="ParseSession.Query Property " Url="html/P_Parse_ParseSession_Query.htm" />
+    <HelpKINode Title="ParseUser.Query Property " Url="html/P_Parse_ParseUser_Query.htm" />
+  </HelpKINode>
+  <HelpKINode Title="Radians property" Url="html/P_Parse_ParseGeoDistance_Radians.htm" />
+  <HelpKINode Title="RegisterSubclass(Of T) method" Url="html/M_Parse_ParseObject_RegisterSubclass__1.htm" />
+  <HelpKINode Title="RegisterSubclass&lt;T&gt; method" Url="html/M_Parse_ParseObject_RegisterSubclass__1.htm" />
+  <HelpKINode Title="Remove method">
+    <HelpKINode Title="ParseObject.Remove Method " Url="html/M_Parse_ParseObject_Remove.htm" />
+    <HelpKINode Title="ParseRelation(T).Remove Method " Url="html/M_Parse_ParseRelation_1_Remove.htm" />
+    <HelpKINode Title="ParseUser.Remove Method " Url="html/M_Parse_ParseUser_Remove.htm" />
+  </HelpKINode>
+  <HelpKINode Title="RemoveAllFromList(Of T) method" Url="html/M_Parse_ParseObject_RemoveAllFromList__1.htm" />
+  <HelpKINode Title="RemoveAllFromList&lt;T&gt; method" Url="html/M_Parse_ParseObject_RemoveAllFromList__1.htm" />
+  <HelpKINode Title="RequestLimitExceeded enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="RequestPasswordResetAsync method" Url="html/Overload_Parse_ParseUser_RequestPasswordResetAsync.htm" />
+  <HelpKINode Title="Revert method" Url="html/M_Parse_ParseObject_Revert.htm" />
+  <HelpKINode Title="Roles property" Url="html/P_Parse_ParseRole_Roles.htm" />
+  <HelpKINode Title="SaveAllAsync method">
+    <HelpKINode Title="ParseExtensions.SaveAllAsync Method " Url="html/Overload_Parse_ParseExtensions_SaveAllAsync.htm" />
+    <HelpKINode Title="ParseObject.SaveAllAsync Method " Url="html/Overload_Parse_ParseObject_SaveAllAsync.htm" />
+  </HelpKINode>
+  <HelpKINode Title="SaveAsync method">
+    <HelpKINode Title="ParseFile.SaveAsync Method " Url="html/Overload_Parse_ParseFile_SaveAsync.htm" />
+    <HelpKINode Title="ParseObject.SaveAsync Method " Url="html/Overload_Parse_ParseObject_SaveAsync.htm" />
+  </HelpKINode>
+  <HelpKINode Title="ScriptFailed enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Select method" Url="html/M_Parse_ParseQuery_1_Select.htm" />
+  <HelpKINode Title="SendAlertAsync method" Url="html/Overload_Parse_ParsePush_SendAlertAsync.htm" />
+  <HelpKINode Title="SendAsync method" Url="html/Overload_Parse_ParsePush_SendAsync.htm" />
+  <HelpKINode Title="SendDataAsync method" Url="html/Overload_Parse_ParsePush_SendDataAsync.htm" />
+  <HelpKINode Title="SessionMissing enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="SessionToken property" Url="html/P_Parse_ParseSession_SessionToken.htm" />
+  <HelpKINode Title="SetProperty(Of T) method" Url="html/M_Parse_ParseObject_SetProperty__1.htm" />
+  <HelpKINode Title="SetProperty&lt;T&gt; method" Url="html/M_Parse_ParseObject_SetProperty__1.htm" />
+  <HelpKINode Title="SetReadAccess method" Url="html/Overload_Parse_ParseACL_SetReadAccess.htm" />
+  <HelpKINode Title="SetRoleReadAccess method" Url="html/Overload_Parse_ParseACL_SetRoleReadAccess.htm" />
+  <HelpKINode Title="SetRoleWriteAccess method" Url="html/Overload_Parse_ParseACL_SetRoleWriteAccess.htm" />
+  <HelpKINode Title="SetWriteAccess method" Url="html/Overload_Parse_ParseACL_SetWriteAccess.htm" />
+  <HelpKINode Title="SignUpAsync method" Url="html/Overload_Parse_ParseUser_SignUpAsync.htm" />
+  <HelpKINode Title="Skip method" Url="html/M_Parse_ParseQuery_1_Skip.htm" />
+  <HelpKINode Title="StringPayload property" Url="html/P_Parse_ParsePushNotificationEventArgs_StringPayload.htm" />
+  <HelpKINode Title="SubscribeAsync method" Url="html/Overload_Parse_ParsePush_SubscribeAsync.htm" />
+  <HelpKINode Title="ThenBy method" Url="html/M_Parse_ParseQuery_1_ThenBy.htm" />
+  <HelpKINode Title="ThenBy(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_ThenBy__2.htm" />
+  <HelpKINode Title="ThenBy&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_ThenBy__2.htm" />
+  <HelpKINode Title="ThenByDescending method" Url="html/M_Parse_ParseQuery_1_ThenByDescending.htm" />
+  <HelpKINode Title="ThenByDescending(Of TSource, TSelector) method" Url="html/M_Parse_ParseQueryExtensions_ThenByDescending__2.htm" />
+  <HelpKINode Title="ThenByDescending&lt;TSource, TSelector&gt; method" Url="html/M_Parse_ParseQueryExtensions_ThenByDescending__2.htm" />
+  <HelpKINode Title="Timeout enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="TimeZone property" Url="html/P_Parse_ParseInstallation_TimeZone.htm" />
+  <HelpKINode Title="ToastNotificationReceived event" Url="html/E_Parse_ParsePush_ToastNotificationReceived.htm" />
+  <HelpKINode Title="TrackAppOpenedAsync method" Url="html/Overload_Parse_ParseAnalytics_TrackAppOpenedAsync.htm" />
+  <HelpKINode Title="TrackEventAsync method" Url="html/Overload_Parse_ParseAnalytics_TrackEventAsync.htm" />
+  <HelpKINode Title="TryGetValue(Of T) method">
+    <HelpKINode Title="ParseConfig.TryGetValue(T) Method " Url="html/M_Parse_ParseConfig_TryGetValue__1.htm" />
+    <HelpKINode Title="ParseObject.TryGetValue(T) Method " Url="html/M_Parse_ParseObject_TryGetValue__1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="TryGetValue&lt;T&gt; method">
+    <HelpKINode Title="ParseConfig.TryGetValue(T) Method " Url="html/M_Parse_ParseConfig_TryGetValue__1.htm" />
+    <HelpKINode Title="ParseObject.TryGetValue(T) Method " Url="html/M_Parse_ParseObject_TryGetValue__1.htm" />
+  </HelpKINode>
+  <HelpKINode Title="UnlinkAsync method" Url="html/Overload_Parse_ParseFacebookUtils_UnlinkAsync.htm" />
+  <HelpKINode Title="UnsubscribeAsync method" Url="html/Overload_Parse_ParsePush_UnsubscribeAsync.htm" />
+  <HelpKINode Title="UnsupportedService enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="UpdatedAt property" Url="html/P_Parse_ParseObject_UpdatedAt.htm" />
+  <HelpKINode Title="Url property" Url="html/P_Parse_ParseFile_Url.htm" />
+  <HelpKINode Title="Username property" Url="html/P_Parse_ParseUser_Username.htm" />
+  <HelpKINode Title="UsernameMissing enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="UsernameTaken enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Users property" Url="html/P_Parse_ParseRole_Users.htm" />
+  <HelpKINode Title="ValidationFailed enumeration member" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+  <HelpKINode Title="Where(Of TSource) method" Url="html/M_Parse_ParseQueryExtensions_Where__1.htm" />
+  <HelpKINode Title="Where&lt;TSource&gt; method" Url="html/M_Parse_ParseQueryExtensions_Where__1.htm" />
+  <HelpKINode Title="WhereContainedIn(Of TIn) method" Url="html/M_Parse_ParseQuery_1_WhereContainedIn__1.htm" />
+  <HelpKINode Title="WhereContainedIn&lt;TIn&gt; method" Url="html/M_Parse_ParseQuery_1_WhereContainedIn__1.htm" />
+  <HelpKINode Title="WhereContains method" Url="html/M_Parse_ParseQuery_1_WhereContains.htm" />
+  <HelpKINode Title="WhereContainsAll(Of TIn) method" Url="html/M_Parse_ParseQuery_1_WhereContainsAll__1.htm" />
+  <HelpKINode Title="WhereContainsAll&lt;TIn&gt; method" Url="html/M_Parse_ParseQuery_1_WhereContainsAll__1.htm" />
+  <HelpKINode Title="WhereDoesNotExist method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotExist.htm" />
+  <HelpKINode Title="WhereDoesNotMatchesKeyInQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="WhereDoesNotMatchesKeyInQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="WhereDoesNotMatchQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchQuery__1.htm" />
+  <HelpKINode Title="WhereDoesNotMatchQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchQuery__1.htm" />
+  <HelpKINode Title="WhereEndsWith method" Url="html/M_Parse_ParseQuery_1_WhereEndsWith.htm" />
+  <HelpKINode Title="WhereEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereEqualTo.htm" />
+  <HelpKINode Title="WhereExists method" Url="html/M_Parse_ParseQuery_1_WhereExists.htm" />
+  <HelpKINode Title="WhereGreaterThan method" Url="html/M_Parse_ParseQuery_1_WhereGreaterThan.htm" />
+  <HelpKINode Title="WhereGreaterThanOrEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereGreaterThanOrEqualTo.htm" />
+  <HelpKINode Title="WhereLessThan method" Url="html/M_Parse_ParseQuery_1_WhereLessThan.htm" />
+  <HelpKINode Title="WhereLessThanOrEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereLessThanOrEqualTo.htm" />
+  <HelpKINode Title="WhereMatches method" Url="html/Overload_Parse_ParseQuery_1_WhereMatches.htm" />
+  <HelpKINode Title="WhereMatchesKeyInQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="WhereMatchesKeyInQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereMatchesKeyInQuery__1.htm" />
+  <HelpKINode Title="WhereMatchesQuery(Of TOther) method" Url="html/M_Parse_ParseQuery_1_WhereMatchesQuery__1.htm" />
+  <HelpKINode Title="WhereMatchesQuery&lt;TOther&gt; method" Url="html/M_Parse_ParseQuery_1_WhereMatchesQuery__1.htm" />
+  <HelpKINode Title="WhereNear method" Url="html/M_Parse_ParseQuery_1_WhereNear.htm" />
+  <HelpKINode Title="WhereNotContainedIn(Of TIn) method" Url="html/M_Parse_ParseQuery_1_WhereNotContainedIn__1.htm" />
+  <HelpKINode Title="WhereNotContainedIn&lt;TIn&gt; method" Url="html/M_Parse_ParseQuery_1_WhereNotContainedIn__1.htm" />
+  <HelpKINode Title="WhereNotEqualTo method" Url="html/M_Parse_ParseQuery_1_WhereNotEqualTo.htm" />
+  <HelpKINode Title="WhereStartsWith method" Url="html/M_Parse_ParseQuery_1_WhereStartsWith.htm" />
+  <HelpKINode Title="WhereWithinDistance method" Url="html/M_Parse_ParseQuery_1_WhereWithinDistance.htm" />
+  <HelpKINode Title="WhereWithinGeoBox method" Url="html/M_Parse_ParseQuery_1_WhereWithinGeoBox.htm" />
+</HelpKI>

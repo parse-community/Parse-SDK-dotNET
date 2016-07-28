@@ -1,0 +1,35 @@
+﻿<html><head><meta http-equiv="X-UA-Compatible" content="IE=edge" /><link rel="shortcut icon" href="../icons/favicon.ico" /><style type="text/css">.OH_CodeSnippetContainerTabLeftActive, .OH_CodeSnippetContainerTabLeft,.OH_CodeSnippetContainerTabLeftDisabled { }.OH_CodeSnippetContainerTabRightActive, .OH_CodeSnippetContainerTabRight,.OH_CodeSnippetContainerTabRightDisabled { }.OH_footer { }</style><link rel="stylesheet" type="text/css" href="../styles/branding.css" /><link rel="stylesheet" type="text/css" href="../styles/branding-en-US.css" /><script type="text/javascript" src="../scripts/branding.js"> </script><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>ParsePush Properties</title><meta name="Language" content="en-us" /><meta name="System.Keywords" content="ParsePush class, properties" /><meta name="Microsoft.Help.Id" content="Properties.T:Parse.ParsePush" /><meta name="Microsoft.Help.ContentType" content="Reference" /><meta name="BrandingAware" content="true" /><meta name="container" content="Parse" /><meta name="file" content="Properties_T_Parse_ParsePush" /><meta name="guid" content="Properties_T_Parse_ParsePush" /><link type="text/css" rel="stylesheet" href="../styles/highlight.css" /><script type="text/javascript" src="../scripts/highlight.js"> </script></head><body onload="OnLoad('cs')"><input type="hidden" id="userDataCache" class="userDataStyle" /><div class="OH_outerDiv"><div class="OH_outerContent"><table class="TitleTable"><tr><td class="OH_tdTitleColumn">ParsePush Properties</td><td class="OH_tdRunningTitleColumn">Parse</td></tr></table><div id="mainSection"><div id="mainBody"><span class="introStyle"></span><p>The <a href="T_Parse_ParsePush.htm">ParsePush</a> type exposes the following members.</p><div class="OH_CollapsibleAreaRegion"><div class="OH_regiontitle">Properties</div><div class="OH_CollapsibleArea_HrDiv"><hr class="OH_CollapsibleArea_Hr" /></div></div><div class="OH_clear"> </div><table id="memberList" class="members"><tr><th class="ps_iconColumn">
+								 
+							</th><th>Name</th><th>Description</th></tr><tr data="public;declared;notNetfw;"><td><img src="../icons/pubproperty.gif" alt="Public property" title="Public property" /></td><td><a href="P_Parse_ParsePush_Alert.htm">Alert</a></td><td><div class="summary">
+            A conveninence method which sets Data to a dictionary with alert as its only field. Equivalent to
+            
+            <div class="OH_CodeSnippetContainer"><div class="OH_CodeSnippetContainerCodeCollection"><div class="OH_CodeSnippetToolBar"><div class="OH_CodeSnippetToolBarText"><a id="ID0EABAFCDA_copyCode" href="#" onclick="javascript:CopyToClipboard('ID0EABAFCDA');return false;" title="Copy">Copy</a></div></div><div id="ID0EABAFCDA_code_Div1" class="OH_CodeSnippetContainerCode" style="display: block"><pre xml:space="preserve">Data = <span class="highlight-keyword">new</span> Dictionary&lt;<span class="highlight-keyword">string</span>, <span class="highlight-keyword">object</span>&gt; {{<span class="highlight-literal">"alert"</span>, alert}};</pre></div></div></div><script type="text/javascript">AddLanguageTabSet("ID0EABAFCDA");</script>
+            
+            This should not be used in tandem with Data.
+            </div></td></tr><tr data="public;declared;notNetfw;"><td><img src="../icons/pubproperty.gif" alt="Public property" title="Public property" /></td><td><a href="P_Parse_ParsePush_Channels.htm">Channels</a></td><td><div class="summary">
+            A short-hand to set a query which only discriminates on the channels to which a device is subscribed.
+            This is shorthand for:
+            
+            <div class="OH_CodeSnippetContainer"><div class="OH_CodeSnippetContainerCodeCollection"><div class="OH_CodeSnippetToolBar"><div class="OH_CodeSnippetToolBarText"><a id="ID0EABAECDA_copyCode" href="#" onclick="javascript:CopyToClipboard('ID0EABAECDA');return false;" title="Copy">Copy</a></div></div><div id="ID0EABAECDA_code_Div1" class="OH_CodeSnippetContainerCode" style="display: block"><pre xml:space="preserve"><span class="highlight-keyword">var</span> push = <span class="highlight-keyword">new</span> Push();
+push.Query = ParseInstallation.Query.WhereKeyContainedIn(<span class="highlight-literal">"channels"</span>, channels);</pre></div></div></div><script type="text/javascript">AddLanguageTabSet("ID0EABAECDA");</script>
+            
+            This cannot be used in tandem with Query.
+            </div></td></tr><tr data="public;declared;notNetfw;"><td><img src="../icons/pubproperty.gif" alt="Public property" title="Public property" /></td><td><a href="P_Parse_ParsePush_Data.htm">Data</a></td><td><div class="summary">
+            The contents of this push. Some keys have special meaning. A full list of pre-defined
+            keys can be found in the Parse Push Guide. The following keys affect WinRT devices.
+            Keys which do not start with x-winrt- can be prefixed with x-winrt- to specify an
+            override only sent to winrt devices.
+            alert: the body of the alert text.
+            title: The title of the text.
+            x-winrt-payload: A full XML payload to be sent to WinRT installations instead of
+                 the auto-layout.
+            This should not be used in tandem with Alert.
+            </div></td></tr><tr data="public;declared;notNetfw;"><td><img src="../icons/pubproperty.gif" alt="Public property" title="Public property" /></td><td><a href="P_Parse_ParsePush_Expiration.htm">Expiration</a></td><td><div class="summary">
+            The time at which this push will expire. This should not be used in tandem with ExpirationInterval.
+            </div></td></tr><tr data="public;declared;notNetfw;"><td><img src="../icons/pubproperty.gif" alt="Public property" title="Public property" /></td><td><a href="P_Parse_ParsePush_ExpirationInterval.htm">ExpirationInterval</a></td><td><div class="summary">
+            The time from initial schedul when this push will expire. This should not be used in tandem with Expiration.
+            </div></td></tr><tr data="public;declared;notNetfw;"><td><img src="../icons/pubproperty.gif" alt="Public property" title="Public property" /></td><td><a href="P_Parse_ParsePush_Query.htm">Query</a></td><td><div class="summary">
+            An installation query that specifies which installations shoudl receive
+            this push.
+            This should not be used in tandem with Channels.
+            </div></td></tr></table><a href="#mainBody">Top</a><div class="OH_CollapsibleAreaRegion" id="seeAlsoSection"><div class="OH_regiontitle">See Also</div><div class="OH_CollapsibleArea_HrDiv"><hr class="OH_CollapsibleArea_Hr" /></div></div><div class="OH_clear"> </div><h4 class="subHeading">Reference</h4><div class="seeAlsoStyle"><a href="T_Parse_ParsePush.htm">ParsePush Class</a></div><div class="seeAlsoStyle"><a href="N_Parse.htm">Parse Namespace</a></div></div></div></div></div><div id="OH_footer" class="OH_footer"> </div></body></html>

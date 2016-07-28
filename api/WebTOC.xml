@@ -1,0 +1,524 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HelpTOC>
+
+  <HelpTOCNode Id="ac320d15-ee54-42ad-bf23-c314aadd92c6" Title="Parse" Url="html/N_Parse.htm">
+    <HelpTOCNode Id="9423d094-41d6-44cb-8501-c3f50920fe54" Title="ParseACL Class" Url="html/T_Parse_ParseACL.htm">
+      <HelpTOCNode Id="8fc4dcb3-028a-4e8d-8e05-8accdccfbd4d" Title="ParseACL Constructor " Url="html/Overload_Parse_ParseACL__ctor.htm">
+        <HelpTOCNode Title="ParseACL Constructor " Url="html/M_Parse_ParseACL__ctor.htm" />
+        <HelpTOCNode Title="ParseACL Constructor (ParseUser)" Url="html/M_Parse_ParseACL__ctor_1.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="b450f303-918f-4fb4-a01c-94178d61be56" Title="ParseACL Properties" Url="html/Properties_T_Parse_ParseACL.htm">
+        <HelpTOCNode Title="PublicReadAccess Property " Url="html/P_Parse_ParseACL_PublicReadAccess.htm" />
+        <HelpTOCNode Title="PublicWriteAccess Property " Url="html/P_Parse_ParseACL_PublicWriteAccess.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="f1986566-264e-4857-bf04-fe9b03a2d33e" Title="ParseACL Methods" Url="html/Methods_T_Parse_ParseACL.htm">
+        <HelpTOCNode Id="f65ea4c1-f26e-4fbe-9a12-f4b39c53ade3" Title="GetReadAccess Method " Url="html/Overload_Parse_ParseACL_GetReadAccess.htm">
+          <HelpTOCNode Title="GetReadAccess Method (String)" Url="html/M_Parse_ParseACL_GetReadAccess_1.htm" />
+          <HelpTOCNode Title="GetReadAccess Method (ParseUser)" Url="html/M_Parse_ParseACL_GetReadAccess.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="7af22dea-522c-490c-a4dd-bb7019e1542a" Title="GetRoleReadAccess Method " Url="html/Overload_Parse_ParseACL_GetRoleReadAccess.htm">
+          <HelpTOCNode Title="GetRoleReadAccess Method (String)" Url="html/M_Parse_ParseACL_GetRoleReadAccess_1.htm" />
+          <HelpTOCNode Title="GetRoleReadAccess Method (ParseRole)" Url="html/M_Parse_ParseACL_GetRoleReadAccess.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="3f2c3b59-a60f-4fc8-a8ef-1a3fdf71b1bc" Title="GetRoleWriteAccess Method " Url="html/Overload_Parse_ParseACL_GetRoleWriteAccess.htm">
+          <HelpTOCNode Title="GetRoleWriteAccess Method (String)" Url="html/M_Parse_ParseACL_GetRoleWriteAccess_1.htm" />
+          <HelpTOCNode Title="GetRoleWriteAccess Method (ParseRole)" Url="html/M_Parse_ParseACL_GetRoleWriteAccess.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="9af65f69-f81d-4d02-8a3f-ec6196aa4f8c" Title="GetWriteAccess Method " Url="html/Overload_Parse_ParseACL_GetWriteAccess.htm">
+          <HelpTOCNode Title="GetWriteAccess Method (String)" Url="html/M_Parse_ParseACL_GetWriteAccess_1.htm" />
+          <HelpTOCNode Title="GetWriteAccess Method (ParseUser)" Url="html/M_Parse_ParseACL_GetWriteAccess.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="e7972913-af0a-42cd-ad75-c5c6951a3fb5" Title="SetReadAccess Method " Url="html/Overload_Parse_ParseACL_SetReadAccess.htm">
+          <HelpTOCNode Title="SetReadAccess Method (String, Boolean)" Url="html/M_Parse_ParseACL_SetReadAccess_1.htm" />
+          <HelpTOCNode Title="SetReadAccess Method (ParseUser, Boolean)" Url="html/M_Parse_ParseACL_SetReadAccess.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="19916f92-1223-49ee-864b-636699ba0bec" Title="SetRoleReadAccess Method " Url="html/Overload_Parse_ParseACL_SetRoleReadAccess.htm">
+          <HelpTOCNode Title="SetRoleReadAccess Method (String, Boolean)" Url="html/M_Parse_ParseACL_SetRoleReadAccess_1.htm" />
+          <HelpTOCNode Title="SetRoleReadAccess Method (ParseRole, Boolean)" Url="html/M_Parse_ParseACL_SetRoleReadAccess.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="9bf325e1-9c7a-43ee-a80d-4c73ef80f44e" Title="SetRoleWriteAccess Method " Url="html/Overload_Parse_ParseACL_SetRoleWriteAccess.htm">
+          <HelpTOCNode Title="SetRoleWriteAccess Method (String, Boolean)" Url="html/M_Parse_ParseACL_SetRoleWriteAccess_1.htm" />
+          <HelpTOCNode Title="SetRoleWriteAccess Method (ParseRole, Boolean)" Url="html/M_Parse_ParseACL_SetRoleWriteAccess.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="7f39f77f-4bcc-4e87-a5c5-ee29d3d942bb" Title="SetWriteAccess Method " Url="html/Overload_Parse_ParseACL_SetWriteAccess.htm">
+          <HelpTOCNode Title="SetWriteAccess Method (String, Boolean)" Url="html/M_Parse_ParseACL_SetWriteAccess_1.htm" />
+          <HelpTOCNode Title="SetWriteAccess Method (ParseUser, Boolean)" Url="html/M_Parse_ParseACL_SetWriteAccess.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="2703ccbd-046c-4ebb-9724-080764b2054a" Title="ParseAnalytics Class" Url="html/T_Parse_ParseAnalytics.htm">
+      <HelpTOCNode Id="bb56164f-6698-44ae-89a5-054f43f1f0c8" Title="ParseAnalytics Methods" Url="html/Methods_T_Parse_ParseAnalytics.htm">
+        <HelpTOCNode Id="b2f436a5-472f-444a-8051-fb89bf30f2cc" Title="TrackAppOpenedAsync Method " Url="html/Overload_Parse_ParseAnalytics_TrackAppOpenedAsync.htm">
+          <HelpTOCNode Title="TrackAppOpenedAsync Method " Url="html/M_Parse_ParseAnalytics_TrackAppOpenedAsync.htm" />
+          <HelpTOCNode Title="TrackAppOpenedAsync Method (ILaunchActivatedEventArgs)" Url="html/M_Parse_ParseAnalytics_TrackAppOpenedAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="add11931-0d9a-4026-b1d3-07c8821589d2" Title="TrackEventAsync Method " Url="html/Overload_Parse_ParseAnalytics_TrackEventAsync.htm">
+          <HelpTOCNode Title="TrackEventAsync Method (String)" Url="html/M_Parse_ParseAnalytics_TrackEventAsync.htm" />
+          <HelpTOCNode Title="TrackEventAsync Method (String, IDictionary(String, String))" Url="html/M_Parse_ParseAnalytics_TrackEventAsync_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="9b2221bb-f7fe-45b1-8f07-006afde22fe8" Title="ParseClassNameAttribute Class" Url="html/T_Parse_ParseClassNameAttribute.htm">
+      <HelpTOCNode Title="ParseClassNameAttribute Constructor " Url="html/M_Parse_ParseClassNameAttribute__ctor.htm" />
+      <HelpTOCNode Id="e5910648-a534-4b38-abe9-0734a1b2fd4c" Title="ParseClassNameAttribute Properties" Url="html/Properties_T_Parse_ParseClassNameAttribute.htm">
+        <HelpTOCNode Title="ClassName Property " Url="html/P_Parse_ParseClassNameAttribute_ClassName.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseClassNameAttribute Methods" Url="html/Methods_T_Parse_ParseClassNameAttribute.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="d586d0d1-4b62-4a4f-9edc-3fb21acc75de" Title="ParseClient Class" Url="html/T_Parse_ParseClient.htm">
+      <HelpTOCNode Id="09c535c8-c12d-49aa-bb3b-05db679a5f8b" Title="ParseClient Methods" Url="html/Methods_T_Parse_ParseClient.htm">
+        <HelpTOCNode Title="Initialize Method " Url="html/M_Parse_ParseClient_Initialize.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="0d0866d6-56f2-4ed2-a8a3-bb566b948a17" Title="ParseCloud Class" Url="html/T_Parse_ParseCloud.htm">
+      <HelpTOCNode Id="c3437ed2-7e86-496b-8e8e-7d486be23240" Title="ParseCloud Methods" Url="html/Methods_T_Parse_ParseCloud.htm">
+        <HelpTOCNode Id="e131decd-8557-4ac1-bd45-b8b6762fc65f" Title="CallFunctionAsync Method " Url="html/Overload_Parse_ParseCloud_CallFunctionAsync.htm">
+          <HelpTOCNode Title="CallFunctionAsync(T) Method (String, IDictionary(String, Object))" Url="html/M_Parse_ParseCloud_CallFunctionAsync__1.htm" />
+          <HelpTOCNode Title="CallFunctionAsync(T) Method (String, IDictionary(String, Object), CancellationToken)" Url="html/M_Parse_ParseCloud_CallFunctionAsync__1_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="c23abaa3-8da0-49e5-875d-63610e7c3d04" Title="ParseConfig Class" Url="html/T_Parse_ParseConfig.htm">
+      <HelpTOCNode Id="55600e81-fb75-424e-a81c-7ae0a9c1964e" Title="ParseConfig Properties" Url="html/Properties_T_Parse_ParseConfig.htm">
+        <HelpTOCNode Title="CurrentConfig Property " Url="html/P_Parse_ParseConfig_CurrentConfig.htm" />
+        <HelpTOCNode Title="Item Property " Url="html/P_Parse_ParseConfig_Item.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="77234d30-38e8-4a4c-9214-a33b3531a1f5" Title="ParseConfig Methods" Url="html/Methods_T_Parse_ParseConfig.htm">
+        <HelpTOCNode Title="Get(T) Method " Url="html/M_Parse_ParseConfig_Get__1.htm" />
+        <HelpTOCNode Id="9837cf5e-1f12-456e-9142-361ad08c21f1" Title="GetAsync Method " Url="html/Overload_Parse_ParseConfig_GetAsync.htm">
+          <HelpTOCNode Title="GetAsync Method " Url="html/M_Parse_ParseConfig_GetAsync.htm" />
+          <HelpTOCNode Title="GetAsync Method (CancellationToken)" Url="html/M_Parse_ParseConfig_GetAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="TryGetValue(T) Method " Url="html/M_Parse_ParseConfig_TryGetValue__1.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="67c619b9-1f2a-4146-bef2-7bd99b7aab96" Title="ParseException Class" Url="html/T_Parse_ParseException.htm">
+      <HelpTOCNode Id="57e60b90-1683-4ccc-b1ab-76849a7bfc13" Title="ParseException Properties" Url="html/Properties_T_Parse_ParseException.htm">
+        <HelpTOCNode Title="Code Property " Url="html/P_Parse_ParseException_Code.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseException Methods" Url="html/Methods_T_Parse_ParseException.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Title="ParseException.ErrorCode Enumeration" Url="html/T_Parse_ParseException_ErrorCode.htm" />
+    <HelpTOCNode Id="77d7c886-4204-4b9c-a2e7-e5a457a4d1b6" Title="ParseExtensions Class" Url="html/T_Parse_ParseExtensions.htm">
+      <HelpTOCNode Id="a5039c86-8f44-414e-9025-e38c3deb5021" Title="ParseExtensions Methods" Url="html/Methods_T_Parse_ParseExtensions.htm">
+        <HelpTOCNode Id="547610e1-6e0a-400f-bdc0-a05cd3a6d506" Title="FetchAllAsync Method " Url="html/Overload_Parse_ParseExtensions_FetchAllAsync.htm">
+          <HelpTOCNode Title="FetchAllAsync(T) Method (IEnumerable(T))" Url="html/M_Parse_ParseExtensions_FetchAllAsync__1.htm" />
+          <HelpTOCNode Title="FetchAllAsync(T) Method (IEnumerable(T), CancellationToken)" Url="html/M_Parse_ParseExtensions_FetchAllAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="4bf799c6-7510-45dc-bed8-03e50fcf90c1" Title="FetchAllIfNeededAsync Method " Url="html/Overload_Parse_ParseExtensions_FetchAllIfNeededAsync.htm">
+          <HelpTOCNode Title="FetchAllIfNeededAsync(T) Method (IEnumerable(T))" Url="html/M_Parse_ParseExtensions_FetchAllIfNeededAsync__1.htm" />
+          <HelpTOCNode Title="FetchAllIfNeededAsync(T) Method (IEnumerable(T), CancellationToken)" Url="html/M_Parse_ParseExtensions_FetchAllIfNeededAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="6af37d0d-c0d4-4a42-8e7f-2d517702ddcf" Title="FetchAsync Method " Url="html/Overload_Parse_ParseExtensions_FetchAsync.htm">
+          <HelpTOCNode Title="FetchAsync(T) Method (T)" Url="html/M_Parse_ParseExtensions_FetchAsync__1.htm" />
+          <HelpTOCNode Title="FetchAsync(T) Method (T, CancellationToken)" Url="html/M_Parse_ParseExtensions_FetchAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="2c5c205d-bd31-44de-9b72-150850f979b8" Title="FetchIfNeededAsync Method " Url="html/Overload_Parse_ParseExtensions_FetchIfNeededAsync.htm">
+          <HelpTOCNode Title="FetchIfNeededAsync(T) Method (T)" Url="html/M_Parse_ParseExtensions_FetchIfNeededAsync__1.htm" />
+          <HelpTOCNode Title="FetchIfNeededAsync(T) Method (T, CancellationToken)" Url="html/M_Parse_ParseExtensions_FetchIfNeededAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="Or(T) Method " Url="html/M_Parse_ParseExtensions_Or__1.htm" />
+        <HelpTOCNode Id="122d5314-2511-40c1-8ae5-c9ee0df2dac0" Title="SaveAllAsync Method " Url="html/Overload_Parse_ParseExtensions_SaveAllAsync.htm">
+          <HelpTOCNode Title="SaveAllAsync(T) Method (IEnumerable(T))" Url="html/M_Parse_ParseExtensions_SaveAllAsync__1.htm" />
+          <HelpTOCNode Title="SaveAllAsync(T) Method (IEnumerable(T), CancellationToken)" Url="html/M_Parse_ParseExtensions_SaveAllAsync__1_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="d7511e3b-a614-44b8-912d-03e2d5552358" Title="ParseFacebookUtils Class" Url="html/T_Parse_ParseFacebookUtils.htm">
+      <HelpTOCNode Id="d5ae9ba2-ca81-4349-af73-64c489b61de2" Title="ParseFacebookUtils Properties" Url="html/Properties_T_Parse_ParseFacebookUtils.htm">
+        <HelpTOCNode Title="AccessToken Property " Url="html/P_Parse_ParseFacebookUtils_AccessToken.htm" />
+        <HelpTOCNode Title="ApplicationId Property " Url="html/P_Parse_ParseFacebookUtils_ApplicationId.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="f52e096f-4a17-4416-8fc3-fcc65ddbc1a0" Title="ParseFacebookUtils Methods" Url="html/Methods_T_Parse_ParseFacebookUtils.htm">
+        <HelpTOCNode Title="Initialize Method " Url="html/M_Parse_ParseFacebookUtils_Initialize.htm" />
+        <HelpTOCNode Title="IsLinked Method " Url="html/M_Parse_ParseFacebookUtils_IsLinked.htm" />
+        <HelpTOCNode Id="1ecad9d8-b484-4024-b878-2258527c1efe" Title="LinkAsync Method " Url="html/Overload_Parse_ParseFacebookUtils_LinkAsync.htm">
+          <HelpTOCNode Title="LinkAsync Method (ParseUser, IEnumerable(String))" Url="html/M_Parse_ParseFacebookUtils_LinkAsync.htm" />
+          <HelpTOCNode Title="LinkAsync Method (ParseUser, IEnumerable(String), CancellationToken)" Url="html/M_Parse_ParseFacebookUtils_LinkAsync_1.htm" />
+          <HelpTOCNode Title="LinkAsync Method (ParseUser, WebView, IEnumerable(String))" Url="html/M_Parse_ParseFacebookUtils_LinkAsync_4.htm" />
+          <HelpTOCNode Title="LinkAsync Method (ParseUser, String, String, DateTime)" Url="html/M_Parse_ParseFacebookUtils_LinkAsync_2.htm" />
+          <HelpTOCNode Title="LinkAsync Method (ParseUser, WebView, IEnumerable(String), CancellationToken)" Url="html/M_Parse_ParseFacebookUtils_LinkAsync_5.htm" />
+          <HelpTOCNode Title="LinkAsync Method (ParseUser, String, String, DateTime, CancellationToken)" Url="html/M_Parse_ParseFacebookUtils_LinkAsync_3.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="4707035a-cf98-441f-8bf3-badd16bd56a9" Title="LogInAsync Method " Url="html/Overload_Parse_ParseFacebookUtils_LogInAsync.htm">
+          <HelpTOCNode Title="LogInAsync Method (IEnumerable(String))" Url="html/M_Parse_ParseFacebookUtils_LogInAsync.htm" />
+          <HelpTOCNode Title="LogInAsync Method (IEnumerable(String), CancellationToken)" Url="html/M_Parse_ParseFacebookUtils_LogInAsync_1.htm" />
+          <HelpTOCNode Title="LogInAsync Method (WebView, IEnumerable(String))" Url="html/M_Parse_ParseFacebookUtils_LogInAsync_4.htm" />
+          <HelpTOCNode Title="LogInAsync Method (String, String, DateTime)" Url="html/M_Parse_ParseFacebookUtils_LogInAsync_2.htm" />
+          <HelpTOCNode Title="LogInAsync Method (WebView, IEnumerable(String), CancellationToken)" Url="html/M_Parse_ParseFacebookUtils_LogInAsync_5.htm" />
+          <HelpTOCNode Title="LogInAsync Method (String, String, DateTime, CancellationToken)" Url="html/M_Parse_ParseFacebookUtils_LogInAsync_3.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="67cca1ac-d6db-4f08-8794-eb2040d61a51" Title="UnlinkAsync Method " Url="html/Overload_Parse_ParseFacebookUtils_UnlinkAsync.htm">
+          <HelpTOCNode Title="UnlinkAsync Method (ParseUser)" Url="html/M_Parse_ParseFacebookUtils_UnlinkAsync.htm" />
+          <HelpTOCNode Title="UnlinkAsync Method (ParseUser, CancellationToken)" Url="html/M_Parse_ParseFacebookUtils_UnlinkAsync_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="feb7988a-5d01-46bf-bae1-0d05e37a19f3" Title="ParseFieldNameAttribute Class" Url="html/T_Parse_ParseFieldNameAttribute.htm">
+      <HelpTOCNode Title="ParseFieldNameAttribute Constructor " Url="html/M_Parse_ParseFieldNameAttribute__ctor.htm" />
+      <HelpTOCNode Id="9f2c71b3-1a32-488c-afed-bd72eab1c6bc" Title="ParseFieldNameAttribute Properties" Url="html/Properties_T_Parse_ParseFieldNameAttribute.htm">
+        <HelpTOCNode Title="FieldName Property " Url="html/P_Parse_ParseFieldNameAttribute_FieldName.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseFieldNameAttribute Methods" Url="html/Methods_T_Parse_ParseFieldNameAttribute.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="95c982b2-706f-4771-beff-b07f8a90f024" Title="ParseFile Class" Url="html/T_Parse_ParseFile.htm">
+      <HelpTOCNode Id="7b03be3e-c5df-49c2-9823-b19b20408dcd" Title="ParseFile Constructor " Url="html/Overload_Parse_ParseFile__ctor.htm">
+        <HelpTOCNode Title="ParseFile Constructor (String, Byte[], String)" Url="html/M_Parse_ParseFile__ctor.htm" />
+        <HelpTOCNode Title="ParseFile Constructor (String, Stream, String)" Url="html/M_Parse_ParseFile__ctor_1.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="3f1bae89-0c89-47fe-a5ad-4f1b54f65f67" Title="ParseFile Properties" Url="html/Properties_T_Parse_ParseFile.htm">
+        <HelpTOCNode Title="IsDirty Property " Url="html/P_Parse_ParseFile_IsDirty.htm" />
+        <HelpTOCNode Title="MimeType Property " Url="html/P_Parse_ParseFile_MimeType.htm" />
+        <HelpTOCNode Title="Name Property " Url="html/P_Parse_ParseFile_Name.htm" />
+        <HelpTOCNode Title="Url Property " Url="html/P_Parse_ParseFile_Url.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="58119f1e-5fd9-4ef2-9cb8-db639b6e3992" Title="ParseFile Methods" Url="html/Methods_T_Parse_ParseFile.htm">
+        <HelpTOCNode Id="7702fd6b-b86b-4768-b2db-e551f6566d4a" Title="SaveAsync Method " Url="html/Overload_Parse_ParseFile_SaveAsync.htm">
+          <HelpTOCNode Title="SaveAsync Method " Url="html/M_Parse_ParseFile_SaveAsync.htm" />
+          <HelpTOCNode Title="SaveAsync Method (CancellationToken)" Url="html/M_Parse_ParseFile_SaveAsync_3.htm" />
+          <HelpTOCNode Title="SaveAsync Method (IProgress(ParseUploadProgressEventArgs))" Url="html/M_Parse_ParseFile_SaveAsync_1.htm" />
+          <HelpTOCNode Title="SaveAsync Method (IProgress(ParseUploadProgressEventArgs), CancellationToken)" Url="html/M_Parse_ParseFile_SaveAsync_2.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="6a990083-88f4-4439-ada4-451f3687e0d2" Title="ParseGeoDistance Structure" Url="html/T_Parse_ParseGeoDistance.htm">
+      <HelpTOCNode Title="ParseGeoDistance Constructor " Url="html/M_Parse_ParseGeoDistance__ctor.htm" />
+      <HelpTOCNode Id="251702c4-b1bd-4202-8500-5250eec45f64" Title="ParseGeoDistance Properties" Url="html/Properties_T_Parse_ParseGeoDistance.htm">
+        <HelpTOCNode Title="Kilometers Property " Url="html/P_Parse_ParseGeoDistance_Kilometers.htm" />
+        <HelpTOCNode Title="Miles Property " Url="html/P_Parse_ParseGeoDistance_Miles.htm" />
+        <HelpTOCNode Title="Radians Property " Url="html/P_Parse_ParseGeoDistance_Radians.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="eccbf0e5-3182-4b05-94ca-7526c15071d3" Title="ParseGeoDistance Methods" Url="html/Methods_T_Parse_ParseGeoDistance.htm">
+        <HelpTOCNode Title="FromKilometers Method " Url="html/M_Parse_ParseGeoDistance_FromKilometers.htm" />
+        <HelpTOCNode Title="FromMiles Method " Url="html/M_Parse_ParseGeoDistance_FromMiles.htm" />
+        <HelpTOCNode Title="FromRadians Method " Url="html/M_Parse_ParseGeoDistance_FromRadians.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="3ea2822a-42cf-4c1b-94b3-09669ba679d1" Title="ParseGeoPoint Structure" Url="html/T_Parse_ParseGeoPoint.htm">
+      <HelpTOCNode Title="ParseGeoPoint Constructor " Url="html/M_Parse_ParseGeoPoint__ctor.htm" />
+      <HelpTOCNode Id="6f07c1c9-3157-4747-8f0f-d5c3dcd02fe8" Title="ParseGeoPoint Properties" Url="html/Properties_T_Parse_ParseGeoPoint.htm">
+        <HelpTOCNode Title="Latitude Property " Url="html/P_Parse_ParseGeoPoint_Latitude.htm" />
+        <HelpTOCNode Title="Longitude Property " Url="html/P_Parse_ParseGeoPoint_Longitude.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="e72ebe45-5311-419d-a7d5-f72ae3f91fed" Title="ParseGeoPoint Methods" Url="html/Methods_T_Parse_ParseGeoPoint.htm">
+        <HelpTOCNode Title="DistanceTo Method " Url="html/M_Parse_ParseGeoPoint_DistanceTo.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="40fbacd2-9ce0-420a-81b6-d78d6625a3cc" Title="ParseInstallation Class" Url="html/T_Parse_ParseInstallation.htm">
+      <HelpTOCNode Title="ParseInstallation Constructor " Url="html/M_Parse_ParseInstallation__ctor.htm" />
+      <HelpTOCNode Id="224ad870-8572-43ac-87eb-f79a1ba0e630" Title="ParseInstallation Properties" Url="html/Properties_T_Parse_ParseInstallation.htm">
+        <HelpTOCNode Title="AppIdentifier Property " Url="html/P_Parse_ParseInstallation_AppIdentifier.htm" />
+        <HelpTOCNode Title="AppName Property " Url="html/P_Parse_ParseInstallation_AppName.htm" />
+        <HelpTOCNode Title="AppVersion Property " Url="html/P_Parse_ParseInstallation_AppVersion.htm" />
+        <HelpTOCNode Title="Channels Property " Url="html/P_Parse_ParseInstallation_Channels.htm" />
+        <HelpTOCNode Title="CurrentInstallation Property " Url="html/P_Parse_ParseInstallation_CurrentInstallation.htm" />
+        <HelpTOCNode Title="DeviceType Property " Url="html/P_Parse_ParseInstallation_DeviceType.htm" />
+        <HelpTOCNode Title="InstallationId Property " Url="html/P_Parse_ParseInstallation_InstallationId.htm" />
+        <HelpTOCNode Title="LocaleIdentifier Property " Url="html/P_Parse_ParseInstallation_LocaleIdentifier.htm" />
+        <HelpTOCNode Title="ParseVersion Property " Url="html/P_Parse_ParseInstallation_ParseVersion.htm" />
+        <HelpTOCNode Title="Query Property " Url="html/P_Parse_ParseInstallation_Query.htm" />
+        <HelpTOCNode Title="TimeZone Property " Url="html/P_Parse_ParseInstallation_TimeZone.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseInstallation Methods" Url="html/Methods_T_Parse_ParseInstallation.htm" />
+      <HelpTOCNode Title="ParseInstallation Events" Url="html/Events_T_Parse_ParseInstallation.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="e0566189-53d1-45ea-a8ed-78b7665e37dd" Title="ParseObject Class" Url="html/T_Parse_ParseObject.htm">
+      <HelpTOCNode Id="a6bdbbbd-dcef-4606-b1d6-158f11b3a30b" Title="ParseObject Constructor " Url="html/Overload_Parse_ParseObject__ctor.htm">
+        <HelpTOCNode Title="ParseObject Constructor " Url="html/M_Parse_ParseObject__ctor.htm" />
+        <HelpTOCNode Title="ParseObject Constructor (String)" Url="html/M_Parse_ParseObject__ctor_1.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="36fb0c0e-6297-4e88-95cf-a55b90b36bca" Title="ParseObject Properties" Url="html/Properties_T_Parse_ParseObject.htm">
+        <HelpTOCNode Title="ACL Property " Url="html/P_Parse_ParseObject_ACL.htm" />
+        <HelpTOCNode Title="ClassName Property " Url="html/P_Parse_ParseObject_ClassName.htm" />
+        <HelpTOCNode Title="CreatedAt Property " Url="html/P_Parse_ParseObject_CreatedAt.htm" />
+        <HelpTOCNode Title="IsDataAvailable Property " Url="html/P_Parse_ParseObject_IsDataAvailable.htm" />
+        <HelpTOCNode Title="IsDirty Property " Url="html/P_Parse_ParseObject_IsDirty.htm" />
+        <HelpTOCNode Title="IsNew Property " Url="html/P_Parse_ParseObject_IsNew.htm" />
+        <HelpTOCNode Title="Item Property " Url="html/P_Parse_ParseObject_Item.htm" />
+        <HelpTOCNode Title="Keys Property " Url="html/P_Parse_ParseObject_Keys.htm" />
+        <HelpTOCNode Title="ObjectId Property " Url="html/P_Parse_ParseObject_ObjectId.htm" />
+        <HelpTOCNode Title="UpdatedAt Property " Url="html/P_Parse_ParseObject_UpdatedAt.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="c1585569-b4a2-43c6-b814-c4f1249eb3cf" Title="ParseObject Methods" Url="html/Methods_T_Parse_ParseObject.htm">
+        <HelpTOCNode Title="Add Method " Url="html/M_Parse_ParseObject_Add.htm" />
+        <HelpTOCNode Title="AddRangeToList(T) Method " Url="html/M_Parse_ParseObject_AddRangeToList__1.htm" />
+        <HelpTOCNode Title="AddRangeUniqueToList(T) Method " Url="html/M_Parse_ParseObject_AddRangeUniqueToList__1.htm" />
+        <HelpTOCNode Title="AddToList Method " Url="html/M_Parse_ParseObject_AddToList.htm" />
+        <HelpTOCNode Title="AddUniqueToList Method " Url="html/M_Parse_ParseObject_AddUniqueToList.htm" />
+        <HelpTOCNode Title="ContainsKey Method " Url="html/M_Parse_ParseObject_ContainsKey.htm" />
+        <HelpTOCNode Id="abd98a31-ad91-4208-8ca2-a37a7e0971af" Title="Create Method " Url="html/Overload_Parse_ParseObject_Create.htm">
+          <HelpTOCNode Title="Create(T) Method " Url="html/M_Parse_ParseObject_Create__1.htm" />
+          <HelpTOCNode Title="Create Method (String)" Url="html/M_Parse_ParseObject_Create.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="98267171-9d60-4bf6-a2cf-99c1533579f7" Title="CreateWithoutData Method " Url="html/Overload_Parse_ParseObject_CreateWithoutData.htm">
+          <HelpTOCNode Title="CreateWithoutData(T) Method (String)" Url="html/M_Parse_ParseObject_CreateWithoutData__1.htm" />
+          <HelpTOCNode Title="CreateWithoutData Method (String, String)" Url="html/M_Parse_ParseObject_CreateWithoutData.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="a702cb1a-0de6-4181-baaf-5c572a5de7e3" Title="DeleteAllAsync Method " Url="html/Overload_Parse_ParseObject_DeleteAllAsync.htm">
+          <HelpTOCNode Title="DeleteAllAsync(T) Method (IEnumerable(T))" Url="html/M_Parse_ParseObject_DeleteAllAsync__1.htm" />
+          <HelpTOCNode Title="DeleteAllAsync(T) Method (IEnumerable(T), CancellationToken)" Url="html/M_Parse_ParseObject_DeleteAllAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="ee21bf16-6b11-45d8-b725-bdce74b3ba53" Title="DeleteAsync Method " Url="html/Overload_Parse_ParseObject_DeleteAsync.htm">
+          <HelpTOCNode Title="DeleteAsync Method " Url="html/M_Parse_ParseObject_DeleteAsync.htm" />
+          <HelpTOCNode Title="DeleteAsync Method (CancellationToken)" Url="html/M_Parse_ParseObject_DeleteAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="029ef3ca-8b41-4882-b04e-af832153948a" Title="FetchAllAsync Method " Url="html/Overload_Parse_ParseObject_FetchAllAsync.htm">
+          <HelpTOCNode Title="FetchAllAsync(T) Method (IEnumerable(T))" Url="html/M_Parse_ParseObject_FetchAllAsync__1.htm" />
+          <HelpTOCNode Title="FetchAllAsync(T) Method (IEnumerable(T), CancellationToken)" Url="html/M_Parse_ParseObject_FetchAllAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="a37f3be3-7f7a-4b41-9345-c0d07d081e83" Title="FetchAllIfNeededAsync Method " Url="html/Overload_Parse_ParseObject_FetchAllIfNeededAsync.htm">
+          <HelpTOCNode Title="FetchAllIfNeededAsync(T) Method (IEnumerable(T))" Url="html/M_Parse_ParseObject_FetchAllIfNeededAsync__1.htm" />
+          <HelpTOCNode Title="FetchAllIfNeededAsync(T) Method (IEnumerable(T), CancellationToken)" Url="html/M_Parse_ParseObject_FetchAllIfNeededAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="Get(T) Method " Url="html/M_Parse_ParseObject_Get__1.htm" />
+        <HelpTOCNode Id="b13cbe22-9bb5-4d26-abc6-58dc764f71da" Title="GetProperty Method " Url="html/Overload_Parse_ParseObject_GetProperty.htm">
+          <HelpTOCNode Title="GetProperty(T) Method (String)" Url="html/M_Parse_ParseObject_GetProperty__1.htm" />
+          <HelpTOCNode Title="GetProperty(T) Method (T, String)" Url="html/M_Parse_ParseObject_GetProperty__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="GetQuery Method " Url="html/M_Parse_ParseObject_GetQuery.htm" />
+        <HelpTOCNode Title="GetRelation(T) Method " Url="html/M_Parse_ParseObject_GetRelation__1.htm" />
+        <HelpTOCNode Title="GetRelationProperty(T) Method " Url="html/M_Parse_ParseObject_GetRelationProperty__1.htm" />
+        <HelpTOCNode Title="HasSameId Method " Url="html/M_Parse_ParseObject_HasSameId.htm" />
+        <HelpTOCNode Id="f0d0f795-793c-4c4a-b09d-ec499f0b9208" Title="Increment Method " Url="html/Overload_Parse_ParseObject_Increment.htm">
+          <HelpTOCNode Title="Increment Method (String)" Url="html/M_Parse_ParseObject_Increment.htm" />
+          <HelpTOCNode Title="Increment Method (String, Double)" Url="html/M_Parse_ParseObject_Increment_1.htm" />
+          <HelpTOCNode Title="Increment Method (String, Int64)" Url="html/M_Parse_ParseObject_Increment_2.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="IsKeyDirty Method " Url="html/M_Parse_ParseObject_IsKeyDirty.htm" />
+        <HelpTOCNode Title="OnFieldsChanged Method " Url="html/M_Parse_ParseObject_OnFieldsChanged.htm" />
+        <HelpTOCNode Title="OnPropertyChanged Method " Url="html/M_Parse_ParseObject_OnPropertyChanged.htm" />
+        <HelpTOCNode Title="RegisterSubclass(T) Method " Url="html/M_Parse_ParseObject_RegisterSubclass__1.htm" />
+        <HelpTOCNode Title="Remove Method " Url="html/M_Parse_ParseObject_Remove.htm" />
+        <HelpTOCNode Title="RemoveAllFromList(T) Method " Url="html/M_Parse_ParseObject_RemoveAllFromList__1.htm" />
+        <HelpTOCNode Title="Revert Method " Url="html/M_Parse_ParseObject_Revert.htm" />
+        <HelpTOCNode Id="b662a17d-306c-46eb-9118-b5024ae98a07" Title="SaveAllAsync Method " Url="html/Overload_Parse_ParseObject_SaveAllAsync.htm">
+          <HelpTOCNode Title="SaveAllAsync(T) Method (IEnumerable(T))" Url="html/M_Parse_ParseObject_SaveAllAsync__1.htm" />
+          <HelpTOCNode Title="SaveAllAsync(T) Method (IEnumerable(T), CancellationToken)" Url="html/M_Parse_ParseObject_SaveAllAsync__1_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="3780aca3-846f-4f47-a3b4-d286206093c6" Title="SaveAsync Method " Url="html/Overload_Parse_ParseObject_SaveAsync.htm">
+          <HelpTOCNode Title="SaveAsync Method " Url="html/M_Parse_ParseObject_SaveAsync.htm" />
+          <HelpTOCNode Title="SaveAsync Method (CancellationToken)" Url="html/M_Parse_ParseObject_SaveAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="SetProperty(T) Method " Url="html/M_Parse_ParseObject_SetProperty__1.htm" />
+        <HelpTOCNode Title="TryGetValue(T) Method " Url="html/M_Parse_ParseObject_TryGetValue__1.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="a37b0d40-da18-49b1-86a6-90c85592d9e6" Title="ParseObject Events" Url="html/Events_T_Parse_ParseObject.htm">
+        <HelpTOCNode Title="PropertyChanged Event" Url="html/E_Parse_ParseObject_PropertyChanged.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="3ff6d68b-cb2b-48e5-aaa6-3ccffaa38481" Title="ParsePush Class" Url="html/T_Parse_ParsePush.htm">
+      <HelpTOCNode Title="ParsePush Constructor " Url="html/M_Parse_ParsePush__ctor.htm" />
+      <HelpTOCNode Id="f3193f17-fec2-4571-89ea-909933d1aa2b" Title="ParsePush Properties" Url="html/Properties_T_Parse_ParsePush.htm">
+        <HelpTOCNode Title="Alert Property " Url="html/P_Parse_ParsePush_Alert.htm" />
+        <HelpTOCNode Title="Channels Property " Url="html/P_Parse_ParsePush_Channels.htm" />
+        <HelpTOCNode Title="Data Property " Url="html/P_Parse_ParsePush_Data.htm" />
+        <HelpTOCNode Title="Expiration Property " Url="html/P_Parse_ParsePush_Expiration.htm" />
+        <HelpTOCNode Title="ExpirationInterval Property " Url="html/P_Parse_ParsePush_ExpirationInterval.htm" />
+        <HelpTOCNode Title="Query Property " Url="html/P_Parse_ParsePush_Query.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="3af7c59f-2a7e-4173-bfe3-e4d0b788cab8" Title="ParsePush Methods" Url="html/Methods_T_Parse_ParsePush.htm">
+        <HelpTOCNode Id="bc41fc17-dafd-4e9e-b4fe-9caed0f9e018" Title="PushJson Method " Url="html/Overload_Parse_ParsePush_PushJson.htm">
+          <HelpTOCNode Title="PushJson Method (ILaunchActivatedEventArgs)" Url="html/M_Parse_ParsePush_PushJson.htm" />
+          <HelpTOCNode Title="PushJson Method (PushNotificationReceivedEventArgs)" Url="html/M_Parse_ParsePush_PushJson_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="4661a711-3e26-48aa-8c8d-3d19999002d9" Title="SendAlertAsync Method " Url="html/Overload_Parse_ParsePush_SendAlertAsync.htm">
+          <HelpTOCNode Title="SendAlertAsync Method (String)" Url="html/M_Parse_ParsePush_SendAlertAsync.htm" />
+          <HelpTOCNode Title="SendAlertAsync Method (String, ParseQuery(ParseInstallation))" Url="html/M_Parse_ParsePush_SendAlertAsync_1.htm" />
+          <HelpTOCNode Title="SendAlertAsync Method (String, IEnumerable(String))" Url="html/M_Parse_ParsePush_SendAlertAsync_2.htm" />
+          <HelpTOCNode Title="SendAlertAsync Method (String, String)" Url="html/M_Parse_ParsePush_SendAlertAsync_3.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="637751f0-083b-4ed9-8f3a-fe30583c95d6" Title="SendAsync Method " Url="html/Overload_Parse_ParsePush_SendAsync.htm">
+          <HelpTOCNode Title="SendAsync Method " Url="html/M_Parse_ParsePush_SendAsync.htm" />
+          <HelpTOCNode Title="SendAsync Method (CancellationToken)" Url="html/M_Parse_ParsePush_SendAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="fae5344c-31ba-4dc8-83ce-7f684bf9f243" Title="SendDataAsync Method " Url="html/Overload_Parse_ParsePush_SendDataAsync.htm">
+          <HelpTOCNode Title="SendDataAsync Method (IDictionary(String, Object))" Url="html/M_Parse_ParsePush_SendDataAsync.htm" />
+          <HelpTOCNode Title="SendDataAsync Method (IDictionary(String, Object), ParseQuery(ParseInstallation))" Url="html/M_Parse_ParsePush_SendDataAsync_1.htm" />
+          <HelpTOCNode Title="SendDataAsync Method (IDictionary(String, Object), IEnumerable(String))" Url="html/M_Parse_ParsePush_SendDataAsync_2.htm" />
+          <HelpTOCNode Title="SendDataAsync Method (IDictionary(String, Object), String)" Url="html/M_Parse_ParsePush_SendDataAsync_3.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="647e6677-80d0-460f-8eb8-bbeb837a682b" Title="SubscribeAsync Method " Url="html/Overload_Parse_ParsePush_SubscribeAsync.htm">
+          <HelpTOCNode Title="SubscribeAsync Method (IEnumerable(String))" Url="html/M_Parse_ParsePush_SubscribeAsync.htm" />
+          <HelpTOCNode Title="SubscribeAsync Method (String)" Url="html/M_Parse_ParsePush_SubscribeAsync_2.htm" />
+          <HelpTOCNode Title="SubscribeAsync Method (IEnumerable(String), CancellationToken)" Url="html/M_Parse_ParsePush_SubscribeAsync_1.htm" />
+          <HelpTOCNode Title="SubscribeAsync Method (String, CancellationToken)" Url="html/M_Parse_ParsePush_SubscribeAsync_3.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="9c2d4a5e-ab10-448f-b474-242df1994170" Title="UnsubscribeAsync Method " Url="html/Overload_Parse_ParsePush_UnsubscribeAsync.htm">
+          <HelpTOCNode Title="UnsubscribeAsync Method (IEnumerable(String))" Url="html/M_Parse_ParsePush_UnsubscribeAsync.htm" />
+          <HelpTOCNode Title="UnsubscribeAsync Method (String)" Url="html/M_Parse_ParsePush_UnsubscribeAsync_2.htm" />
+          <HelpTOCNode Title="UnsubscribeAsync Method (IEnumerable(String), CancellationToken)" Url="html/M_Parse_ParsePush_UnsubscribeAsync_1.htm" />
+          <HelpTOCNode Title="UnsubscribeAsync Method (String, CancellationToken)" Url="html/M_Parse_ParsePush_UnsubscribeAsync_3.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+      <HelpTOCNode Id="03c6f30c-3f35-4b4e-afee-c41e5a4c5da1" Title="ParsePush Events" Url="html/Events_T_Parse_ParsePush.htm">
+        <HelpTOCNode Title="ParsePushNotificationReceived Event" Url="html/E_Parse_ParsePush_ParsePushNotificationReceived.htm" />
+        <HelpTOCNode Title="PushNotificationReceived Event" Url="html/E_Parse_ParsePush_PushNotificationReceived.htm" />
+        <HelpTOCNode Title="ToastNotificationReceived Event" Url="html/E_Parse_ParsePush_ToastNotificationReceived.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="e1a937d4-ef2b-4037-a9d9-d5bc9b65e88b" Title="ParsePushNotificationEventArgs Class" Url="html/T_Parse_ParsePushNotificationEventArgs.htm">
+      <HelpTOCNode Id="2224d475-b780-4032-bc23-307234af896e" Title="ParsePushNotificationEventArgs Properties" Url="html/Properties_T_Parse_ParsePushNotificationEventArgs.htm">
+        <HelpTOCNode Title="Payload Property " Url="html/P_Parse_ParsePushNotificationEventArgs_Payload.htm" />
+        <HelpTOCNode Title="StringPayload Property " Url="html/P_Parse_ParsePushNotificationEventArgs_StringPayload.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParsePushNotificationEventArgs Methods" Url="html/Methods_T_Parse_ParsePushNotificationEventArgs.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="9629768b-8537-4e91-9a66-6683843da7ea" Title="ParseQuery(T) Class" Url="html/T_Parse_ParseQuery_1.htm">
+      <HelpTOCNode Id="7229338a-54b6-496d-95b9-5676f03dac8d" Title="ParseQuery(T) Constructor " Url="html/Overload_Parse_ParseQuery_1__ctor.htm">
+        <HelpTOCNode Title="ParseQuery(T) Constructor " Url="html/M_Parse_ParseQuery_1__ctor.htm" />
+        <HelpTOCNode Title="ParseQuery(T) Constructor (String)" Url="html/M_Parse_ParseQuery_1__ctor_1.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="087a9ca5-8972-4d19-8d74-59227b9a82a1" Title="ParseQuery(T) Methods" Url="html/Methods_T_Parse_ParseQuery_1.htm">
+        <HelpTOCNode Id="6333b1b4-25f0-4968-a579-4ace917a2b56" Title="CountAsync Method " Url="html/Overload_Parse_ParseQuery_1_CountAsync.htm">
+          <HelpTOCNode Title="CountAsync Method " Url="html/M_Parse_ParseQuery_1_CountAsync.htm" />
+          <HelpTOCNode Title="CountAsync Method (CancellationToken)" Url="html/M_Parse_ParseQuery_1_CountAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="623f7fa3-a332-4c82-9311-d2005a0c9cfe" Title="FindAsync Method " Url="html/Overload_Parse_ParseQuery_1_FindAsync.htm">
+          <HelpTOCNode Title="FindAsync Method " Url="html/M_Parse_ParseQuery_1_FindAsync.htm" />
+          <HelpTOCNode Title="FindAsync Method (CancellationToken)" Url="html/M_Parse_ParseQuery_1_FindAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="4863d3ed-3008-4c92-8867-95c2d0a8b5d4" Title="FirstAsync Method " Url="html/Overload_Parse_ParseQuery_1_FirstAsync.htm">
+          <HelpTOCNode Title="FirstAsync Method " Url="html/M_Parse_ParseQuery_1_FirstAsync.htm" />
+          <HelpTOCNode Title="FirstAsync Method (CancellationToken)" Url="html/M_Parse_ParseQuery_1_FirstAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="05a780b7-705a-4673-892a-2900d06d8b07" Title="FirstOrDefaultAsync Method " Url="html/Overload_Parse_ParseQuery_1_FirstOrDefaultAsync.htm">
+          <HelpTOCNode Title="FirstOrDefaultAsync Method " Url="html/M_Parse_ParseQuery_1_FirstOrDefaultAsync.htm" />
+          <HelpTOCNode Title="FirstOrDefaultAsync Method (CancellationToken)" Url="html/M_Parse_ParseQuery_1_FirstOrDefaultAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="6da57b8e-8675-4484-9123-42a797bc6d51" Title="GetAsync Method " Url="html/Overload_Parse_ParseQuery_1_GetAsync.htm">
+          <HelpTOCNode Title="GetAsync Method (String)" Url="html/M_Parse_ParseQuery_1_GetAsync.htm" />
+          <HelpTOCNode Title="GetAsync Method (String, CancellationToken)" Url="html/M_Parse_ParseQuery_1_GetAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="Include Method " Url="html/M_Parse_ParseQuery_1_Include.htm" />
+        <HelpTOCNode Title="Limit Method " Url="html/M_Parse_ParseQuery_1_Limit.htm" />
+        <HelpTOCNode Title="Or Method " Url="html/M_Parse_ParseQuery_1_Or.htm" />
+        <HelpTOCNode Title="OrderBy Method " Url="html/M_Parse_ParseQuery_1_OrderBy.htm" />
+        <HelpTOCNode Title="OrderByDescending Method " Url="html/M_Parse_ParseQuery_1_OrderByDescending.htm" />
+        <HelpTOCNode Title="Select Method " Url="html/M_Parse_ParseQuery_1_Select.htm" />
+        <HelpTOCNode Title="Skip Method " Url="html/M_Parse_ParseQuery_1_Skip.htm" />
+        <HelpTOCNode Title="ThenBy Method " Url="html/M_Parse_ParseQuery_1_ThenBy.htm" />
+        <HelpTOCNode Title="ThenByDescending Method " Url="html/M_Parse_ParseQuery_1_ThenByDescending.htm" />
+        <HelpTOCNode Title="WhereContainedIn(TIn) Method " Url="html/M_Parse_ParseQuery_1_WhereContainedIn__1.htm" />
+        <HelpTOCNode Title="WhereContains Method " Url="html/M_Parse_ParseQuery_1_WhereContains.htm" />
+        <HelpTOCNode Title="WhereContainsAll(TIn) Method " Url="html/M_Parse_ParseQuery_1_WhereContainsAll__1.htm" />
+        <HelpTOCNode Title="WhereDoesNotExist Method " Url="html/M_Parse_ParseQuery_1_WhereDoesNotExist.htm" />
+        <HelpTOCNode Title="WhereDoesNotMatchesKeyInQuery(TOther) Method " Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchesKeyInQuery__1.htm" />
+        <HelpTOCNode Title="WhereDoesNotMatchQuery(TOther) Method " Url="html/M_Parse_ParseQuery_1_WhereDoesNotMatchQuery__1.htm" />
+        <HelpTOCNode Title="WhereEndsWith Method " Url="html/M_Parse_ParseQuery_1_WhereEndsWith.htm" />
+        <HelpTOCNode Title="WhereEqualTo Method " Url="html/M_Parse_ParseQuery_1_WhereEqualTo.htm" />
+        <HelpTOCNode Title="WhereExists Method " Url="html/M_Parse_ParseQuery_1_WhereExists.htm" />
+        <HelpTOCNode Title="WhereGreaterThan Method " Url="html/M_Parse_ParseQuery_1_WhereGreaterThan.htm" />
+        <HelpTOCNode Title="WhereGreaterThanOrEqualTo Method " Url="html/M_Parse_ParseQuery_1_WhereGreaterThanOrEqualTo.htm" />
+        <HelpTOCNode Title="WhereLessThan Method " Url="html/M_Parse_ParseQuery_1_WhereLessThan.htm" />
+        <HelpTOCNode Title="WhereLessThanOrEqualTo Method " Url="html/M_Parse_ParseQuery_1_WhereLessThanOrEqualTo.htm" />
+        <HelpTOCNode Id="d71d87c4-4b74-47dd-bc8b-9fb8ab398433" Title="WhereMatches Method " Url="html/Overload_Parse_ParseQuery_1_WhereMatches.htm">
+          <HelpTOCNode Title="WhereMatches Method (String, String)" Url="html/M_Parse_ParseQuery_1_WhereMatches.htm" />
+          <HelpTOCNode Title="WhereMatches Method (String, Regex)" Url="html/M_Parse_ParseQuery_1_WhereMatches_2.htm" />
+          <HelpTOCNode Title="WhereMatches Method (String, String, String)" Url="html/M_Parse_ParseQuery_1_WhereMatches_1.htm" />
+          <HelpTOCNode Title="WhereMatches Method (String, Regex, String)" Url="html/M_Parse_ParseQuery_1_WhereMatches_3.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="WhereMatchesKeyInQuery(TOther) Method " Url="html/M_Parse_ParseQuery_1_WhereMatchesKeyInQuery__1.htm" />
+        <HelpTOCNode Title="WhereMatchesQuery(TOther) Method " Url="html/M_Parse_ParseQuery_1_WhereMatchesQuery__1.htm" />
+        <HelpTOCNode Title="WhereNear Method " Url="html/M_Parse_ParseQuery_1_WhereNear.htm" />
+        <HelpTOCNode Title="WhereNotContainedIn(TIn) Method " Url="html/M_Parse_ParseQuery_1_WhereNotContainedIn__1.htm" />
+        <HelpTOCNode Title="WhereNotEqualTo Method " Url="html/M_Parse_ParseQuery_1_WhereNotEqualTo.htm" />
+        <HelpTOCNode Title="WhereStartsWith Method " Url="html/M_Parse_ParseQuery_1_WhereStartsWith.htm" />
+        <HelpTOCNode Title="WhereWithinDistance Method " Url="html/M_Parse_ParseQuery_1_WhereWithinDistance.htm" />
+        <HelpTOCNode Title="WhereWithinGeoBox Method " Url="html/M_Parse_ParseQuery_1_WhereWithinGeoBox.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="8e7b15d3-bd57-4de4-84fe-4fea0642b5af" Title="ParseQueryExtensions Class" Url="html/T_Parse_ParseQueryExtensions.htm">
+      <HelpTOCNode Id="7e184233-6110-46e8-ba3d-a0e6fc7c1dbb" Title="ParseQueryExtensions Methods" Url="html/Methods_T_Parse_ParseQueryExtensions.htm">
+        <HelpTOCNode Title="Join(TOuter, TInner, TKey, TResult) Method " Url="html/M_Parse_ParseQueryExtensions_Join__4.htm" />
+        <HelpTOCNode Title="OrderBy(TSource, TSelector) Method " Url="html/M_Parse_ParseQueryExtensions_OrderBy__2.htm" />
+        <HelpTOCNode Title="OrderByDescending(TSource, TSelector) Method " Url="html/M_Parse_ParseQueryExtensions_OrderByDescending__2.htm" />
+        <HelpTOCNode Title="ThenBy(TSource, TSelector) Method " Url="html/M_Parse_ParseQueryExtensions_ThenBy__2.htm" />
+        <HelpTOCNode Title="ThenByDescending(TSource, TSelector) Method " Url="html/M_Parse_ParseQueryExtensions_ThenByDescending__2.htm" />
+        <HelpTOCNode Title="Where(TSource) Method " Url="html/M_Parse_ParseQueryExtensions_Where__1.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="7816ba73-6033-4c20-906c-c0ac0af313d4" Title="ParseRelation(T) Class" Url="html/T_Parse_ParseRelation_1.htm">
+      <HelpTOCNode Id="7fca9df3-b8b4-45cf-ad3d-1574f44857ed" Title="ParseRelation(T) Properties" Url="html/Properties_T_Parse_ParseRelation_1.htm">
+        <HelpTOCNode Title="Query Property " Url="html/P_Parse_ParseRelation_1_Query.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="82503eb0-f85f-464a-a1f6-3dc55f2cfdd8" Title="ParseRelation(T) Methods" Url="html/Methods_T_Parse_ParseRelation_1.htm">
+        <HelpTOCNode Title="Add Method " Url="html/M_Parse_ParseRelation_1_Add.htm" />
+        <HelpTOCNode Title="Remove Method " Url="html/M_Parse_ParseRelation_1_Remove.htm" />
+      </HelpTOCNode>
+    </HelpTOCNode>
+    <HelpTOCNode Id="824a3186-b717-4c8c-92c4-8d4e1ae2ae63" Title="ParseRole Class" Url="html/T_Parse_ParseRole.htm">
+      <HelpTOCNode Id="49b3279b-ab21-4e7a-9cc3-b4ef6439e686" Title="ParseRole Constructor " Url="html/Overload_Parse_ParseRole__ctor.htm">
+        <HelpTOCNode Title="ParseRole Constructor " Url="html/M_Parse_ParseRole__ctor.htm" />
+        <HelpTOCNode Title="ParseRole Constructor (String, ParseACL)" Url="html/M_Parse_ParseRole__ctor_1.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="4a3f5164-ca02-43f5-8191-4bb0a1d2e0a2" Title="ParseRole Properties" Url="html/Properties_T_Parse_ParseRole.htm">
+        <HelpTOCNode Title="Name Property " Url="html/P_Parse_ParseRole_Name.htm" />
+        <HelpTOCNode Title="Query Property " Url="html/P_Parse_ParseRole_Query.htm" />
+        <HelpTOCNode Title="Roles Property " Url="html/P_Parse_ParseRole_Roles.htm" />
+        <HelpTOCNode Title="Users Property " Url="html/P_Parse_ParseRole_Users.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseRole Methods" Url="html/Methods_T_Parse_ParseRole.htm" />
+      <HelpTOCNode Title="ParseRole Events" Url="html/Events_T_Parse_ParseRole.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="dacfa9d9-cd36-4bc1-b092-32cdd1a122bc" Title="ParseSession Class" Url="html/T_Parse_ParseSession.htm">
+      <HelpTOCNode Title="ParseSession Constructor " Url="html/M_Parse_ParseSession__ctor.htm" />
+      <HelpTOCNode Id="761ae318-94be-4fd3-86dd-d1a0d58a84e4" Title="ParseSession Properties" Url="html/Properties_T_Parse_ParseSession.htm">
+        <HelpTOCNode Title="Query Property " Url="html/P_Parse_ParseSession_Query.htm" />
+        <HelpTOCNode Title="SessionToken Property " Url="html/P_Parse_ParseSession_SessionToken.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="a28844c5-5a0b-4799-a921-ef4e5897e8ea" Title="ParseSession Methods" Url="html/Methods_T_Parse_ParseSession.htm">
+        <HelpTOCNode Id="21f6a3cd-21bb-478d-8b95-f543f40c671f" Title="GetCurrentSessionAsync Method " Url="html/Overload_Parse_ParseSession_GetCurrentSessionAsync.htm">
+          <HelpTOCNode Title="GetCurrentSessionAsync Method " Url="html/M_Parse_ParseSession_GetCurrentSessionAsync.htm" />
+          <HelpTOCNode Title="GetCurrentSessionAsync Method (CancellationToken)" Url="html/M_Parse_ParseSession_GetCurrentSessionAsync_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseSession Events" Url="html/Events_T_Parse_ParseSession.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="2186d18c-bea8-46c8-8ace-d8587c81fa3f" Title="ParseUploadProgressEventArgs Class" Url="html/T_Parse_ParseUploadProgressEventArgs.htm">
+      <HelpTOCNode Id="60347ffe-b77a-4274-a353-e99824be9be8" Title="ParseUploadProgressEventArgs Properties" Url="html/Properties_T_Parse_ParseUploadProgressEventArgs.htm">
+        <HelpTOCNode Title="Progress Property " Url="html/P_Parse_ParseUploadProgressEventArgs_Progress.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseUploadProgressEventArgs Methods" Url="html/Methods_T_Parse_ParseUploadProgressEventArgs.htm" />
+    </HelpTOCNode>
+    <HelpTOCNode Id="d70d3530-2a68-4f16-b296-7e25027e6944" Title="ParseUser Class" Url="html/T_Parse_ParseUser.htm">
+      <HelpTOCNode Title="ParseUser Constructor " Url="html/M_Parse_ParseUser__ctor.htm" />
+      <HelpTOCNode Id="6ce20af6-3760-4c1d-a832-eabd860540c9" Title="ParseUser Properties" Url="html/Properties_T_Parse_ParseUser.htm">
+        <HelpTOCNode Title="CurrentUser Property " Url="html/P_Parse_ParseUser_CurrentUser.htm" />
+        <HelpTOCNode Title="Email Property " Url="html/P_Parse_ParseUser_Email.htm" />
+        <HelpTOCNode Title="IsAuthenticated Property " Url="html/P_Parse_ParseUser_IsAuthenticated.htm" />
+        <HelpTOCNode Title="Password Property " Url="html/P_Parse_ParseUser_Password.htm" />
+        <HelpTOCNode Title="Query Property " Url="html/P_Parse_ParseUser_Query.htm" />
+        <HelpTOCNode Title="Username Property " Url="html/P_Parse_ParseUser_Username.htm" />
+      </HelpTOCNode>
+      <HelpTOCNode Id="6d1d2ea7-e3ec-4915-88fa-cdef28fd1c66" Title="ParseUser Methods" Url="html/Methods_T_Parse_ParseUser.htm">
+        <HelpTOCNode Id="dfe01823-0453-4b5d-a1f2-eea3b243bf45" Title="BecomeAsync Method " Url="html/Overload_Parse_ParseUser_BecomeAsync.htm">
+          <HelpTOCNode Title="BecomeAsync Method (String)" Url="html/M_Parse_ParseUser_BecomeAsync.htm" />
+          <HelpTOCNode Title="BecomeAsync Method (String, CancellationToken)" Url="html/M_Parse_ParseUser_BecomeAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="9a16e2a8-1316-4782-a7a2-3342f5f5bab5" Title="EnableRevocableSessionAsync Method " Url="html/Overload_Parse_ParseUser_EnableRevocableSessionAsync.htm">
+          <HelpTOCNode Title="EnableRevocableSessionAsync Method " Url="html/M_Parse_ParseUser_EnableRevocableSessionAsync.htm" />
+          <HelpTOCNode Title="EnableRevocableSessionAsync Method (CancellationToken)" Url="html/M_Parse_ParseUser_EnableRevocableSessionAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="6106a503-1efd-4571-93cb-0e18b6964e10" Title="LogInAsync Method " Url="html/Overload_Parse_ParseUser_LogInAsync.htm">
+          <HelpTOCNode Title="LogInAsync Method (String, String)" Url="html/M_Parse_ParseUser_LogInAsync.htm" />
+          <HelpTOCNode Title="LogInAsync Method (String, String, CancellationToken)" Url="html/M_Parse_ParseUser_LogInAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="LogOut Method " Url="html/M_Parse_ParseUser_LogOut.htm" />
+        <HelpTOCNode Id="0f9bea24-7afb-4c46-ac67-67723baed6ef" Title="LogOutAsync Method " Url="html/Overload_Parse_ParseUser_LogOutAsync.htm">
+          <HelpTOCNode Title="LogOutAsync Method " Url="html/M_Parse_ParseUser_LogOutAsync.htm" />
+          <HelpTOCNode Title="LogOutAsync Method (CancellationToken)" Url="html/M_Parse_ParseUser_LogOutAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Title="Remove Method " Url="html/M_Parse_ParseUser_Remove.htm" />
+        <HelpTOCNode Id="f91ba489-f662-484b-a9ea-016daae64bed" Title="RequestPasswordResetAsync Method " Url="html/Overload_Parse_ParseUser_RequestPasswordResetAsync.htm">
+          <HelpTOCNode Title="RequestPasswordResetAsync Method (String)" Url="html/M_Parse_ParseUser_RequestPasswordResetAsync.htm" />
+          <HelpTOCNode Title="RequestPasswordResetAsync Method (String, CancellationToken)" Url="html/M_Parse_ParseUser_RequestPasswordResetAsync_1.htm" />
+        </HelpTOCNode>
+        <HelpTOCNode Id="691eded4-75f2-4a54-9789-3564d569a729" Title="SignUpAsync Method " Url="html/Overload_Parse_ParseUser_SignUpAsync.htm">
+          <HelpTOCNode Title="SignUpAsync Method " Url="html/M_Parse_ParseUser_SignUpAsync.htm" />
+          <HelpTOCNode Title="SignUpAsync Method (CancellationToken)" Url="html/M_Parse_ParseUser_SignUpAsync_1.htm" />
+        </HelpTOCNode>
+      </HelpTOCNode>
+      <HelpTOCNode Title="ParseUser Events" Url="html/Events_T_Parse_ParseUser.htm" />
+    </HelpTOCNode>
+  </HelpTOCNode>
+</HelpTOC>

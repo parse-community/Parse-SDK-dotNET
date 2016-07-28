@@ -1,0 +1,187 @@
+/* File    : TOC.css
+// Author  : Eric Woodruff  (Eric@EWoodruff.us)
+// Updated : 09/07/2007
+//
+// Stylesheet for the table of content
+*/
+
+*
+{
+	margin: 0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+body
+{
+    font-family: verdana, arial, sans-serif;
+    font-size: 8.5pt;
+    background-color: #6699CC;
+    color: White;
+	overflow: hidden;
+}
+
+input
+{
+	font-size: 8.5pt;
+}
+
+img
+{
+    border: 0;
+    margin-left: 5px;
+    margin-right: 2px;
+}
+
+img.TreeNodeImg
+{
+    cursor: pointer;
+}
+
+img.TOCLink
+{
+    cursor: pointer;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+a.SelectedNode, a.UnselectedNode
+{
+	color: white;
+	text-shadow: rgba(0,0,0, 0.8) 0px 1px 0px;
+    text-decoration: none;
+	padding: 1px 3px 1px 3px;
+    white-space: nowrap;
+    font-size: 15px;
+}
+
+a.SelectedNode
+{
+}
+
+a.UnselectedNode:hover, a.SelectedNode:hover
+{
+}
+
+.Visible
+{
+    display: block;
+    margin-left: 0px;
+}
+
+.Hidden
+{
+    display: none;
+}
+
+.Tree
+{
+	overflow: auto;
+}
+
+.TreeNode, .TreeItem
+{
+    white-space: nowrap;
+    margin: 2px 2px 2px 2px;
+    padding: 5px 10px;
+}
+.TreeNode a:hover{
+  color: #17b6fa;
+}
+
+.TOCDiv
+{
+	position: relative;
+	float: left;
+	width: 300px;
+  height: 100%;
+  background: url(bg_column.png); 
+  color: white;
+}
+
+.TOCSizer
+{
+	clear: none;
+	float: left;
+	width: 10px;
+  height: 100%;
+  background-color: #6699CC;
+  background-image: url("Splitter.gif");
+  background-position:center center;
+	background-repeat:no-repeat;
+	position: relative;
+	cursor: w-resize;
+}
+
+.TopicContent
+{
+	position: relative;
+	float: right;
+  background-color: white;
+  height: 100%;
+}
+
+.SearchOpts
+{
+  padding: 5px 5px 0px 5px;
+  background-color: lightgrey;
+  color: black;
+  width: 300px;
+}
+
+.NavOpts
+{
+  display: none;
+}
+
+.IndexOpts
+{
+  padding: 5px 5px 0px 5px;
+  background-color: lightgrey;
+  color: black;
+  width: 300px;
+}
+
+.IndexItem
+{
+    white-space: nowrap;
+    margin: 2px 2px 2px 2px;
+}
+
+.IndexSubItem
+{
+    white-space: nowrap;
+    margin: 2px 2px 2px 12px;
+}
+
+.PaddedText
+{
+    margin: 10px 10px 10px 10px;
+}
+
+#indexform:before {
+  content:"Parse .NET SDK API Reference";
+  height: 30px;
+  width: 100%;
+  background-color: red;
+  position: absolute;
+  z-index: 10;
+  clear: both;
+  padding: 10px 2%;
+  background-color: #1789BA;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #1789BA), color-stop(100%, #0A67A0));
+  background-image: -webkit-linear-gradient(#1789BA, #0A67A0);
+  background-image: -moz-linear-gradient(#1789BA, #0A67A0);
+  background-image: -o-linear-gradient(#1789BA, #0A67A0);
+  background-image: -ms-linear-gradient(#1789BA, #0A67A0);
+  background-image: linear-gradient(#1789BA, #0A67A0);
+  -moz-box-shadow: rgba(255, 255, 255, 0.2) 0 1px 0px 0 inset, rgba(255, 255, 255, 0.2) 0 1px 0px 0;
+  -webkit-box-shadow: rgba(255, 255, 255, 0.2) 0 1px 0px 0 inset, rgba(255, 255, 255, 0.2) 0 1px 0px 0;
+  -o-box-shadow: rgba(255, 255, 255, 0.2) 0 1px 0px 0 inset, rgba(255, 255, 255, 0.2) 0 1px 0px 0;
+  box-shadow: rgba(255, 255, 255, 0.2) 0 1px 0px 0 inset, rgba(255, 255, 255, 0.2) 0 1px 0px 0;
+  border: 1px solid #363636;
+  color: white;
+  text-shadow: rgba(0, 0, 0, 0.6) 0 -1px 0;
+  font-size: 20px;
+}
+.TOCDiv, .TOCSizer, .TopicContent {
+  margin-top: 50px;
+}

@@ -1,0 +1,882 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shfbBuild product="Sandcastle Help File Builder and Tools" version="2015.7.25.0" projectFile="C:\Users\listiarso\Documents\hungry\windows\Parse.Documentation\Parse.Documentation.shfbproj" started="8/21/2015 11:30:56 AM">
+<buildStep step="Initializing">
+Finding tools...
+The Sandcastle tools are located in &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\&#39;
+Locating components in the following folder(s):
+    C:\Users\listiarso\Documents\hungry\windows\Parse.Documentation
+    C:\ProgramData\EWSoftware\Sandcastle Help File Builder\Components and Plug-Ins\
+    C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\
+Framework reflection data location: C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore
+Using presentation style &#39;VS2010&#39; located in &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010&#39;
+</buildStep>
+<buildStep step="ClearWorkFolder">
+Clearing working folder...
+-------------------------------
+Clearing any prior web/markdown output...
+</buildStep>
+<buildStep step="ValidatingDocumentationSources">
+Validating and copying documentation source information
+Source: C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\Parse.dll
+    Found assembly &#39;C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\Parse.dll&#39;
+Source: C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\Parse.xml
+Source: C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\WinRT\Parse.WinRT.dll
+    Found assembly &#39;C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\WinRT\Parse.WinRT.dll&#39;
+Source: C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\WinRT\Parse.WinRT.xml
+
+Copying XML comments files
+    C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\Parse.xml -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Parse.xml
+    C:\Users\listiarso\Documents\hungry\windows\Parse\Parse\bin\Release\WinRT\Parse.WinRT.xml -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Parse.WinRT.xml
+</buildStep>
+<buildStep step="GenerateSharedContent">
+Generating shared content files (en-US, English (United States))...
+    Last step completed in 00:00:00.0680
+</buildStep>
+<buildStep step="GenerateApiFilter">
+Generating API filter for MRefBuilder...
+    Last step completed in 00:00:00.0360
+</buildStep>
+<buildStep step="GenerateReflectionInfo">
+Generating reflection information...
+[C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe - GenerateRefInfo.proj]
+Build started 8/21/2015 11:31:01 AM.
+Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\GenerateRefInfo.proj&quot; on node 1 (default targets).
+PrepareForBuild:
+  Creating directory &quot;obj\Debug\&quot;.
+GenerateRefInfo:
+  MRefBuilder (v2015.7.25.0)
+  Copyright c 2006-2015, Microsoft Corporation, All Rights Reserved.
+  Portions Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+  Loaded 2 assemblies for reflection and 0 dependency assemblies.
+  Wrote information on 1 namespaces, 25 types, and 318 members
+  Copying file from &quot;reflection.org&quot; to &quot;reflection.all&quot;.
+  XslTransform (v2015.7.25.0)
+  Copyright c 2006-2015, Microsoft Corporation, All Rights Reserved.
+  Portions Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+  Applying XSL transformation &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\ProductionTransforms\MergeDuplicates.xsl&#39;.
+Done Building Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\GenerateRefInfo.proj&quot; (default targets).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.13
+    Last step completed in 00:00:02.6261
+</buildStep>
+<buildStep step="TransformReflectionInfo">
+Transforming reflection output...
+[C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe - TransformManifest.proj]
+Build started 8/21/2015 11:31:03 AM.
+Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\TransformManifest.proj&quot; on node 1 (default targets).
+TransformManifest:
+  XslTransform (v2015.7.25.0)
+  Copyright c 2006-2015, Microsoft Corporation, All Rights Reserved.
+  Portions Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+  Applying XSL transformation &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\\ProductionTransforms\ApplyVSDocModel.xsl&#39;.
+  Copying file from &quot;reflection.xml&quot; to &quot;reflection.nofilenames&quot;.
+  XslTransform (v2015.7.25.0)
+  Copyright c 2006-2015, Microsoft Corporation, All Rights Reserved.
+  Portions Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+  Applying XSL transformation &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\ProductionTransforms\AddFilenames.xsl&#39;.
+    Unique name M_Parse_ParseACL__ctor_1 generated for M:Parse.ParseACL.#ctor(Parse.ParseUser)
+    Unique name M_Parse_ParseACL_GetReadAccess_1 generated for M:Parse.ParseACL.GetReadAccess(System.String)
+    Unique name M_Parse_ParseACL_GetRoleReadAccess_1 generated for M:Parse.ParseACL.GetRoleReadAccess(System.String)
+    Unique name M_Parse_ParseACL_GetRoleWriteAccess_1 generated for M:Parse.ParseACL.GetRoleWriteAccess(System.String)
+    Unique name M_Parse_ParseACL_GetWriteAccess_1 generated for M:Parse.ParseACL.GetWriteAccess(System.String)
+    Unique name M_Parse_ParseACL_SetReadAccess_1 generated for M:Parse.ParseACL.SetReadAccess(System.String,System.Boolean)
+    Unique name M_Parse_ParseACL_SetRoleReadAccess_1 generated for M:Parse.ParseACL.SetRoleReadAccess(System.String,System.Boolean)
+    Unique name M_Parse_ParseACL_SetRoleWriteAccess_1 generated for M:Parse.ParseACL.SetRoleWriteAccess(System.String,System.Boolean)
+    Unique name M_Parse_ParseACL_SetWriteAccess_1 generated for M:Parse.ParseACL.SetWriteAccess(System.String,System.Boolean)
+    Unique name M_Parse_ParseAnalytics_TrackAppOpenedAsync_1 generated for M:Parse.ParseAnalytics.TrackAppOpenedAsync(Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs)
+    Unique name M_Parse_ParseAnalytics_TrackEventAsync_1 generated for M:Parse.ParseAnalytics.TrackEventAsync(System.String,System.Collections.Generic.IDictionary{System.String,System.String})
+    Unique name M_Parse_ParseCloud_CallFunctionAsync__1_1 generated for M:Parse.ParseCloud.CallFunctionAsync``1(System.String,System.Collections.Generic.IDictionary{System.String,System.Object},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseConfig_GetAsync_1 generated for M:Parse.ParseConfig.GetAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseExtensions_FetchAllAsync__1_1 generated for M:Parse.ParseExtensions.FetchAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseExtensions_FetchAllIfNeededAsync__1_1 generated for M:Parse.ParseExtensions.FetchAllIfNeededAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseExtensions_FetchAsync__1_1 generated for M:Parse.ParseExtensions.FetchAsync``1(``0,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseExtensions_FetchIfNeededAsync__1_1 generated for M:Parse.ParseExtensions.FetchIfNeededAsync``1(``0,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseExtensions_SaveAllAsync__1_1 generated for M:Parse.ParseExtensions.SaveAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFacebookUtils_LinkAsync_1 generated for M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFacebookUtils_LinkAsync_2 generated for M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,System.String,System.String,System.DateTime)
+    Unique name M_Parse_ParseFacebookUtils_LinkAsync_3 generated for M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,System.String,System.String,System.DateTime,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFacebookUtils_LinkAsync_4 generated for M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String})
+    Unique name M_Parse_ParseFacebookUtils_LinkAsync_5 generated for M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFacebookUtils_LogInAsync_1 generated for M:Parse.ParseFacebookUtils.LogInAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFacebookUtils_LogInAsync_2 generated for M:Parse.ParseFacebookUtils.LogInAsync(System.String,System.String,System.DateTime)
+    Unique name M_Parse_ParseFacebookUtils_LogInAsync_3 generated for M:Parse.ParseFacebookUtils.LogInAsync(System.String,System.String,System.DateTime,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFacebookUtils_LogInAsync_4 generated for M:Parse.ParseFacebookUtils.LogInAsync(Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String})
+    Unique name M_Parse_ParseFacebookUtils_LogInAsync_5 generated for M:Parse.ParseFacebookUtils.LogInAsync(Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFacebookUtils_UnlinkAsync_1 generated for M:Parse.ParseFacebookUtils.UnlinkAsync(Parse.ParseUser,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFile__ctor_1 generated for M:Parse.ParseFile.#ctor(System.String,System.IO.Stream,System.String)
+    Unique name M_Parse_ParseFile_SaveAsync_1 generated for M:Parse.ParseFile.SaveAsync(System.IProgress{Parse.ParseUploadProgressEventArgs})
+    Unique name M_Parse_ParseFile_SaveAsync_2 generated for M:Parse.ParseFile.SaveAsync(System.IProgress{Parse.ParseUploadProgressEventArgs},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseFile_SaveAsync_3 generated for M:Parse.ParseFile.SaveAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseObject__ctor_1 generated for M:Parse.ParseObject.#ctor(System.String)
+    Unique name M_Parse_ParseObject_DeleteAllAsync__1_1 generated for M:Parse.ParseObject.DeleteAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseObject_DeleteAsync_1 generated for M:Parse.ParseObject.DeleteAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseObject_FetchAllAsync__1_1 generated for M:Parse.ParseObject.FetchAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseObject_FetchAllIfNeededAsync__1_1 generated for M:Parse.ParseObject.FetchAllIfNeededAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseObject_GetProperty__1_1 generated for M:Parse.ParseObject.GetProperty``1(``0,System.String)
+    Unique name M_Parse_ParseObject_Increment_1 generated for M:Parse.ParseObject.Increment(System.String,System.Double)
+    Unique name M_Parse_ParseObject_Increment_2 generated for M:Parse.ParseObject.Increment(System.String,System.Int64)
+    Unique name M_Parse_ParseObject_SaveAllAsync__1_1 generated for M:Parse.ParseObject.SaveAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+    Unique name M_Parse_ParseObject_SaveAsync_1 generated for M:Parse.ParseObject.SaveAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParsePush_PushJson_1 generated for M:Parse.ParsePush.PushJson(Windows.Networking.PushNotifications.PushNotificationReceivedEventArgs)
+    Unique name M_Parse_ParsePush_SendAlertAsync_1 generated for M:Parse.ParsePush.SendAlertAsync(System.String,Parse.ParseQuery{Parse.ParseInstallation})
+    Unique name M_Parse_ParsePush_SendAlertAsync_2 generated for M:Parse.ParsePush.SendAlertAsync(System.String,System.Collections.Generic.IEnumerable{System.String})
+    Unique name M_Parse_ParsePush_SendAlertAsync_3 generated for M:Parse.ParsePush.SendAlertAsync(System.String,System.String)
+    Unique name M_Parse_ParsePush_SendAsync_1 generated for M:Parse.ParsePush.SendAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParsePush_SendDataAsync_1 generated for M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},Parse.ParseQuery{Parse.ParseInstallation})
+    Unique name M_Parse_ParsePush_SendDataAsync_2 generated for M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},System.Collections.Generic.IEnumerable{System.String})
+    Unique name M_Parse_ParsePush_SendDataAsync_3 generated for M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},System.String)
+    Unique name M_Parse_ParsePush_SubscribeAsync_1 generated for M:Parse.ParsePush.SubscribeAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    Unique name M_Parse_ParsePush_SubscribeAsync_2 generated for M:Parse.ParsePush.SubscribeAsync(System.String)
+    Unique name M_Parse_ParsePush_SubscribeAsync_3 generated for M:Parse.ParsePush.SubscribeAsync(System.String,System.Threading.CancellationToken)
+    Unique name M_Parse_ParsePush_UnsubscribeAsync_1 generated for M:Parse.ParsePush.UnsubscribeAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+    Unique name M_Parse_ParsePush_UnsubscribeAsync_2 generated for M:Parse.ParsePush.UnsubscribeAsync(System.String)
+    Unique name M_Parse_ParsePush_UnsubscribeAsync_3 generated for M:Parse.ParsePush.UnsubscribeAsync(System.String,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseQuery_1__ctor_1 generated for M:Parse.ParseQuery`1.#ctor(System.String)
+    Unique name M_Parse_ParseQuery_1_CountAsync_1 generated for M:Parse.ParseQuery`1.CountAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseQuery_1_FindAsync_1 generated for M:Parse.ParseQuery`1.FindAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseQuery_1_FirstAsync_1 generated for M:Parse.ParseQuery`1.FirstAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseQuery_1_FirstOrDefaultAsync_1 generated for M:Parse.ParseQuery`1.FirstOrDefaultAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseQuery_1_GetAsync_1 generated for M:Parse.ParseQuery`1.GetAsync(System.String,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseQuery_1_WhereMatches_1 generated for M:Parse.ParseQuery`1.WhereMatches(System.String,System.String,System.String)
+    Unique name M_Parse_ParseQuery_1_WhereMatches_2 generated for M:Parse.ParseQuery`1.WhereMatches(System.String,System.Text.RegularExpressions.Regex)
+    Unique name M_Parse_ParseQuery_1_WhereMatches_3 generated for M:Parse.ParseQuery`1.WhereMatches(System.String,System.Text.RegularExpressions.Regex,System.String)
+    Unique name M_Parse_ParseRole__ctor_1 generated for M:Parse.ParseRole.#ctor(System.String,Parse.ParseACL)
+    Unique name M_Parse_ParseSession_GetCurrentSessionAsync_1 generated for M:Parse.ParseSession.GetCurrentSessionAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseUser_BecomeAsync_1 generated for M:Parse.ParseUser.BecomeAsync(System.String,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseUser_EnableRevocableSessionAsync_1 generated for M:Parse.ParseUser.EnableRevocableSessionAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseUser_LogInAsync_1 generated for M:Parse.ParseUser.LogInAsync(System.String,System.String,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseUser_LogOutAsync_1 generated for M:Parse.ParseUser.LogOutAsync(System.Threading.CancellationToken)
+    Unique name M_Parse_ParseUser_RequestPasswordResetAsync_1 generated for M:Parse.ParseUser.RequestPasswordResetAsync(System.String,System.Threading.CancellationToken)
+    Unique name M_Parse_ParseUser_SignUpAsync_1 generated for M:Parse.ParseUser.SignUpAsync(System.Threading.CancellationToken)
+  XslTransform (v2015.7.25.0)
+  Copyright c 2006-2015, Microsoft Corporation, All Rights Reserved.
+  Portions Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+  Applying XSL transformation &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\ProductionTransforms\ReflectionToManifest.xsl&#39;.
+Done Building Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\TransformManifest.proj&quot; (default targets).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.79
+    Last step completed in 00:00:02.0605
+</buildStep>
+<buildStep step="GenerateNamespaceSummaries">
+Generating namespace summary information...
+    Last step completed in 00:00:00.1130
+</buildStep>
+<buildStep step="CopyAdditionalContent">
+Copying additional content files...
+No additional content to copy
+    Last step completed in 00:00:00.0090
+</buildStep>
+<buildStep step="MergeTablesOfContents">
+Merging conceptual and additional tables of contents...
+    Last step completed in 00:00:00.0010
+</buildStep>
+<buildStep step="GenerateIntermediateTableOfContents">
+Generating intermediate table of contents file...
+[C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe - GenerateIntermediateTOC.proj]
+Build started 8/21/2015 11:31:05 AM.
+Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\GenerateIntermediateTOC.proj&quot; on node 1 (default targets).
+GenerateIntermediateTOC:
+  XslTransform (v2015.7.25.0)
+  Copyright c 2006-2015, Microsoft Corporation, All Rights Reserved.
+  Portions Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+  Applying XSL transformation &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\\ProductionTransforms\CreateVSToc.xsl&#39;.
+Done Building Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\GenerateIntermediateTOC.proj&quot; (default targets).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.42
+Generating conceptual content intermediate TOC file...
+    Last step completed in 00:00:00.6101
+</buildStep>
+<buildStep step="CreateBuildAssemblerConfigs">
+Creating Sandcastle configuration files...
+    sandcastle.config
+    Last step completed in 00:00:00.9590
+</buildStep>
+<buildStep step="MergeCustomConfigs">
+Merging custom build component configurations
+C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\sandcastle.config
+    Last step completed in 00:00:00.0370
+</buildStep>
+<buildStep step="BuildReferenceTopics">
+Building reference help topics...
+[C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe - BuildReferenceTopics.proj]
+Build started 8/21/2015 11:31:07 AM.
+Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\BuildReferenceTopics.proj&quot; on node 1 (default targets).
+BuildReferenceTopics:
+  BuildAssembler (v2015.7.25.0)
+  Copyright c 2006-2015, Microsoft Corporation, All Rights Reserved.
+  Portions Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+  CopyFromFileComponent: Loading data file &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Transforms\skeleton.xml&#39;.
+  CopyFromFileComponent: Loaded 1 copy commands
+  CopyFromIndexComponent: Searching for files that match &#39;*.xml&#39; in &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore&#39;
+  CopyFromIndexComponent: Searching for files that match &#39;reflection.xml&#39; in &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working&#39;
+  CopyFromIndexComponent: Indexed 11961 elements
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 1 subcomponents.
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 1 subcomponents.
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 1 subcomponents.
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 1 subcomponents.
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 1 subcomponents.
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 1 subcomponents.
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 1 subcomponents.
+  SyntaxComponent: Loaded 2 syntax generators.
+  CopyFromIndexComponent: Searching for files that match &#39;*.xml&#39; in &#39;C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETCore\v4.5&#39;
+  CopyFromIndexComponent: Searching for files that match &#39;Parse.xml&#39; in &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working&#39;
+  CopyFromIndexComponent: Searching for files that match &#39;Parse.WinRT.xml&#39; in &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working&#39;
+  CopyFromIndexComponent: Indexed 13371 elements
+  ForEachComponent: Loading subcomponents.
+  ForEachComponent: Loaded 2 subcomponents.
+  ShowMissingComponent: [Sandcastle Help File Builder and Tools, version 2015.7.25.0]
+      Show Missing Documentation Component. Copyright c 2006-2015, Eric Woodruff, All Rights Reserved
+      https://GitHub.com/EWSoftware/SHFB
+  CodeBlockComponent: [Sandcastle Help File Builder and Tools, version 2015.7.25.0]
+      Code Block Component.  Copyright c 2006-2015, Eric Woodruff, All Rights Reserved.
+      Portions copyright (c) 2003-2015, Jonathan de Halleux, All rights reserved.
+      https://GitHub.com/EWSoftware/SHFB
+  MultiFormatOutputComponent: [Sandcastle Help File Builder and Tools, version 2015.7.25.0]
+      Multi-Format Output Component. Copyright c 2006-2015, Eric Woodruff, All Rights Reserved
+      https://GitHub.com/EWSoftware/SHFB
+  MultiFormatOutputComponent: Loading components for Website format
+  SharedContentComponent: Searching for files that match &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\shared_content.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\shared_content.xml&#39;.
+  SharedContentComponent: Found 1 files in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\shared_content.xml.
+  SharedContentComponent: Searching for files that match &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\reference_content.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\reference_content.xml&#39;.
+  SharedContentComponent: Found 1 files in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\reference_content.xml.
+  SharedContentComponent: Searching for files that match &#39;C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\syntax_content.xml&#39;.
+  SharedContentComponent: Found 0 files in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\Content\syntax_content.xml.
+  SharedContentComponent: Searching for files that match &#39;SHFBContent.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;copyright_info&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;copyright_link&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;copyright_text&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;header&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;topicTitle_root&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;productTitle&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;runningHeaderText&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;locale&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Overriding shared content item &#39;brandingLocaleCss&#39; with value in file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\SHFBContent.xml&#39;.
+  SharedContentComponent: Found 1 files in SHFBContent.xml.
+  SharedContentComponent: Searching for files that match &#39;AspNet.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\AspNet.xml&#39;.
+  SharedContentComponent: Found 1 files in AspNet.xml.
+  SharedContentComponent: Searching for files that match &#39;ManagedCPlusPlus.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\ManagedCPlusPlus.xml&#39;.
+  SharedContentComponent: Found 1 files in ManagedCPlusPlus.xml.
+  SharedContentComponent: Searching for files that match &#39;CSharp.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\CSharp.xml&#39;.
+  SharedContentComponent: Found 1 files in CSharp.xml.
+  SharedContentComponent: Searching for files that match &#39;FSharp.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\FSharp.xml&#39;.
+  SharedContentComponent: Found 1 files in FSharp.xml.
+  SharedContentComponent: Searching for files that match &#39;JavaScript.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\JavaScript.xml&#39;.
+  SharedContentComponent: Found 1 files in JavaScript.xml.
+  SharedContentComponent: Searching for files that match &#39;JScript.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\JScript.xml&#39;.
+  SharedContentComponent: Found 1 files in JScript.xml.
+  SharedContentComponent: Searching for files that match &#39;JSharp.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\JSharp.xml&#39;.
+  SharedContentComponent: Found 1 files in JSharp.xml.
+  SharedContentComponent: Searching for files that match &#39;VisualBasic.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\VisualBasic.xml&#39;.
+  SharedContentComponent: Found 1 files in VisualBasic.xml.
+  SharedContentComponent: Searching for files that match &#39;VisualBasicUsage.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\VisualBasicUsage.xml&#39;.
+  SharedContentComponent: Found 1 files in VisualBasicUsage.xml.
+  SharedContentComponent: Searching for files that match &#39;XAML.xml&#39;.
+  SharedContentComponent: Loading shared content file &#39;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\XAML.xml&#39;.
+  SharedContentComponent: Found 1 files in XAML.xml.
+  SharedContentComponent: Loaded 655 shared content items.
+  ResolveConceptualLinksComponent: Collected 1 targets directories.
+  ResolveReferenceLinksComponent: Loading Msdn reference link type targets
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Collections.Generic.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Collections.ObjectModel.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Collections.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.ComponentModel.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.IO.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Reflection.Emit.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Reflection.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Linq.Expressions.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Runtime.CompilerServices.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Security.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Text.RegularExpressions.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Text.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Linq.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Threading.Tasks.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\System.Threading.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\Windows.ApplicationModel.Activation.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\Windows.ApplicationModel.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\Windows.Networking.PushNotifications.xml
+  ResolveReferenceLinksComponent: Indexing targets in C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\Data\.NETCore\Windows.UI.Xaml.Controls.xml
+  ResolveReferenceLinksComponent: Loading Local reference link type targets
+  ResolveReferenceLinksComponent: Indexing targets in C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\reflection.xml
+  ResolveReferenceLinksComponent: 11961 total reference link targets
+  ResolveReferenceLinksComponent: Creating MSDN URL resolver
+  ResolveReferenceLinksComponent: Loaded 58 cached MSDN content ID entries
+  BuildAssemblerCore: Building topic N:Parse
+  BuildAssemblerCore: Building topic T:Parse.ParseACL
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseACL
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseACL
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.#ctor
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.GetReadAccess
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.GetRoleReadAccess
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.GetRoleWriteAccess
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.GetWriteAccess
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.SetReadAccess
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.SetRoleReadAccess
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.SetRoleWriteAccess
+  BuildAssemblerCore: Building topic Overload:Parse.ParseACL.SetWriteAccess
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.#ctor
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.#ctor(Parse.ParseUser)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetReadAccess(Parse.ParseUser)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetReadAccess(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetRoleReadAccess(Parse.ParseRole)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetRoleReadAccess(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetRoleWriteAccess(Parse.ParseRole)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetRoleWriteAccess(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetWriteAccess(Parse.ParseUser)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.GetWriteAccess(System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseACL.PublicReadAccess
+  BuildAssemblerCore: Building topic P:Parse.ParseACL.PublicWriteAccess
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetReadAccess(Parse.ParseUser,System.Boolean)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetReadAccess(System.String,System.Boolean)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetRoleReadAccess(Parse.ParseRole,System.Boolean)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetRoleReadAccess(System.String,System.Boolean)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetRoleWriteAccess(Parse.ParseRole,System.Boolean)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetRoleWriteAccess(System.String,System.Boolean)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetWriteAccess(Parse.ParseUser,System.Boolean)
+  BuildAssemblerCore: Building topic M:Parse.ParseACL.SetWriteAccess(System.String,System.Boolean)
+  BuildAssemblerCore: Building topic T:Parse.ParseAnalytics
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseAnalytics
+  BuildAssemblerCore: Building topic Overload:Parse.ParseAnalytics.TrackAppOpenedAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseAnalytics.TrackEventAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseAnalytics.TrackAppOpenedAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseAnalytics.TrackAppOpenedAsync(Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs)
+  BuildAssemblerCore: Building topic M:Parse.ParseAnalytics.TrackEventAsync(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseAnalytics.TrackEventAsync(System.String,System.Collections.Generic.IDictionary{System.String,System.String})
+  BuildAssemblerCore: Building topic T:Parse.ParseClassNameAttribute
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseClassNameAttribute
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseClassNameAttribute
+  BuildAssemblerCore: Building topic M:Parse.ParseClassNameAttribute.#ctor(System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseClassNameAttribute.ClassName
+  BuildAssemblerCore: Building topic T:Parse.ParseClient
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseClient
+  BuildAssemblerCore: Building topic M:Parse.ParseClient.Initialize(System.String,System.String)
+  BuildAssemblerCore: Building topic T:Parse.ParseCloud
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseCloud
+  BuildAssemblerCore: Building topic Overload:Parse.ParseCloud.CallFunctionAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseCloud.CallFunctionAsync``1(System.String,System.Collections.Generic.IDictionary{System.String,System.Object})
+  BuildAssemblerCore: Building topic M:Parse.ParseCloud.CallFunctionAsync``1(System.String,System.Collections.Generic.IDictionary{System.String,System.Object},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic T:Parse.ParseConfig
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseConfig
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseConfig
+  BuildAssemblerCore: Building topic Overload:Parse.ParseConfig.GetAsync
+  BuildAssemblerCore: Building topic P:Parse.ParseConfig.CurrentConfig
+  BuildAssemblerCore: Building topic M:Parse.ParseConfig.Get``1(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseConfig.GetAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseConfig.GetAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic P:Parse.ParseConfig.Item(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseConfig.TryGetValue``1(System.String,``0@)
+  BuildAssemblerCore: Building topic T:Parse.ParseException
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseException
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseException
+  BuildAssemblerCore: Building topic P:Parse.ParseException.Code
+  BuildAssemblerCore: Building topic T:Parse.ParseException.ErrorCode
+  BuildAssemblerCore: Building topic T:Parse.ParseExtensions
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseExtensions
+  BuildAssemblerCore: Building topic Overload:Parse.ParseExtensions.FetchAllAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseExtensions.FetchAllIfNeededAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseExtensions.FetchAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseExtensions.FetchIfNeededAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseExtensions.SaveAllAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchAllAsync``1(System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchAllIfNeededAsync``1(System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchAllIfNeededAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchAsync``1(``0)
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchAsync``1(``0,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchIfNeededAsync``1(``0)
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.FetchIfNeededAsync``1(``0,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.Or``1(Parse.ParseQuery{``0},Parse.ParseQuery{``0}[])
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.SaveAllAsync``1(System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseExtensions.SaveAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic T:Parse.ParseFacebookUtils
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseFacebookUtils
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseFacebookUtils
+  BuildAssemblerCore: Building topic Overload:Parse.ParseFacebookUtils.LinkAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseFacebookUtils.LogInAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseFacebookUtils.UnlinkAsync
+  BuildAssemblerCore: Building topic P:Parse.ParseFacebookUtils.AccessToken
+  BuildAssemblerCore: Building topic P:Parse.ParseFacebookUtils.ApplicationId
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.Initialize(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.IsLinked(Parse.ParseUser)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,System.String,System.String,System.DateTime)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,System.String,System.String,System.DateTime,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LinkAsync(Parse.ParseUser,Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LogInAsync(System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LogInAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LogInAsync(System.String,System.String,System.DateTime)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LogInAsync(System.String,System.String,System.DateTime,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LogInAsync(Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.LogInAsync(Windows.UI.Xaml.Controls.WebView,System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.UnlinkAsync(Parse.ParseUser)
+  BuildAssemblerCore: Building topic M:Parse.ParseFacebookUtils.UnlinkAsync(Parse.ParseUser,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic T:Parse.ParseFieldNameAttribute
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseFieldNameAttribute
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseFieldNameAttribute
+  BuildAssemblerCore: Building topic M:Parse.ParseFieldNameAttribute.#ctor(System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseFieldNameAttribute.FieldName
+  BuildAssemblerCore: Building topic T:Parse.ParseFile
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseFile
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseFile
+  BuildAssemblerCore: Building topic Overload:Parse.ParseFile.#ctor
+  BuildAssemblerCore: Building topic Overload:Parse.ParseFile.SaveAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseFile.#ctor(System.String,System.Byte[],System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseFile.#ctor(System.String,System.IO.Stream,System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseFile.IsDirty
+  BuildAssemblerCore: Building topic P:Parse.ParseFile.MimeType
+  BuildAssemblerCore: Building topic P:Parse.ParseFile.Name
+  BuildAssemblerCore: Building topic M:Parse.ParseFile.SaveAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseFile.SaveAsync(System.IProgress{Parse.ParseUploadProgressEventArgs})
+  BuildAssemblerCore: Building topic M:Parse.ParseFile.SaveAsync(System.IProgress{Parse.ParseUploadProgressEventArgs},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseFile.SaveAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic P:Parse.ParseFile.Url
+  BuildAssemblerCore: Building topic T:Parse.ParseGeoDistance
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseGeoDistance
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseGeoDistance
+  BuildAssemblerCore: Building topic M:Parse.ParseGeoDistance.#ctor(System.Double)
+  BuildAssemblerCore: Building topic M:Parse.ParseGeoDistance.FromKilometers(System.Double)
+  BuildAssemblerCore: Building topic M:Parse.ParseGeoDistance.FromMiles(System.Double)
+  BuildAssemblerCore: Building topic M:Parse.ParseGeoDistance.FromRadians(System.Double)
+  BuildAssemblerCore: Building topic P:Parse.ParseGeoDistance.Kilometers
+  BuildAssemblerCore: Building topic P:Parse.ParseGeoDistance.Miles
+  BuildAssemblerCore: Building topic P:Parse.ParseGeoDistance.Radians
+  BuildAssemblerCore: Building topic T:Parse.ParseGeoPoint
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseGeoPoint
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseGeoPoint
+  BuildAssemblerCore: Building topic M:Parse.ParseGeoPoint.#ctor(System.Double,System.Double)
+  BuildAssemblerCore: Building topic M:Parse.ParseGeoPoint.DistanceTo(Parse.ParseGeoPoint)
+  BuildAssemblerCore: Building topic P:Parse.ParseGeoPoint.Latitude
+  BuildAssemblerCore: Building topic P:Parse.ParseGeoPoint.Longitude
+  BuildAssemblerCore: Building topic T:Parse.ParseInstallation
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseInstallation
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseInstallation
+  BuildAssemblerCore: Building topic Events.T:Parse.ParseInstallation
+  BuildAssemblerCore: Building topic M:Parse.ParseInstallation.#ctor
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.AppIdentifier
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.AppName
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.AppVersion
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.Channels
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.CurrentInstallation
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.DeviceType
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.InstallationId
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.LocaleIdentifier
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.ParseVersion
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.Query
+  BuildAssemblerCore: Building topic P:Parse.ParseInstallation.TimeZone
+  BuildAssemblerCore: Building topic T:Parse.ParseObject
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseObject
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseObject
+  BuildAssemblerCore: Building topic Events.T:Parse.ParseObject
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.#ctor
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.Create
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.CreateWithoutData
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.DeleteAllAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.DeleteAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.FetchAllAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.FetchAllIfNeededAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.GetProperty
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.Increment
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.SaveAllAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseObject.SaveAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.#ctor
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.#ctor(System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.ACL
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Add(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.AddRangeToList``1(System.String,System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.AddRangeUniqueToList``1(System.String,System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.AddToList(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.AddUniqueToList(System.String,System.Object)
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.ClassName
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.ContainsKey(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Create``1
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Create(System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.CreatedAt
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.CreateWithoutData``1(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.CreateWithoutData(System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.DeleteAllAsync``1(System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.DeleteAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.DeleteAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.DeleteAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.FetchAllAsync``1(System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.FetchAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.FetchAllIfNeededAsync``1(System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.FetchAllIfNeededAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Get``1(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.GetProperty``1(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.GetProperty``1(``0,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.GetQuery(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.GetRelation``1(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.GetRelationProperty``1(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.HasSameId(Parse.ParseObject)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Increment(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Increment(System.String,System.Double)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Increment(System.String,System.Int64)
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.IsDataAvailable
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.IsDirty
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.IsKeyDirty(System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.IsNew
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.Item(System.String)
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.Keys
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.ObjectId
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.OnFieldsChanged(System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.OnPropertyChanged(System.String)
+  BuildAssemblerCore: Building topic E:Parse.ParseObject.PropertyChanged
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.RegisterSubclass``1
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Remove(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.RemoveAllFromList``1(System.String,System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.Revert
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.SaveAllAsync``1(System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.SaveAllAsync``1(System.Collections.Generic.IEnumerable{``0},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.SaveAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.SaveAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.SetProperty``1(``0,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseObject.TryGetValue``1(System.String,``0@)
+  BuildAssemblerCore: Building topic P:Parse.ParseObject.UpdatedAt
+  BuildAssemblerCore: Building topic T:Parse.ParsePush
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParsePush
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParsePush
+  BuildAssemblerCore: Building topic Events.T:Parse.ParsePush
+  BuildAssemblerCore: Building topic Overload:Parse.ParsePush.PushJson
+  BuildAssemblerCore: Building topic Overload:Parse.ParsePush.SendAlertAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParsePush.SendAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParsePush.SendDataAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParsePush.SubscribeAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParsePush.UnsubscribeAsync
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.#ctor
+  BuildAssemblerCore: Building topic P:Parse.ParsePush.Alert
+  BuildAssemblerCore: Building topic P:Parse.ParsePush.Channels
+  BuildAssemblerCore: Building topic P:Parse.ParsePush.Data
+  BuildAssemblerCore: Building topic P:Parse.ParsePush.Expiration
+  BuildAssemblerCore: Building topic P:Parse.ParsePush.ExpirationInterval
+  BuildAssemblerCore: Building topic E:Parse.ParsePush.ParsePushNotificationReceived
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.PushJson(Windows.ApplicationModel.Activation.ILaunchActivatedEventArgs)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.PushJson(Windows.Networking.PushNotifications.PushNotificationReceivedEventArgs)
+  BuildAssemblerCore: Building topic E:Parse.ParsePush.PushNotificationReceived
+  BuildAssemblerCore: Building topic P:Parse.ParsePush.Query
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendAlertAsync(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendAlertAsync(System.String,Parse.ParseQuery{Parse.ParseInstallation})
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendAlertAsync(System.String,System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendAlertAsync(System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendAsync
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object})
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},Parse.ParseQuery{Parse.ParseInstallation})
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SendDataAsync(System.Collections.Generic.IDictionary{System.String,System.Object},System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SubscribeAsync(System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SubscribeAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SubscribeAsync(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.SubscribeAsync(System.String,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic E:Parse.ParsePush.ToastNotificationReceived
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.UnsubscribeAsync(System.Collections.Generic.IEnumerable{System.String})
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.UnsubscribeAsync(System.Collections.Generic.IEnumerable{System.String},System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.UnsubscribeAsync(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParsePush.UnsubscribeAsync(System.String,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic T:Parse.ParsePushNotificationEventArgs
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParsePushNotificationEventArgs
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParsePushNotificationEventArgs
+  BuildAssemblerCore: Building topic P:Parse.ParsePushNotificationEventArgs.Payload
+  BuildAssemblerCore: Building topic P:Parse.ParsePushNotificationEventArgs.StringPayload
+  BuildAssemblerCore: Building topic T:Parse.ParseQuery`1
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseQuery`1
+  BuildAssemblerCore: Building topic Overload:Parse.ParseQuery`1.#ctor
+  BuildAssemblerCore: Building topic Overload:Parse.ParseQuery`1.CountAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseQuery`1.FindAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseQuery`1.FirstAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseQuery`1.FirstOrDefaultAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseQuery`1.GetAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseQuery`1.WhereMatches
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.#ctor
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.#ctor(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.CountAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.CountAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.FindAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.FindAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.FirstAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.FirstAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.FirstOrDefaultAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.FirstOrDefaultAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.GetAsync(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.GetAsync(System.String,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.Include(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.Limit(System.Int32)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.Or(System.Collections.Generic.IEnumerable{Parse.ParseQuery{`0}})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.OrderBy(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.OrderByDescending(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.Select(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.Skip(System.Int32)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.ThenBy(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.ThenByDescending(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereContainedIn``1(System.String,System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereContains(System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereContainsAll``1(System.String,System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereDoesNotExist(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereDoesNotMatchesKeyInQuery``1(System.String,System.String,Parse.ParseQuery{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereDoesNotMatchQuery``1(System.String,Parse.ParseQuery{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereEndsWith(System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereEqualTo(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereExists(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereGreaterThan(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereGreaterThanOrEqualTo(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereLessThan(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereLessThanOrEqualTo(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereMatches(System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereMatches(System.String,System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereMatches(System.String,System.Text.RegularExpressions.Regex)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereMatches(System.String,System.Text.RegularExpressions.Regex,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereMatchesKeyInQuery``1(System.String,System.String,Parse.ParseQuery{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereMatchesQuery``1(System.String,Parse.ParseQuery{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereNear(System.String,Parse.ParseGeoPoint)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereNotContainedIn``1(System.String,System.Collections.Generic.IEnumerable{``0})
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereNotEqualTo(System.String,System.Object)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereStartsWith(System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereWithinDistance(System.String,Parse.ParseGeoPoint,Parse.ParseGeoDistance)
+  BuildAssemblerCore: Building topic M:Parse.ParseQuery`1.WhereWithinGeoBox(System.String,Parse.ParseGeoPoint,Parse.ParseGeoPoint)
+  BuildAssemblerCore: Building topic T:Parse.ParseQueryExtensions
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseQueryExtensions
+  BuildAssemblerCore: Building topic M:Parse.ParseQueryExtensions.Join``4(Parse.ParseQuery{``0},Parse.ParseQuery{``1},System.Linq.Expressions.Expression{System.Func{``0,``2}},System.Linq.Expressions.Expression{System.Func{``1,``2}},System.Linq.Expressions.Expression{System.Func{``0,``1,``3}})
+  BuildAssemblerCore: Building topic M:Parse.ParseQueryExtensions.OrderBy``2(Parse.ParseQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})
+  BuildAssemblerCore: Building topic M:Parse.ParseQueryExtensions.OrderByDescending``2(Parse.ParseQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})
+  BuildAssemblerCore: Building topic M:Parse.ParseQueryExtensions.ThenBy``2(Parse.ParseQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})
+  BuildAssemblerCore: Building topic M:Parse.ParseQueryExtensions.ThenByDescending``2(Parse.ParseQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,``1}})
+  BuildAssemblerCore: Building topic M:Parse.ParseQueryExtensions.Where``1(Parse.ParseQuery{``0},System.Linq.Expressions.Expression{System.Func{``0,System.Boolean}})
+  BuildAssemblerCore: Building topic T:Parse.ParseRelation`1
+BuildAssembler : warning : ResolveReferenceLinksComponent: [T:Parse.ParseRelation`1] Unknown reference link target &#39;T:Parse.ParseRelationBase&#39;. [C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\BuildReferenceTopics.proj]
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseRelation`1
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseRelation`1
+  BuildAssemblerCore: Building topic M:Parse.ParseRelation`1.Add(`0)
+  BuildAssemblerCore: Building topic P:Parse.ParseRelation`1.Query
+  BuildAssemblerCore: Building topic M:Parse.ParseRelation`1.Remove(`0)
+  BuildAssemblerCore: Building topic T:Parse.ParseRole
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseRole
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseRole
+  BuildAssemblerCore: Building topic Events.T:Parse.ParseRole
+  BuildAssemblerCore: Building topic Overload:Parse.ParseRole.#ctor
+  BuildAssemblerCore: Building topic M:Parse.ParseRole.#ctor
+  BuildAssemblerCore: Building topic M:Parse.ParseRole.#ctor(System.String,Parse.ParseACL)
+  BuildAssemblerCore: Building topic P:Parse.ParseRole.Name
+  BuildAssemblerCore: Building topic P:Parse.ParseRole.Query
+  BuildAssemblerCore: Building topic P:Parse.ParseRole.Roles
+  BuildAssemblerCore: Building topic P:Parse.ParseRole.Users
+  BuildAssemblerCore: Building topic T:Parse.ParseSession
+  ShowMissingComponent: [M:Parse.ParseSession.#ctor] Auto-documenting constructor
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseSession
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseSession
+  BuildAssemblerCore: Building topic Events.T:Parse.ParseSession
+  BuildAssemblerCore: Building topic Overload:Parse.ParseSession.GetCurrentSessionAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseSession.#ctor
+  ShowMissingComponent: [M:Parse.ParseSession.#ctor] Auto-documenting constructor
+  BuildAssemblerCore: Building topic M:Parse.ParseSession.GetCurrentSessionAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseSession.GetCurrentSessionAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic P:Parse.ParseSession.Query
+  BuildAssemblerCore: Building topic P:Parse.ParseSession.SessionToken
+  BuildAssemblerCore: Building topic T:Parse.ParseUploadProgressEventArgs
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseUploadProgressEventArgs
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseUploadProgressEventArgs
+  BuildAssemblerCore: Building topic P:Parse.ParseUploadProgressEventArgs.Progress
+  BuildAssemblerCore: Building topic T:Parse.ParseUser
+  BuildAssemblerCore: Building topic Methods.T:Parse.ParseUser
+  BuildAssemblerCore: Building topic Properties.T:Parse.ParseUser
+  BuildAssemblerCore: Building topic Events.T:Parse.ParseUser
+  BuildAssemblerCore: Building topic Overload:Parse.ParseUser.BecomeAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseUser.EnableRevocableSessionAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseUser.LogInAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseUser.LogOutAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseUser.RequestPasswordResetAsync
+  BuildAssemblerCore: Building topic Overload:Parse.ParseUser.SignUpAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.#ctor
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.BecomeAsync(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.BecomeAsync(System.String,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic P:Parse.ParseUser.CurrentUser
+  BuildAssemblerCore: Building topic P:Parse.ParseUser.Email
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.EnableRevocableSessionAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.EnableRevocableSessionAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic P:Parse.ParseUser.IsAuthenticated
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.LogInAsync(System.String,System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.LogInAsync(System.String,System.String,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.LogOut
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.LogOutAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.LogOutAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic P:Parse.ParseUser.Password
+  BuildAssemblerCore: Building topic P:Parse.ParseUser.Query
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.Remove(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.RequestPasswordResetAsync(System.String)
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.RequestPasswordResetAsync(System.String,System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.SignUpAsync
+  BuildAssemblerCore: Building topic M:Parse.ParseUser.SignUpAsync(System.Threading.CancellationToken)
+  BuildAssemblerCore: Building topic P:Parse.ParseUser.Username
+  Processed 403 topic(s)
+  1 warning(s)
+  CopyFromIndexComponent: &quot;reflection&quot; in-memory cache entries used: 13 of 15.
+  CopyFromIndexComponent: &quot;comments&quot; in-memory cache entries used: 3 of 30.
+  ResolveReferenceLinksComponent: MSDN content ID cache updated.  Saving new information to C:\Users\listiarso\AppData\Local\EWSoftware\Sandcastle Help File Builder\Cache\MsdnContentId.cache
+  ResolveReferenceLinksComponent: New MSDN content ID cache size: 61 entries
+Done Building Project &quot;C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\BuildReferenceTopics.proj&quot; (default targets).
+
+Build succeeded.
+
+Time Elapsed 00:00:27.02
+    Last step completed in 00:00:27.3242
+</buildStep>
+<buildStep step="CombiningIntermediateTocFiles">
+Combining conceptual and API intermediate TOC files...
+    Last step completed in 00:00:00.0060
+</buildStep>
+<buildStep step="ExtractingHtmlInfo">
+Extracting HTML info for HTML Help 1 and/or website...
+[C:\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe - ExtractHtmlInfo.proj]
+Sandcastle Help File Builder and Tools, version 2015.7.25.0
+Copyright c 2006-2015, Eric Woodruff, All Rights Reserved
+E-Mail: Eric@EWoodruff.us
+
+Using LCID &#39;1033&#39;, code page &#39;65001&#39;, encoding charset &#39;UTF-8&#39;.
+
+Processing website files in C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website
+Processed 403 HTML files
+Sorting keywords and generating See Also indices
+Saving website keyword index to C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\WebKI.xml
+Saving website table of contents to C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\WebTOC.xml
+    Last step completed in 00:00:07.1382
+</buildStep>
+<buildStep step="CopyStandardHelpContent">
+Copying standard help content...
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\alert_caution.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\alert_caution.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\alert_note.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\alert_note.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\alert_security.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\alert_security.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\CFW.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\CFW.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\CodeExample.png -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\CodeExample.png
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\favicon.ico -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\favicon.ico
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\footer_slice.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\footer_slice.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privclass.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privclass.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privdelegate.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privdelegate.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privenumeration.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privenumeration.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privevent.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privevent.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privextension.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privextension.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privfield.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privfield.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privinterface.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privinterface.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privmethod.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privmethod.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privproperty.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privproperty.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\privstructure.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\privstructure.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protclass.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protclass.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protdelegate.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protdelegate.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protenumeration.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protenumeration.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protevent.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protevent.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protextension.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protextension.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protfield.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protfield.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protinterface.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protinterface.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protmethod.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protmethod.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protoperator.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protoperator.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protproperty.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protproperty.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\protstructure.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\protstructure.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubclass.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubclass.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubdelegate.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubdelegate.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubenumeration.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubenumeration.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubevent.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubevent.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubextension.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubextension.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubfield.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubfield.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubinterface.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubinterface.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubmethod.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubmethod.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\puboperator.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\puboperator.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubproperty.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubproperty.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\pubstructure.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\pubstructure.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\slMobile.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\slMobile.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\static.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\static.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\tabLeftBG.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\tabLeftBG.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\tabRightBG.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\tabRightBG.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\icons\xna.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\icons\xna.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\scripts\branding.js -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\scripts\branding.js
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-cs-CZ.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-cs-CZ.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-de-DE.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-de-DE.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-en-US.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-en-US.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-es-ES.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-es-ES.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-fr-FR.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-fr-FR.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-Help1.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-Help1.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-HelpViewer.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-HelpViewer.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-it-IT.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-it-IT.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-ja-JP.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-ja-JP.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-ko-KR.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-ko-KR.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-pl-PL.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-pl-PL.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-pt-BR.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-pt-BR.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-ru-RU.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-ru-RU.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-tr-TR.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-tr-TR.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-zh-CN.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-zh-CN.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding-zh-TW.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding-zh-TW.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\styles\branding.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\styles\branding.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\CloseSearch.png -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\CloseSearch.png
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\CollapseAll.png -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\CollapseAll.png
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Collapsed.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Collapsed.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Expanded.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Expanded.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\favicon.ico -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\favicon.ico
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\FillNode.aspx -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\FillNode.aspx
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\FillNode.php -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\FillNode.php
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Index.aspx -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Index.aspx
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Index.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Index.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\index.html -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\index.html
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\index.php -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\index.php
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Item.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Item.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\LoadIndexKeywords.aspx -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\LoadIndexKeywords.aspx
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\LoadIndexKeywords.php -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\LoadIndexKeywords.php
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Search.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Search.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\SearchHelp.aspx -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\SearchHelp.aspx
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\SearchHelp.inc.php -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\SearchHelp.inc.php
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\SearchHelp.php -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\SearchHelp.php
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Splitter.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Splitter.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\SyncTOC.gif -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\SyncTOC.gif
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\TOC.css -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\TOC.css
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\TOC.js -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\TOC.js
+C:\Program Files (x86)\EWSoftware\Sandcastle Help File Builder\PresentationStyles\VS2010\..\LegacyWeb\Web.Config -&gt; C:\Users\listiarso\Documents\hungry\parse\public\docs\dotnet\api\Working\Output\Website\Web.Config
+    Last step completed in 00:00:02.6543
+</buildStep>
+<buildStep step="GenerateHelpFormatTableOfContents">
+Generating website table of contents file...
+    Last step completed in 00:00:00.0029
+</buildStep>
+<buildStep step="GenerateFullTextIndex">
+Generating full-text index for the website...
+
+    Last step completed in 00:00:02.0761
+</buildStep>
+<buildStep step="CopyingWebsiteFiles">
+Copying website files to output folder...
+
+Copied 500 files
+Copied 516 files for the website content
+    Last step completed in 00:00:09.9083
+</buildStep>
+<buildStep step="CleanIntermediates">
+Removing intermediate files...
+    Last step completed in 00:00:02.9481
+</buildStep>
+<buildStep step="Completed">
+
+Build completed successfully at 8/21/2015 11:31:59 AM.  Total time: 00:01:02.7751
+
+</buildStep>
+</shfbBuild>
