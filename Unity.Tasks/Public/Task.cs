@@ -87,13 +87,16 @@ namespace System.Threading.Tasks {
     /// Blocks until the task is complete.
     /// </summary>
     public void Wait() {
-      lock (mutex) {
-        if (!IsCompleted) {
-          Monitor.Wait(mutex);
+      while (true) {
+        lock (mutex) {
+          if (IsCompleted) {
+            return;
+          }
+          if (IsFaulted) {
+            throw Exception;
+          }
         }
-        if (IsFaulted) {
-          throw Exception;
-        }
+        Thread.Sleep(0);
       }
     }
 

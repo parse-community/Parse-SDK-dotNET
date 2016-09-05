@@ -275,7 +275,6 @@ namespace Parse {
     /// Typically, you should use <see cref="LogOutAsync()"/>, unless you are managing your own threading.
     /// </remarks>
     public static void LogOut() {
-      // TODO (hallucinogen): this will without a doubt fail in Unity. But what else can we do?
       LogOutAsync().Wait();
     }
 
@@ -338,7 +337,6 @@ namespace Parse {
     public static ParseUser CurrentUser {
       get {
         var userTask = GetCurrentUserAsync();
-        // TODO (hallucinogen): this will without a doubt fail in Unity. How should we fix it?
         userTask.Wait();
         return userTask.Result;
       }

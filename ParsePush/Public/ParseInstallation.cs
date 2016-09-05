@@ -52,7 +52,6 @@ namespace Parse {
     public static ParseInstallation CurrentInstallation {
       get {
         var task = CurrentInstallationController.GetAsync(CancellationToken.None);
-        // TODO (hallucinogen): this will absolutely break on Unity, but how should we resolve this?
         task.Wait();
         return task.Result;
       }
