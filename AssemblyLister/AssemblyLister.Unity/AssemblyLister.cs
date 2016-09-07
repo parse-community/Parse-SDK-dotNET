@@ -33,8 +33,18 @@ namespace AssemblyLister {
         if (seen.Contains(reference.FullName))
           continue;
 
-        Assembly referencedAsm = Assembly.Load(reference);
-        assemblies.AddRange(referencedAsm.DeepWalkReferences(seen));
+        try {
+          Assembly referencedAsm = Assembly.Load(reference);
+          assemblies.AddRange(referencedAsm.DeepWalkReferences(seen));
+        }
+        catch (System.IO.FileNotFoundException) {
+          if (reference.Name == "UnityEditor.iOS.Extensions.Xcode") {
+            // It's okay. On Windows, this won't exist.
+          }
+          else {
+            throw; // this is an actual problem
+          }
+        }
       }
 
       return assemblies;
