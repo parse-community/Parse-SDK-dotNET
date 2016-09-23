@@ -16,6 +16,7 @@ namespace Parse.Common.Internal {
     private TaskQueue taskQueue = new TaskQueue();
     private string settingsPath;
     private StorageDictionary storageDictionary;
+    private static bool isWebPlayer;
 
     private class StorageDictionary : IStorageDictionary<string, object> {
       private object mutex;
@@ -35,7 +36,7 @@ namespace Parse.Common.Internal {
           jsonEncoded = Json.Encode(dictionary);
         }
 
-        if (Application.isWebPlayer) {
+        if (StorageController.isWebPlayer) {
           PlayerPrefs.SetString(ParseStorageFileName, jsonEncoded);
           PlayerPrefs.Save();
         } else if (Application.platform == RuntimePlatform.tvOS) {
@@ -55,7 +56,7 @@ namespace Parse.Common.Internal {
         string jsonString = null;
 
         try {
-          if (Application.isWebPlayer) {
+          if (StorageController.isWebPlayer) {
             jsonString = PlayerPrefs.GetString(ParseStorageFileName, null);
           } else if (Application.platform == RuntimePlatform.tvOS) {
             Debug.Log("Running on TvOS, prefs cannot be loaded.");
@@ -146,6 +147,10 @@ namespace Parse.Common.Internal {
 
     public StorageController() {
       settingsPath = Path.Combine(Application.persistentDataPath, ParseStorageFileName);
+    }
+
+    public void Initialize() {
+      isWebPlayer = Application.isWebPlayer;
     }
 
     public StorageController(String settingsPath) {

@@ -150,6 +150,8 @@ namespace Parse {
         ParseObject.RegisterSubclass<ParseRole>();
         ParseObject.RegisterSubclass<ParseSession>();
 
+        Parse.Core.Internal.ParseCorePlugins.Instance.StorageController.Initialize();
+
         ParseModuleController.Instance.ParseDidInitialize();
       }
     }

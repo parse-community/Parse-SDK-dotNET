@@ -19,6 +19,13 @@ namespace Parse.Common.Internal {
     /// <param name="contents"></param>
     /// <returns></returns>
     Task<IStorageDictionary<string, object>> SaveAsync(IDictionary<string, object> contents);
+
+    /// <summary>
+    /// Do any setup necessary before the object is used--particularly
+    /// code which must run in the Unity thread.
+    /// </summary>
+    /// <returns></returns>
+    void Initialize();
   }
 
   /// <summary>

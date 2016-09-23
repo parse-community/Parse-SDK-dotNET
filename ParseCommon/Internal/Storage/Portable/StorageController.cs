@@ -122,6 +122,10 @@ namespace Parse.Common.Internal {
       this.fileTask = Task.FromResult(file);
     }
 
+    public void Initialize() {
+      // no init needed
+    }
+
     public Task<IStorageDictionary<string, object>> LoadAsync() {
       return taskQueue.Enqueue(toAwait => {
         return toAwait.ContinueWith(_ => {
