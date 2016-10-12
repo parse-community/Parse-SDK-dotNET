@@ -64,6 +64,7 @@ namespace Parse.Core.Internal {
       this.Method = other.Method;
       this.DataObject = other.DataObject;
       this.Headers = new List<KeyValuePair<string, string>>(other.Headers);
+      this.Data = other.Data;
     }
   }
 }
