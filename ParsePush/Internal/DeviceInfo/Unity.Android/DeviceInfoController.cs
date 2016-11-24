@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 using UnityEngine;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   /// <summary>
   /// This is a concrete implementation of IDeviceInfoController for Unity Android targets.
   /// </summary>

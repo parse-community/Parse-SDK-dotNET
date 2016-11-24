@@ -1,9 +1,9 @@
 using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Analytics.Internal;
-using Parse.Core.Internal;
-using Parse.Common.Internal;
+using LeanCloud;
+using LeanCloud.Analytics.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Common.Internal;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -19,7 +19,7 @@ namespace ParseTest {
   public class AnalyticsControllerTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.Initialize(new ParseClient.Configuration {
+      AVClient.Initialize(new AVClient.Configuration {
         ApplicationId = "",
         WindowsKey = ""
       });
@@ -39,7 +39,7 @@ namespace ParseTest {
         cancellationToken: CancellationToken.None).ContinueWith(t => {
         Assert.IsFalse(t.IsFaulted);
         Assert.IsFalse(t.IsCanceled);
-        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/events/SomeEvent"),
+        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/events/SomeEvent"),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()), Times.Exactly(1));
@@ -59,16 +59,16 @@ namespace ParseTest {
         cancellationToken: CancellationToken.None).ContinueWith(t => {
           Assert.IsFalse(t.IsFaulted);
           Assert.IsFalse(t.IsCanceled);
-          mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/events/AppOpened"),
+          mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/events/AppOpened"),
             It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
             It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
         });
     }
 
-    private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response) {
-      var mockRunner = new Mock<IParseCommandRunner>();
-      mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(),
+    private Mock<IAVCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response) {
+      var mockRunner = new Mock<IAVCommandRunner>();
+      mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<AVCommand>(),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()))

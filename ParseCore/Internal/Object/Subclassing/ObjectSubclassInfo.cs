@@ -5,16 +5,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
+namespace LeanCloud.Core.Internal {
   internal class ObjectSubclassInfo {
     public ObjectSubclassInfo(Type type, ConstructorInfo constructor) {
       TypeInfo = type.GetTypeInfo();
       ClassName = GetClassName(TypeInfo);
       Constructor = constructor;
       PropertyMappings = ReflectionHelpers.GetProperties(type)
-        .Select(prop => Tuple.Create(prop, prop.GetCustomAttribute<ParseFieldNameAttribute>(true)))
+        .Select(prop => Tuple.Create(prop, prop.GetCustomAttribute<AVFieldNameAttribute>(true)))
         .Where(t => t.Item2 != null)
         .Select(t => Tuple.Create(t.Item1, t.Item2.FieldName))
         .ToDictionary(t => t.Item1.Name, t => t.Item2);
@@ -25,12 +25,12 @@ namespace Parse.Core.Internal {
     public IDictionary<String, String> PropertyMappings { get; private set; }
     private ConstructorInfo Constructor { get; set; }
 
-    public ParseObject Instantiate() {
-      return (ParseObject)Constructor.Invoke(null);
+    public AVObject Instantiate() {
+      return (AVObject)Constructor.Invoke(null);
     }
 
     internal static String GetClassName(TypeInfo type) {
-      var attribute = type.GetCustomAttribute<ParseClassNameAttribute>();
+      var attribute = type.GetCustomAttribute<AVClassNameAttribute>();
       return attribute != null ? attribute.ClassName : null;
     }
   }

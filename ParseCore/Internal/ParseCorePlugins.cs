@@ -1,20 +1,20 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 
-namespace Parse.Core.Internal {
-  public class ParseCorePlugins : IParseCorePlugins {
+namespace LeanCloud.Core.Internal {
+  public class AVPlugins : IAVCorePlugins {
     private static readonly object instanceMutex = new object();
-    private static IParseCorePlugins instance;
-    public static IParseCorePlugins Instance {
+    private static IAVCorePlugins instance;
+    public static IAVCorePlugins Instance {
       get {
         lock (instanceMutex) {
-          instance = instance ?? new ParseCorePlugins();
+          instance = instance ?? new AVPlugins();
           return instance;
         }
       }
@@ -30,23 +30,23 @@ namespace Parse.Core.Internal {
     #region Server Controllers
 
     private IHttpClient httpClient;
-    private IParseCommandRunner commandRunner;
+    private IAVCommandRunner commandRunner;
     private IStorageController storageController;
 
-    private IParseCloudCodeController cloudCodeController;
-    private IParseConfigController configController;
-    private IParseFileController fileController;
-    private IParseObjectController objectController;
-    private IParseQueryController queryController;
-    private IParseSessionController sessionController;
-    private IParseUserController userController;
+    private IAVCloudCodeController cloudCodeController;
+    private IAVConfigController configController;
+    private IAVFileController fileController;
+    private IAVObjectController objectController;
+    private IAVQueryController queryController;
+    private IAVSessionController sessionController;
+    private IAVUserController userController;
     private IObjectSubclassingController subclassingController;
 
     #endregion
 
     #region Current Instance Controller
 
-    private IParseCurrentUserController currentUserController;
+    private IAVCurrentUserController currentUserController;
     private IInstallationIdController installationIdController;
 
     #endregion
@@ -83,10 +83,10 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseCommandRunner CommandRunner {
+    public IAVCommandRunner CommandRunner {
       get {
         lock (mutex) {
-          commandRunner = commandRunner ?? new ParseCommandRunner(HttpClient, InstallationIdController);
+          commandRunner = commandRunner ?? new AVCommandRunner(HttpClient, InstallationIdController);
           return commandRunner;
         }
       }
@@ -111,10 +111,10 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseCloudCodeController CloudCodeController {
+    public IAVCloudCodeController CloudCodeController {
       get {
         lock (mutex) {
-          cloudCodeController = cloudCodeController ?? new ParseCloudCodeController(CommandRunner);
+          cloudCodeController = cloudCodeController ?? new AVCloudCodeController(CommandRunner);
           return cloudCodeController;
         }
       }
@@ -125,10 +125,10 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseFileController FileController {
+    public IAVFileController FileController {
       get {
         lock (mutex) {
-          fileController = fileController ?? new ParseFileController(CommandRunner);
+          fileController = fileController ?? new AVFileController(CommandRunner);
           return fileController;
         }
       }
@@ -139,11 +139,11 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseConfigController ConfigController {
+    public IAVConfigController ConfigController {
       get {
         lock (mutex) {
           if (configController == null) {
-            configController = new ParseConfigController(CommandRunner, StorageController);
+            configController = new AVConfigController(CommandRunner, StorageController);
           }
           return configController;
         }
@@ -155,10 +155,10 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseObjectController ObjectController {
+    public IAVObjectController ObjectController {
       get {
         lock (mutex) {
-          objectController = objectController ?? new ParseObjectController(CommandRunner);
+          objectController = objectController ?? new AVObjectController(CommandRunner);
           return objectController;
         }
       }
@@ -169,11 +169,11 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseQueryController QueryController {
+    public IAVQueryController QueryController {
       get {
         lock (mutex) {
           if (queryController == null) {
-            queryController = new ParseQueryController(CommandRunner);
+            queryController = new AVQueryController(CommandRunner);
           }
           return queryController;
         }
@@ -185,10 +185,10 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseSessionController SessionController {
+    public IAVSessionController SessionController {
       get {
         lock (mutex) {
-          sessionController = sessionController ?? new ParseSessionController(CommandRunner);
+          sessionController = sessionController ?? new AVSessionController(CommandRunner);
           return sessionController;
         }
       }
@@ -199,10 +199,10 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseUserController UserController {
+    public IAVUserController UserController {
       get {
         lock (mutex) {
-          userController = userController ?? new ParseUserController(CommandRunner);
+          userController = userController ?? new AVUserController(CommandRunner);
           return userController;
         }
       }
@@ -213,10 +213,10 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public IParseCurrentUserController CurrentUserController {
+    public IAVCurrentUserController CurrentUserController {
       get {
         lock (mutex) {
-          currentUserController = currentUserController ?? new ParseCurrentUserController(StorageController);
+          currentUserController = currentUserController ?? new AVCurrentUserController(StorageController);
           return currentUserController;
         }
       }
@@ -232,7 +232,7 @@ namespace Parse.Core.Internal {
         lock (mutex) {
           if (subclassingController == null) {
             subclassingController = new ObjectSubclassingController();
-            subclassingController.AddRegisterHook(typeof(ParseUser), () => CurrentUserController.ClearFromMemory());
+            subclassingController.AddRegisterHook(typeof(AVUser), () => CurrentUserController.ClearFromMemory());
           }
           return subclassingController;
         }

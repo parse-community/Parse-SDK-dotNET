@@ -5,7 +5,7 @@ using PCLStorage;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Parse.Common.Internal {
+namespace LeanCloud.Common.Internal {
   /// <summary>
   /// Implements `IStorageController` for PCL targets, based off of PCLStorage.
   /// </summary>

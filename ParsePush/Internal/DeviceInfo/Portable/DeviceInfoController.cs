@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   /// <summary>
   /// This is a concrete implementation of IDeviceInfoController.
   /// Everything is implemented to be a no-op, as an installation

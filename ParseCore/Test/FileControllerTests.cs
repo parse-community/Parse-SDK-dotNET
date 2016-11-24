@@ -1,7 +1,7 @@
 using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,7 +15,7 @@ namespace ParseTest {
   public class FileControllerTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.Initialize(new ParseClient.Configuration {
+      AVClient.Initialize(new AVClient.Configuration {
         ApplicationId = "",
         WindowsKey = ""
       });
@@ -31,7 +31,7 @@ namespace ParseTest {
         MimeType = "image/png"
       };
 
-      var controller = new ParseFileController(mockRunner.Object);
+      var controller = new AVFileController(mockRunner.Object);
       return controller.SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t => {
         Assert.True(t.IsFaulted);
       });
@@ -47,7 +47,7 @@ namespace ParseTest {
         MimeType = "image/png"
       };
 
-      var controller = new ParseFileController(mockRunner.Object);
+      var controller = new AVFileController(mockRunner.Object);
       return controller.SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t => {
         Assert.True(t.IsFaulted);
       });
@@ -66,7 +66,7 @@ namespace ParseTest {
         MimeType = "image/png"
       };
 
-      var controller = new ParseFileController(mockRunner.Object);
+      var controller = new AVFileController(mockRunner.Object);
       return controller.SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t => {
         Assert.True(t.IsFaulted);
       });
@@ -86,7 +86,7 @@ namespace ParseTest {
         MimeType = "image/png"
       };
 
-      var controller = new ParseFileController(mockRunner.Object);
+      var controller = new AVFileController(mockRunner.Object);
       return controller.SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t => {
         Assert.False(t.IsFaulted);
         var newState = t.Result;
@@ -97,9 +97,9 @@ namespace ParseTest {
       });
     }
 
-    private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response) {
-      var mockRunner = new Mock<IParseCommandRunner>();
-      mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(),
+    private Mock<IAVCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response) {
+      var mockRunner = new Mock<IAVCommandRunner>();
+      mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<AVCommand>(),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()))

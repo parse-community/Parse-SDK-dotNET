@@ -1,14 +1,14 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Push.Internal;
-using Parse.Core.Internal;
-using Parse.Common.Internal;
+using LeanCloud.Push.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
   ///  A utility class for sending and receiving push notifications.
   /// </summary>
@@ -34,7 +34,7 @@ namespace Parse {
     /// this push.
     /// This should not be used in tandem with Channels.
     /// </summary>
-    public ParseQuery<ParseInstallation> Query {
+    public AVQuery<ParseInstallation> Query {
       get { return state.Query; }
       set {
         MutateState(s => {
@@ -117,7 +117,7 @@ namespace Parse {
 
     /// <summary>
     /// The contents of this push. Some keys have special meaning. A full list of pre-defined
-    /// keys can be found in the Parse Push Guide. The following keys affect WinRT devices.
+    /// keys can be found in the LeanCloud Push Guide. The following keys affect WinRT devices.
     /// Keys which do not start with x-winrt- can be prefixed with x-winrt- to specify an
     /// override only sent to winrt devices.
     /// alert: the body of the alert text.
@@ -186,7 +186,7 @@ namespace Parse {
     #region Sending Push
 
     /// <summary>
-    /// Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
+    /// Request a push to be sent. When this task completes, LeanCloud has successfully acknowledged a request
     /// to send push notifications but has not necessarily finished sending all notifications
     /// requested. The current status of recent push notifications can be seen in your Push Notifications
     /// console on http://parse.com
@@ -197,7 +197,7 @@ namespace Parse {
     }
 
     /// <summary>
-    /// Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
+    /// Request a push to be sent. When this task completes, LeanCloud has successfully acknowledged a request
     /// to send push notifications but has not necessarily finished sending all notifications
     /// requested. The current status of recent push notifications can be seen in your Push Notifications
     /// console on http://parse.com
@@ -273,7 +273,7 @@ namespace Parse {
     /// </summary>
     /// <param name="alert">The alert message to send.</param>
     /// <param name="query">A query filtering the devices which should receive this Push Notification.</param>
-    public static Task SendAlertAsync(string alert, ParseQuery<ParseInstallation> query) {
+    public static Task SendAlertAsync(string alert, AVQuery<ParseInstallation> query) {
       var push = new ParsePush();
       push.Query = query;
       push.Alert = alert;
@@ -346,7 +346,7 @@ namespace Parse {
     /// </summary>
     /// <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
     /// <param name="query">A query filtering the devices which should receive this Push Notification.</param>
-    public static Task SendDataAsync(IDictionary<string, object> data, ParseQuery<ParseInstallation> query) {
+    public static Task SendDataAsync(IDictionary<string, object> data, AVQuery<ParseInstallation> query) {
       var push = new ParsePush();
       push.Query = query;
       push.Data = data;

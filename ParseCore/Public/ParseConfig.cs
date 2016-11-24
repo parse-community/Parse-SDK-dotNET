@@ -1,29 +1,29 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Core.Internal;
-using Parse.Utilities;
-using Parse.Common.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Utilities;
+using LeanCloud.Common.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// The ParseConfig is a representation of the remote configuration object,
+  /// The AVConfig is a representation of the remote configuration object,
   /// that enables you to add things like feature gating, a/b testing or simple "Message of the day".
   /// </summary>
-  public class ParseConfig : IJsonConvertible {
+  public class AVConfig : IJsonConvertible {
     private IDictionary<string, object> properties = new Dictionary<string, object>();
 
     /// <summary>
-    /// Gets the latest fetched ParseConfig.
+    /// Gets the latest fetched AVConfig.
     /// </summary>
-    /// <returns>ParseConfig object</returns>
-    public static ParseConfig CurrentConfig {
+    /// <returns>AVConfig object</returns>
+    public static AVConfig CurrentConfig {
       get {
-        Task<ParseConfig> task = ConfigController.CurrentConfigController.GetCurrentConfigAsync();
+        Task<AVConfig> task = ConfigController.CurrentConfigController.GetCurrentConfigAsync();
         task.Wait();
         return task.Result;
       }
@@ -37,41 +37,41 @@ namespace Parse {
       ConfigController.CurrentConfigController.ClearCurrentConfigInMemoryAsync().Wait();
     }
 
-    private static IParseConfigController ConfigController {
-      get { return ParseCorePlugins.Instance.ConfigController; }
+    private static IAVConfigController ConfigController {
+      get { return AVPlugins.Instance.ConfigController; }
     }
 
-    internal ParseConfig()
+    internal AVConfig()
       : base() {
     }
 
-    internal ParseConfig(IDictionary<string, object> fetchedConfig) {
-      var props = ParseDecoder.Instance.Decode(fetchedConfig["params"]) as IDictionary<string, object>;
+    internal AVConfig(IDictionary<string, object> fetchedConfig) {
+      var props = AVDecoder.Instance.Decode(fetchedConfig["params"]) as IDictionary<string, object>;
       properties = props;
     }
 
     /// <summary>
-    /// Retrieves the ParseConfig asynchronously from the server.
+    /// Retrieves the AVConfig asynchronously from the server.
     /// </summary>
-    /// <returns>ParseConfig object that was fetched</returns>
-    public static Task<ParseConfig> GetAsync() {
+    /// <returns>AVConfig object that was fetched</returns>
+    public static Task<AVConfig> GetAsync() {
       return GetAsync(CancellationToken.None);
     }
 
     /// <summary>
-    /// Retrieves the ParseConfig asynchronously from the server.
+    /// Retrieves the AVConfig asynchronously from the server.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>ParseConfig object that was fetched</returns>
-    public static Task<ParseConfig> GetAsync(CancellationToken cancellationToken) {
-        return ConfigController.FetchConfigAsync(ParseUser.CurrentSessionToken, cancellationToken);
+    /// <returns>AVConfig object that was fetched</returns>
+    public static Task<AVConfig> GetAsync(CancellationToken cancellationToken) {
+        return ConfigController.FetchConfigAsync(AVUser.CurrentSessionToken, cancellationToken);
     }
 
     /// <summary>
     /// Gets a value for the key of a particular type.
     /// </summary>
     /// <typeparam name="T">The type to convert the value to. Supported types are
-    /// ParseObject and its descendents, Parse types such as ParseRelation and ParseGeopoint,
+    /// AVObject and its descendents, LeanCloud types such as AVRelation and ParseGeopoint,
     /// primitive types,IList&lt;T&gt;, IDictionary&lt;string, T&gt; and strings.</typeparam>
     /// <param name="key">The key of the element to get.</param>
     /// <exception cref="System.Collections.Generic.KeyNotFoundException">The property is retrieved

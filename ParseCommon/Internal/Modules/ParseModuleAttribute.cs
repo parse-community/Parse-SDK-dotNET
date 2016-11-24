@@ -1,13 +1,13 @@
 using System;
 
-namespace Parse.Common.Internal {
+namespace LeanCloud.Common.Internal {
   [AttributeUsage(AttributeTargets.Assembly)]
-  public class ParseModuleAttribute : Attribute {
+  public class AVModuleAttribute : Attribute {
     /// <summary>
-    /// Instantiates a new ParseModuleAttribute.
+    /// Instantiates a new AVModuleAttribute.
     /// </summary>
     /// <param name="ModuleType">The type to which this module is applied.</param>
-    public ParseModuleAttribute(Type ModuleType) {
+    public AVModuleAttribute(Type ModuleType) {
       this.ModuleType = ModuleType;
     }
 

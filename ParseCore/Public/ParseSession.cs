@@ -1,18 +1,18 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// Represents a session of a user for a Parse application.
+  /// Represents a session of a user for a LeanCloud application.
   /// </summary>
-  [ParseClassName("_Session")]
-  public class ParseSession : ParseObject {
+  [AVClassName("_Session")]
+  public class AVSession : AVObject {
     private static readonly HashSet<string> readOnlyKeys = new HashSet<string> {
       "sessionToken", "createdWith", "restricted", "user", "expiresAt", "installationId"
     };
@@ -24,30 +24,30 @@ namespace Parse {
     /// <summary>
     /// Gets the session token for a user, if they are logged in.
     /// </summary>
-    [ParseFieldName("sessionToken")]
+    [AVFieldName("sessionToken")]
     public string SessionToken {
       get { return GetProperty<string>(null, "SessionToken"); }
     }
 
     /// <summary>
-    /// Constructs a <see cref="ParseQuery{ParseSession}"/> for ParseSession.
+    /// Constructs a <see cref="ParseQuery{ParseSession}"/> for AVSession.
     /// </summary>
-    public static ParseQuery<ParseSession> Query {
+    public static AVQuery<AVSession> Query {
       get {
-        return new ParseQuery<ParseSession>();
+        return new AVQuery<AVSession>();
       }
     }
 
-    internal static IParseSessionController SessionController {
+    internal static IAVSessionController SessionController {
       get {
-        return ParseCorePlugins.Instance.SessionController;
+        return AVPlugins.Instance.SessionController;
       }
     }
 
     /// <summary>
     /// Gets the current <see cref="ParseSession"/> object related to the current user.
     /// </summary>
-    public static Task<ParseSession> GetCurrentSessionAsync() {
+    public static Task<AVSession> GetCurrentSessionAsync() {
       return GetCurrentSessionAsync(CancellationToken.None);
     }
 
@@ -55,20 +55,20 @@ namespace Parse {
     /// Gets the current <see cref="ParseSession"/> object related to the current user.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token</param>
-    public static Task<ParseSession> GetCurrentSessionAsync(CancellationToken cancellationToken) {
-      return ParseUser.GetCurrentUserAsync().OnSuccess(t1 => {
-        ParseUser user = t1.Result;
+    public static Task<AVSession> GetCurrentSessionAsync(CancellationToken cancellationToken) {
+      return AVUser.GetCurrentUserAsync().OnSuccess(t1 => {
+        AVUser user = t1.Result;
         if (user == null) {
-          return Task<ParseSession>.FromResult((ParseSession)null);
+          return Task<AVSession>.FromResult((AVSession)null);
         }
 
         string sessionToken = user.SessionToken;
         if (sessionToken == null) {
-          return Task<ParseSession>.FromResult((ParseSession)null);
+          return Task<AVSession>.FromResult((AVSession)null);
         }
 
         return SessionController.GetSessionAsync(sessionToken, cancellationToken).OnSuccess(t => {
-          ParseSession session = ParseObject.FromState<ParseSession>(t.Result, "_Session");
+          AVSession session = AVObject.FromState<AVSession>(t.Result, "_Session");
           return session;
         });
       }).Unwrap();
@@ -87,7 +87,7 @@ namespace Parse {
       }
 
       return SessionController.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken).OnSuccess(t => {
-        ParseSession session = ParseObject.FromState<ParseSession>(t.Result, "_Session");
+        AVSession session = AVObject.FromState<AVSession>(t.Result, "_Session");
         return session.SessionToken;
       });
     }

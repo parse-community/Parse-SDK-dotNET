@@ -1,5 +1,5 @@
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using NUnit.Framework;
 using Moq;
 using System;
@@ -13,7 +13,7 @@ namespace ParseTest {
   public class CloudTests {
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance.Reset();
+      AVPlugins.Instance.Reset();
     }
 
     [Test]
@@ -23,19 +23,19 @@ namespace ParseTest {
         { "fosco", "ben" },
         { "list", new List<object> { 1, 2, 3 } }
       };
-      var mockController = new Mock<IParseCloudCodeController>();
+      var mockController = new Mock<IAVCloudCodeController>();
       mockController.Setup(obj => obj.CallFunctionAsync<IDictionary<string, object>>(It.IsAny<string>(),
           It.IsAny<IDictionary<string, object>>(),
           It.IsAny<string>(),
           It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
-      var mockCurrentUserController = new Mock<IParseCurrentUserController>();
+      var mockCurrentUserController = new Mock<IAVCurrentUserController>();
 
-      ParseCorePlugins plugins = new ParseCorePlugins();
+      AVPlugins plugins = new AVPlugins();
       plugins.CloudCodeController = mockController.Object;
       plugins.CurrentUserController = mockCurrentUserController.Object;
-      ParseCorePlugins.Instance = plugins;
+      AVPlugins.Instance = plugins;
 
-      return ParseCloud.CallFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None).ContinueWith(t => {
+      return AVCloud.CallFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None).ContinueWith(t => {
         Assert.IsFalse(t.IsFaulted);
         Assert.IsFalse(t.IsCanceled);
         Assert.IsInstanceOf<IDictionary<string, object>>(t.Result);

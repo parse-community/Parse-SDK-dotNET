@@ -1,8 +1,8 @@
 using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Analytics.Internal;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Analytics.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -21,8 +21,8 @@ namespace ParseTest {
     [AsyncStateMachine(typeof(AnalyticsTests))]
     public Task TestTrackEvent() {
       var mockController = new Mock<IParseAnalyticsController>();
-      var mockCorePlugins = new Mock<IParseCorePlugins>();
-      var mockCurrentUserController = new Mock<IParseCurrentUserController>();
+      var mockCorePlugins = new Mock<IAVCorePlugins>();
+      var mockCurrentUserController = new Mock<IAVCurrentUserController>();
 
       mockCorePlugins
         .Setup(corePlugins => corePlugins.CurrentUserController)
@@ -51,8 +51,8 @@ namespace ParseTest {
     [AsyncStateMachine(typeof(AnalyticsTests))]
     public Task TestTrackEventWithDimension() {
       var mockController = new Mock<IParseAnalyticsController>();
-      var mockCorePlugins = new Mock<IParseCorePlugins>();
-      var mockCurrentUserController = new Mock<IParseCurrentUserController>();
+      var mockCorePlugins = new Mock<IAVCorePlugins>();
+      var mockCurrentUserController = new Mock<IAVCurrentUserController>();
 
       mockCorePlugins
         .Setup(corePlugins => corePlugins.CurrentUserController)
@@ -85,8 +85,8 @@ namespace ParseTest {
     [AsyncStateMachine(typeof(AnalyticsTests))]
     public Task TestTrackAppOpened() {
       var mockController = new Mock<IParseAnalyticsController>();
-      var mockCorePlugins = new Mock<IParseCorePlugins>();
-      var mockCurrentUserController = new Mock<IParseCurrentUserController>();
+      var mockCorePlugins = new Mock<IAVCorePlugins>();
+      var mockCurrentUserController = new Mock<IAVCurrentUserController>();
 
       mockCorePlugins
         .Setup(corePlugins => corePlugins.CurrentUserController)

@@ -1,7 +1,7 @@
 using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +14,7 @@ namespace ParseTest {
   public class FileTests {
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance = null;
+      AVPlugins.Instance = null;
     }
 
     [Test]
@@ -25,19 +25,19 @@ namespace ParseTest {
         Url = new Uri("https://www.parse.com/newBekti.png"),
         MimeType = "image/png"
       };
-      var mockController = new Mock<IParseFileController>();
+      var mockController = new Mock<IAVFileController>();
       mockController.Setup(obj => obj.SaveAsync(It.IsAny<FileState>(),
           It.IsAny<Stream>(),
           It.IsAny<string>(),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
-      var mockCurrentUserController = new Mock<IParseCurrentUserController>();
-      ParseCorePlugins.Instance = new ParseCorePlugins {
+      var mockCurrentUserController = new Mock<IAVCurrentUserController>();
+      AVPlugins.Instance = new AVPlugins {
         FileController = mockController.Object,
         CurrentUserController = mockCurrentUserController.Object
       };
 
-      ParseFile file = new ParseFile("bekti.jpeg", new MemoryStream(), "image/jpeg");
+      AVFile file = new AVFile("bekti.jpeg", new MemoryStream(), "image/jpeg");
       Assert.AreEqual("bekti.jpeg", file.Name);
       Assert.AreEqual("image/jpeg", file.MimeType);
       Assert.True(file.IsDirty);
@@ -57,13 +57,13 @@ namespace ParseTest {
       Uri secureUri = new Uri("https://files.parsetfss.com/yolo.txt");
       Uri randomUri = new Uri("http://random.server.local/file.foo");
 
-      ParseFile file = ParseFileExtensions.Create("Foo", unsecureUri);
+      AVFile file = AVFileExtensions.Create("Foo", unsecureUri);
       Assert.AreEqual(secureUri, file.Url);
 
-      file = ParseFileExtensions.Create("Bar", secureUri);
+      file = AVFileExtensions.Create("Bar", secureUri);
       Assert.AreEqual(secureUri, file.Url);
 
-      file = ParseFileExtensions.Create("Baz", randomUri);
+      file = AVFileExtensions.Create("Baz", randomUri);
       Assert.AreEqual(randomUri, file.Url);
     }
   }

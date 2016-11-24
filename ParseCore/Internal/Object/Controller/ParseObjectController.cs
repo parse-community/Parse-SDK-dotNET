@@ -1,25 +1,25 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Utilities;
-using Parse.Common.Internal;
+using LeanCloud.Utilities;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
-  public class ParseObjectController : IParseObjectController {
-    private readonly IParseCommandRunner commandRunner;
+namespace LeanCloud.Core.Internal {
+  public class AVObjectController : IAVObjectController {
+    private readonly IAVCommandRunner commandRunner;
 
-    public ParseObjectController(IParseCommandRunner commandRunner) {
+    public AVObjectController(IAVCommandRunner commandRunner) {
       this.commandRunner = commandRunner;
     }
 
     public Task<IObjectState> FetchAsync(IObjectState state,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("classes/{0}/{1}",
+      var command = new AVCommand(string.Format("classes/{0}/{1}",
               Uri.EscapeDataString(state.ClassName),
               Uri.EscapeDataString(state.ObjectId)),
           method: "GET",
@@ -27,17 +27,17 @@ namespace Parse.Core.Internal {
           data: null);
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        return ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        return AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
       });
     }
 
     public Task<IObjectState> SaveAsync(IObjectState state,
-        IDictionary<string, IParseFieldOperation> operations,
+        IDictionary<string, IAVFieldOperation> operations,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var objectJSON = ParseObject.ToJSONObjectForSaving(operations);
+      var objectJSON = AVObject.ToJSONObjectForSaving(operations);
 
-      var command = new ParseCommand((state.ObjectId == null ?
+      var command = new AVCommand((state.ObjectId == null ?
               string.Format("classes/{0}", Uri.EscapeDataString(state.ClassName)) :
               string.Format("classes/{0}/{1}", Uri.EscapeDataString(state.ClassName), state.ObjectId)),
           method: (state.ObjectId == null ? "POST" : "PUT"),
@@ -45,7 +45,7 @@ namespace Parse.Core.Internal {
           data: objectJSON);
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        var serverState = ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        var serverState = AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
         serverState = serverState.MutatedClone(mutableClone => {
           mutableClone.IsNew = t.Result.Item1 == System.Net.HttpStatusCode.Created;
         });
@@ -54,24 +54,24 @@ namespace Parse.Core.Internal {
     }
 
     public IList<Task<IObjectState>> SaveAllAsync(IList<IObjectState> states,
-        IList<IDictionary<string, IParseFieldOperation>> operationsList,
+        IList<IDictionary<string, IAVFieldOperation>> operationsList,
         string sessionToken,
         CancellationToken cancellationToken) {
 
       var requests = states
-        .Zip(operationsList, (item, ops) => new ParseCommand(
+        .Zip(operationsList, (item, ops) => new AVCommand(
           item.ObjectId == null
             ? string.Format("classes/{0}", Uri.EscapeDataString(item.ClassName))
             : string.Format("classes/{0}/{1}", Uri.EscapeDataString(item.ClassName), Uri.EscapeDataString(item.ObjectId)),
           method: item.ObjectId == null ? "POST" : "PUT",
-          data: ParseObject.ToJSONObjectForSaving(ops)))
+          data: AVObject.ToJSONObjectForSaving(ops)))
         .ToList();
 
       var batchTasks = ExecuteBatchRequests(requests, sessionToken, cancellationToken);
       var stateTasks = new List<Task<IObjectState>>();
       foreach (var task in batchTasks) {
         stateTasks.Add(task.OnSuccess(t => {
-          return ParseObjectCoder.Instance.Decode(t.Result, ParseDecoder.Instance);
+          return AVObjectCoder.Instance.Decode(t.Result, AVDecoder.Instance);
         }));
       }
 
@@ -81,7 +81,7 @@ namespace Parse.Core.Internal {
     public Task DeleteAsync(IObjectState state,
         string sessionToken,
         CancellationToken cancellationToken) {
-      var command = new ParseCommand(string.Format("classes/{0}/{1}",
+      var command = new AVCommand(string.Format("classes/{0}/{1}",
               state.ClassName, state.ObjectId),
           method: "DELETE",
           sessionToken: sessionToken,
@@ -95,7 +95,7 @@ namespace Parse.Core.Internal {
         CancellationToken cancellationToken) {
       var requests = states
         .Where(item => item.ObjectId != null)
-        .Select(item => new ParseCommand(
+        .Select(item => new AVCommand(
           string.Format("classes/{0}/{1}", Uri.EscapeDataString(item.ClassName), Uri.EscapeDataString(item.ObjectId)),
             method: "DELETE",
             data: null))
@@ -105,13 +105,13 @@ namespace Parse.Core.Internal {
 
     // TODO (hallucinogen): move this out to a class to be used by Analytics
     private const int MaximumBatchSize = 50;
-    internal IList<Task<IDictionary<string, object>>> ExecuteBatchRequests(IList<ParseCommand> requests,
+    internal IList<Task<IDictionary<string, object>>> ExecuteBatchRequests(IList<AVCommand> requests,
         string sessionToken,
         CancellationToken cancellationToken) {
       var tasks = new List<Task<IDictionary<string, object>>>();
       int batchSize = requests.Count;
 
-      IEnumerable<ParseCommand> remaining = requests;
+      IEnumerable<AVCommand> remaining = requests;
       while (batchSize > MaximumBatchSize) {
         var process = remaining.Take(MaximumBatchSize).ToList();
         remaining = remaining.Skip(MaximumBatchSize);
@@ -125,7 +125,7 @@ namespace Parse.Core.Internal {
       return tasks;
     }
 
-    private IList<Task<IDictionary<string, object>>> ExecuteBatchRequest(IList<ParseCommand> requests,
+    private IList<Task<IDictionary<string, object>>> ExecuteBatchRequest(IList<AVCommand> requests,
         string sessionToken,
         CancellationToken cancellationToken) {
       var tasks = new List<Task<IDictionary<string, object>>>();
@@ -148,7 +148,7 @@ namespace Parse.Core.Internal {
         }
         return results;
       }).Cast<object>().ToList();
-      var command = new ParseCommand("batch",
+      var command = new AVCommand("batch",
         method: "POST",
         sessionToken: sessionToken,
         data: new Dictionary<string, object> { { "requests", encodedRequests } });
@@ -184,7 +184,7 @@ namespace Parse.Core.Internal {
           } else if (result.ContainsKey("error")) {
             var error = result["error"] as IDictionary<string, object>;
             long errorCode = (long)error["code"];
-            tcs.TrySetException(new ParseException((ParseException.ErrorCode)errorCode, error["error"] as string));
+            tcs.TrySetException(new AVException((AVException.ErrorCode)errorCode, error["error"] as string));
           } else {
             tcs.TrySetException(new InvalidOperationException(
                 "Invalid batch command response."));

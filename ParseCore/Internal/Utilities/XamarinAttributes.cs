@@ -2,10 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Parse;
-using Parse.Common.Internal;
+using LeanCloud;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
+namespace LeanCloud.Core.Internal {
   /// <summary>
   /// A reimplementation of Xamarin's PreserveAttribute.
   /// This allows us to support AOT and linking for Xamarin platforms.
@@ -33,26 +33,26 @@ namespace Parse.Core.Internal {
     /// </summary>
     private static List<object> CreateWrapperTypes() {
       return new List<object> {
-				(Action)(() => ParseCloud.CallFunctionAsync<object>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<bool>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<byte>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<sbyte>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<short>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<ushort>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<int>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<uint>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<long>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<ulong>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<char>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<double>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<float>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<IDictionary<string, object>>(null, null, CancellationToken.None)),
-				(Action)(() => ParseCloud.CallFunctionAsync<IList<object>>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<object>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<bool>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<byte>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<sbyte>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<short>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<ushort>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<int>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<uint>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<long>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<ulong>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<char>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<double>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<float>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<IDictionary<string, object>>(null, null, CancellationToken.None)),
+				(Action)(() => AVCloud.CallFunctionAsync<IList<object>>(null, null, CancellationToken.None)),
 
-        typeof(FlexibleListWrapper<object, ParseGeoPoint>),
-				typeof(FlexibleListWrapper<ParseGeoPoint, object>),
-				typeof(FlexibleDictionaryWrapper<object, ParseGeoPoint>),
-				typeof(FlexibleDictionaryWrapper<ParseGeoPoint, object>),
+        typeof(FlexibleListWrapper<object, AVGeoPoint>),
+				typeof(FlexibleListWrapper<AVGeoPoint, object>),
+				typeof(FlexibleDictionaryWrapper<object, AVGeoPoint>),
+				typeof(FlexibleDictionaryWrapper<AVGeoPoint, object>),
 			};
     }
   }

@@ -1,14 +1,14 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// The ParseCloud class provides methods for interacting with Parse Cloud Functions.
+  /// The AVCloud class provides methods for interacting with LeanCloud Cloud Functions.
   /// </summary>
   /// <example>
   /// For example, this sample code calls the
@@ -17,13 +17,13 @@ namespace Parse {
   ///
   /// <code>
   /// var result =
-  ///     await ParseCloud.CallFunctionAsync&lt;IDictionary&lt;string, object&gt;&gt;("validateGame", parameters);
+  ///     await AVCloud.CallFunctionAsync&lt;IDictionary&lt;string, object&gt;&gt;("validateGame", parameters);
   /// </code>
   /// </example>
-  public static class ParseCloud {
-    internal static IParseCloudCodeController CloudCodeController {
+  public static class AVCloud {
+    internal static IAVCloudCodeController CloudCodeController {
       get {
-        return ParseCorePlugins.Instance.CloudCodeController;
+        return AVPlugins.Instance.CloudCodeController;
       }
     }
 
@@ -31,11 +31,11 @@ namespace Parse {
     /// Calls a cloud function.
     /// </summary>
     /// <typeparam name="T">The type of data you will receive from the cloud function. This
-    /// can be an IDictionary, string, IList, ParseObject, or any other type supported by
-    /// ParseObject.</typeparam>
+    /// can be an IDictionary, string, IList, AVObject, or any other type supported by
+    /// AVObject.</typeparam>
     /// <param name="name">The cloud function to call.</param>
     /// <param name="parameters">The parameters to send to the cloud function. This
-    /// dictionary can contain anything that could be passed into a ParseObject except for
+    /// dictionary can contain anything that could be passed into a AVObject except for
     /// ParseObjects themselves.</param>
     /// <returns>The result of the cloud call.</returns>
     public static Task<T> CallFunctionAsync<T>(String name, IDictionary<string, object> parameters) {
@@ -46,11 +46,11 @@ namespace Parse {
     /// Calls a cloud function.
     /// </summary>
     /// <typeparam name="T">The type of data you will receive from the cloud function. This
-    /// can be an IDictionary, string, IList, ParseObject, or any other type supported by
-    /// ParseObject.</typeparam>
+    /// can be an IDictionary, string, IList, AVObject, or any other type supported by
+    /// AVObject.</typeparam>
     /// <param name="name">The cloud function to call.</param>
     /// <param name="parameters">The parameters to send to the cloud function. This
-    /// dictionary can contain anything that could be passed into a ParseObject except for
+    /// dictionary can contain anything that could be passed into a AVObject except for
     /// ParseObjects themselves.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The result of the cloud call.</returns>
@@ -58,7 +58,7 @@ namespace Parse {
         IDictionary<string, object> parameters, CancellationToken cancellationToken) {
       return CloudCodeController.CallFunctionAsync<T>(name,
           parameters,
-          ParseUser.CurrentSessionToken,
+          AVUser.CurrentSessionToken,
           cancellationToken);
     }
   }

@@ -1,31 +1,31 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// Exceptions that may occur when sending requests to Parse.
+  /// Exceptions that may occur when sending requests to LeanCloud.
   /// </summary>
-  public class ParseException : Exception {
+  public class AVException : Exception {
     /// <summary>
-    /// Error codes that may be delivered in response to requests to Parse.
+    /// Error codes that may be delivered in response to requests to LeanCloud.
     /// </summary>
     public enum ErrorCode {
       /// <summary>
-      /// Error code indicating that an unknown error or an error unrelated to Parse
+      /// Error code indicating that an unknown error or an error unrelated to LeanCloud
       /// occurred.
       /// </summary>
       OtherCause = -1,
 
       /// <summary>
       /// Error code indicating that something has gone wrong with the server.
-      /// If you get this error code, it is Parse's fault. Please report the bug to
+      /// If you get this error code, it is LeanCloud's fault. Please report the bug to
       /// https://parse.com/help.
       /// </summary>
       InternalServerError = 1,
 
       /// <summary>
-      /// Error code indicating the connection to the Parse servers failed.
+      /// Error code indicating the connection to the LeanCloud servers failed.
       /// </summary>
       ConnectionFailed = 100,
 
@@ -60,7 +60,7 @@ namespace Parse {
 
       /// <summary>
       /// Error code indicating a malformed pointer. You should not see this unless
-      /// you have been mucking about changing internal Parse code.
+      /// you have been mucking about changing internal LeanCloud code.
       /// </summary>
       InvalidPointer = 106,
 
@@ -78,7 +78,7 @@ namespace Parse {
       CommandUnavailable = 108,
 
       /// <summary>
-      /// You must call Parse.initialize before using the Parse library.
+      /// You must call LeanCloud.initialize before using the LeanCloud library.
       /// </summary>
       NotInitialized = 109,
 
@@ -121,7 +121,7 @@ namespace Parse {
       InvalidNestedKey = 121,
 
       /// <summary>
-      /// Error code indicating that an invalid filename was used for ParseFile.
+      /// Error code indicating that an invalid filename was used for AVFile.
       /// A valid file name contains only a-zA-Z0-9_. characters and is between 1
       /// and 128 characters.
       /// </summary>
@@ -256,13 +256,13 @@ namespace Parse {
       UnsupportedService = 252
     }
 
-    internal ParseException(ErrorCode code, string message, Exception cause = null)
+    internal AVException(ErrorCode code, string message, Exception cause = null)
       : base(message, cause) {
       this.Code = code;
     }
 
     /// <summary>
-    /// The Parse error code associated with the exception.
+    /// The LeanCloud error code associated with the exception.
     /// </summary>
     public ErrorCode Code { get; private set; }
   }

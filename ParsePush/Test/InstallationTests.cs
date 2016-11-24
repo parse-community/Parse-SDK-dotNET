@@ -1,6 +1,6 @@
-using Parse;
-using Parse.Core.Internal;
-using Parse.Push.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
+using LeanCloud.Push.Internal;
 using NUnit.Framework;
 using Moq;
 using System;
@@ -14,17 +14,17 @@ namespace ParseTest {
   public class InstallationTests {
     [SetUp]
     public void SetUp() {
-      ParseObject.RegisterSubclass<ParseInstallation>();
+      AVObject.RegisterSubclass<ParseInstallation>();
     }
 
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance = null;
+      AVPlugins.Instance = null;
     }
 
     [Test]
     public void TestGetInstallationQuery() {
-      Assert.IsInstanceOf<ParseQuery<ParseInstallation>>(ParseInstallation.Query);
+      Assert.IsInstanceOf<AVQuery<ParseInstallation>>(ParseInstallation.Query);
     }
 
     [Test]
@@ -35,7 +35,7 @@ namespace ParseTest {
           { "installationId", guid.ToString() }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual(guid, installation.InstallationId);
 
@@ -52,7 +52,7 @@ namespace ParseTest {
           { "deviceType", "parseOS" }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual("parseOS", installation.DeviceType);
 
@@ -68,7 +68,7 @@ namespace ParseTest {
           { "appName", "parseApp" }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual("parseApp", installation.AppName);
 
@@ -84,7 +84,7 @@ namespace ParseTest {
           { "appVersion", "1.2.3" }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual("1.2.3", installation.AppVersion);
 
@@ -100,7 +100,7 @@ namespace ParseTest {
           { "appIdentifier", "com.parse.app" }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual("com.parse.app", installation.AppIdentifier);
 
@@ -116,7 +116,7 @@ namespace ParseTest {
           { "timeZone", "America/Los_Angeles" }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual("America/Los_Angeles", installation.TimeZone);
     }
@@ -128,7 +128,7 @@ namespace ParseTest {
           { "localeIdentifier", "en-US" }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual("en-US", installation.LocaleIdentifier);
     }
@@ -141,7 +141,7 @@ namespace ParseTest {
           { "channels", channels }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       Assert.NotNull(installation);
       Assert.AreEqual("the", installation.Channels[0]);
       Assert.AreEqual("richard", installation.Channels[1]);
@@ -159,7 +159,7 @@ namespace ParseTest {
           { "installationId", guid.ToString() }
         }
       };
-      ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      ParseInstallation installation = AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
       var mockController = new Mock<IParseCurrentInstallationController>();
       mockController.Setup(obj => obj.GetAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(installation));
 

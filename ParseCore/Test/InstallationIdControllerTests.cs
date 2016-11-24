@@ -1,9 +1,9 @@
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using Moq;
 using NUnit.Framework;
 using System;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 
@@ -12,7 +12,7 @@ namespace ParseTest {
   public class InstallationIdControllerTests {
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance = null;
+      AVPlugins.Instance = null;
     }
 
     [Test]

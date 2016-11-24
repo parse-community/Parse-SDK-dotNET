@@ -1,25 +1,25 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   internal class ParsePushController : IParsePushController {
-    private readonly IParseCommandRunner commandRunner;
-    private readonly IParseCurrentUserController currentUserController;
+    private readonly IAVCommandRunner commandRunner;
+    private readonly IAVCurrentUserController currentUserController;
 
-    public ParsePushController(IParseCommandRunner commandRunner, IParseCurrentUserController currentUserController) {
+    public ParsePushController(IAVCommandRunner commandRunner, IAVCurrentUserController currentUserController) {
       this.commandRunner = commandRunner;
       this.currentUserController = currentUserController;
     }
 
     public Task SendPushNotificationAsync(IPushState state, CancellationToken cancellationToken) {
       return currentUserController.GetCurrentSessionTokenAsync(cancellationToken).OnSuccess(sessionTokenTask => {
-        var command = new ParseCommand("push",
+        var command = new AVCommand("push",
             method: "POST",
             sessionToken: sessionTokenTask.Result,
             data: ParsePushEncoder.Instance.Encode(state));

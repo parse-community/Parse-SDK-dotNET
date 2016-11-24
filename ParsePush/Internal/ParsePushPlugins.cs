@@ -1,7 +1,7 @@
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 using System;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   public class ParsePushPlugins : IParsePushPlugins {
     private static readonly object instanceMutex = new object();
     private static IParsePushPlugins instance;
@@ -19,7 +19,7 @@ namespace Parse.Push.Internal {
 
     private readonly object mutex = new object();
 
-    private IParseCorePlugins corePlugins;
+    private IAVCorePlugins corePlugins;
     private IParsePushChannelsController pushChannelsController;
     private IParsePushController pushController;
     private IParseCurrentInstallationController currentInstallationController;
@@ -35,10 +35,10 @@ namespace Parse.Push.Internal {
       }
     }
 
-    public IParseCorePlugins CorePlugins {
+    public IAVCorePlugins CorePlugins {
       get {
         lock (mutex) {
-          corePlugins = corePlugins ?? ParseCorePlugins.Instance;
+          corePlugins = corePlugins ?? AVPlugins.Instance;
           return corePlugins;
         }
       }

@@ -1,15 +1,15 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Parse.Utilities;
+using LeanCloud.Utilities;
 
-namespace Parse.Core.Internal {
-  public class ParseAddUniqueOperation : IParseFieldOperation {
+namespace LeanCloud.Core.Internal {
+  public class AVAddUniqueOperation : IAVFieldOperation {
     private ReadOnlyCollection<object> objects;
-    public ParseAddUniqueOperation(IEnumerable<object> objects) {
+    public AVAddUniqueOperation(IEnumerable<object> objects) {
       this.objects = new ReadOnlyCollection<object>(objects.Distinct().ToList());
     }
 
@@ -20,22 +20,22 @@ namespace Parse.Core.Internal {
       };
     }
 
-    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) {
+    public IAVFieldOperation MergeWithPrevious(IAVFieldOperation previous) {
       if (previous == null) {
         return this;
       }
-      if (previous is ParseDeleteOperation) {
-        return new ParseSetOperation(objects.ToList());
+      if (previous is AVDeleteOperation) {
+        return new AVSetOperation(objects.ToList());
       }
-      if (previous is ParseSetOperation) {
-        var setOp = (ParseSetOperation)previous;
+      if (previous is AVSetOperation) {
+        var setOp = (AVSetOperation)previous;
         var oldList = Conversion.To<IList<object>>(setOp.Value);
         var result = this.Apply(oldList, null);
-        return new ParseSetOperation(result);
+        return new AVSetOperation(result);
       }
-      if (previous is ParseAddUniqueOperation) {
-        var oldList = ((ParseAddUniqueOperation)previous).Objects;
-        return new ParseAddUniqueOperation((IList<object>)this.Apply(oldList, null));
+      if (previous is AVAddUniqueOperation) {
+        var oldList = ((AVAddUniqueOperation)previous).Objects;
+        return new AVAddUniqueOperation((IList<object>)this.Apply(oldList, null));
       }
       throw new InvalidOperationException("Operation is invalid after previous operation.");
     }
@@ -47,7 +47,7 @@ namespace Parse.Core.Internal {
       var newList = Conversion.To<IList<object>>(oldValue).ToList();
       var comparer = ParseFieldOperations.ParseObjectComparer;
       foreach (var objToAdd in objects) {
-        if (objToAdd is ParseObject) {
+        if (objToAdd is AVObject) {
           var matchedObj = newList.FirstOrDefault(listObj => comparer.Equals(objToAdd, listObj));
           if (matchedObj == null) {
             newList.Add(objToAdd);

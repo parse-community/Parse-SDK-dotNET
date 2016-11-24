@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   public interface IDeviceInfoController {
     string DeviceType { get; }
     string DeviceTimeZone { get; }

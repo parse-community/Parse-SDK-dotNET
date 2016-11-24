@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Parse.Common.Internal {
+namespace LeanCloud.Common.Internal {
   /// <summary>
-  /// An abstraction for accessing persistent storage in the Parse SDK.
+  /// An abstraction for accessing persistent storage in the LeanCloud SDK.
   /// </summary>
   public interface IStorageController {
     /// <summary>

@@ -110,13 +110,13 @@
       <Project>{4bbce4f8-c097-4680-8b07-b69d567eaa5b}</Project>
       <Name>AssemblyLister.NetFx</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\ParseCommon\ParseCommon.Portable.csproj">
+    <ProjectReference Include="..\..\ParseCommon\LeanCloud.Storage.Portable.csproj">
       <Project>{de07a443-9619-4bd7-b540-41296f8a2959}</Project>
-      <Name>ParseCommon.Portable</Name>
+      <Name>LeanCloud.Storage.Portable</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\ParseCore\ParseCore.Portable.csproj">
+    <ProjectReference Include="..\..\ParseCore\LeanCloud.Core.Portable.csproj">
       <Project>{f3f65351-2ce1-4412-84b4-c36f34eab928}</Project>
-      <Name>ParseCore.Portable</Name>
+      <Name>LeanCloud.Core.Portable</Name>
     </ProjectReference>
     <ProjectReference Include="..\ParsePush.Portable.csproj">
       <Project>{9da3ec57-cdc7-4f9a-850d-8c63c7850409}</Project>

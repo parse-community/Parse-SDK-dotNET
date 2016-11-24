@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 
 namespace ParseTest {
   [TestFixture]
   public class RelationTests {
     [Test]
     public void TestRelationQuery() {
-      ParseObject parent = ParseObject.CreateWithoutData("Foo", "abcxyz");
+      AVObject parent = AVObject.CreateWithoutData("Foo", "abcxyz");
 
-      ParseRelation<ParseObject> relation = parent.GetRelation<ParseObject>("child");
-      ParseQuery<ParseObject> query = relation.Query;
+      AVRelation<AVObject> relation = parent.GetRelation<AVObject>("child");
+      AVQuery<AVObject> query = relation.Query;
 
       // Client side, the query will appear to be for the wrong class.
       // When the server recieves it, the class name will be redirected using the 'redirectClassNameForKey' option.

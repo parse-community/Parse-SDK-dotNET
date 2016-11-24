@@ -4,22 +4,22 @@ using System.Linq;
 using System.Reflection;
 using AssemblyLister;
 
-namespace Parse.Common.Internal {
+namespace LeanCloud.Common.Internal {
   /// <summary>
   /// The class which controls the loading of other ParseModules
   /// </summary>
-  public class ParseModuleController {
-    private static readonly ParseModuleController instance = new ParseModuleController();
-    public static ParseModuleController Instance {
+  public class AVModuleController {
+    private static readonly AVModuleController instance = new AVModuleController();
+    public static AVModuleController Instance {
       get { return instance; }
     }
 
     private readonly object mutex = new object();
-    private readonly List<IParseModule> modules = new List<IParseModule>();
+    private readonly List<IAVModule> modules = new List<IAVModule>();
 
     private bool isParseInitialized = false;
 
-    public void RegisterModule(IParseModule module) {
+    public void RegisterModule(IAVModule module) {
       if (module == null) {
         return;
       }
@@ -36,16 +36,16 @@ namespace Parse.Common.Internal {
 
     public void ScanForModules() {
       var moduleTypes = Lister.AllAssemblies
-        .SelectMany(asm => asm.GetCustomAttributes<ParseModuleAttribute>())
+        .SelectMany(asm => asm.GetCustomAttributes<AVModuleAttribute>())
         .Select(attr => attr.ModuleType)
-        .Where(type => type != null && type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IParseModule)));
+        .Where(type => type != null && type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IAVModule)));
 
       lock (mutex) {
         foreach (Type moduleType in moduleTypes) {
           try {
             ConstructorInfo constructor = moduleType.FindConstructor();
             if (constructor != null) {
-              var module = constructor.Invoke(new object[] {}) as IParseModule;
+              var module = constructor.Invoke(new object[] {}) as IAVModule;
               RegisterModule(module);
             }
           } catch (Exception) {
@@ -64,7 +64,7 @@ namespace Parse.Common.Internal {
 
     public void ParseDidInitialize() {
       lock (mutex) {
-        foreach (IParseModule module in modules) {
+        foreach (IAVModule module in modules) {
           module.OnParseInitialized();
         }
         isParseInitialized = true;

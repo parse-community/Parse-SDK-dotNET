@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{68E871A4-6C4A-4BF8-AD86-E25AE2A911F7}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{68E871
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{D84CEB01-FEB3-4E91-B704-D47C5A146EFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseCommon.Portable", "ParseCommon\ParseCommon.Portable.csproj", "{DE07A443-9619-4BD7-B540-41296F8A2959}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeanCloud.Storage.Portable", "ParseCommon\LeanCloud.Storage.Portable.csproj", "{DE07A443-9619-4BD7-B540-41296F8A2959}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseCommon.Unity", "ParseCommon\ParseCommon.Unity.csproj", "{196457AA-9BA0-40BC-91A3-21BAAD6F4169}"
 EndProject
@@ -48,7 +48,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseAnalytics.Test.Unit.Ne
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseCore.Unity", "ParseCore\ParseCore.Unity.csproj", "{27D3F5E9-CA66-426B-BE69-9B6158071A35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseCore.Portable", "ParseCore\ParseCore.Portable.csproj", "{F3F65351-2CE1-4412-84B4-C36F34EAB928}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeanCloud.Core.Portable", "ParseCore\LeanCloud.Core.Portable.csproj", "{F3F65351-2CE1-4412-84B4-C36F34EAB928}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseCommon.Test.Unit.NetFx45", "ParseCommon\Test\ParseCommon.Test.Unit.NetFx45.csproj", "{53E714FF-3EF2-48EB-B305-36E1AB37C485}"
 EndProject

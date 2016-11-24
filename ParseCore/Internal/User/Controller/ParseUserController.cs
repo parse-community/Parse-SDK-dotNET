@@ -1,30 +1,30 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
-  public class ParseUserController : IParseUserController {
-    private readonly IParseCommandRunner commandRunner;
+namespace LeanCloud.Core.Internal {
+  public class AVUserController : IAVUserController {
+    private readonly IAVCommandRunner commandRunner;
 
-    public ParseUserController(IParseCommandRunner commandRunner) {
+    public AVUserController(IAVCommandRunner commandRunner) {
       this.commandRunner = commandRunner;
     }
 
     public Task<IObjectState> SignUpAsync(IObjectState state,
-        IDictionary<string, IParseFieldOperation> operations,
+        IDictionary<string, IAVFieldOperation> operations,
         CancellationToken cancellationToken) {
-      var objectJSON = ParseObject.ToJSONObjectForSaving(operations);
+      var objectJSON = AVObject.ToJSONObjectForSaving(operations);
 
-      var command = new ParseCommand("classes/_User",
+      var command = new AVCommand("classes/_User",
           method: "POST",
           data: objectJSON);
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        var serverState = ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        var serverState = AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
         serverState = serverState.MutatedClone(mutableClone => {
           mutableClone.IsNew = true;
         });
@@ -40,12 +40,12 @@ namespace Parse.Core.Internal {
         {"password", password}
       };
 
-      var command = new ParseCommand(string.Format("login?{0}", ParseClient.BuildQueryString(data)),
+      var command = new AVCommand(string.Format("login?{0}", AVClient.BuildQueryString(data)),
           method: "GET",
           data: null);
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        var serverState = ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        var serverState = AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
         serverState = serverState.MutatedClone(mutableClone => {
           mutableClone.IsNew = t.Result.Item1 == System.Net.HttpStatusCode.Created;
         });
@@ -59,14 +59,14 @@ namespace Parse.Core.Internal {
       var authData = new Dictionary<string, object>();
       authData[authType] = data;
 
-      var command = new ParseCommand("users",
+      var command = new AVCommand("users",
           method: "POST",
           data: new Dictionary<string, object> {
             {"authData", authData}
           });
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        var serverState = ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        var serverState = AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
         serverState = serverState.MutatedClone(mutableClone => {
           mutableClone.IsNew = t.Result.Item1 == System.Net.HttpStatusCode.Created;
         });
@@ -75,18 +75,18 @@ namespace Parse.Core.Internal {
     }
 
     public Task<IObjectState> GetUserAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("users/me",
+      var command = new AVCommand("users/me",
           method: "GET",
           sessionToken: sessionToken,
           data: null);
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        return ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        return AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
       });
     }
 
     public Task RequestPasswordResetAsync(string email, CancellationToken cancellationToken) {
-      var command = new ParseCommand("requestPasswordReset",
+      var command = new AVCommand("requestPasswordReset",
           method: "POST",
           data: new Dictionary<string, object> {
             {"email", email}

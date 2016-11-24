@@ -1,20 +1,20 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Parse.Core.Internal;
-using Parse.Common.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// A ParseACL is used to control which users and roles can access or modify a particular object. Each
-  /// <see cref="ParseObject"/> can have its own ParseACL. You can grant read and write permissions
+  /// A AVACL is used to control which users and roles can access or modify a particular object. Each
+  /// <see cref="ParseObject"/> can have its own AVACL. You can grant read and write permissions
   /// separately to specific users, to groups of users that belong to roles, or you can grant permissions
   /// to "the public" so that, for example, any user could read a particular object but only a particular
   /// set of users could write to that object.
   /// </summary>
-  public class ParseACL : IJsonConvertible {
+  public class AVACL : IJsonConvertible {
     private enum AccessKind {
       Read,
       Write
@@ -23,7 +23,7 @@ namespace Parse {
     private readonly ICollection<string> readers = new HashSet<string>();
     private readonly ICollection<string> writers = new HashSet<string>();
 
-    internal ParseACL(IDictionary<string, object> jsonObject) {
+    internal AVACL(IDictionary<string, object> jsonObject) {
       readers = new HashSet<string>(from pair in jsonObject
                                     where ((IDictionary<string, object>)pair.Value).ContainsKey("read")
                                     select pair.Key);
@@ -35,14 +35,14 @@ namespace Parse {
     /// <summary>
     /// Creates an ACL with no permissions granted.
     /// </summary>
-    public ParseACL() {
+    public AVACL() {
     }
 
     /// <summary>
     /// Creates an ACL where only the provided user has access.
     /// </summary>
     /// <param name="owner">The only user that can read or write objects governed by this ACL.</param>
-    public ParseACL(ParseUser owner) {
+    public AVACL(AVUser owner) {
       SetReadAccess(owner, true);
       SetWriteAccess(owner, true);
     }
@@ -136,7 +136,7 @@ namespace Parse {
     /// </summary>
     /// <param name="user">The user.</param>
     /// <param name="allowed">Whether the user has permission.</param>
-    public void SetReadAccess(ParseUser user, bool allowed) {
+    public void SetReadAccess(AVUser user, bool allowed) {
       SetReadAccess(user.ObjectId, allowed);
     }
 
@@ -154,7 +154,7 @@ namespace Parse {
     /// </summary>
     /// <param name="user">The user.</param>
     /// <param name="allowed">Whether the user has permission.</param>
-    public void SetWriteAccess(ParseUser user, bool allowed) {
+    public void SetWriteAccess(AVUser user, bool allowed) {
       SetWriteAccess(user.ObjectId, allowed);
     }
 
@@ -176,7 +176,7 @@ namespace Parse {
     /// </summary>
     /// <param name="user">The user to check.</param>
     /// <returns>Whether the user has access.</returns>
-    public bool GetReadAccess(ParseUser user) {
+    public bool GetReadAccess(AVUser user) {
       return GetReadAccess(user.ObjectId);
     }
 
@@ -198,7 +198,7 @@ namespace Parse {
     /// </summary>
     /// <param name="user">The user to check.</param>
     /// <returns>Whether the user has access.</returns>
-    public bool GetWriteAccess(ParseUser user) {
+    public bool GetWriteAccess(AVUser user) {
       return GetWriteAccess(user.ObjectId);
     }
 
@@ -217,7 +217,7 @@ namespace Parse {
     /// </summary>
     /// <param name="role">The role.</param>
     /// <param name="allowed">Whether the role has access.</param>
-    public void SetRoleReadAccess(ParseRole role, bool allowed) {
+    public void SetRoleReadAccess(AVRole role, bool allowed) {
       SetRoleReadAccess(role.Name, allowed);
     }
 
@@ -239,7 +239,7 @@ namespace Parse {
     /// </summary>
     /// <param name="role">The name of the role.</param>
     /// <returns>Whether the role has access.</returns>
-    public bool GetRoleReadAccess(ParseRole role) {
+    public bool GetRoleReadAccess(AVRole role) {
       return GetRoleReadAccess(role.Name);
     }
 
@@ -258,7 +258,7 @@ namespace Parse {
     /// </summary>
     /// <param name="role">The role.</param>
     /// <param name="allowed">Whether the role has access.</param>
-    public void SetRoleWriteAccess(ParseRole role, bool allowed) {
+    public void SetRoleWriteAccess(AVRole role, bool allowed) {
       SetRoleWriteAccess(role.Name, allowed);
     }
 
@@ -280,7 +280,7 @@ namespace Parse {
     /// </summary>
     /// <param name="role">The name of the role.</param>
     /// <returns>Whether the role has access.</returns>
-    public bool GetRoleWriteAccess(ParseRole role) {
+    public bool GetRoleWriteAccess(AVRole role) {
       return GetRoleWriteAccess(role.Name);
     }
   }

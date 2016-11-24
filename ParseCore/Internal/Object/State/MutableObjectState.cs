@@ -1,10 +1,10 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Parse.Core.Internal {
+namespace LeanCloud.Core.Internal {
   public class MutableObjectState : IObjectState {
     public bool IsNew { get; set; }
     public string ClassName { get; set; }
@@ -34,13 +34,13 @@ namespace Parse.Core.Internal {
       return ServerData.ContainsKey(key);
     }
 
-    public void Apply(IDictionary<string, IParseFieldOperation> operationSet) {
+    public void Apply(IDictionary<string, IAVFieldOperation> operationSet) {
       // Apply operationSet
       foreach (var pair in operationSet) {
         object oldValue;
         ServerData.TryGetValue(pair.Key, out oldValue);
         var newValue = pair.Value.Apply(oldValue, pair.Key);
-        if (newValue != ParseDeleteOperation.DeleteToken) {
+        if (newValue != AVDeleteOperation.DeleteToken) {
           ServerData[pair.Key] = newValue;
         } else {
           ServerData.Remove(pair.Key);

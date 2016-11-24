@@ -1,5 +1,5 @@
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using NUnit.Framework;
 using Moq;
 using System;
@@ -15,7 +15,7 @@ namespace ParseTest {
   public class SessionControllerTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.Initialize(new ParseClient.Configuration {
+      AVClient.Initialize(new AVClient.Configuration {
         ApplicationId = "",
         WindowsKey = ""
       });
@@ -27,7 +27,7 @@ namespace ParseTest {
       var response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null);
       var mockRunner = CreateMockRunner(response);
 
-      var controller = new ParseSessionController(mockRunner.Object);
+      var controller = new AVSessionController(mockRunner.Object);
       return controller.GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t => {
         Assert.True(t.IsFaulted);
         Assert.False(t.IsCanceled);
@@ -46,11 +46,11 @@ namespace ParseTest {
           });
       var mockRunner = CreateMockRunner(response);
 
-      var controller = new ParseSessionController(mockRunner.Object);
+      var controller = new AVSessionController(mockRunner.Object);
       return controller.GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t => {
         Assert.False(t.IsFaulted);
         Assert.False(t.IsCanceled);
-        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/sessions/me"),
+        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/sessions/me"),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()), Times.Exactly(1));
@@ -68,11 +68,11 @@ namespace ParseTest {
       var response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null);
       var mockRunner = CreateMockRunner(response);
 
-      var controller = new ParseSessionController(mockRunner.Object);
+      var controller = new AVSessionController(mockRunner.Object);
       return controller.RevokeAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t => {
         Assert.IsFalse(t.IsFaulted);
         Assert.IsFalse(t.IsCanceled);
-        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/logout"),
+        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/logout"),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()), Times.Exactly(1));
@@ -91,11 +91,11 @@ namespace ParseTest {
           });
       var mockRunner = CreateMockRunner(response);
 
-      var controller = new ParseSessionController(mockRunner.Object);
+      var controller = new AVSessionController(mockRunner.Object);
       return controller.UpgradeToRevocableSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t => {
         Assert.IsFalse(t.IsFaulted);
         Assert.IsFalse(t.IsCanceled);
-        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/upgradeToRevocableSession"),
+        mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/upgradeToRevocableSession"),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()), Times.Exactly(1));
@@ -109,7 +109,7 @@ namespace ParseTest {
 
     [Test]
     public void TestIsRevocableSessionToken() {
-      IParseSessionController sessionController = new ParseSessionController(Mock.Of<IParseCommandRunner>());
+      IAVSessionController sessionController = new AVSessionController(Mock.Of<IAVCommandRunner>());
       Assert.True(sessionController.IsRevocableSessionToken("r:session"));
       Assert.True(sessionController.IsRevocableSessionToken("r:session:r:"));
       Assert.True(sessionController.IsRevocableSessionToken("session:r:"));
@@ -119,9 +119,9 @@ namespace ParseTest {
     }
 
 
-    private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response) {
-      var mockRunner = new Mock<IParseCommandRunner>();
-      mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(),
+    private Mock<IAVCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response) {
+      var mockRunner = new Mock<IAVCommandRunner>();
+      mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<AVCommand>(),
           It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
           It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()))

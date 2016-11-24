@@ -1,6 +1,6 @@
 using NUnit.Framework;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -65,10 +65,10 @@ namespace ParseTest {
 
     [Test]
     public void TestApplyOperation() {
-      IParseFieldOperation op1 = new ParseIncrementOperation(7);
-      IParseFieldOperation op2 = new ParseSetOperation("legendia");
-      IParseFieldOperation op3 = new ParseSetOperation("vesperia");
-      var operations = new Dictionary<string, IParseFieldOperation>() {
+      IAVFieldOperation op1 = new AVIncrementOperation(7);
+      IAVFieldOperation op2 = new AVSetOperation("legendia");
+      IAVFieldOperation op3 = new AVSetOperation("vesperia");
+      var operations = new Dictionary<string, IAVFieldOperation>() {
         { "exist", op1 },
         { "missing", op2 },
         { "change", op3 }

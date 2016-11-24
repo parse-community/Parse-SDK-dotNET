@@ -1,15 +1,15 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Parse.Utilities;
+using LeanCloud.Utilities;
 
-namespace Parse.Core.Internal {
-  public class ParseAddOperation : IParseFieldOperation {
+namespace LeanCloud.Core.Internal {
+  public class AVAddOperation : IAVFieldOperation {
     private ReadOnlyCollection<object> objects;
-    public ParseAddOperation(IEnumerable<object> objects) {
+    public AVAddOperation(IEnumerable<object> objects) {
       this.objects = new ReadOnlyCollection<object>(objects.ToList());
     }
 
@@ -20,20 +20,20 @@ namespace Parse.Core.Internal {
       };
     }
 
-    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) {
+    public IAVFieldOperation MergeWithPrevious(IAVFieldOperation previous) {
       if (previous == null) {
         return this;
       }
-      if (previous is ParseDeleteOperation) {
-        return new ParseSetOperation(objects.ToList());
+      if (previous is AVDeleteOperation) {
+        return new AVSetOperation(objects.ToList());
       }
-      if (previous is ParseSetOperation) {
-        var setOp = (ParseSetOperation)previous;
+      if (previous is AVSetOperation) {
+        var setOp = (AVSetOperation)previous;
         var oldList = Conversion.To<IList<object>>(setOp.Value);
-        return new ParseSetOperation(oldList.Concat(objects).ToList());
+        return new AVSetOperation(oldList.Concat(objects).ToList());
       }
-      if (previous is ParseAddOperation) {
-        return new ParseAddOperation(((ParseAddOperation)previous).Objects.Concat(objects));
+      if (previous is AVAddOperation) {
+        return new AVAddOperation(((AVAddOperation)previous).Objects.Concat(objects));
       }
       throw new InvalidOperationException("Operation is invalid after previous operation.");
     }

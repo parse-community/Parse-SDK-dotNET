@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
+namespace LeanCloud.Core.Internal {
   internal class ObjectSubclassingController : IObjectSubclassingController {
     // Class names starting with _ are documented to be reserved. Use this one
     // here to allow us to 'inherit' certain properties.
@@ -20,13 +20,13 @@ namespace Parse.Core.Internal {
       registeredSubclasses = new Dictionary<String, ObjectSubclassInfo>();
       registerActions = new Dictionary<string, Action>();
 
-      // Register the ParseObject subclass, so we get access to the ACL,
+      // Register the AVObject subclass, so we get access to the ACL,
       // objectId, and other ParseFieldName properties.
-      RegisterSubclass(typeof(ParseObject));
+      RegisterSubclass(typeof(AVObject));
     }
 
     public String GetClassName(Type type) {
-      return type == typeof(ParseObject)
+      return type == typeof(AVObject)
         ? parseObjectClassName
         : ObjectSubclassInfo.GetClassName(type.GetTypeInfo());
     }
@@ -50,14 +50,14 @@ namespace Parse.Core.Internal {
       mutex.ExitReadLock();
 
       return subclassInfo == null
-        ? type == typeof(ParseObject)
+        ? type == typeof(AVObject)
         : subclassInfo.TypeInfo == type.GetTypeInfo();
     }
 
     public void RegisterSubclass(Type type) {
       TypeInfo typeInfo = type.GetTypeInfo();
-      if (!typeof(ParseObject).GetTypeInfo().IsAssignableFrom(typeInfo)) {
-        throw new ArgumentException("Cannot register a type that is not a subclass of ParseObject");
+      if (!typeof(AVObject).GetTypeInfo().IsAssignableFrom(typeInfo)) {
+        throw new ArgumentException("Cannot register a type that is not a subclass of AVObject");
       }
 
       String className = GetClassName(type);
@@ -80,7 +80,7 @@ namespace Parse.Core.Internal {
           } else {
             throw new ArgumentException(
               "Tried to register both " + previousInfo.TypeInfo.FullName + " and " + typeInfo.FullName +
-              " as the ParseObject subclass of " + className + ". Cannot determine the right class " +
+              " as the AVObject subclass of " + className + ". Cannot determine the right class " +
               "to use because neither inherits from the other."
             );
           }
@@ -119,7 +119,7 @@ namespace Parse.Core.Internal {
       mutex.ExitWriteLock();
     }
 
-    public ParseObject Instantiate(String className) {
+    public AVObject Instantiate(String className) {
       ObjectSubclassInfo info = null;
 
       mutex.EnterReadLock();
@@ -128,7 +128,7 @@ namespace Parse.Core.Internal {
 
       return info != null
         ? info.Instantiate()
-        : new ParseObject(className);
+        : new AVObject(className);
     }
 
     public IDictionary<String, String> GetPropertyMappings(String className) {

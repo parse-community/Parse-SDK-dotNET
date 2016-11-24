@@ -1,9 +1,9 @@
 using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
-using Parse.Push.Internal;
+using LeanCloud;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Push.Internal;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -47,7 +47,7 @@ namespace ParseTest {
 
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance = null;
+      AVPlugins.Instance = null;
       ParsePushPlugins.Instance = null;
     }
 
@@ -78,7 +78,7 @@ namespace ParseTest {
         Assert.True(t.IsCompleted);
         Assert.False(t.IsFaulted);
 
-        ParseQuery<ParseInstallation> query = new ParseQuery<ParseInstallation>("aClass");
+        AVQuery<ParseInstallation> query = new AVQuery<ParseInstallation>("aClass");
         thePush.Query = query;
         state.Query = query;
 

@@ -1,7 +1,7 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
-using Parse.Common.Internal;
-using Parse.Push.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Push.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.Networking.PushNotifications;
 using Windows.UI.Notifications;
 
-namespace Parse {
+namespace LeanCloud {
   public partial class ParsePush {
 
     static ParsePush() {
@@ -47,7 +47,7 @@ namespace Parse {
     }
 
     /// <summary>
-    /// Helper method to extract the full Push JSON provided to Parse, including any
+    /// Helper method to extract the full Push JSON provided to LeanCloud, including any
     /// non-visual custom information. Overloads exist for all data types which may be
     /// provided by Windows, I.E. LaunchActivatedEventArgs and PushNotificationReceivedEventArgs.
     /// Returns an empty dictionary if this push type cannot include non-visual data or
@@ -63,7 +63,7 @@ namespace Parse {
     }
 
     /// <summary>
-    /// Helper method to extract the full Push JSON provided to Parse, including any
+    /// Helper method to extract the full Push JSON provided to LeanCloud, including any
     /// non-visual custom information. Overloads exist for all data types which may be
     /// provided by Windows, I.E. LaunchActivatedEventArgs and PushNotificationReceivedEventArgs.
     /// Returns an empty dictionary if this push type cannot include non-visual data or

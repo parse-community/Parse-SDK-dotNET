@@ -6,12 +6,12 @@ using System.Linq;
 using UnityEngine;
 using System.Threading;
 
-namespace Parse.Common.Internal {
+namespace LeanCloud.Common.Internal {
   /// <summary>
   /// Implements `IStorageController` for PCL targets, based off of PCLStorage.
   /// </summary>
   public class StorageController : IStorageController {
-    private const string ParseStorageFileName = "Parse.settings";
+    private const string ParseStorageFileName = "LeanCloud.settings";
 
     private TaskQueue taskQueue = new TaskQueue();
     private string settingsPath;

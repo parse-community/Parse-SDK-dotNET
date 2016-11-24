@@ -1,32 +1,32 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
-  public class ParseSessionController : IParseSessionController {
-    private readonly IParseCommandRunner commandRunner;
+namespace LeanCloud.Core.Internal {
+  public class AVSessionController : IAVSessionController {
+    private readonly IAVCommandRunner commandRunner;
 
-    public ParseSessionController(IParseCommandRunner commandRunner) {
+    public AVSessionController(IAVCommandRunner commandRunner) {
       this.commandRunner = commandRunner;
     }
 
     public Task<IObjectState> GetSessionAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("sessions/me",
+      var command = new AVCommand("sessions/me",
           method: "GET",
           sessionToken: sessionToken,
           data: null);
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        return ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        return AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
       });
     }
 
     public Task RevokeAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("logout",
+      var command = new AVCommand("logout",
           method: "POST",
           sessionToken: sessionToken,
           data: new Dictionary<string, object>());
@@ -35,13 +35,13 @@ namespace Parse.Core.Internal {
     }
 
     public Task<IObjectState> UpgradeToRevocableSessionAsync(string sessionToken, CancellationToken cancellationToken) {
-      var command = new ParseCommand("upgradeToRevocableSession",
+      var command = new AVCommand("upgradeToRevocableSession",
           method: "POST",
           sessionToken: sessionToken,
           data: new Dictionary<string, object>());
 
       return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t => {
-        return ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
+        return AVObjectCoder.Instance.Decode(t.Result.Item2, AVDecoder.Instance);
       });
     }
 

@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using System.Xml;
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 using System.Collections.Generic;
 using Microsoft.Phone.Notification;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   public class DeviceInfoController : IDeviceInfoController {
     public string DeviceType {
       get {

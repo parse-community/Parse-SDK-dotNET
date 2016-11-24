@@ -1,24 +1,24 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
-using Parse.Utilities;
+using LeanCloud.Utilities;
 
-namespace Parse.Core.Internal {
-  public class ParseDecoder {
+namespace LeanCloud.Core.Internal {
+  public class AVDecoder {
     // This class isn't really a Singleton, but since it has no state, it's more efficient to get
     // the default instance.
-    private static readonly ParseDecoder instance = new ParseDecoder();
-    public static ParseDecoder Instance {
+    private static readonly AVDecoder instance = new AVDecoder();
+    public static AVDecoder Instance {
       get {
         return instance;
       }
     }
 
     // Prevent default constructor.
-    private ParseDecoder() { }
+    private AVDecoder() { }
 
     public object Decode(object data) {
       if (data == null) {
@@ -56,21 +56,21 @@ namespace Parse.Core.Internal {
         }
 
         if (typeString == "File") {
-          return new ParseFile(dict["name"] as string, new Uri(dict["url"] as string));
+          return new AVFile(dict["name"] as string, new Uri(dict["url"] as string));
         }
 
         if (typeString == "GeoPoint") {
-          return new ParseGeoPoint(Conversion.To<double>(dict["latitude"]),
+          return new AVGeoPoint(Conversion.To<double>(dict["latitude"]),
               Conversion.To<double>(dict["longitude"]));
         }
 
         if (typeString == "Object") {
-          var state = ParseObjectCoder.Instance.Decode(dict, this);
-          return ParseObject.FromState<ParseObject>(state, dict["className"] as string);
+          var state = AVObjectCoder.Instance.Decode(dict, this);
+          return AVObject.FromState<AVObject>(state, dict["className"] as string);
         }
 
         if (typeString == "Relation") {
-          return ParseRelationBase.CreateRelation(null, null, dict["className"] as string);
+          return AVRelationBase.CreateRelation(null, null, dict["className"] as string);
         }
 
         var converted = new Dictionary<string, object>();
@@ -90,14 +90,14 @@ namespace Parse.Core.Internal {
     }
 
     protected virtual object DecodePointer(string className, string objectId) {
-      return ParseObject.CreateWithoutData(className, objectId);
+      return AVObject.CreateWithoutData(className, objectId);
     }
 
     public static DateTime ParseDate(string input) {
       // TODO(hallucinogen): Figure out if we should be more flexible with the date formats
       // we accept.
       return DateTime.ParseExact(input,
-        ParseClient.DateFormatStrings,
+        AVClient.DateFormatStrings,
         CultureInfo.InvariantCulture,
         DateTimeStyles.None);
     }

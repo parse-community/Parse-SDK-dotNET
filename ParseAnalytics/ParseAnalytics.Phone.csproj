@@ -98,9 +98,9 @@
     <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ParseCommon\ParseCommon.Portable.csproj">
+    <ProjectReference Include="..\ParseCommon\LeanCloud.Storage.Portable.csproj">
       <Project>{de07a443-9619-4bd7-b540-41296f8a2959}</Project>
-      <Name>ParseCommon.Portable</Name>
+      <Name>LeanCloud.Storage.Portable</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

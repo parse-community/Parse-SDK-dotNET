@@ -1,9 +1,9 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
-using Parse;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
-using Parse.Push.Internal;
+using LeanCloud;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Push.Internal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,15 +13,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse {
+namespace LeanCloud {
 
   /// <summary>
   ///  Represents this app installed on this device. Use this class to track information you want
   ///  to sample from (i.e. if you update a field on app launch, you can issue a query to see
   ///  the number of devices which were active in the last N hours).
   /// </summary>
-  [ParseClassName("_Installation")]
-  public partial class ParseInstallation : ParseObject {
+  [AVClassName("_Installation")]
+  public partial class ParseInstallation : AVObject {
     private static readonly HashSet<string> readOnlyKeys = new HashSet<string> {
       "deviceType", "deviceUris", "installationId", "timeZone", "localeIdentifier", "parseVersion", "appName", "appIdentifier", "appVersion", "pushType"
     };
@@ -77,16 +77,16 @@ namespace Parse {
     /// You can add additional query conditions, but one of the above must appear as a top-level <c>AND</c>
     /// clause in the query.
     /// </remarks>
-    public static ParseQuery<ParseInstallation> Query {
+    public static AVQuery<ParseInstallation> Query {
       get {
-        return new ParseQuery<ParseInstallation>();
+        return new AVQuery<ParseInstallation>();
       }
     }
 
     /// <summary>
     /// A GUID that uniquely names this app installed on this device.
     /// </summary>
-    [ParseFieldName("installationId")]
+    [AVFieldName("installationId")]
     public Guid InstallationId {
       get {
         string installationIdString = GetProperty<string>("InstallationId");
@@ -108,7 +108,7 @@ namespace Parse {
     /// <summary>
     /// The runtime target of this installation object.
     /// </summary>
-    [ParseFieldName("deviceType")]
+    [AVFieldName("deviceType")]
     public string DeviceType {
       get { return GetProperty<string>("DeviceType"); }
       internal set { SetProperty<string>(value, "DeviceType"); }
@@ -117,7 +117,7 @@ namespace Parse {
     /// <summary>
     /// The user-friendly display name of this application.
     /// </summary>
-    [ParseFieldName("appName")]
+    [AVFieldName("appName")]
     public string AppName {
       get { return GetProperty<string>("AppName"); }
       internal set { SetProperty<string>(value, "AppName"); }
@@ -126,7 +126,7 @@ namespace Parse {
     /// <summary>
     /// A version string consisting of Major.Minor.Build.Revision.
     /// </summary>
-    [ParseFieldName("appVersion")]
+    [AVFieldName("appVersion")]
     public string AppVersion {
       get { return GetProperty<string>("AppVersion"); }
       internal set { SetProperty<string>(value, "AppVersion"); }
@@ -137,7 +137,7 @@ namespace Parse {
     /// sufficient to distinctly name an app on stores which may allow multiple apps with the
     /// same display name.
     /// </summary>
-    [ParseFieldName("appIdentifier")]
+    [AVFieldName("appIdentifier")]
     public string AppIdentifier {
       get { return GetProperty<string>("AppIdentifier"); }
       internal set { SetProperty<string>(value, "AppIdentifier"); }
@@ -145,12 +145,12 @@ namespace Parse {
 
     /// <summary>
     /// The time zone in which this device resides. This string is in the tz database format
-    /// Parse uses for local-time pushes. Due to platform restrictions, the mapping is less
+    /// LeanCloud uses for local-time pushes. Due to platform restrictions, the mapping is less
     /// granular on Windows than it may be on other systems. E.g. The zones
     /// America/Vancouver America/Dawson America/Whitehorse, America/Tijuana, PST8PDT, and
     /// America/Los_Angeles are all reported as America/Los_Angeles.
     /// </summary>
-    [ParseFieldName("timeZone")]
+    [AVFieldName("timeZone")]
     public string TimeZone {
       get { return GetProperty<string>("TimeZone"); }
       private set { SetProperty<string>(value, "TimeZone"); }
@@ -158,9 +158,9 @@ namespace Parse {
 
     /// <summary>
     /// The users locale. This field gets automatically populated by the SDK.
-    /// Can be null (Parse Push uses default language in this case).
+    /// Can be null (LeanCloud Push uses default language in this case).
     /// </summary>
-    [ParseFieldName("localeIdentifier")]
+    [AVFieldName("localeIdentifier")]
     public string LocaleIdentifier {
       get { return GetProperty<string>("LocaleIdentifier"); }
       private set { SetProperty<string>(value, "LocaleIdentifier"); }
@@ -187,9 +187,9 @@ namespace Parse {
     }
 
     /// <summary>
-    /// The version of the Parse SDK used to build this application.
+    /// The version of the LeanCloud SDK used to build this application.
     /// </summary>
-    [ParseFieldName("parseVersion")]
+    [AVFieldName("parseVersion")]
     public Version ParseVersion {
       get {
         var versionString = GetProperty<string>("ParseVersion");
@@ -212,7 +212,7 @@ namespace Parse {
     /// A sequence of arbitrary strings which are used to identify this installation for push notifications.
     /// By convention, the empty string is known as the "Broadcast" channel.
     /// </summary>
-    [ParseFieldName("channels")]
+    [AVFieldName("channels")]
     public IList<string> Channels {
       get { return GetProperty<IList<string>>("Channels"); }
       set { SetProperty(value, "Channels"); }
@@ -225,7 +225,7 @@ namespace Parse {
     protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken) {
       Task platformHookTask = null;
       if (CurrentInstallationController.IsCurrent(this)) {
-        var configuration = ParseClient.CurrentConfiguration;
+        var configuration = AVClient.CurrentConfiguration;
 
         // 'this' is required in order for the extension method to be used.
         this.SetIfDifferent("deviceType", DeviceInfoController.DeviceType);
@@ -373,7 +373,7 @@ namespace Parse {
       { new TimeSpan(10, 30, 0), "Australia/Lord_Howe" },
       { new TimeSpan(9, 30, 0),  "Australia/Adelaide" },
       { new TimeSpan(8, 45, 0), "Australia/Eucla" },
-      { new TimeSpan(8, 30, 0), "Asia/Pyongyang" }, // Parse in North Korea confirmed.
+      { new TimeSpan(8, 30, 0), "Asia/Pyongyang" }, // LeanCloud in North Korea confirmed.
       { new TimeSpan(6, 30, 0), "Asia/Rangoon" },
       { new TimeSpan(5, 45, 0), "Asia/Kathmandu" },
       { new TimeSpan(5, 30, 0), "Asia/Colombo" },

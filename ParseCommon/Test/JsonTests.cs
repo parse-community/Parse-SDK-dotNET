@@ -1,5 +1,5 @@
-using Parse;
-using Parse.Common.Internal;
+using LeanCloud;
+using LeanCloud.Common.Internal;
 using NUnit.Framework;
 using System;
 using System.Collections;

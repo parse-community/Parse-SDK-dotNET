@@ -1,4 +1,4 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
@@ -6,21 +6,21 @@ using System.Linq;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
-  public class ParseCurrentUserController : IParseCurrentUserController {
+namespace LeanCloud.Core.Internal {
+  public class AVCurrentUserController : IAVCurrentUserController {
     private readonly object mutex = new object();
     private readonly TaskQueue taskQueue = new TaskQueue();
 
     private IStorageController storageController;
 
-    public ParseCurrentUserController(IStorageController storageController) {
+    public AVCurrentUserController(IStorageController storageController) {
       this.storageController = storageController;
     }
 
-    private ParseUser currentUser;
-    public ParseUser CurrentUser {
+    private AVUser currentUser;
+    public AVUser CurrentUser {
       get {
         lock (mutex) {
           return currentUser;
@@ -33,7 +33,7 @@ namespace Parse.Core.Internal {
       }
     }
 
-    public Task SetAsync(ParseUser user, CancellationToken cancellationToken) {
+    public Task SetAsync(AVUser user, CancellationToken cancellationToken) {
       return taskQueue.Enqueue(toAwait => {
         return toAwait.ContinueWith(_ => {
           Task saveTask = null;
@@ -47,11 +47,11 @@ namespace Parse.Core.Internal {
             var data = user.ServerDataToJSONObjectForSerialization();
             data["objectId"] = user.ObjectId;
             if (user.CreatedAt != null) {
-              data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First(),
+              data["createdAt"] = user.CreatedAt.Value.ToString(AVClient.DateFormatStrings.First(),
                 CultureInfo.InvariantCulture);
             }
             if (user.UpdatedAt != null) {
-              data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First(),
+              data["updatedAt"] = user.UpdatedAt.Value.ToString(AVClient.DateFormatStrings.First(),
                 CultureInfo.InvariantCulture);
             }
 
@@ -67,15 +67,15 @@ namespace Parse.Core.Internal {
       }, cancellationToken);
     }
 
-    public Task<ParseUser> GetAsync(CancellationToken cancellationToken) {
-      ParseUser cachedCurrent;
+    public Task<AVUser> GetAsync(CancellationToken cancellationToken) {
+      AVUser cachedCurrent;
 
       lock (mutex) {
         cachedCurrent = CurrentUser;
       }
 
       if (cachedCurrent != null) {
-        return Task<ParseUser>.FromResult(cachedCurrent);
+        return Task<AVUser>.FromResult(cachedCurrent);
       }
 
       return taskQueue.Enqueue(toAwait => {
@@ -84,11 +84,11 @@ namespace Parse.Core.Internal {
             object temp;
             t.Result.TryGetValue("CurrentUser", out temp);
             var userDataString = temp as string;
-            ParseUser user = null;
+            AVUser user = null;
             if (userDataString != null) {
               var userData =  Json.Parse(userDataString) as IDictionary<string, object>;
-              var state = ParseObjectCoder.Instance.Decode(userData, ParseDecoder.Instance);
-              user = ParseObject.FromState<ParseUser>(state, "_User");
+              var state = AVObjectCoder.Instance.Decode(userData, AVDecoder.Instance);
+              user = AVObject.FromState<AVUser>(state, "_User");
             }
 
             CurrentUser = user;
@@ -110,7 +110,7 @@ namespace Parse.Core.Internal {
       }, cancellationToken);
     }
 
-    public bool IsCurrent(ParseUser user) {
+    public bool IsCurrent(AVUser user) {
       lock (mutex) {
         return CurrentUser == user;
       }

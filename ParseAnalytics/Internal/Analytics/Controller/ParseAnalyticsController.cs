@@ -1,16 +1,16 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 
-namespace Parse.Analytics.Internal {
+namespace LeanCloud.Analytics.Internal {
   public class ParseAnalyticsController : IParseAnalyticsController {
-    private readonly IParseCommandRunner commandRunner;
+    private readonly IAVCommandRunner commandRunner;
 
-    public ParseAnalyticsController(IParseCommandRunner commandRunner) {
+    public ParseAnalyticsController(IAVCommandRunner commandRunner) {
       this.commandRunner = commandRunner;
     }
 
@@ -26,7 +26,7 @@ namespace Parse.Analytics.Internal {
         data["dimensions"] = dimensions;
       }
 
-      var command = new ParseCommand("events/" + name,
+      var command = new AVCommand("events/" + name,
           method: "POST",
           sessionToken: sessionToken,
           data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);
@@ -44,7 +44,7 @@ namespace Parse.Analytics.Internal {
         data["push_hash"] = pushHash;
       }
 
-      var command = new ParseCommand("events/AppOpened",
+      var command = new AVCommand("events/AppOpened",
           method: "POST",
           sessionToken: sessionToken,
           data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);

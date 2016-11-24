@@ -1,6 +1,6 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// Represents a Role on the Parse server. ParseRoles represent groupings
+  /// Represents a Role on the LeanCloud server. ParseRoles represent groupings
   /// of <see cref="ParseUser"/>s for the purposes of granting permissions (e.g.
   /// specifying a <see cref="ParseACL"/> for a <see cref="ParseObject"/>. Roles
   /// are specified by their sets of child users and child roles, all of which are granted
@@ -19,21 +19,21 @@ namespace Parse {
   /// Roles must have a name (that cannot be changed after creation of the role),
   /// and must specify an ACL.
   /// </summary>
-  [ParseClassName("_Role")]
-  public class ParseRole : ParseObject {
+  [AVClassName("_Role")]
+  public class AVRole : AVObject {
     private static readonly Regex namePattern = new Regex("^[0-9a-zA-Z_\\- ]+$");
 
     /// <summary>
-    /// Constructs a new ParseRole. You must assign a name and ACL to the role.
+    /// Constructs a new AVRole. You must assign a name and ACL to the role.
     /// </summary>
-    public ParseRole() : base() { }
+    public AVRole() : base() { }
 
     /// <summary>
-    /// Constructs a new ParseRole with the given name.
+    /// Constructs a new AVRole with the given name.
     /// </summary>
     /// <param name="name">The name of the role to create.</param>
     /// <param name="acl">The ACL for this role. Roles must have an ACL.</param>
-    public ParseRole(string name, ParseACL acl)
+    public AVRole(string name, AVACL acl)
       : this() {
       Name = name;
       ACL = acl;
@@ -42,7 +42,7 @@ namespace Parse {
     /// <summary>
     /// Gets the name of the role.
     /// </summary>
-    [ParseFieldName("name")]
+    [AVFieldName("name")]
     public string Name {
       get { return GetProperty<string>("Name"); }
       set { SetProperty(value, "Name"); }
@@ -54,9 +54,9 @@ namespace Parse {
     /// this role has been granted (e.g. read or write access through ACLs). You can
     /// add or remove child users from the role through this relation.
     /// </summary>
-    [ParseFieldName("users")]
-    public ParseRelation<ParseUser> Users {
-      get { return GetRelationProperty<ParseUser>("Users"); }
+    [AVFieldName("users")]
+    public AVRelation<AVUser> Users {
+      get { return GetRelationProperty<AVUser>("Users"); }
     }
 
     /// <summary>
@@ -65,9 +65,9 @@ namespace Parse {
     /// this role has been granted (e.g. read or write access through ACLs). You can
     /// add or remove child roles from the role through this relation.
     /// </summary>
-    [ParseFieldName("roles")]
-    public ParseRelation<ParseRole> Roles {
-      get { return GetRelationProperty<ParseRole>("Roles"); }
+    [AVFieldName("roles")]
+    public AVRelation<AVRole> Roles {
+      get { return GetRelationProperty<AVRole>("Roles"); }
     }
 
     internal override void OnSettingValue(ref string key, ref object value) {
@@ -91,9 +91,9 @@ namespace Parse {
     /// <summary>
     /// Gets a <see cref="ParseQuery{ParseRole}"/> over the Role collection.
     /// </summary>
-    public static ParseQuery<ParseRole> Query {
+    public static AVQuery<AVRole> Query {
       get {
-        return new ParseQuery<ParseRole>();
+        return new AVQuery<AVRole>();
       }
     }
   }

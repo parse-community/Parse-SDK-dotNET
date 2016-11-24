@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-namespace Parse.Common.Internal {
+namespace LeanCloud.Common.Internal {
   /// <summary>
-  /// This class represents the internal Unity dispatcher used by the Parse SDK.
+  /// This class represents the internal Unity dispatcher used by the LeanCloud SDK.
   ///
   /// It should be initialized once in your game, usually via ParseInitializeBehavior.
   ///

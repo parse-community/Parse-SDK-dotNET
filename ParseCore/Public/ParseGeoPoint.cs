@@ -1,25 +1,25 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
-using Parse.Core.Internal;
-using Parse.Common.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// ParseGeoPoint represents a latitude / longitude point that may be associated
-  /// with a key in a ParseObject or used as a reference point for geo queries.
+  /// AVGeoPoint represents a latitude / longitude point that may be associated
+  /// with a key in a AVObject or used as a reference point for geo queries.
   /// This allows proximity-based queries on the key.
   ///
   /// Only one key in a class may contain a GeoPoint.
   /// </summary>
-  public struct ParseGeoPoint : IJsonConvertible {
+  public struct AVGeoPoint : IJsonConvertible {
     /// <summary>
-    /// Constructs a ParseGeoPoint with the specified latitude and longitude.
+    /// Constructs a AVGeoPoint with the specified latitude and longitude.
     /// </summary>
     /// <param name="latitude">The point's latitude.</param>
     /// <param name="longitude">The point's longitude.</param>
-    public ParseGeoPoint(double latitude, double longitude)
+    public AVGeoPoint(double latitude, double longitude)
       : this() {
       Latitude = latitude;
       Longitude = longitude;
@@ -67,7 +67,7 @@ namespace Parse {
     /// </summary>
     /// <param name="point">GeoPoint describing the other point being measured against.</param>
     /// <returns>The distance in between the two points.</returns>
-    public ParseGeoDistance DistanceTo(ParseGeoPoint point) {
+    public AVGeoDistance DistanceTo(AVGeoPoint point) {
       double d2r = Math.PI / 180; // radian conversion factor
       double lat1rad = Latitude * d2r;
       double long1rad = longitude * d2r;
@@ -82,7 +82,7 @@ namespace Parse {
       double a = sinDeltaLatDiv2 * sinDeltaLatDiv2 +
         Math.Cos(lat1rad) * Math.Cos(lat2rad) * sinDeltaLongDiv2 * sinDeltaLongDiv2;
       a = Math.Min(1.0, a);
-      return new ParseGeoDistance(2 * Math.Asin(Math.Sqrt(a)));
+      return new AVGeoDistance(2 * Math.Asin(Math.Sqrt(a)));
     }
 
     IDictionary<string, object> IJsonConvertible.ToJSON() {

@@ -1,4 +1,4 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using Microsoft.Phone.Notification;
 using System;
@@ -9,10 +9,10 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
-using Parse.Common.Internal;
-using Parse.Push.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Push.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   public partial class ParsePush {
     static ParsePush() {
       DeviceInfoController.GetToastChannelTask.ContinueWith(t => {

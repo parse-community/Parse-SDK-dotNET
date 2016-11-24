@@ -1,19 +1,19 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Parse.Utilities;
-using Parse.Common.Internal;
+using LeanCloud.Utilities;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Core.Internal {
+namespace LeanCloud.Core.Internal {
   /// <summary>
-  /// A <c>ParseEncoder</c> can be used to transform objects such as <see cref="ParseObject"/> into JSON
+  /// A <c>AVEncoder</c> can be used to transform objects such as <see cref="ParseObject"/> into JSON
   /// data structures.
   /// </summary>
-  /// <seealso cref="ParseDecoder"/>
-  public abstract class ParseEncoder {
+  /// <seealso cref="AVDecoder"/>
+  public abstract class AVEncoder {
 #if UNITY
     private static readonly bool isCompiledByIL2CPP = AppDomain.CurrentDomain.FriendlyName.Equals("IL2CPP Root Domain");
 #else
@@ -24,11 +24,11 @@ namespace Parse.Core.Internal {
       return value == null ||
           ReflectionHelpers.IsPrimitive(value.GetType()) ||
           value is string ||
-          value is ParseObject ||
-          value is ParseACL ||
-          value is ParseFile ||
-          value is ParseGeoPoint ||
-          value is ParseRelationBase ||
+          value is AVObject ||
+          value is AVACL ||
+          value is AVFile ||
+          value is AVGeoPoint ||
+          value is AVRelationBase ||
           value is DateTime ||
           value is byte[] ||
           Conversion.As<IDictionary<string, object>>(value) != null ||
@@ -40,7 +40,7 @@ namespace Parse.Core.Internal {
       // encoded object. Otherwise, just return the original object.
       if (value is DateTime) {
         return new Dictionary<string, object> {
-          {"iso", ((DateTime)value).ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture)},
+          {"iso", ((DateTime)value).ToString(AVClient.DateFormatStrings.First(), CultureInfo.InvariantCulture)},
           {"__type", "Date"}
         };
       }
@@ -53,7 +53,7 @@ namespace Parse.Core.Internal {
         };
       }
 
-      var obj = value as ParseObject;
+      var obj = value as AVObject;
       if (obj != null) {
         return EncodeParseObject(obj);
       }
@@ -77,8 +77,8 @@ namespace Parse.Core.Internal {
         return EncodeList(list);
       }
 
-      // TODO (hallucinogen): convert IParseFieldOperation to IJsonConvertible
-      var operation = value as IParseFieldOperation;
+      // TODO (hallucinogen): convert IAVFieldOperation to IJsonConvertible
+      var operation = value as IAVFieldOperation;
       if (operation != null) {
         return operation.Encode();
       }
@@ -86,7 +86,7 @@ namespace Parse.Core.Internal {
       return value;
     }
 
-    protected abstract IDictionary<string, object> EncodeParseObject(ParseObject value);
+    protected abstract IDictionary<string, object> EncodeParseObject(AVObject value);
 
     private object EncodeList(IList<object> list) {
       var newArray = new List<object>();

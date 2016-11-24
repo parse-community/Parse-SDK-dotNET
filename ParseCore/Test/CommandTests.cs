@@ -1,8 +1,8 @@
 using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Linq;
 using System.Threading;
@@ -16,7 +16,7 @@ namespace ParseTest {
   public class CommandTests {
     [SetUp]
     public void SetUp() {
-      ParseClient.Initialize(new ParseClient.Configuration {
+      AVClient.Initialize(new AVClient.Configuration {
         ApplicationId = "",
         WindowsKey = ""
       });
@@ -24,12 +24,12 @@ namespace ParseTest {
 
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance.Reset();
+      AVPlugins.Instance.Reset();
     }
 
     [Test]
     public void TestMakeCommand() {
-      ParseCommand command = new ParseCommand("endpoint",
+      AVCommand command = new AVCommand("endpoint",
           method: "GET",
           sessionToken: "abcd",
           headers: null,
@@ -37,7 +37,7 @@ namespace ParseTest {
 
       Assert.AreEqual("/1/endpoint", command.Uri.AbsolutePath);
       Assert.AreEqual("GET", command.Method);
-      Assert.IsTrue(command.Headers.Any(pair => pair.Key == "X-Parse-Session-Token" && pair.Value == "abcd"));
+      Assert.IsTrue(command.Headers.Any(pair => pair.Key == "X-LeanCloud-Session-Token" && pair.Value == "abcd"));
     }
 
     [Test]
@@ -53,8 +53,8 @@ namespace ParseTest {
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
-      ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
-      var command = new ParseCommand("endpoint", method: "GET", data: null);
+      AVCommandRunner commandRunner = new AVCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
+      var command = new AVCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.False(t.IsFaulted);
         Assert.False(t.IsCanceled);
@@ -76,8 +76,8 @@ namespace ParseTest {
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
-      ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
-      var command = new ParseCommand("endpoint", method: "GET", data: null);
+      AVCommandRunner commandRunner = new AVCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
+      var command = new AVCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.False(t.IsFaulted);
         Assert.False(t.IsCanceled);
@@ -101,14 +101,14 @@ namespace ParseTest {
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
-      ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
-      var command = new ParseCommand("endpoint", method: "GET", data: null);
+      AVCommandRunner commandRunner = new AVCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
+      var command = new AVCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.True(t.IsFaulted);
         Assert.False(t.IsCanceled);
-        Assert.IsInstanceOf<ParseException>(t.Exception.InnerException);
-        var parseException = t.Exception.InnerException as ParseException;
-        Assert.AreEqual(ParseException.ErrorCode.OtherCause, parseException.Code);
+        Assert.IsInstanceOf<AVException>(t.Exception.InnerException);
+        var parseException = t.Exception.InnerException as AVException;
+        Assert.AreEqual(AVException.ErrorCode.OtherCause, parseException.Code);
       });
     }
 
@@ -125,14 +125,14 @@ namespace ParseTest {
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
-      ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
-      var command = new ParseCommand("endpoint", method: "GET", data: null);
+      AVCommandRunner commandRunner = new AVCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
+      var command = new AVCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.True(t.IsFaulted);
         Assert.False(t.IsCanceled);
-        Assert.IsInstanceOf<ParseException>(t.Exception.InnerException);
-        var parseException = t.Exception.InnerException as ParseException;
-        Assert.AreEqual(ParseException.ErrorCode.ObjectNotFound, parseException.Code);
+        Assert.IsInstanceOf<AVException>(t.Exception.InnerException);
+        var parseException = t.Exception.InnerException as AVException;
+        Assert.AreEqual(AVException.ErrorCode.ObjectNotFound, parseException.Code);
         Assert.AreEqual("Object not found.", parseException.Message);
       });
     }
@@ -150,14 +150,14 @@ namespace ParseTest {
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
-      ParseCommandRunner commandRunner = new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
-      var command = new ParseCommand("endpoint", method: "GET", data: null);
+      AVCommandRunner commandRunner = new AVCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object);
+      var command = new AVCommand("endpoint", method: "GET", data: null);
       return commandRunner.RunCommandAsync(command).ContinueWith(t => {
         Assert.True(t.IsFaulted);
         Assert.False(t.IsCanceled);
-        Assert.IsInstanceOf<ParseException>(t.Exception.InnerException);
-        var parseException = t.Exception.InnerException as ParseException;
-        Assert.AreEqual(ParseException.ErrorCode.InternalServerError, parseException.Code);
+        Assert.IsInstanceOf<AVException>(t.Exception.InnerException);
+        var parseException = t.Exception.InnerException as AVException;
+        Assert.AreEqual(AVException.ErrorCode.InternalServerError, parseException.Code);
       });
     }
   }

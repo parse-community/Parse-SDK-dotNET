@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   public class ParseInstallationCoder : IParseInstallationCoder {
     private static readonly ParseInstallationCoder instance = new ParseInstallationCoder();
     public static ParseInstallationCoder Instance {
@@ -28,8 +28,8 @@ namespace Parse.Push.Internal {
     }
 
     public ParseInstallation Decode(IDictionary<string, object> data) {
-      var state = ParseObjectCoder.Instance.Decode(data, ParseDecoder.Instance);
-      return ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      var state = AVObjectCoder.Instance.Decode(data, AVDecoder.Instance);
+      return AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
     }
   }
 }

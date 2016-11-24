@@ -1,7 +1,7 @@
 using System;
 
-namespace Parse.Common.Internal {
-  public interface IParseModule {
+namespace LeanCloud.Common.Internal {
+  public interface IAVModule {
     void OnModuleRegistered();
     void OnParseInitialized();
   }

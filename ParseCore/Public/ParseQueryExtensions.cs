@@ -1,19 +1,19 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
   /// Provides extension methods for <see cref="ParseQuery{T}"/> to support
   /// Linq-style queries.
   /// </summary>
-  public static class ParseQueryExtensions {
+  public static class AVQueryExtensions {
     private static readonly MethodInfo getMethod;
     private static readonly MethodInfo stringContains;
     private static readonly MethodInfo stringStartsWith;
@@ -23,34 +23,34 @@ namespace Parse {
     private static readonly MethodInfo containsKeyMethod;
     private static readonly MethodInfo notContainsKeyMethod;
     private static readonly Dictionary<MethodInfo, MethodInfo> functionMappings;
-    static ParseQueryExtensions() {
-      getMethod = GetMethod<ParseObject>(obj => obj.Get<int>(null)).GetGenericMethodDefinition();
+    static AVQueryExtensions() {
+      getMethod = GetMethod<AVObject>(obj => obj.Get<int>(null)).GetGenericMethodDefinition();
       stringContains = GetMethod<string>(str => str.Contains(null));
       stringStartsWith = GetMethod<string>(str => str.StartsWith(null));
       stringEndsWith = GetMethod<string>(str => str.EndsWith(null));
       functionMappings = new Dictionary<MethodInfo, MethodInfo> {
         {
           stringContains,
-          GetMethod<ParseQuery<ParseObject>>(q => q.WhereContains(null, null))
+          GetMethod<AVQuery<AVObject>>(q => q.WhereContains(null, null))
         },
         {
           stringStartsWith,
-          GetMethod<ParseQuery<ParseObject>>(q => q.WhereStartsWith(null, null))
+          GetMethod<AVQuery<AVObject>>(q => q.WhereStartsWith(null, null))
         },
         {
           stringEndsWith,
-          GetMethod<ParseQuery<ParseObject>>(q => q.WhereEndsWith(null,null))
+          GetMethod<AVQuery<AVObject>>(q => q.WhereEndsWith(null,null))
         },
       };
       containsMethod = GetMethod<object>(
-          o => ParseQueryExtensions.ContainsStub<object>(null, null)).GetGenericMethodDefinition();
+          o => AVQueryExtensions.ContainsStub<object>(null, null)).GetGenericMethodDefinition();
       notContainsMethod = GetMethod<object>(
-          o => ParseQueryExtensions.NotContainsStub<object>(null, null))
+          o => AVQueryExtensions.NotContainsStub<object>(null, null))
               .GetGenericMethodDefinition();
 
-      containsKeyMethod = GetMethod<object>(o => ParseQueryExtensions.ContainsKeyStub(null, null));
+      containsKeyMethod = GetMethod<object>(o => AVQueryExtensions.ContainsKeyStub(null, null));
       notContainsKeyMethod = GetMethod<object>(
-        o => ParseQueryExtensions.NotContainsKeyStub(null, null));
+        o => AVQueryExtensions.NotContainsKeyStub(null, null));
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ namespace Parse {
     /// When a query is normalized, this is a placeholder to indicate that we should
     /// add a WhereExists() clause.
     /// </summary>
-    private static bool ContainsKeyStub(ParseObject obj, string key) {
+    private static bool ContainsKeyStub(AVObject obj, string key) {
       throw new NotImplementedException(
           "Exists only for expression translation as a placeholder.");
     }
@@ -91,7 +91,7 @@ namespace Parse {
     /// When a query is normalized, this is a placeholder to indicate that we should
     /// add a WhereDoesNotExist() clause.
     /// </summary>
-    private static bool NotContainsKeyStub(ParseObject obj, string key) {
+    private static bool NotContainsKeyStub(AVObject obj, string key) {
       throw new NotImplementedException(
           "Exists only for expression translation as a placeholder.");
     }
@@ -110,14 +110,14 @@ namespace Parse {
     }
 
     /// <summary>
-    /// Checks whether the MethodCallExpression is a call to ParseObject.Get(),
-    /// which is the call we normalize all indexing into the ParseObject to.
+    /// Checks whether the MethodCallExpression is a call to AVObject.Get(),
+    /// which is the call we normalize all indexing into the AVObject to.
     /// </summary>
     private static bool IsParseObjectGet(MethodCallExpression node) {
       if (node == null || node.Object == null) {
         return false;
       }
-      if (!typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Object.Type.GetTypeInfo())) {
+      if (!typeof(AVObject).GetTypeInfo().IsAssignableFrom(node.Object.Type.GetTypeInfo())) {
         return false;
       }
       return node.Method.IsGenericMethod && node.Method.GetGenericMethodDefinition() == getMethod;
@@ -125,8 +125,8 @@ namespace Parse {
 
 
     /// <summary>
-    /// Visits an Expression, converting ParseObject.Get/ParseObject[]/ParseObject.Property,
-    /// and nested indices into a single call to ParseObject.Get() with a "field path" like
+    /// Visits an Expression, converting AVObject.Get/AVObject[]/AVObject.Property,
+    /// and nested indices into a single call to AVObject.Get() with a "field path" like
     /// "foo.bar.baz"
     /// </summary>
     private class ObjectNormalizer : ExpressionVisitor {
@@ -151,9 +151,9 @@ namespace Parse {
       /// properties like foo.ObjectId into foo.Get("objectId")
       /// </summary>
       protected override Expression VisitMember(MemberExpression node) {
-        var fieldName = node.Member.GetCustomAttribute<ParseFieldNameAttribute>();
+        var fieldName = node.Member.GetCustomAttribute<AVFieldNameAttribute>();
         if (fieldName != null &&
-            typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Expression.Type.GetTypeInfo())) {
+            typeof(AVObject).GetTypeInfo().IsAssignableFrom(node.Expression.Type.GetTypeInfo())) {
           var newPath = fieldName.FieldName;
           return Expression.Call(node.Expression,
               getMethod.MakeGenericMethod(node.Type),
@@ -163,7 +163,7 @@ namespace Parse {
       }
 
       /// <summary>
-      /// If a ParseObject.Get() call has been cast, just change the generic parameter.
+      /// If a AVObject.Get() call has been cast, just change the generic parameter.
       /// </summary>
       protected override Expression VisitUnary(UnaryExpression node) {
         var methodCall = Visit(node.Operand) as MethodCallExpression;
@@ -212,8 +212,8 @@ namespace Parse {
 
       /// <summary>
       /// Normalizes binary operators. &lt;, &gt;, &lt;=, &gt;= !=, and ==
-      /// This puts the ParseObject.Get() on the left side of the operation
-      /// (reversing it if necessary), and normalizes the ParseObject.Get()
+      /// This puts the AVObject.Get() on the left side of the operation
+      /// (reversing it if necessary), and normalizes the AVObject.Get()
       /// </summary>
       protected override Expression VisitBinary(BinaryExpression node) {
         var leftTransformed = new ObjectNormalizer().Visit(node.Left) as MethodCallExpression;
@@ -383,11 +383,11 @@ namespace Parse {
     }
 
     /// <summary>
-    /// Converts a normalized method call expression into the appropriate ParseQuery clause.
+    /// Converts a normalized method call expression into the appropriate AVQuery clause.
     /// </summary>
-    private static ParseQuery<T> WhereMethodCall<T>(
-        this ParseQuery<T> source, Expression<Func<T, bool>> expression, MethodCallExpression node)
-        where T : ParseObject {
+    private static AVQuery<T> WhereMethodCall<T>(
+        this AVQuery<T> source, Expression<Func<T, bool>> expression, MethodCallExpression node)
+        where T : AVObject {
       if (IsParseObjectGet(node) && (node.Type == typeof(bool) || node.Type == typeof(bool?))) {
         // This is a raw boolean field access like 'where obj.Get<bool>("foo")'
         return source.WhereEqualTo(GetValue(node.Arguments[0]) as string, true);
@@ -399,7 +399,7 @@ namespace Parse {
         if (!(IsParseObjectGet(objTransformed) &&
             objTransformed.Object == expression.Parameters[0])) {
           throw new InvalidOperationException(
-            "The left-hand side of a supported function call must be a ParseObject field access.");
+            "The left-hand side of a supported function call must be a AVObject field access.");
         }
         var fieldPath = GetValue(objTransformed.Arguments[0]);
         var containedIn = GetValue(node.Arguments[0]);
@@ -408,7 +408,7 @@ namespace Parse {
         translatedMethod = ReflectionHelpers.GetMethod(queryType,
             translatedMethod.Name,
             translatedMethod.GetParameters().Select(p => p.ParameterType).ToArray());
-        return translatedMethod.Invoke(source, new[] { fieldPath, containedIn }) as ParseQuery<T>;
+        return translatedMethod.Invoke(source, new[] { fieldPath, containedIn }) as AVQuery<T>;
       }
 
       if (node.Arguments[0] == expression.Parameters[0]) {
@@ -459,23 +459,23 @@ namespace Parse {
     }
 
     /// <summary>
-    /// Converts a normalized binary expression into the appropriate ParseQuery clause.
+    /// Converts a normalized binary expression into the appropriate AVQuery clause.
     /// </summary>
-    private static ParseQuery<T> WhereBinaryExpression<T>(
-        this ParseQuery<T> source, Expression<Func<T, bool>> expression, BinaryExpression node)
-        where T : ParseObject {
+    private static AVQuery<T> WhereBinaryExpression<T>(
+        this AVQuery<T> source, Expression<Func<T, bool>> expression, BinaryExpression node)
+        where T : AVObject {
       var leftTransformed = new ObjectNormalizer().Visit(node.Left) as MethodCallExpression;
 
       if (!(IsParseObjectGet(leftTransformed) &&
           leftTransformed.Object == expression.Parameters[0])) {
         throw new InvalidOperationException(
-          "Where expressions must have one side be a field operation on a ParseObject.");
+          "Where expressions must have one side be a field operation on a AVObject.");
       }
 
       var fieldPath = GetValue(leftTransformed.Arguments[0]) as string;
       var filterValue = GetValue(node.Right);
 
-      if (filterValue != null && !ParseEncoder.IsValidType(filterValue)) {
+      if (filterValue != null && !AVEncoder.IsValidType(filterValue)) {
         throw new InvalidOperationException(
           "Where clauses must use types compatible with ParseObjects.");
       }
@@ -502,17 +502,17 @@ namespace Parse {
     /// <summary>
     /// Filters a query based upon the predicate provided.
     /// </summary>
-    /// <typeparam name="TSource">The type of ParseObject being queried for.</typeparam>
+    /// <typeparam name="TSource">The type of AVObject being queried for.</typeparam>
     /// <param name="source">The base <see cref="ParseQuery{TSource}"/> to which
     /// the predicate will be added.</param>
-    /// <param name="predicate">A function to test each ParseObject for a condition.
+    /// <param name="predicate">A function to test each AVObject for a condition.
     /// The predicate must be able to be represented by one of the standard Where
-    /// functions on ParseQuery</param>
-    /// <returns>A new ParseQuery whose results will match the given predicate as
+    /// functions on AVQuery</param>
+    /// <returns>A new AVQuery whose results will match the given predicate as
     /// well as the source's filters.</returns>
-    public static ParseQuery<TSource> Where<TSource>(
-        this ParseQuery<TSource> source, Expression<Func<TSource, bool>> predicate)
-        where TSource : ParseObject {
+    public static AVQuery<TSource> Where<TSource>(
+        this AVQuery<TSource> source, Expression<Func<TSource, bool>> predicate)
+        where TSource : AVObject {
       // Handle top-level logic operators && and ||
       var binaryExpression = predicate.Body as BinaryExpression;
       if (binaryExpression != null) {
@@ -559,7 +559,7 @@ namespace Parse {
 
     /// <summary>
     /// Normalizes an OrderBy's keySelector expression and then extracts the path
-    /// from the ParseObject.Get() call.
+    /// from the AVObject.Get() call.
     /// </summary>
     private static string GetOrderByPath<TSource, TSelector>(
           Expression<Func<TSource, TSelector>> keySelector) {
@@ -572,7 +572,7 @@ namespace Parse {
       }
       if (result == null) {
         throw new InvalidOperationException(
-          "OrderBy expression must be a field access on a ParseObject.");
+          "OrderBy expression must be a field access on a AVObject.");
       }
       return result;
     }
@@ -580,60 +580,60 @@ namespace Parse {
     /// <summary>
     /// Orders a query based upon the key selector provided.
     /// </summary>
-    /// <typeparam name="TSource">The type of ParseObject being queried for.</typeparam>
+    /// <typeparam name="TSource">The type of AVObject being queried for.</typeparam>
     /// <typeparam name="TSelector">The type of key returned by keySelector.</typeparam>
     /// <param name="source">The query to order.</param>
-    /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
-    /// <returns>A new ParseQuery based on source whose results will be ordered by
+    /// <param name="keySelector">A function to extract a key from the AVObject.</param>
+    /// <returns>A new AVQuery based on source whose results will be ordered by
     /// the key specified in the keySelector.</returns>
-    public static ParseQuery<TSource> OrderBy<TSource, TSelector>(
-        this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-        where TSource : ParseObject {
+    public static AVQuery<TSource> OrderBy<TSource, TSelector>(
+        this AVQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
+        where TSource : AVObject {
       return source.OrderBy(GetOrderByPath(keySelector));
     }
 
     /// <summary>
     /// Orders a query based upon the key selector provided.
     /// </summary>
-    /// <typeparam name="TSource">The type of ParseObject being queried for.</typeparam>
+    /// <typeparam name="TSource">The type of AVObject being queried for.</typeparam>
     /// <typeparam name="TSelector">The type of key returned by keySelector.</typeparam>
     /// <param name="source">The query to order.</param>
-    /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
-    /// <returns>A new ParseQuery based on source whose results will be ordered by
+    /// <param name="keySelector">A function to extract a key from the AVObject.</param>
+    /// <returns>A new AVQuery based on source whose results will be ordered by
     /// the key specified in the keySelector.</returns>
-    public static ParseQuery<TSource> OrderByDescending<TSource, TSelector>(
-        this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-        where TSource : ParseObject {
+    public static AVQuery<TSource> OrderByDescending<TSource, TSelector>(
+        this AVQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
+        where TSource : AVObject {
       return source.OrderByDescending(GetOrderByPath(keySelector));
     }
 
     /// <summary>
     /// Performs a subsequent ordering of a query based upon the key selector provided.
     /// </summary>
-    /// <typeparam name="TSource">The type of ParseObject being queried for.</typeparam>
+    /// <typeparam name="TSource">The type of AVObject being queried for.</typeparam>
     /// <typeparam name="TSelector">The type of key returned by keySelector.</typeparam>
     /// <param name="source">The query to order.</param>
-    /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
-    /// <returns>A new ParseQuery based on source whose results will be ordered by
+    /// <param name="keySelector">A function to extract a key from the AVObject.</param>
+    /// <returns>A new AVQuery based on source whose results will be ordered by
     /// the key specified in the keySelector.</returns>
-    public static ParseQuery<TSource> ThenBy<TSource, TSelector>(
-        this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-        where TSource : ParseObject {
+    public static AVQuery<TSource> ThenBy<TSource, TSelector>(
+        this AVQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
+        where TSource : AVObject {
       return source.ThenBy(GetOrderByPath(keySelector));
     }
 
     /// <summary>
     /// Performs a subsequent ordering of a query based upon the key selector provided.
     /// </summary>
-    /// <typeparam name="TSource">The type of ParseObject being queried for.</typeparam>
+    /// <typeparam name="TSource">The type of AVObject being queried for.</typeparam>
     /// <typeparam name="TSelector">The type of key returned by keySelector.</typeparam>
     /// <param name="source">The query to order.</param>
-    /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
-    /// <returns>A new ParseQuery based on source whose results will be ordered by
+    /// <param name="keySelector">A function to extract a key from the AVObject.</param>
+    /// <returns>A new AVQuery based on source whose results will be ordered by
     /// the key specified in the keySelector.</returns>
-    public static ParseQuery<TSource> ThenByDescending<TSource, TSelector>(
-        this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-        where TSource : ParseObject {
+    public static AVQuery<TSource> ThenByDescending<TSource, TSelector>(
+        this AVQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
+        where TSource : AVObject {
       return source.ThenByDescending(GetOrderByPath(keySelector));
     }
 
@@ -654,17 +654,17 @@ namespace Parse {
     /// the second query.</param>
     /// <param name="resultSelector">A function to select either the outer or inner query
     /// result to determine which query is the base query.</param>
-    /// <returns>A new ParseQuery with a WhereMatchesQuery or WhereMatchesKeyInQuery
+    /// <returns>A new AVQuery with a WhereMatchesQuery or WhereMatchesKeyInQuery
     /// clause based upon the query indicated in the <paramref name="resultSelector"/>.</returns>
-    public static ParseQuery<TResult> Join<TOuter, TInner, TKey, TResult>(
-        this ParseQuery<TOuter> outer,
-        ParseQuery<TInner> inner,
+    public static AVQuery<TResult> Join<TOuter, TInner, TKey, TResult>(
+        this AVQuery<TOuter> outer,
+        AVQuery<TInner> inner,
         Expression<Func<TOuter, TKey>> outerKeySelector,
         Expression<Func<TInner, TKey>> innerKeySelector,
         Expression<Func<TOuter, TInner, TResult>> resultSelector)
-      where TOuter : ParseObject
-      where TInner : ParseObject
-      where TResult : ParseObject {
+      where TOuter : AVObject
+      where TInner : AVObject
+      where TResult : AVObject {
       // resultSelector must select either the inner object or the outer object. If it's the inner
       // object, reverse the query.
       if (resultSelector.Body == resultSelector.Parameters[1]) {
@@ -673,7 +673,7 @@ namespace Parse {
             outer,
             innerKeySelector,
             outerKeySelector,
-            (i, o) => i) as ParseQuery<TResult>;
+            (i, o) => i) as AVQuery<TResult>;
       }
       if (resultSelector.Body != resultSelector.Parameters[0]) {
         throw new InvalidOperationException("Joins must select either the outer or inner object.");
@@ -690,17 +690,17 @@ namespace Parse {
         if (IsParseObjectGet(innerAsGet) && innerAsGet.Object == innerKeySelector.Parameters[0]) {
           // Both are key accesses, so treat this as a WhereMatchesKeyInQuery
           var innerKey = GetValue(innerAsGet.Arguments[0]) as string;
-          return outer.WhereMatchesKeyInQuery(outerKey, innerKey, inner) as ParseQuery<TResult>;
+          return outer.WhereMatchesKeyInQuery(outerKey, innerKey, inner) as AVQuery<TResult>;
         }
 
         if (innerKeySelector.Body == innerKeySelector.Parameters[0]) {
           // The inner selector is on the result of the query itself, so treat this as a
           // WhereMatchesQuery
-          return outer.WhereMatchesQuery(outerKey, inner) as ParseQuery<TResult>;
+          return outer.WhereMatchesQuery(outerKey, inner) as AVQuery<TResult>;
         }
         throw new InvalidOperationException(
-            "The key for the joined object must be a ParseObject or a field access " +
-            "on the ParseObject.");
+            "The key for the joined object must be a AVObject or a field access " +
+            "on the AVObject.");
       }
 
       // TODO (hallucinogen): If we ever support "and" queries fully and/or support a "where this object
@@ -708,7 +708,7 @@ namespace Parse {
       // can add support for even more types of joins.
 
       throw new InvalidOperationException(
-        "The key for the selected object must be a field access on the ParseObject.");
+        "The key for the selected object must be a field access on the AVObject.");
     }
   }
 }

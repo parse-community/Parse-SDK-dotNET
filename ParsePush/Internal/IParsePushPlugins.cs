@@ -1,11 +1,11 @@
 using System;
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   public interface IParsePushPlugins {
     void Reset();
 
-    IParseCorePlugins CorePlugins { get; }
+    IAVCorePlugins CorePlugins { get; }
     IParsePushChannelsController PushChannelsController { get; }
     IParsePushController PushController { get; }
     IParseCurrentInstallationController CurrentInstallationController { get; }

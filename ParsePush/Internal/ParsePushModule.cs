@@ -1,16 +1,16 @@
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 using System;
 
-namespace Parse.Push.Internal {
-  public class ParsePushModule : IParseModule {
+namespace LeanCloud.Push.Internal {
+  public class ParsePushModule : IAVModule {
     public void OnModuleRegistered() {
     }
 
     public void OnParseInitialized() {
-      ParseObject.RegisterSubclass<ParseInstallation>();
+      AVObject.RegisterSubclass<ParseInstallation>();
 
-      ParseCorePlugins.Instance.SubclassingController.AddRegisterHook(typeof(ParseInstallation), () => {
+      AVPlugins.Instance.SubclassingController.AddRegisterHook(typeof(ParseInstallation), () => {
         ParsePushPlugins.Instance.CurrentInstallationController.ClearFromMemory();
       });
 

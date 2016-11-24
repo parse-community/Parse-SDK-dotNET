@@ -1,12 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using Parse.Core.Internal;
-using Parse.Common.Internal;
+using LeanCloud.Core.Internal;
+using LeanCloud.Common.Internal;
 using System.Collections.Generic;
 using NotificationServices = UnityEngine.iOS.NotificationServices;
 using UnityEngine;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   /// <summary>
   /// This is a concrete implementation of IDeviceInfoController for Unity iOS targets.
   /// </summary>

@@ -1,16 +1,16 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using Parse.Common.Internal;
-using Parse.Analytics.Internal;
-using Parse.Core.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Analytics.Internal;
+using LeanCloud.Core.Internal;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// Provides an interface to Parse's logging and analytics backend.
+  /// Provides an interface to LeanCloud's logging and analytics backend.
   ///
   /// Methods will return immediately and cache requests (along with timestamps)
   /// to be handled in the background.
@@ -22,7 +22,7 @@ namespace Parse {
       }
     }
 
-    internal static IParseCurrentUserController CurrentUserController {
+    internal static IAVCurrentUserController CurrentUserController {
       get {
         return ParseAnalyticsPlugins.Instance.CorePlugins.CurrentUserController;
       }
@@ -38,7 +38,7 @@ namespace Parse {
 
     /// <summary>
     /// Tracks the occurrence of a custom event with additional dimensions.
-    /// Parse will store a data point at the time of invocation with the
+    /// LeanCloud will store a data point at the time of invocation with the
     /// given event name.
     ///
     /// Dimensions will allow segmentation of the occurrences of this
@@ -57,7 +57,7 @@ namespace Parse {
     ///
     /// There is a default limit of 8 dimensions per event tracked.
     /// </summary>
-    /// <param name="name">The name of the custom event to report to ParseClient
+    /// <param name="name">The name of the custom event to report to AVClient
     /// as having happened.</param>
     /// <returns>An Async Task that can be waited on or ignored.</returns>
     public static Task TrackEventAsync(string name) {
@@ -66,7 +66,7 @@ namespace Parse {
 
     /// <summary>
     /// Tracks the occurrence of a custom event with additional dimensions.
-    /// Parse will store a data point at the time of invocation with the
+    /// LeanCloud will store a data point at the time of invocation with the
     /// given event name.
     ///
     /// Dimensions will allow segmentation of the occurrences of this
@@ -85,7 +85,7 @@ namespace Parse {
     ///
     /// There is a default limit of 8 dimensions per event tracked.
     /// </summary>
-    /// <param name="name">The name of the custom event to report to ParseClient
+    /// <param name="name">The name of the custom event to report to AVClient
     /// as having happened.</param>
     /// <param name="dimensions">The dictionary of information by which to
     /// segment this event.</param>

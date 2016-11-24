@@ -1,4 +1,4 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Text;
 using Foundation;
 using UIKit;
 
-namespace Parse {
+namespace LeanCloud {
   public partial class ParsePush {
     /// <summary>
     /// HandlePush is a push notification handler that allows you to listen to push notifications using
@@ -25,7 +25,7 @@ namespace Parse {
     }
 
     /// <summary>
-    /// Helper method to extract the full Push JSON provided to Parse, including any
+    /// Helper method to extract the full Push JSON provided to LeanCloud, including any
     /// non-visual custom information.
     /// </summary>
     /// <param name="userInfo">userInfo dictionary from <see cref="UIApplicationDelegate.ReceivedRemoteNotification"/></param>

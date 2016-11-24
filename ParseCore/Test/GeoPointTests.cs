@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using Parse;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Threading;
 using System.Globalization;
@@ -15,13 +15,13 @@ namespace ParseTest {
       var originalCulture = Thread.CurrentThread.CurrentCulture;
       foreach (var c in CultureInfo.GetCultures(CultureTypes.AllCultures)) {
         Thread.CurrentThread.CurrentCulture = c;
-        var point = new ParseGeoPoint(1.234, 1.234);
+        var point = new AVGeoPoint(1.234, 1.234);
         var serialized = Json.Encode(
           new Dictionary<string, object> {
             { "point", NoObjectsEncoder.Instance.Encode(point) }
           });
-        var deserialized = ParseDecoder.Instance.Decode(Json.Parse(serialized)) as IDictionary<string, object>;
-        var pointAgain = (ParseGeoPoint)deserialized["point"];
+        var deserialized = AVDecoder.Instance.Decode(Json.Parse(serialized)) as IDictionary<string, object>;
+        var pointAgain = (AVGeoPoint)deserialized["point"];
         Assert.AreEqual(1.234, pointAgain.Latitude);
         Assert.AreEqual(1.234, pointAgain.Longitude);
       }
@@ -29,11 +29,11 @@ namespace ParseTest {
 
     [Test]
     public void TestGeoPointConstructor() {
-      var point = new ParseGeoPoint();
+      var point = new AVGeoPoint();
       Assert.AreEqual(0.0, point.Latitude);
       Assert.AreEqual(0.0, point.Longitude);
 
-      point = new ParseGeoPoint(42, 36);
+      point = new AVGeoPoint(42, 36);
       Assert.AreEqual(42.0, point.Latitude);
       Assert.AreEqual(36.0, point.Longitude);
 
@@ -46,20 +46,20 @@ namespace ParseTest {
     [Test]
     public void TestGeoPointExceptionOutOfBounds() {
       Assert.Throws<ArgumentOutOfRangeException>(() =>
-          new ParseGeoPoint(90.01, 0.0));
+          new AVGeoPoint(90.01, 0.0));
       Assert.Throws<ArgumentOutOfRangeException>(() =>
-          new ParseGeoPoint(-90.01, 0.0));
+          new AVGeoPoint(-90.01, 0.0));
       Assert.Throws<ArgumentOutOfRangeException>(() =>
-          new ParseGeoPoint(0.0, 180.01));
+          new AVGeoPoint(0.0, 180.01));
       Assert.Throws<ArgumentOutOfRangeException>(() =>
-          new ParseGeoPoint(0.0, -180.01));
+          new AVGeoPoint(0.0, -180.01));
     }
 
     [Test]
     public void TestGeoDistanceInRadians() {
       var d2r = Math.PI / 180.0;
-      var pointA = new ParseGeoPoint();
-      var pointB = new ParseGeoPoint();
+      var pointA = new AVGeoPoint();
+      var pointB = new AVGeoPoint();
 
       // Zero
       Assert.AreEqual(0.0, pointA.DistanceTo(pointB).Radians, 0.00001);

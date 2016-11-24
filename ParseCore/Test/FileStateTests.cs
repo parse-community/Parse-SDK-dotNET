@@ -1,6 +1,6 @@
 using System;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using System.Text;
 using System.Collections.Generic;
 using NUnit.Framework;

@@ -1,13 +1,13 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 
-namespace Parse.Push.Internal {
+namespace LeanCloud.Push.Internal {
   public class MutablePushState : IPushState {
-    public ParseQuery<ParseInstallation> Query { get; set; }
+    public AVQuery<ParseInstallation> Query { get; set; }
     public IEnumerable<string> Channels { get; set; }
     public DateTime? Expiration { get; set; }
     public TimeSpan? ExpirationInterval { get; set; }

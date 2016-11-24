@@ -1,9 +1,9 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
-using Parse.Core.Internal;
+using LeanCloud.Core.Internal;
 
-namespace Parse.Analytics.Internal {
+namespace LeanCloud.Analytics.Internal {
   public class ParseAnalyticsPlugins : IParseAnalyticsPlugins {
     private static readonly object instanceMutex = new object();
     private static IParseAnalyticsPlugins instance;
@@ -23,7 +23,7 @@ namespace Parse.Analytics.Internal {
 
     private readonly object mutex = new object();
 
-    private IParseCorePlugins corePlugins;
+    private IAVCorePlugins corePlugins;
     private IParseAnalyticsController analyticsController;
 
     public void Reset() {
@@ -33,10 +33,10 @@ namespace Parse.Analytics.Internal {
       }
     }
 
-    public IParseCorePlugins CorePlugins {
+    public IAVCorePlugins CorePlugins {
       get {
         lock (mutex) {
-          corePlugins = corePlugins ?? ParseCorePlugins.Instance;
+          corePlugins = corePlugins ?? AVPlugins.Instance;
           return corePlugins;
         }
       }

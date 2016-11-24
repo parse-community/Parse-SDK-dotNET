@@ -1,17 +1,17 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse.Core.Internal {
+namespace LeanCloud.Core.Internal {
   /// <summary>
-  /// <code>IParseObjectCurrentController</code> controls the single-instance <see cref="ParseObject"/>
+  /// <code>IAVObjectCurrentController</code> controls the single-instance <see cref="ParseObject"/>
   /// persistence used throughout the code-base. Sample usages are <see cref="ParseUser.CurrentUser"/> and
   /// <see cref="ParseInstallation.CurrentInstallation"/>.
   /// </summary>
   /// <typeparam name="T">Type of object being persisted.</typeparam>
-  public interface IParseObjectCurrentController<T> where T : ParseObject {
+  public interface IAVObjectCurrentController<T> where T : AVObject {
     /// <summary>
     /// Persists current <see cref="ParseObject"/>.
     /// </summary>

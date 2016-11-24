@@ -4,7 +4,7 @@ using System.Reflection;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ParseTest")]
-[assembly: AssemblyDescription("Parse unit test project.")]
+[assembly: AssemblyDescription("LeanCloud unit test project.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ParseTest")]

@@ -1,6 +1,6 @@
-using Parse;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,18 +14,18 @@ namespace ParseTest {
   public class CurrentUserControllerTests {
     [SetUp]
     public void SetUp() {
-      ParseObject.RegisterSubclass<ParseUser>();
+      AVObject.RegisterSubclass<AVUser>();
     }
 
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance.Reset();
+      AVPlugins.Instance.Reset();
     }
 
     [Test]
     public void TestConstructor() {
       var storageController = new Mock<IStorageController>();
-      var controller = new ParseCurrentUserController(storageController.Object);
+      var controller = new AVCurrentUserController(storageController.Object);
       Assert.IsNull(controller.CurrentUser);
     }
 
@@ -34,8 +34,8 @@ namespace ParseTest {
     public Task TestGetSetAsync() {
       var storageController = new Mock<IStorageController>(MockBehavior.Strict);
       var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-      var controller = new ParseCurrentUserController(storageController.Object);
-      var user = new ParseUser();
+      var controller = new AVCurrentUserController(storageController.Object);
+      var user = new AVUser();
 
       storageController.Setup(s => s.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
 
@@ -72,8 +72,8 @@ namespace ParseTest {
     public Task TestExistsAsync() {
       var storageController = new Mock<IStorageController>();
       var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-      var controller = new ParseCurrentUserController(storageController.Object);
-      var user = new ParseUser();
+      var controller = new AVCurrentUserController(storageController.Object);
+      var user = new AVUser();
 
       storageController.Setup(c => c.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
 
@@ -116,9 +116,9 @@ namespace ParseTest {
     public Task TestIsCurrent() {
       var storageController = new Mock<IStorageController>(MockBehavior.Strict);
       var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-      var controller = new ParseCurrentUserController(storageController.Object);
-      var user = new ParseUser();
-      var user2 = new ParseUser();
+      var controller = new AVCurrentUserController(storageController.Object);
+      var user = new AVUser();
+      var user2 = new AVUser();
 
       storageController.Setup(s => s.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
 
@@ -153,7 +153,7 @@ namespace ParseTest {
     public Task TestCurrentSessionToken() {
       var storageController = new Mock<IStorageController>();
       var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-      var controller = new ParseCurrentUserController(storageController.Object);
+      var controller = new AVCurrentUserController(storageController.Object);
 
       storageController.Setup(c => c.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
 
@@ -166,7 +166,7 @@ namespace ParseTest {
             { "sessionToken", "randomString" }
           }
         };
-        var user = ParseObject.CreateWithoutData<ParseUser>(null);
+        var user = AVObject.CreateWithoutData<AVUser>(null);
         user.HandleFetchResult(userState);
 
         return controller.SetAsync(user, CancellationToken.None);
@@ -179,8 +179,8 @@ namespace ParseTest {
 
     public Task TestLogOut() {
       var storageController = new Mock<IStorageController>(MockBehavior.Strict);
-      var controller = new ParseCurrentUserController(storageController.Object);
-      var user = new ParseUser();
+      var controller = new AVCurrentUserController(storageController.Object);
+      var user = new AVUser();
 
       return controller.SetAsync(user, CancellationToken.None).OnSuccess(_ => {
         Assert.AreEqual(user, controller.CurrentUser);

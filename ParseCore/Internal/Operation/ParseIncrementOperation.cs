@@ -1,14 +1,14 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Parse.Core.Internal {
-  public class ParseIncrementOperation : IParseFieldOperation {
+namespace LeanCloud.Core.Internal {
+  public class AVIncrementOperation : IAVFieldOperation {
     private static readonly IDictionary<Tuple<Type, Type>, Func<object, object, object>> adders;
 
-    static ParseIncrementOperation() {
+    static AVIncrementOperation() {
       // Defines adders for all of the implicit conversions: http://msdn.microsoft.com/en-US/library/y5b434w4(v=vs.80).aspx
       adders = new Dictionary<Tuple<Type, Type>, Func<object, object, object>> {
         {new Tuple<Type, Type>(typeof(sbyte), typeof(sbyte)), (left, right) => (sbyte)left + (sbyte)right},
@@ -88,7 +88,7 @@ namespace Parse.Core.Internal {
 
     private object amount;
 
-    public ParseIncrementOperation(object amount) {
+    public AVIncrementOperation(object amount) {
       this.amount = amount;
     }
 
@@ -107,25 +107,25 @@ namespace Parse.Core.Internal {
       throw new InvalidCastException("Cannot add " + obj1.GetType() + " to " + obj2.GetType());
     }
 
-    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) {
+    public IAVFieldOperation MergeWithPrevious(IAVFieldOperation previous) {
       if (previous == null) {
         return this;
       }
-      if (previous is ParseDeleteOperation) {
-        return new ParseSetOperation(amount);
+      if (previous is AVDeleteOperation) {
+        return new AVSetOperation(amount);
       }
-      if (previous is ParseSetOperation) {
-        var otherAmount = ((ParseSetOperation)previous).Value;
+      if (previous is AVSetOperation) {
+        var otherAmount = ((AVSetOperation)previous).Value;
         if (otherAmount is string) {
           throw new InvalidOperationException("Cannot increment a non-number type.");
         }
         var myAmount = amount;
-        return new ParseSetOperation(Add(otherAmount, myAmount));
+        return new AVSetOperation(Add(otherAmount, myAmount));
       }
-      if (previous is ParseIncrementOperation) {
-        object otherAmount = ((ParseIncrementOperation)previous).Amount;
+      if (previous is AVIncrementOperation) {
+        object otherAmount = ((AVIncrementOperation)previous).Amount;
         object myAmount = amount;
-        return new ParseIncrementOperation(Add(otherAmount, myAmount));
+        return new AVIncrementOperation(Add(otherAmount, myAmount));
       }
       throw new InvalidOperationException("Operation is invalid after previous operation.");
     }

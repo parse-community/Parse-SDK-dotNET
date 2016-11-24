@@ -1,7 +1,7 @@
 using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using System;
 using System.Threading;
 using System.Globalization;

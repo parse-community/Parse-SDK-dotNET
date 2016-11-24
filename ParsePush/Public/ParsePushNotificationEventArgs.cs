@@ -1,12 +1,12 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
-using Parse.Common.Internal;
+using LeanCloud.Common.Internal;
 using System;
 using System.Collections.Generic;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// A wrapper around Parse push notification payload.
+  /// A wrapper around LeanCloud push notification payload.
   /// </summary>
   public class ParsePushNotificationEventArgs : EventArgs {
     internal ParsePushNotificationEventArgs(IDictionary<string, object> payload) {

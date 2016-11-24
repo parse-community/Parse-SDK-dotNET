@@ -1,16 +1,16 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-using Parse.Utilities;
+using LeanCloud.Utilities;
 
-namespace Parse.Core.Internal {
-  public class ParseRemoveOperation : IParseFieldOperation {
+namespace LeanCloud.Core.Internal {
+  public class AVRemoveOperation : IAVFieldOperation {
     private ReadOnlyCollection<object> objects;
-    public ParseRemoveOperation(IEnumerable<object> objects) {
+    public AVRemoveOperation(IEnumerable<object> objects) {
       this.objects = new ReadOnlyCollection<object>(objects.Distinct().ToList());
     }
 
@@ -21,21 +21,21 @@ namespace Parse.Core.Internal {
       };
     }
 
-    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) {
+    public IAVFieldOperation MergeWithPrevious(IAVFieldOperation previous) {
       if (previous == null) {
         return this;
       }
-      if (previous is ParseDeleteOperation) {
+      if (previous is AVDeleteOperation) {
         return previous;
       }
-      if (previous is ParseSetOperation) {
-        var setOp = (ParseSetOperation)previous;
+      if (previous is AVSetOperation) {
+        var setOp = (AVSetOperation)previous;
         var oldList = Conversion.As<IList<object>>(setOp.Value);
-        return new ParseSetOperation(this.Apply(oldList, null));
+        return new AVSetOperation(this.Apply(oldList, null));
       }
-      if (previous is ParseRemoveOperation) {
-        var oldOp = (ParseRemoveOperation)previous;
-        return new ParseRemoveOperation(oldOp.Objects.Concat(objects));
+      if (previous is AVRemoveOperation) {
+        var oldOp = (AVRemoveOperation)previous;
+        return new AVRemoveOperation(oldOp.Objects.Concat(objects));
       }
       throw new InvalidOperationException("Operation is invalid after previous operation.");
     }

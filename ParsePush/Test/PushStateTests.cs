@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using Parse.Push.Internal;
+using LeanCloud.Push.Internal;
 
 namespace ParseTest {
   [TestFixture]

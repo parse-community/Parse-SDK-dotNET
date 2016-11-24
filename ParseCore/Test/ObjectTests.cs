@@ -1,7 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Parse;
-using Parse.Core.Internal;
+using LeanCloud;
+using LeanCloud.Core.Internal;
 using System;
 using System.Linq;
 using System.Collections.Generic;
@@ -13,22 +13,22 @@ using System.Threading.Tasks;
 namespace ParseTest {
   [TestFixture]
   public class ObjectTests {
-    [ParseClassName("SubClass")]
-    private class SubClass : ParseObject {
+    [AVClassName("SubClass")]
+    private class SubClass : AVObject {
     }
 
-    [ParseClassName("UnregisteredSubClass")]
-    private class UnregisteredSubClass : ParseObject {
+    [AVClassName("UnregisteredSubClass")]
+    private class UnregisteredSubClass : AVObject {
     }
 
     [TearDown]
     public void TearDown() {
-      ParseCorePlugins.Instance.Reset();
+      AVPlugins.Instance.Reset();
     }
 
     [Test]
     public void TestParseObjectConstructor() {
-      ParseObject obj = new ParseObject("Corgi");
+      AVObject obj = new AVObject("Corgi");
       Assert.AreEqual("Corgi", obj.ClassName);
       Assert.Null(obj.CreatedAt);
       Assert.True(obj.IsDataAvailable);
@@ -37,13 +37,13 @@ namespace ParseTest {
 
     [Test]
     public void TestParseObjectCreate() {
-      ParseObject obj = ParseObject.Create("Corgi");
+      AVObject obj = AVObject.Create("Corgi");
       Assert.AreEqual("Corgi", obj.ClassName);
       Assert.Null(obj.CreatedAt);
       Assert.True(obj.IsDataAvailable);
       Assert.True(obj.IsDirty);
 
-      ParseObject obj2 = ParseObject.CreateWithoutData("Corgi", "waGiManPutr4Pet1r");
+      AVObject obj2 = AVObject.CreateWithoutData("Corgi", "waGiManPutr4Pet1r");
       Assert.AreEqual("Corgi", obj2.ClassName);
       Assert.AreEqual("waGiManPutr4Pet1r", obj2.ObjectId);
       Assert.Null(obj2.CreatedAt);
@@ -53,15 +53,15 @@ namespace ParseTest {
 
     [Test]
     public void TestParseObjectCreateWithGeneric() {
-      ParseObject.RegisterSubclass<SubClass>();
+      AVObject.RegisterSubclass<SubClass>();
 
-      ParseObject obj = ParseObject.Create<SubClass>();
+      AVObject obj = AVObject.Create<SubClass>();
       Assert.AreEqual("SubClass", obj.ClassName);
       Assert.Null(obj.CreatedAt);
       Assert.True(obj.IsDataAvailable);
       Assert.True(obj.IsDirty);
 
-      ParseObject obj2 = ParseObject.CreateWithoutData<SubClass>("waGiManPutr4Pet1r");
+      AVObject obj2 = AVObject.CreateWithoutData<SubClass>("waGiManPutr4Pet1r");
       Assert.AreEqual("SubClass", obj2.ClassName);
       Assert.AreEqual("waGiManPutr4Pet1r", obj2.ObjectId);
       Assert.Null(obj2.CreatedAt);
@@ -71,7 +71,7 @@ namespace ParseTest {
 
     [Test]
     public void TestParseObjectCreateWithGenericFailWithoutSubclass() {
-      Assert.Throws<InvalidCastException>(() => ParseObject.Create<SubClass>());
+      Assert.Throws<InvalidCastException>(() => AVObject.Create<SubClass>());
     }
 
     [Test]
@@ -85,7 +85,7 @@ namespace ParseTest {
           { "sessionToken", "se551onT0k3n" }
         }
       };
-      ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+      AVObject obj = AVObjectExtensions.FromState<AVObject>(state, "Omitted");
 
       Assert.AreEqual("waGiManPutr4Pet1r", obj.ObjectId);
       Assert.AreEqual("Pagi", obj.ClassName);
@@ -97,21 +97,21 @@ namespace ParseTest {
 
     [Test]
     public void TestRegisterSubclass() {
-      Assert.Throws<InvalidCastException>(() => ParseObject.Create<SubClass>());
+      Assert.Throws<InvalidCastException>(() => AVObject.Create<SubClass>());
 
-      ParseObject.RegisterSubclass<SubClass>();
-      Assert.DoesNotThrow(() => ParseObject.Create<SubClass>());
+      AVObject.RegisterSubclass<SubClass>();
+      Assert.DoesNotThrow(() => AVObject.Create<SubClass>());
 
-      ParseCorePlugins.Instance.SubclassingController.UnregisterSubclass(typeof(UnregisteredSubClass));
-      Assert.DoesNotThrow(() => ParseObject.Create<SubClass>());
+      AVPlugins.Instance.SubclassingController.UnregisterSubclass(typeof(UnregisteredSubClass));
+      Assert.DoesNotThrow(() => AVObject.Create<SubClass>());
 
-      ParseCorePlugins.Instance.SubclassingController.UnregisterSubclass(typeof(SubClass));
-      Assert.Throws<InvalidCastException>(() => ParseObject.Create<SubClass>());
+      AVPlugins.Instance.SubclassingController.UnregisterSubclass(typeof(SubClass));
+      Assert.Throws<InvalidCastException>(() => AVObject.Create<SubClass>());
     }
 
     [Test]
     public void TestRevert() {
-      ParseObject obj = ParseObject.Create("Corgi");
+      AVObject obj = AVObject.Create("Corgi");
       obj["gogo"] = true;
 
       Assert.True(obj.IsDirty);
@@ -127,36 +127,36 @@ namespace ParseTest {
 
     [Test]
     public void TestDeepTraversal() {
-      ParseObject obj = ParseObject.Create("Corgi");
+      AVObject obj = AVObject.Create("Corgi");
       IDictionary<string, object> someDict = new Dictionary<string, object>() {
         { "someList", new List<object>() }
       };
-      obj["obj"] = ParseObject.Create("Pug");
-      obj["obj2"] = ParseObject.Create("Pug");
+      obj["obj"] = AVObject.Create("Pug");
+      obj["obj2"] = AVObject.Create("Pug");
       obj["list"] = new List<object>();
       obj["dict"] = someDict;
       obj["someBool"] = true;
       obj["someInt"] = 23;
 
-      IEnumerable<object> traverseResult = ParseObjectExtensions.DeepTraversal(obj, true, true);
+      IEnumerable<object> traverseResult = AVObjectExtensions.DeepTraversal(obj, true, true);
       Assert.AreEqual(8, traverseResult.Count());
 
-      // Don't traverse beyond the root (since root is ParseObject)
-      traverseResult = ParseObjectExtensions.DeepTraversal(obj, false, true);
+      // Don't traverse beyond the root (since root is AVObject)
+      traverseResult = AVObjectExtensions.DeepTraversal(obj, false, true);
       Assert.AreEqual(1, traverseResult.Count());
 
-      traverseResult = ParseObjectExtensions.DeepTraversal(someDict, false, true);
+      traverseResult = AVObjectExtensions.DeepTraversal(someDict, false, true);
       Assert.AreEqual(2, traverseResult.Count());
 
       // Should ignore root
-      traverseResult = ParseObjectExtensions.DeepTraversal(obj, true, false);
+      traverseResult = AVObjectExtensions.DeepTraversal(obj, true, false);
       Assert.AreEqual(7, traverseResult.Count());
 
     }
 
     [Test]
     public void TestRemove() {
-      ParseObject obj = ParseObject.Create("Corgi");
+      AVObject obj = AVObject.Create("Corgi");
       obj["gogo"] = true;
       Assert.True(obj.ContainsKey("gogo"));
 
@@ -173,7 +173,7 @@ namespace ParseTest {
         }
       };
 
-      obj = ParseObjectExtensions.FromState<ParseObject>(state, "Corgi");
+      obj = AVObjectExtensions.FromState<AVObject>(state, "Corgi");
       Assert.True(obj.ContainsKey("username"));
       Assert.True(obj.ContainsKey("sessionToken"));
 
@@ -184,12 +184,12 @@ namespace ParseTest {
 
     [Test]
     public void TestIndexGetterSetter() {
-      ParseObject obj = ParseObject.Create("Corgi");
+      AVObject obj = AVObject.Create("Corgi");
       obj["gogo"] = true;
       obj["list"] = new List<string>();
       obj["dict"] = new Dictionary<string, object>();
-      obj["fakeACL"] = new ParseACL();
-      obj["obj"] = new ParseObject("Corgi");
+      obj["fakeACL"] = new AVACL();
+      obj["obj"] = new AVObject("Corgi");
 
       Assert.True(obj.ContainsKey("gogo"));
       Assert.IsInstanceOf<bool>(obj["gogo"]);
@@ -201,10 +201,10 @@ namespace ParseTest {
       Assert.IsInstanceOf<IDictionary<string, object>>(obj["dict"]);
 
       Assert.True(obj.ContainsKey("fakeACL"));
-      Assert.IsInstanceOf<ParseACL>(obj["fakeACL"]);
+      Assert.IsInstanceOf<AVACL>(obj["fakeACL"]);
 
       Assert.True(obj.ContainsKey("obj"));
-      Assert.IsInstanceOf<ParseObject>(obj["obj"]);
+      Assert.IsInstanceOf<AVObject>(obj["obj"]);
 
       Assert.Throws<KeyNotFoundException>(() => { var gogo = obj["missingItem"]; });
     }
@@ -221,7 +221,7 @@ namespace ParseTest {
           { "sessionToken", "se551onT0k3n" }
         }
       };
-      ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+      AVObject obj = AVObjectExtensions.FromState<AVObject>(state, "Omitted");
 
       Assert.AreEqual("Pagi", obj.ClassName);
       Assert.AreEqual(now, obj.CreatedAt);
@@ -234,7 +234,7 @@ namespace ParseTest {
 
     [Test]
     public void TestAddToList() {
-      ParseObject obj = new ParseObject("Corgi");
+      AVObject obj = new AVObject("Corgi");
       obj.AddToList("emptyList", "gogo");
       obj["existingList"] = new List<string>() { "rich" };
 
@@ -254,7 +254,7 @@ namespace ParseTest {
 
     [Test]
     public void TestAddUniqueToList() {
-      ParseObject obj = new ParseObject("Corgi");
+      AVObject obj = new AVObject("Corgi");
       obj.AddUniqueToList("emptyList", "gogo");
       obj["existingList"] = new List<string>() { "gogo" };
 
@@ -274,7 +274,7 @@ namespace ParseTest {
 
     [Test]
     public void TestRemoveAllFromList() {
-      ParseObject obj = new ParseObject("Corgi");
+      AVObject obj = new AVObject("Corgi");
       obj["existingList"] = new List<string>() { "gogo", "Queen of Pain" };
 
       obj.RemoveAllFromList("existingList", new List<string>() { "gogo", "missingItem" });
@@ -297,13 +297,13 @@ namespace ParseTest {
           { "sessionToken", "se551onT0k3n" }
         }
       };
-      ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+      AVObject obj = AVObjectExtensions.FromState<AVObject>(state, "Omitted");
       string res = null;
       obj.TryGetValue<string>("username", out res);
       Assert.AreEqual("kevin", res);
 
-      ParseObject resObj = null;
-      obj.TryGetValue<ParseObject>("username", out resObj);
+      AVObject resObj = null;
+      obj.TryGetValue<AVObject>("username", out resObj);
       Assert.Null(resObj);
 
       obj.TryGetValue<string>("missingItem", out res);
@@ -321,9 +321,9 @@ namespace ParseTest {
           { "sessionToken", "se551onT0k3n" }
         }
       };
-      ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+      AVObject obj = AVObjectExtensions.FromState<AVObject>(state, "Omitted");
       Assert.AreEqual("kevin", obj.Get<string>("username"));
-      Assert.Throws<InvalidCastException>(() => obj.Get<ParseObject>("username"));
+      Assert.Throws<InvalidCastException>(() => obj.Get<AVObject>("username"));
       Assert.Throws<KeyNotFoundException>(() => obj.Get<string>("missingItem"));
     }
 
@@ -348,7 +348,7 @@ namespace ParseTest {
           { "sessionToken", "se551onT0k3n" }
         }
       };
-      ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+      AVObject obj = AVObjectExtensions.FromState<AVObject>(state, "Omitted");
       Assert.AreEqual(2, obj.Keys.Count);
 
       obj["additional"] = true;
@@ -369,7 +369,7 @@ namespace ParseTest {
           { "sessionToken", "se551onT0k3n" }
         }
       };
-      ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+      AVObject obj = AVObjectExtensions.FromState<AVObject>(state, "Omitted");
       Assert.Throws<ArgumentException>(() => obj.Add("username", "kevin"));
 
       obj.Add("zeus", "bewithyou");
@@ -387,7 +387,7 @@ namespace ParseTest {
           { "sessionToken", "se551onT0k3n" }
         }
       };
-      ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+      AVObject obj = AVObjectExtensions.FromState<AVObject>(state, "Omitted");
 
       int count = 0;
       foreach (var key in obj) {
@@ -405,14 +405,14 @@ namespace ParseTest {
 
     [Test]
     public void TestGetQuery() {
-      ParseObject.RegisterSubclass<SubClass>();
+      AVObject.RegisterSubclass<SubClass>();
 
-      ParseQuery<ParseObject> query = ParseObject.GetQuery("UnregisteredSubClass");
+      AVQuery<AVObject> query = AVObject.GetQuery("UnregisteredSubClass");
       Assert.AreEqual("UnregisteredSubClass", query.GetClassName());
 
-      Assert.Throws<ArgumentException>(() => ParseObject.GetQuery("SubClass"));
+      Assert.Throws<ArgumentException>(() => AVObject.GetQuery("SubClass"));
 
-      ParseCorePlugins.Instance.SubclassingController.UnregisterSubclass(typeof(SubClass));
+      AVPlugins.Instance.SubclassingController.UnregisterSubclass(typeof(SubClass));
     }
 
     [Test]

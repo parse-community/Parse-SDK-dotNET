@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Parse.Core.Internal {
+namespace LeanCloud.Core.Internal {
   public interface IObjectSubclassingController {
     String GetClassName(Type type);
     Type GetType(String className);
@@ -16,7 +16,7 @@ namespace Parse.Core.Internal {
 
     void AddRegisterHook(Type t, Action action);
 
-    ParseObject Instantiate(String className);
+    AVObject Instantiate(String className);
     IDictionary<String, String> GetPropertyMappings(String className);
   }
 }

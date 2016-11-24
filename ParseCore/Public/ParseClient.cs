@@ -1,7 +1,7 @@
-// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using LeanCloud.Common.Internal;
+using LeanCloud.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,12 +13,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse {
+namespace LeanCloud {
   /// <summary>
-  /// ParseClient contains static functions that handle global
-  /// configuration for the Parse library.
+  /// AVClient contains static functions that handle global
+  /// configuration for the LeanCloud library.
   /// </summary>
-  public static partial class ParseClient {
+  public static partial class AVClient {
     internal static readonly string[] DateFormatStrings = {
       // Official ISO format
       "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'",
@@ -30,13 +30,13 @@ namespace Parse {
     };
 
     /// <summary>
-    /// Represents the configuration of the Parse SDK.
+    /// Represents the configuration of the LeanCloud SDK.
     /// </summary>
     public struct Configuration {
       /// <summary>
-      /// In the event that you would like to use the Parse SDK
+      /// In the event that you would like to use the LeanCloud SDK
       /// from a completely portable project, with no platform-specific library required,
-      /// to get full access to all of our features available on Parse.com
+      /// to get full access to all of our features available on LeanCloud.com
       /// (A/B testing, slow queries, etc.), you must set the values of this struct
       /// to be appropriate for your platform.
       ///
@@ -61,19 +61,19 @@ namespace Parse {
       }
 
       /// <summary>
-      /// The Parse.com application ID of your app.
+      /// The LeanCloud.com application ID of your app.
       /// </summary>
       public String ApplicationId { get; set; }
 
       /// <summary>
-      /// The Parse.com API server to connect to.
+      /// The LeanCloud.com API server to connect to.
       ///
       /// Only needs to be set if you're using another server than https://api.parse.com/1.
       /// </summary>
       public String Server { get; set; }
 
       /// <summary>
-      /// The Parse.com .NET key for your app.
+      /// The LeanCloud.com .NET key for your app.
       /// </summary>
       public String WindowsKey { get; set; }
 
@@ -90,10 +90,10 @@ namespace Parse {
 
     private static readonly object mutex = new object();
 
-    static ParseClient() {
+    static AVClient() {
       versionString = "net-portable-" + Version;
 
-      ParseModuleController.Instance.ScanForModules();
+      AVModuleController.Instance.ScanForModules();
     }
 
     /// <summary>
@@ -104,7 +104,7 @@ namespace Parse {
 
     internal static Version Version {
       get {
-        var assemblyName = new AssemblyName(typeof(ParseClient).GetTypeInfo().Assembly.FullName);
+        var assemblyName = new AssemblyName(typeof(AVClient).GetTypeInfo().Assembly.FullName);
         return assemblyName.Version;
       }
     }
@@ -118,13 +118,13 @@ namespace Parse {
 
     /// <summary>
     /// Authenticates this client as belonging to your application. This must be
-    /// called before your application can use the Parse library. The recommended
+    /// called before your application can use the LeanCloud library. The recommended
     /// way is to put a call to <c>ParseFramework.Initialize</c> in your
     /// Application startup.
     /// </summary>
-    /// <param name="applicationId">The Application ID provided in the Parse dashboard.
+    /// <param name="applicationId">The Application ID provided in the LeanCloud dashboard.
     /// </param>
-    /// <param name="dotnetKey">The .NET API Key provided in the Parse dashboard.
+    /// <param name="dotnetKey">The .NET API Key provided in the LeanCloud dashboard.
     /// </param>
     public static void Initialize(string applicationId, string dotnetKey) {
       Initialize(new Configuration {
@@ -135,22 +135,22 @@ namespace Parse {
 
     /// <summary>
     /// Authenticates this client as belonging to your application. This must be
-    /// called before your application can use the Parse library. The recommended
+    /// called before your application can use the LeanCloud library. The recommended
     /// way is to put a call to <c>ParseFramework.Initialize</c> in your
     /// Application startup.
     /// </summary>
-    /// <param name="configuration">The configuration to initialize Parse with.
+    /// <param name="configuration">The configuration to initialize LeanCloud with.
     /// </param>
     public static void Initialize(Configuration configuration) {
       lock (mutex) {
         configuration.Server = configuration.Server ?? "https://api.parse.com/1/";
         CurrentConfiguration = configuration;
 
-        ParseObject.RegisterSubclass<ParseUser>();
-        ParseObject.RegisterSubclass<ParseRole>();
-        ParseObject.RegisterSubclass<ParseSession>();
+        AVObject.RegisterSubclass<AVUser>();
+        AVObject.RegisterSubclass<AVRole>();
+        AVObject.RegisterSubclass<AVSession>();
 
-        ParseModuleController.Instance.ParseDidInitialize();
+        AVModuleController.Instance.ParseDidInitialize();
       }
     }
 
