@@ -8,9 +8,9 @@ namespace LeanCloud.Push.Internal {
     }
 
     public void OnParseInitialized() {
-      AVObject.RegisterSubclass<ParseInstallation>();
+      AVObject.RegisterSubclass<AVInstallation>();
 
-      AVPlugins.Instance.SubclassingController.AddRegisterHook(typeof(ParseInstallation), () => {
+      AVPlugins.Instance.SubclassingController.AddRegisterHook(typeof(AVInstallation), () => {
         ParsePushPlugins.Instance.CurrentInstallationController.ClearFromMemory();
       });
 

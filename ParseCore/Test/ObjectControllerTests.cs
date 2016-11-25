@@ -48,8 +48,8 @@ namespace ParseTest {
         Assert.IsFalse(t.IsCanceled);
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi/st4nl3yW"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
 
         var newState = t.Result;
@@ -90,8 +90,8 @@ namespace ParseTest {
         Assert.IsFalse(t.IsCanceled);
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi/st4nl3yW"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
 
         var newState = t.Result;
@@ -132,8 +132,8 @@ namespace ParseTest {
         Assert.IsFalse(t.IsCanceled);
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
 
         var newState = t.Result;
@@ -203,8 +203,8 @@ namespace ParseTest {
         }
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
       });
     }
@@ -266,8 +266,8 @@ namespace ParseTest {
 
       var mockRunner = new Mock<IAVCommandRunner>();
       mockRunner.SetupSequence(obj => obj.RunCommandAsync(It.IsAny<AVCommand>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()))
           .Returns(Task<Tuple<HttpStatusCode, IDictionary<string, object>>>.FromResult(response))
           .Returns(Task<Tuple<HttpStatusCode, IDictionary<string, object>>>.FromResult(response))
@@ -290,8 +290,8 @@ namespace ParseTest {
         }
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(3));
       });
     }
@@ -316,8 +316,8 @@ namespace ParseTest {
         Assert.IsFalse(t.IsCanceled);
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi/st4nl3yW"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
       });
     }
@@ -356,8 +356,8 @@ namespace ParseTest {
         Assert.True(tasks.All(task => task.IsCompleted && !task.IsCanceled && !task.IsFaulted));
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
       });
     }
@@ -401,8 +401,8 @@ namespace ParseTest {
 
       var mockRunner = new Mock<IAVCommandRunner>();
       mockRunner.SetupSequence(obj => obj.RunCommandAsync(It.IsAny<AVCommand>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()))
           .Returns(Task<Tuple<HttpStatusCode, IDictionary<string, object>>>.FromResult(response))
           .Returns(Task<Tuple<HttpStatusCode, IDictionary<string, object>>>.FromResult(response))
@@ -415,8 +415,8 @@ namespace ParseTest {
         Assert.True(tasks.All(task => task.IsCompleted && !task.IsCanceled && !task.IsFaulted));
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(3));
       });
     }
@@ -474,8 +474,8 @@ namespace ParseTest {
         }
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
       });
     }
@@ -515,8 +515,8 @@ namespace ParseTest {
         Assert.IsInstanceOf<InvalidOperationException>(tasks[0].Exception.InnerException);
 
         mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<AVCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-            It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-            It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+            It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
             It.IsAny<CancellationToken>()), Times.Exactly(1));
       });
     }
@@ -524,8 +524,8 @@ namespace ParseTest {
     private Mock<IAVCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response) {
       var mockRunner = new Mock<IAVCommandRunner>();
       mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<AVCommand>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>()))
           .Returns(Task<Tuple<HttpStatusCode, IDictionary<string, object>>>.FromResult(response));
 

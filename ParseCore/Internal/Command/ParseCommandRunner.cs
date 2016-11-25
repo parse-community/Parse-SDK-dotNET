@@ -18,8 +18,8 @@ namespace LeanCloud.Core.Internal {
     }
 
     public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(AVCommand command,
-        IProgress<ParseUploadProgressEventArgs> uploadProgress = null,
-        IProgress<ParseDownloadProgressEventArgs> downloadProgress = null,
+        IProgress<AVUploadProgressEventArgs> uploadProgress = null,
+        IProgress<AVDownloadProgressEventArgs> downloadProgress = null,
         CancellationToken cancellationToken = default(CancellationToken)) {
       return PrepareCommand(command).ContinueWith(commandTask => {
         return httpClient.ExecuteAsync(commandTask.Result, uploadProgress, downloadProgress, cancellationToken).OnSuccess(t => {

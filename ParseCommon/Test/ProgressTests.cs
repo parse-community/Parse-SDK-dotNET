@@ -12,7 +12,7 @@ namespace ParseTest {
   public class ProgressTests {
     [Test]
     public void TestDownloadProgressEventGetterSetter() {
-      var downloadProgressEvent = new ParseDownloadProgressEventArgs {
+      var downloadProgressEvent = new AVDownloadProgressEventArgs {
         Progress = 0.5f
       };
       Assert.AreEqual(0.5f, downloadProgressEvent.Progress);
@@ -23,7 +23,7 @@ namespace ParseTest {
 
     [Test]
     public void TestUploadProgressEventGetterSetter() {
-      var uploadProgressEvent = new ParseDownloadProgressEventArgs {
+      var uploadProgressEvent = new AVDownloadProgressEventArgs {
         Progress = 0.5f
       };
       Assert.AreEqual(0.5f, uploadProgressEvent.Progress);
@@ -35,17 +35,17 @@ namespace ParseTest {
     [Test]
     public void TestObservingDownloadProgress() {
       int called = 0;
-      var mockProgress = new Mock<IProgress<ParseDownloadProgressEventArgs>>();
-      mockProgress.Setup(obj => obj.Report(It.IsAny<ParseDownloadProgressEventArgs>())).Callback(() => {
+      var mockProgress = new Mock<IProgress<AVDownloadProgressEventArgs>>();
+      mockProgress.Setup(obj => obj.Report(It.IsAny<AVDownloadProgressEventArgs>())).Callback(() => {
         called++;
       });
-      IProgress<ParseDownloadProgressEventArgs> progress = mockProgress.Object;
+      IProgress<AVDownloadProgressEventArgs> progress = mockProgress.Object;
 
-      progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.2f });
-      progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.42f });
-      progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.53f });
-      progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.68f });
-      progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.88f });
+      progress.Report(new AVDownloadProgressEventArgs { Progress = 0.2f });
+      progress.Report(new AVDownloadProgressEventArgs { Progress = 0.42f });
+      progress.Report(new AVDownloadProgressEventArgs { Progress = 0.53f });
+      progress.Report(new AVDownloadProgressEventArgs { Progress = 0.68f });
+      progress.Report(new AVDownloadProgressEventArgs { Progress = 0.88f });
 
       Assert.AreEqual(5, called);
     }
@@ -53,17 +53,17 @@ namespace ParseTest {
     [Test]
     public void TestObservingUploadProgress() {
       int called = 0;
-      var mockProgress = new Mock<IProgress<ParseUploadProgressEventArgs>>();
-      mockProgress.Setup(obj => obj.Report(It.IsAny<ParseUploadProgressEventArgs>())).Callback(() => {
+      var mockProgress = new Mock<IProgress<AVUploadProgressEventArgs>>();
+      mockProgress.Setup(obj => obj.Report(It.IsAny<AVUploadProgressEventArgs>())).Callback(() => {
         called++;
       });
-      IProgress<ParseUploadProgressEventArgs> progress = mockProgress.Object;
+      IProgress<AVUploadProgressEventArgs> progress = mockProgress.Object;
 
-      progress.Report(new ParseUploadProgressEventArgs { Progress = 0.2f });
-      progress.Report(new ParseUploadProgressEventArgs { Progress = 0.42f });
-      progress.Report(new ParseUploadProgressEventArgs { Progress = 0.53f });
-      progress.Report(new ParseUploadProgressEventArgs { Progress = 0.68f });
-      progress.Report(new ParseUploadProgressEventArgs { Progress = 0.88f });
+      progress.Report(new AVUploadProgressEventArgs { Progress = 0.2f });
+      progress.Report(new AVUploadProgressEventArgs { Progress = 0.42f });
+      progress.Report(new AVUploadProgressEventArgs { Progress = 0.53f });
+      progress.Report(new AVUploadProgressEventArgs { Progress = 0.68f });
+      progress.Report(new AVUploadProgressEventArgs { Progress = 0.88f });
 
       Assert.AreEqual(5, called);
     }

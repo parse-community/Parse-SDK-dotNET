@@ -17,12 +17,12 @@ namespace LeanCloud {
     static ParsePush() {
       DeviceInfoController.GetChannelTask.ContinueWith(t =>
         t.Result.PushNotificationReceived += (sender, args) => {
-          PushNotificationReceived(ParseInstallation.CurrentInstallation, args);
+          PushNotificationReceived(AVInstallation.CurrentInstallation, args);
 
           var payload = PushJson(args);
           var handler = parsePushNotificationReceived;
           if (handler != null) {
-            handler.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
+            handler.Invoke(AVInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
           }
         }
       );

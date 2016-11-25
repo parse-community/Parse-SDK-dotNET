@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{27D3F5E9-CA66-426B-BE69-9B6158071A35}</ProjectGuid>
+    <ProjectGuid>{C805F141-F6F1-46B8-90F5-E8C83D7DC534}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Parse.Core</RootNamespace>
-    <AssemblyName>Parse.Core</AssemblyName>
+    <RootNamespace>LeanCloud.Push</RootNamespace>
+    <AssemblyName>LeanCloud.Push</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>5</LangVersion>
-    <DocumentationFile>bin\Release\Unity\Parse.Common.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Unity\LeanCloud.Push.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -47,11 +47,26 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+  <!-- Used for setting excluded files -->
+  <PropertyGroup>
+    <ExcludedPlatformSpecificSourceFilesString>
+          **\Android\**;
+          **\Portable\**;
+          **\iOS\**;
+          **\Mono\**;
+          **\NetFx45\**;
+          **\Phone\**;
+	  **\WinRT\**;
+	  **\Unity.Android\**;
+      </ExcludedPlatformSpecificSourceFilesString>
+  </PropertyGroup>
   <ItemGroup>
     <!-- Assembly info, etc. -->
-    <Compile Include="Properties\*.cs" />
-    <Compile Include="Internal\**\*.cs" />
-    <Compile Include="Public\**\*.cs" />
+    <Compile Include="Properties\*.cs" Exclude="Properties\Settings.Designer.cs" />
+    <Compile Include="Compat\**\*.cs" />
+    <Compile Include="Tasks\**\*.cs" />
+    <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+    <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
@@ -63,9 +78,13 @@
   </Target>
   -->
   <ItemGroup>
-    <ProjectReference Include="..\ParseCommon\ParseCommon.Unity.csproj">
+    <ProjectReference Include="..\ParseCommon\LeanCloud.Storage.Unity.csproj">
       <Project>{196457aa-9ba0-40bc-91a3-21baad6f4169}</Project>
-      <Name>ParseCommon.Unity</Name>
+      <Name>LeanCloud.Storage.Unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ParseCore\LeanCloud.Core.Unity.csproj">
+      <Project>{27d3f5e9-ca66-426b-be69-9b6158071a35}</Project>
+      <Name>LeanCloud.Core.Unity</Name>
     </ProjectReference>
     <ProjectReference Include="..\Unity.Compat\Unity.Compat.csproj">
       <Project>{8473bef6-7086-4414-aad6-264967a7fe75}</Project>

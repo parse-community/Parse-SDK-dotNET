@@ -17,7 +17,7 @@ namespace LeanCloud.Core.Internal {
     public Task<FileState> SaveAsync(FileState state,
         Stream dataStream,
         String sessionToken,
-        IProgress<ParseUploadProgressEventArgs> progress,
+        IProgress<AVUploadProgressEventArgs> progress,
         CancellationToken cancellationToken = default(CancellationToken)) {
       if (state.Url != null) {
         // !isDirty

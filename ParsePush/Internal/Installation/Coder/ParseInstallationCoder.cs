@@ -14,7 +14,7 @@ namespace LeanCloud.Push.Internal {
     }
     private const string ISO8601Format = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'";
 
-    public IDictionary<string, object> Encode(ParseInstallation installation) {
+    public IDictionary<string, object> Encode(AVInstallation installation) {
       var state = installation.GetState();
       var data = PointerOrLocalIdEncoder.Instance.Encode(state.ToDictionary(x => x.Key, x => x.Value)) as IDictionary<string, object>;
       data["objectId"] = state.ObjectId;
@@ -27,9 +27,9 @@ namespace LeanCloud.Push.Internal {
       return data;
     }
 
-    public ParseInstallation Decode(IDictionary<string, object> data) {
+    public AVInstallation Decode(IDictionary<string, object> data) {
       var state = AVObjectCoder.Instance.Decode(data, AVDecoder.Instance);
-      return AVObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+      return AVObjectExtensions.FromState<AVInstallation>(state, "_Installation");
     }
   }
 }

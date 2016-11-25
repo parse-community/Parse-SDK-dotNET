@@ -16,13 +16,13 @@ namespace LeanCloud.Common.Internal {
     private static bool isCompiledByIL2CPP = System.AppDomain.CurrentDomain.FriendlyName.Equals("IL2CPP Root Domain");
 
     public Task<Tuple<HttpStatusCode, string>> ExecuteAsync(HttpRequest httpRequest,
-        IProgress<ParseUploadProgressEventArgs> uploadProgress,
-        IProgress<ParseDownloadProgressEventArgs> downloadProgress,
+        IProgress<AVUploadProgressEventArgs> uploadProgress,
+        IProgress<AVDownloadProgressEventArgs> downloadProgress,
         CancellationToken cancellationToken) {
       var tcs = new TaskCompletionSource<Tuple<HttpStatusCode, string>>();
       cancellationToken.Register(() => tcs.TrySetCanceled());
-      uploadProgress = uploadProgress ?? new Progress<ParseUploadProgressEventArgs>();
-      downloadProgress = downloadProgress ?? new Progress<ParseDownloadProgressEventArgs>();
+      uploadProgress = uploadProgress ?? new Progress<AVUploadProgressEventArgs>();
+      downloadProgress = downloadProgress ?? new Progress<AVDownloadProgressEventArgs>();
 
       var headerTable = new Hashtable();
       // Fill in the headers
@@ -85,8 +85,8 @@ namespace LeanCloud.Common.Internal {
               return;
             }
             if (www.isDone) {
-              uploadProgress.Report(new ParseUploadProgressEventArgs { Progress = 1 });
-              downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1 });
+              uploadProgress.Report(new AVUploadProgressEventArgs { Progress = 1 });
+              downloadProgress.Report(new AVDownloadProgressEventArgs { Progress = 1 });
 
               var statusCode = GetStatusCode(www);
               // Returns HTTP error if that's the only info we have.
@@ -100,14 +100,14 @@ namespace LeanCloud.Common.Internal {
               // Update upload progress
               var newUploadProgress = www.uploadProgress;
               if (oldUploadProgress < newUploadProgress) {
-                uploadProgress.Report(new ParseUploadProgressEventArgs { Progress = newUploadProgress });
+                uploadProgress.Report(new AVUploadProgressEventArgs { Progress = newUploadProgress });
               }
               oldUploadProgress = newUploadProgress;
 
               // Update download progress
               var newDownloadProgress = www.progress;
               if (oldDownloadProgress < newDownloadProgress) {
-                downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = newDownloadProgress });
+                downloadProgress.Report(new AVDownloadProgressEventArgs { Progress = newDownloadProgress });
               }
               oldDownloadProgress = newDownloadProgress;
             }

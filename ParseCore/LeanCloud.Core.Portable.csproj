@@ -41,7 +41,24 @@
     <!-- Assembly info, etc. -->
     <Compile Include="Properties\*.cs" />
     <Compile Include="Internal\**\*.cs" />
-    <Compile Include="Public\**\*.cs" Exclude="**\Unity\**" />
+    <Compile Include="Public\ParseACL.cs" />
+    <Compile Include="Public\ParseClassNameAttribute.cs" />
+    <Compile Include="Public\ParseClient.cs" />
+    <Compile Include="Public\ParseCloud.cs" />
+    <Compile Include="Public\ParseConfig.cs" />
+    <Compile Include="Public\ParseException.cs" />
+    <Compile Include="Public\ParseExtensions.cs" />
+    <Compile Include="Public\ParseFieldNameAttribute.cs" />
+    <Compile Include="Public\AVFile.cs" />
+    <Compile Include="Public\ParseGeoDistance.cs" />
+    <Compile Include="Public\ParseGeoPoint.cs" />
+    <Compile Include="Public\ParseObject.cs" />
+    <Compile Include="Public\ParseQuery.cs" />
+    <Compile Include="Public\ParseQueryExtensions.cs" />
+    <Compile Include="Public\ParseRelation.cs" />
+    <Compile Include="Public\ParseRole.cs" />
+    <Compile Include="Public\ParseSession.cs" />
+    <Compile Include="Public\ParseUser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ParseCommon\LeanCloud.Storage.Portable.csproj">

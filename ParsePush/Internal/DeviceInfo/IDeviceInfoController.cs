@@ -16,7 +16,7 @@ namespace LeanCloud.Push.Internal {
     /// </summary>
     /// <param name="installation">Installation to be mutated.</param>
     /// <returns></returns>
-    Task ExecuteParseInstallationSaveHookAsync(ParseInstallation installation);
+    Task ExecuteParseInstallationSaveHookAsync(AVInstallation installation);
 
     void Initialize();
   }

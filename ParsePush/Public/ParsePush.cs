@@ -23,7 +23,7 @@ namespace LeanCloud {
       mutex = new object();
       // Default to everyone.
       state = new MutablePushState {
-        Query = ParseInstallation.Query
+        Query = AVInstallation.Query
       };
     }
 
@@ -34,7 +34,7 @@ namespace LeanCloud {
     /// this push.
     /// This should not be used in tandem with Channels.
     /// </summary>
-    public AVQuery<ParseInstallation> Query {
+    public AVQuery<AVInstallation> Query {
       get { return state.Query; }
       set {
         MutateState(s => {
@@ -52,7 +52,7 @@ namespace LeanCloud {
     ///
     /// <code>
     /// var push = new Push();
-    /// push.Query = ParseInstallation.Query.WhereKeyContainedIn("channels", channels);
+    /// push.Query = AVInstallation.Query.WhereKeyContainedIn("channels", channels);
     /// </code>
     ///
     /// This cannot be used in tandem with Query.
@@ -273,7 +273,7 @@ namespace LeanCloud {
     /// </summary>
     /// <param name="alert">The alert message to send.</param>
     /// <param name="query">A query filtering the devices which should receive this Push Notification.</param>
-    public static Task SendAlertAsync(string alert, AVQuery<ParseInstallation> query) {
+    public static Task SendAlertAsync(string alert, AVQuery<AVInstallation> query) {
       var push = new ParsePush();
       push.Query = query;
       push.Alert = alert;
@@ -346,7 +346,7 @@ namespace LeanCloud {
     /// </summary>
     /// <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
     /// <param name="query">A query filtering the devices which should receive this Push Notification.</param>
-    public static Task SendDataAsync(IDictionary<string, object> data, AVQuery<ParseInstallation> query) {
+    public static Task SendDataAsync(IDictionary<string, object> data, AVQuery<AVInstallation> query) {
       var push = new ParsePush();
       push.Query = query;
       push.Data = data;
@@ -379,7 +379,7 @@ namespace LeanCloud {
     /// Subscribe the current installation to this channel. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.AddUniqueToList("channels", channel);
     /// installation.SaveAsync();
     /// </code>
@@ -393,7 +393,7 @@ namespace LeanCloud {
     /// Subscribe the current installation to this channel. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.AddUniqueToList("channels", channel);
     /// installation.SaveAsync(cancellationToken);
     /// </code>
@@ -408,7 +408,7 @@ namespace LeanCloud {
     /// Subscribe the current installation to these channels. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.AddRangeUniqueToList("channels", channels);
     /// installation.SaveAsync();
     /// </code>
@@ -422,7 +422,7 @@ namespace LeanCloud {
     /// Subscribe the current installation to these channels. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.AddRangeUniqueToList("channels", channels);
     /// installation.SaveAsync(cancellationToken);
     /// </code>
@@ -437,7 +437,7 @@ namespace LeanCloud {
     /// Unsubscribe the current installation from this channel. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.Remove("channels", channel);
     /// installation.SaveAsync();
     /// </code>
@@ -451,7 +451,7 @@ namespace LeanCloud {
     /// Unsubscribe the current installation from this channel. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.Remove("channels", channel);
     /// installation.SaveAsync(cancellationToken);
     /// </code>
@@ -466,7 +466,7 @@ namespace LeanCloud {
     /// Unsubscribe the current installation from these channels. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.RemoveAllFromList("channels", channels);
     /// installation.SaveAsync();
     /// </code>
@@ -480,7 +480,7 @@ namespace LeanCloud {
     /// Unsubscribe the current installation from these channels. This is shorthand for:
     ///
     /// <code>
-    /// var installation = ParseInstallation.CurrentInstallation;
+    /// var installation = AVInstallation.CurrentInstallation;
     /// installation.RemoveAllFromList("channels", channels);
     /// installation.SaveAsync(cancellationToken);
     /// </code>

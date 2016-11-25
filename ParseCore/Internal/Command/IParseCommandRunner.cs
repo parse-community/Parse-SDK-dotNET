@@ -17,8 +17,8 @@ namespace LeanCloud.Core.Internal {
     /// <param name="cancellationToken">The cancellation token for the request.</param>
     /// <returns></returns>
     Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(AVCommand command,
-        IProgress<ParseUploadProgressEventArgs> uploadProgress = null,
-        IProgress<ParseDownloadProgressEventArgs> downloadProgress = null,
+        IProgress<AVUploadProgressEventArgs> uploadProgress = null,
+        IProgress<AVDownloadProgressEventArgs> downloadProgress = null,
         CancellationToken cancellationToken = default(CancellationToken));
   }
 }

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace LeanCloud {
-  public partial class ParseInstallation : AVObject {
+  public partial class AVInstallation : AVObject {
     /// <summary>
     /// iOS Badge.
     /// </summary>

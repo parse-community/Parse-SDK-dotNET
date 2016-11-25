@@ -13,7 +13,7 @@ using LocalNotification = UnityEngine.iOS.LocalNotification;
 using NotificationServices = UnityEngine.iOS.NotificationServices;
 
 namespace LeanCloud {
-  public partial class ParseInstallation : AVObject {
+  public partial class AVInstallation : AVObject {
     /// <summary>
     /// iOS Badge.
     /// </summary>

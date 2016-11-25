@@ -21,7 +21,7 @@ namespace LeanCloud {
       UIApplication application = UIApplication.SharedApplication;
       var payload = PushJson(userInfo);
 
-      parsePushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
+      parsePushNotificationReceived.Invoke(AVInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
     }
 
     /// <summary>

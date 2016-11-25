@@ -29,7 +29,7 @@ namespace ParseTest {
       mockController.Setup(obj => obj.SaveAsync(It.IsAny<FileState>(),
           It.IsAny<Stream>(),
           It.IsAny<string>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
           It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
       var mockCurrentUserController = new Mock<IAVCurrentUserController>();
       AVPlugins.Instance = new AVPlugins {

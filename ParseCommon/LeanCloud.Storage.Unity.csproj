@@ -7,8 +7,8 @@
     <ProjectGuid>{196457AA-9BA0-40BC-91A3-21BAAD6F4169}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Parse.Common</RootNamespace>
-    <AssemblyName>Parse.Common</AssemblyName>
+    <RootNamespace>LeanCloud.Storage</RootNamespace>
+    <AssemblyName>LeanCloud.Storage</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
@@ -36,7 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>5</LangVersion>
-    <DocumentationFile>bin\Release\Unity\Parse.Common.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Unity\LeanCloud.Storage.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

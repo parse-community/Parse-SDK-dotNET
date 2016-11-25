@@ -4,6 +4,6 @@ using LeanCloud.Core.Internal;
 using System;
 
 namespace LeanCloud.Push.Internal {
-  public interface IParseCurrentInstallationController : IAVObjectCurrentController<ParseInstallation> {
+  public interface IParseCurrentInstallationController : IAVObjectCurrentController<AVInstallation> {
   }
 }

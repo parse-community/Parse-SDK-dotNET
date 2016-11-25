@@ -39,11 +39,11 @@ namespace LeanCloud.Common.Internal {
     private NetHttpClient client;
 
     public Task<Tuple<HttpStatusCode, string>> ExecuteAsync(HttpRequest httpRequest,
-        IProgress<ParseUploadProgressEventArgs> uploadProgress,
-        IProgress<ParseDownloadProgressEventArgs> downloadProgress,
+        IProgress<AVUploadProgressEventArgs> uploadProgress,
+        IProgress<AVDownloadProgressEventArgs> downloadProgress,
         CancellationToken cancellationToken) {
-      uploadProgress = uploadProgress ?? new Progress<ParseUploadProgressEventArgs>();
-      downloadProgress = downloadProgress ?? new Progress<ParseDownloadProgressEventArgs>();
+      uploadProgress = uploadProgress ?? new Progress<AVUploadProgressEventArgs>();
+      downloadProgress = downloadProgress ?? new Progress<AVDownloadProgressEventArgs>();
 
       HttpMethod httpMethod = new HttpMethod(httpRequest.Method);
       HttpRequestMessage message = new HttpRequestMessage(httpMethod, httpRequest.Uri);
@@ -73,13 +73,13 @@ namespace LeanCloud.Common.Internal {
       message.Headers.IfModifiedSince = DateTimeOffset.UtcNow;
 
       // TODO: (richardross) investigate progress here, maybe there's something we're missing in order to support this.
-      uploadProgress.Report(new ParseUploadProgressEventArgs { Progress = 0 });
+      uploadProgress.Report(new AVUploadProgressEventArgs { Progress = 0 });
 
       return client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken)
         .ContinueWith(httpMessageTask => {
           var response = httpMessageTask.Result;
 
-          uploadProgress.Report(new ParseUploadProgressEventArgs { Progress = 1 });
+          uploadProgress.Report(new AVUploadProgressEventArgs { Progress = 1 });
 
           return response.Content.ReadAsStreamAsync().ContinueWith(streamTask => {
             var resultStream = new MemoryStream();
@@ -109,7 +109,7 @@ namespace LeanCloud.Common.Internal {
                 readSoFar += bytesRead;
 
                 if (totalLength > -1) {
-                  downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1.0 * readSoFar / totalLength });
+                  downloadProgress.Report(new AVDownloadProgressEventArgs { Progress = 1.0 * readSoFar / totalLength });
                 }
               });
             }).ContinueWith(_ => {
@@ -118,7 +118,7 @@ namespace LeanCloud.Common.Internal {
             }).Unwrap().OnSuccess(_ => {
               // If getting stream size is not supported, then report download only once.
               if (totalLength == -1) {
-                downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1.0 });
+                downloadProgress.Report(new AVDownloadProgressEventArgs { Progress = 1.0 });
               }
 
               // Assume UTF-8 encoding.

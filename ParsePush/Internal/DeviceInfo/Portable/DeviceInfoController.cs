@@ -28,7 +28,7 @@ namespace LeanCloud.Push.Internal {
       get { return null; }
     }
 
-    public Task ExecuteParseInstallationSaveHookAsync(ParseInstallation installation) {
+    public Task ExecuteParseInstallationSaveHookAsync(AVInstallation installation) {
       return Task.FromResult<object>(null);
     }
 

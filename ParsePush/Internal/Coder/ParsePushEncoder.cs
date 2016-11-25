@@ -26,7 +26,7 @@ namespace LeanCloud.Push.Internal {
       }
 
       var data = state.Data ?? new Dictionary<string, object> { { "alert", state.Alert } };
-      var query = state.Query ?? ParseInstallation.Query;
+      var query = state.Query ?? AVInstallation.Query;
       if (state.Channels != null) {
         query = query.WhereContainedIn("channels", state.Channels);
       }

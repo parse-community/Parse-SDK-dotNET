@@ -20,7 +20,7 @@ namespace LeanCloud.Push.Internal {
         TimeZoneInfo tzInfo = TimeZoneInfo.Local;
 
         string deviceTimeZone = null;
-        if (ParseInstallation.TimeZoneNameMap.TryGetValue(tzInfo.StandardName, out deviceTimeZone)) {
+        if (AVInstallation.TimeZoneNameMap.TryGetValue(tzInfo.StandardName, out deviceTimeZone)) {
           return deviceTimeZone;
         }
 
@@ -28,7 +28,7 @@ namespace LeanCloud.Push.Internal {
 
         // If we have an offset that is not a round hour, then use our second map to see if we can
         // convert it or not.
-        if (ParseInstallation.TimeZoneOffsetMap.TryGetValue(utcOffset, out deviceTimeZone)) {
+        if (AVInstallation.TimeZoneOffsetMap.TryGetValue(utcOffset, out deviceTimeZone)) {
           return deviceTimeZone;
         }
 
@@ -63,7 +63,7 @@ namespace LeanCloud.Push.Internal {
       }
     }
 
-    public Task ExecuteParseInstallationSaveHookAsync(ParseInstallation installation) {
+    public Task ExecuteParseInstallationSaveHookAsync(AVInstallation installation) {
       return getToastUriTask.Value.ContinueWith(t => {
         installation.SetIfDifferent("deviceUris", t.Result == null ? null :
           new Dictionary<string, string> {
@@ -80,7 +80,7 @@ namespace LeanCloud.Push.Internal {
     /// </summary>
     /// <param name="attributeName">the attribute name</param>
     /// <returns>the attribute value</returns>
-    /// This is a duplicate of what we have in ParseInstallation. We do it because
+    /// This is a duplicate of what we have in AVInstallation. We do it because
     /// it's easier to maintain this way (rather than referencing <c>PlatformHooks</c> everywhere).
     private string GetAppAttribute(string attributeName) {
       string appManifestName = "WMAppManifest.xml";

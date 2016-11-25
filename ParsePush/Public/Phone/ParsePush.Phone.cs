@@ -18,12 +18,12 @@ namespace LeanCloud {
       DeviceInfoController.GetToastChannelTask.ContinueWith(t => {
         if (t.Result != null) {
           t.Result.ShellToastNotificationReceived += (sender, args) => {
-            toastNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, args);
+            toastNotificationReceived.Invoke(AVInstallation.CurrentInstallation, args);
             var payload = PushJson(args);
-            parsePushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
+            parsePushNotificationReceived.Invoke(AVInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
           };
           t.Result.HttpNotificationReceived += (sender, args) => {
-            pushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, args);
+            pushNotificationReceived.Invoke(AVInstallation.CurrentInstallation, args);
 
             // TODO (hallucinogen): revisit this since we haven't officially support this yet.
             var payloadStream = args.Notification.Body;
@@ -32,7 +32,7 @@ namespace LeanCloud {
 
             // Always assume it's a JSON payload.
             var payload = Json.Parse(payloadString) as IDictionary<string, object>;
-            parsePushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
+            parsePushNotificationReceived.Invoke(AVInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(payload));
           };
         }
       });

@@ -10,11 +10,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{68E871
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{D84CEB01-FEB3-4E91-B704-D47C5A146EFB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{D84CEB01-FEB3-4E91-B704-D47C5A146EFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeanCloud.Storage.Portable", "ParseCommon\LeanCloud.Storage.Portable.csproj", "{DE07A443-9619-4BD7-B540-41296F8A2959}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseCommon.Unity", "ParseCommon\ParseCommon.Unity.csproj", "{196457AA-9BA0-40BC-91A3-21BAAD6F4169}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeanCloud.Storage.Unity", "ParseCommon\LeanCloud.Storage.Unity.csproj", "{196457AA-9BA0-40BC-91A3-21BAAD6F4169}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{F9EC5355-F32F-4582-9A34-980C4B86C8A3}"
 EndProject
@@ -46,7 +46,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{2CEA544F-5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseAnalytics.Test.Unit.NetFx45", "ParseAnalytics\Test\ParseAnalytics.Test.Unit.NetFx45.csproj", "{5E1D2160-915E-4F67-AD55-918BFCB57F5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParseCore.Unity", "ParseCore\ParseCore.Unity.csproj", "{27D3F5E9-CA66-426B-BE69-9B6158071A35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeanCloud.Core.Unity", "ParseCore\LeanCloud.Core.Unity.csproj", "{27D3F5E9-CA66-426B-BE69-9B6158071A35}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeanCloud.Core.Portable", "ParseCore\LeanCloud.Core.Portable.csproj", "{F3F65351-2CE1-4412-84B4-C36F34EAB928}"
 EndProject
@@ -62,7 +62,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsePush.Phone", "ParsePus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsePush.Unity.Android", "ParsePush\ParsePush.Unity.Android.csproj", "{CF036943-9D9C-4DC8-B31C-38C4E5A9069F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsePush.Unity.iOS", "ParsePush\ParsePush.Unity.iOS.csproj", "{C805F141-F6F1-46B8-90F5-E8C83D7DC534}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeanCloud.Unity.iOS", "ParsePush\LeanCloud.Unity.iOS.csproj", "{C805F141-F6F1-46B8-90F5-E8C83D7DC534}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsePush.WinRT", "ParsePush\ParsePush.WinRT.csproj", "{871208ED-7C81-490B-BFCE-9BCF3B58A8AB}"
 EndProject

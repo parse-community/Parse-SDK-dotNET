@@ -34,7 +34,7 @@ namespace LeanCloud.Push.Internal {
           behavior.Initialize();
         }
 
-        ParsePush.parsePushNotificationReceived.Invoke(ParseInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(pushPayloadString));
+        ParsePush.parsePushNotificationReceived.Invoke(AVInstallation.CurrentInstallation, new ParsePushNotificationEventArgs(pushPayloadString));
       }
 
       /// <summary>
@@ -45,7 +45,7 @@ namespace LeanCloud.Push.Internal {
       internal void OnGcmRegistrationReceived(string registrationId) {
         Initialize();
 
-        var installation = ParseInstallation.CurrentInstallation;
+        var installation = AVInstallation.CurrentInstallation;
         installation.DeviceToken = registrationId;
         // Set `pushType` via internal `Set` method since we want to skip mutability check.
         installation.Set("pushType", "gcm");
@@ -68,7 +68,7 @@ namespace LeanCloud.Push.Internal {
           TimeZoneInfo tzInfo = TimeZoneInfo.Local;
 
           string deviceTimeZone = null;
-          if (ParseInstallation.TimeZoneNameMap.TryGetValue(tzInfo.StandardName, out deviceTimeZone)) {
+          if (AVInstallation.TimeZoneNameMap.TryGetValue(tzInfo.StandardName, out deviceTimeZone)) {
             return deviceTimeZone;
           }
 
@@ -76,7 +76,7 @@ namespace LeanCloud.Push.Internal {
 
           // If we have an offset that is not a round hour, then use our second map to see if we can
           // convert it or not.
-          if (ParseInstallation.TimeZoneOffsetMap.TryGetValue(utcOffset, out deviceTimeZone)) {
+          if (AVInstallation.TimeZoneOffsetMap.TryGetValue(utcOffset, out deviceTimeZone)) {
             return deviceTimeZone;
           }
 
@@ -110,7 +110,7 @@ namespace LeanCloud.Push.Internal {
       get { return appName; }
     }
 
-    public Task ExecuteParseInstallationSaveHookAsync(ParseInstallation installation) {
+    public Task ExecuteParseInstallationSaveHookAsync(AVInstallation installation) {
       return Task.Run(() => {
         installation.SetIfDifferent("badge", installation.Badge);
       });

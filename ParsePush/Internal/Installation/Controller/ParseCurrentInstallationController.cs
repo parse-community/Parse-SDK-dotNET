@@ -25,8 +25,8 @@ namespace LeanCloud.Push.Internal {
       this.installationCoder = installationCoder;
     }
 
-    private ParseInstallation currentInstallation;
-    internal ParseInstallation CurrentInstallation {
+    private AVInstallation currentInstallation;
+    internal AVInstallation CurrentInstallation {
       get {
         lock (mutex) {
           return currentInstallation;
@@ -39,7 +39,7 @@ namespace LeanCloud.Push.Internal {
       }
     }
 
-    public Task SetAsync(ParseInstallation installation, CancellationToken cancellationToken) {
+    public Task SetAsync(AVInstallation installation, CancellationToken cancellationToken) {
       return taskQueue.Enqueue(toAwait => {
         return toAwait.ContinueWith(_ => {
           Task saveTask = storageController.LoadAsync().OnSuccess(storage => {
@@ -57,12 +57,12 @@ namespace LeanCloud.Push.Internal {
       }, cancellationToken);
     }
 
-    public Task<ParseInstallation> GetAsync(CancellationToken cancellationToken) {
-      ParseInstallation cachedCurrent;
+    public Task<AVInstallation> GetAsync(CancellationToken cancellationToken) {
+      AVInstallation cachedCurrent;
       cachedCurrent = CurrentInstallation;
 
       if (cachedCurrent != null) {
-        return Task<ParseInstallation>.FromResult(cachedCurrent);
+        return Task<AVInstallation>.FromResult(cachedCurrent);
       }
 
       return taskQueue.Enqueue(toAwait => {
@@ -72,14 +72,14 @@ namespace LeanCloud.Push.Internal {
             object temp;
             stroage.Result.TryGetValue(ParseInstallationKey, out temp);
             var installationDataString = temp as string;
-            ParseInstallation installation = null;
+            AVInstallation installation = null;
             if (installationDataString != null) {
               var installationData = Json.Parse(installationDataString) as IDictionary<string, object>;
               installation = installationCoder.Decode(installationData);
 
               fetchTask = Task.FromResult<object>(null);
             } else {
-              installation = AVObject.Create<ParseInstallation>();
+              installation = AVObject.Create<AVInstallation>();
               fetchTask = installationIdController.GetAsync().ContinueWith(t => {
                 installation.SetIfDifferent("installationId" , t.Result.ToString());
               });
@@ -104,7 +104,7 @@ namespace LeanCloud.Push.Internal {
       }, cancellationToken);
     }
 
-    public bool IsCurrent(ParseInstallation installation) {
+    public bool IsCurrent(AVInstallation installation) {
       return CurrentInstallation == installation;
     }
 

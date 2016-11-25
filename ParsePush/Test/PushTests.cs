@@ -55,7 +55,7 @@ namespace ParseTest {
     [AsyncStateMachine(typeof(PushTests))]
     public Task TestSendPush() {
       MutablePushState state = new MutablePushState {
-        Query = ParseInstallation.Query
+        Query = AVInstallation.Query
       };
 
       ParsePush thePush = new ParsePush();
@@ -78,7 +78,7 @@ namespace ParseTest {
         Assert.True(t.IsCompleted);
         Assert.False(t.IsFaulted);
 
-        AVQuery<ParseInstallation> query = new AVQuery<ParseInstallation>("aClass");
+        AVQuery<AVInstallation> query = new AVQuery<AVInstallation>("aClass");
         thePush.Query = query;
         state.Query = query;
 

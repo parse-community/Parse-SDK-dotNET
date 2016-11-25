@@ -25,7 +25,7 @@ namespace LeanCloud.Push.Internal {
         TimeZoneInfo tzInfo = TimeZoneInfo.Local;
 
         string deviceTimeZone = null;
-        if (ParseInstallation.TimeZoneNameMap.TryGetValue(tzInfo.StandardName, out deviceTimeZone)) {
+        if (AVInstallation.TimeZoneNameMap.TryGetValue(tzInfo.StandardName, out deviceTimeZone)) {
           return deviceTimeZone;
         }
 
@@ -33,7 +33,7 @@ namespace LeanCloud.Push.Internal {
 
         // If we have an offset that is not a round hour, then use our second map to see if we can
         // convert it or not.
-        if (ParseInstallation.TimeZoneOffsetMap.TryGetValue(utcOffset, out deviceTimeZone)) {
+        if (AVInstallation.TimeZoneOffsetMap.TryGetValue(utcOffset, out deviceTimeZone)) {
           return deviceTimeZone;
         }
 
@@ -81,7 +81,7 @@ namespace LeanCloud.Push.Internal {
       }
     }
 
-    public Task ExecuteParseInstallationSaveHookAsync(ParseInstallation installation) {
+    public Task ExecuteParseInstallationSaveHookAsync(AVInstallation installation) {
       return GetChannelTask.ContinueWith(t => {
         installation.SetIfDifferent("deviceUris", new Dictionary<string, string> {
           { defaultChannelTag, t.Result.Uri }

@@ -21,7 +21,7 @@ namespace LeanCloud {
   ///  the number of devices which were active in the last N hours).
   /// </summary>
   [AVClassName("_Installation")]
-  public partial class ParseInstallation : AVObject {
+  public partial class AVInstallation : AVObject {
     private static readonly HashSet<string> readOnlyKeys = new HashSet<string> {
       "deviceType", "deviceUris", "installationId", "timeZone", "localeIdentifier", "parseVersion", "appName", "appIdentifier", "appVersion", "pushType"
     };
@@ -39,17 +39,17 @@ namespace LeanCloud {
     }
 
     /// <summary>
-    /// Constructs a new ParseInstallation. Generally, you should not need to construct
+    /// Constructs a new AVInstallation. Generally, you should not need to construct
     /// ParseInstallations yourself. Instead use <see cref="CurrentInstallation"/>.
     /// </summary>
-    public ParseInstallation()
+    public AVInstallation()
       : base() {
     }
 
     /// <summary>
-    /// Gets the ParseInstallation representing this app on this device.
+    /// Gets the AVInstallation representing this app on this device.
     /// </summary>
-    public static ParseInstallation CurrentInstallation {
+    public static AVInstallation CurrentInstallation {
       get {
         var task = CurrentInstallationController.GetAsync(CancellationToken.None);
         // TODO (hallucinogen): this will absolutely break on Unity, but how should we resolve this?
@@ -77,9 +77,9 @@ namespace LeanCloud {
     /// You can add additional query conditions, but one of the above must appear as a top-level <c>AND</c>
     /// clause in the query.
     /// </remarks>
-    public static AVQuery<ParseInstallation> Query {
+    public static AVQuery<AVInstallation> Query {
       get {
-        return new AVQuery<ParseInstallation>();
+        return new AVQuery<AVInstallation>();
       }
     }
 
@@ -250,7 +250,7 @@ namespace LeanCloud {
     }
 
     private Version GetParseVersion() {
-      return new AssemblyName(typeof(ParseInstallation).GetTypeInfo().Assembly.FullName).Version;
+      return new AssemblyName(typeof(AVInstallation).GetTypeInfo().Assembly.FullName).Version;
     }
 
     /// <summary>

@@ -47,8 +47,8 @@ namespace ParseTest {
       var mockInstallationIdController = new Mock<IInstallationIdController>();
       var fakeResponse = Task<Tuple<HttpStatusCode, string>>.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "{}"));
       mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
@@ -70,8 +70,8 @@ namespace ParseTest {
       var mockInstallationIdController = new Mock<IInstallationIdController>();
       var fakeResponse = Task<Tuple<HttpStatusCode, string>>.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "[]"));
       mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
@@ -95,8 +95,8 @@ namespace ParseTest {
       var mockInstallationIdController = new Mock<IInstallationIdController>();
       var fakeResponse = Task<Tuple<HttpStatusCode, string>>.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "invalid"));
       mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
@@ -119,8 +119,8 @@ namespace ParseTest {
       var mockInstallationIdController = new Mock<IInstallationIdController>();
       var fakeResponse = Task<Tuple<HttpStatusCode, string>>.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.NotFound, "{ \"code\": 101, \"error\": \"Object not found.\" }"));
       mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
@@ -144,8 +144,8 @@ namespace ParseTest {
       var mockInstallationIdController = new Mock<IInstallationIdController>();
       var fakeResponse = Task<Tuple<HttpStatusCode, string>>.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.InternalServerError, null));
       mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(),
-          It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-          It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVUploadProgressEventArgs>>(),
+          It.IsAny<IProgress<AVDownloadProgressEventArgs>>(),
           It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
       mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));

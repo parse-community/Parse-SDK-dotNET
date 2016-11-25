@@ -157,7 +157,7 @@ namespace LeanCloud {
     /// Saves the file to the LeanCloud cloud.
     /// </summary>
     /// <param name="progress">The progress callback.</param>
-    public Task SaveAsync(IProgress<ParseUploadProgressEventArgs> progress) {
+    public Task SaveAsync(IProgress<AVUploadProgressEventArgs> progress) {
       return SaveAsync(progress, CancellationToken.None);
     }
 
@@ -166,7 +166,7 @@ namespace LeanCloud {
     /// </summary>
     /// <param name="progress">The progress callback.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public Task SaveAsync(IProgress<ParseUploadProgressEventArgs> progress,
+    public Task SaveAsync(IProgress<AVUploadProgressEventArgs> progress,
         CancellationToken cancellationToken) {
       return taskQueue.Enqueue(
           toAwait => FileController.SaveAsync(state, dataStream, AVUser.CurrentSessionToken, progress, cancellationToken), cancellationToken)

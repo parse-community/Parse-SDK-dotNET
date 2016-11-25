@@ -7,7 +7,7 @@ using LeanCloud.Common.Internal;
 
 namespace LeanCloud.Push.Internal {
   public class MutablePushState : IPushState {
-    public AVQuery<ParseInstallation> Query { get; set; }
+    public AVQuery<AVInstallation> Query { get; set; }
     public IEnumerable<string> Channels { get; set; }
     public DateTime? Expiration { get; set; }
     public TimeSpan? ExpirationInterval { get; set; }

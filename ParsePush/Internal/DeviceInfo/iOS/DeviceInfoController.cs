@@ -33,7 +33,7 @@ namespace LeanCloud.Push.Internal {
       get { return GetAppAttribute("CFBundleDisplayName"); }
     }
 
-    public Task ExecuteParseInstallationSaveHookAsync(ParseInstallation installation) {
+    public Task ExecuteParseInstallationSaveHookAsync(AVInstallation installation) {
       return Task.Run(() => {
         installation.SetIfDifferent("badge", installation.Badge);
       });
@@ -47,7 +47,7 @@ namespace LeanCloud.Push.Internal {
     /// </summary>
     /// <param name="attributeName">the attribute name</param>
     /// <returns>the attribute value</returns>
-    /// This is a duplicate of what we have in ParseInstallation. We do it because
+    /// This is a duplicate of what we have in AVInstallation. We do it because
     /// it's easier to maintain this way (rather than referencing <c>PlatformHooks</c> everywhere).
     private string GetAppAttribute(string attributeName) {
       var appAttributes = NSBundle.MainBundle;

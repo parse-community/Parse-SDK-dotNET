@@ -78,13 +78,13 @@
   </Target>
   -->
   <ItemGroup>
-    <ProjectReference Include="..\ParseCommon\ParseCommon.Unity.csproj">
+    <ProjectReference Include="..\ParseCommon\LeanCloud.Storage.Unity.csproj">
       <Project>{196457aa-9ba0-40bc-91a3-21baad6f4169}</Project>
-      <Name>ParseCommon.Unity</Name>
+      <Name>LeanCloud.Storage.Unity</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ParseCore\ParseCore.Unity.csproj">
+    <ProjectReference Include="..\ParseCore\LeanCloud.Core.Unity.csproj">
       <Project>{27d3f5e9-ca66-426b-be69-9b6158071a35}</Project>
-      <Name>ParseCore.Unity</Name>
+      <Name>LeanCloud.Core.Unity</Name>
     </ProjectReference>
     <ProjectReference Include="..\Unity.Compat\Unity.Compat.csproj">
       <Project>{8473bef6-7086-4414-aad6-264967a7fe75}</Project>
