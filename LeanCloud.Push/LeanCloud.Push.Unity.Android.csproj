@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CF036943-9D9C-4DC8-B31C-38C4E5A9069F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LeanCloud.Push</RootNamespace>
+    <AssemblyName>LeanCloud.Push</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\Unity\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>5</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\Unity\</OutputPath>
+    <DefineConstants>TRACE;UNITY</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>5</LangVersion>
+    <DocumentationFile>bin\Release\Unity\LeanCloud.Push.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <!-- Used for setting excluded files -->
+  <PropertyGroup>
+    <ExcludedPlatformSpecificSourceFilesString>
+          **\Android\**;
+	  **\iOS\**;
+	  **\Portable\**;
+          **\Mono\**;
+          **\NetFx45\**;
+          **\Phone\**;
+	  **\WinRT\**;
+	  **\Unity.iOS\**;
+      </ExcludedPlatformSpecificSourceFilesString>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Assembly info, etc. -->
+    <Compile Include="Properties\*.cs" Exclude="Properties\Settings.Designer.cs" />
+    <Compile Include="Compat\**\*.cs" />
+    <Compile Include="Tasks\**\*.cs" />
+    <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+    <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\LeanCloud.Storage\LeanCloud.Storage.Unity.csproj">
+      <Project>{196457aa-9ba0-40bc-91a3-21baad6f4169}</Project>
+      <Name>LeanCloud.Storage.Unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LeanCloud.Core\LeanCloud.Core.Unity.csproj">
+      <Project>{27d3f5e9-ca66-426b-be69-9b6158071a35}</Project>
+      <Name>LeanCloud.Core.Unity</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Unity.Compat\Unity.Compat.csproj">
+      <Project>{8473bef6-7086-4414-aad6-264967a7fe75}</Project>
+      <Name>Unity.Compat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Unity.Tasks\Unity.Tasks.csproj">
+      <Project>{ce75c800-a97f-4464-9a8b-3f65258456bf}</Project>
+      <Name>Unity.Tasks</Name>
+    </ProjectReference>
+  </ItemGroup>
+</Project>
