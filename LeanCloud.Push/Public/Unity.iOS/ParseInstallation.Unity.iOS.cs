@@ -7,7 +7,7 @@ using System.Text;
 using System.Collections;
 using System.Reflection;
 using System.Threading.Tasks;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using UnityEngine;
 using LocalNotification = UnityEngine.iOS.LocalNotification;
 using NotificationServices = UnityEngine.iOS.NotificationServices;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LeanCloud.Utilities;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// Provides a Dictionary implementation that can delegate to any other
   /// dictionary, regardless of its value type. Used for coercion of

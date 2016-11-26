@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   public class LockSet {
     private static readonly ConditionalWeakTable<object, IComparable> stableIds =
         new ConditionalWeakTable<object, IComparable>();

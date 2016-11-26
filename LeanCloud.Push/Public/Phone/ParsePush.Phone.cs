@@ -9,7 +9,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using LeanCloud.Push.Internal;
 
 namespace LeanCloud {

@@ -1,6 +1,6 @@
 using System;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   [AttributeUsage(AttributeTargets.Assembly)]
   public class AVModuleAttribute : Attribute {
     /// <summary>

@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace LeanCloud.Common.Internal
+namespace LeanCloud.Storage.Internal
 {
     /// <summary>
     /// An equality comparer that uses the object identity (i.e. ReferenceEquals)

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// A reimplementation of Xamarin's PreserveAttribute.
   /// This allows us to support AOT and linking for Xamarin platforms.

@@ -13,7 +13,7 @@ using NetHttpClient = System.Net.Http.HttpClient;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   public class HttpClient : IHttpClient {
     private static HashSet<string> HttpContentHeaders = new HashSet<string> {
       { "Allow" },

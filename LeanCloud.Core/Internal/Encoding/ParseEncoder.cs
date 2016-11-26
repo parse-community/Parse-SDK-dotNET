@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using LeanCloud.Utilities;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud.Core.Internal {
   /// <summary>
-  /// A <c>AVEncoder</c> can be used to transform objects such as <see cref="ParseObject"/> into JSON
+  /// A <c>AVEncoder</c> can be used to transform objects such as <see cref="AVObject"/> into JSON
   /// data structures.
   /// </summary>
   /// <seealso cref="AVDecoder"/>

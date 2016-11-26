@@ -98,6 +98,10 @@
     <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\LeanCloud.Core\LeanCloud.Core.Portable.csproj">
+      <Project>{f3f65351-2ce1-4412-84b4-c36f34eab928}</Project>
+      <Name>LeanCloud.Core.Portable</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LeanCloud.Storage\LeanCloud.Storage.Portable.csproj">
       <Project>{de07a443-9619-4bd7-b540-41296f8a2959}</Project>
       <Name>LeanCloud.Storage.Portable</Name>

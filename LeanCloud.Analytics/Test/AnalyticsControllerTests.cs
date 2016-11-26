@@ -3,7 +3,7 @@ using NUnit.Framework;
 using LeanCloud;
 using LeanCloud.Analytics.Internal;
 using LeanCloud.Core.Internal;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -21,7 +21,7 @@ namespace ParseTest {
     public void SetUp() {
       AVClient.Initialize(new AVClient.Configuration {
         ApplicationId = "",
-        WindowsKey = ""
+        ApplicationKey = ""
       });
     }
 

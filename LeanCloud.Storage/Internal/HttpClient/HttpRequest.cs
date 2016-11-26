@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// <code>IHttpRequest</code> is an interface that provides an API to execute HTTP request data.
   /// </summary>

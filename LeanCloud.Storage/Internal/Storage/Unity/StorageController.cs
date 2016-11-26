@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using System.Threading;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// Implements `IStorageController` for PCL targets, based off of PCLStorage.
   /// </summary>

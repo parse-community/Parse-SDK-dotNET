@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using LeanCloud.Core.Internal;
 
 namespace LeanCloud.Push.Internal {

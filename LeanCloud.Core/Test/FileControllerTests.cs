@@ -17,7 +17,7 @@ namespace ParseTest {
     public void SetUp() {
       AVClient.Initialize(new AVClient.Configuration {
         ApplicationId = "",
-        WindowsKey = ""
+        ApplicationKey = ""
       });
     }
 

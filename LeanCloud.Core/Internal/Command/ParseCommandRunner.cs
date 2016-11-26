@@ -5,21 +5,37 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud.Core.Internal
 {
+    /// <summary>
+    /// Command Runner.
+    /// </summary>
     public class AVCommandRunner : IAVCommandRunner
     {
         private readonly IHttpClient httpClient;
         private readonly IInstallationIdController installationIdController;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="httpClient"></param>
+        /// <param name="installationIdController"></param>
         public AVCommandRunner(IHttpClient httpClient, IInstallationIdController installationIdController)
         {
             this.httpClient = httpClient;
             this.installationIdController = installationIdController;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="uploadProgress"></param>
+        /// <param name="downloadProgress"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(AVCommand command,
             IProgress<AVUploadProgressEventArgs> uploadProgress = null,
             IProgress<AVDownloadProgressEventArgs> downloadProgress = null,
@@ -120,7 +136,7 @@ namespace LeanCloud.Core.Internal
             }
             else
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-Key", configuration.WindowsKey));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-Key", configuration.ApplicationKey));
             }
 
             // TODO (richardross): Inject this instead of using static here.

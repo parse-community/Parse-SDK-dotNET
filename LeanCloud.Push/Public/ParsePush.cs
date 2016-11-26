@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using LeanCloud.Push.Internal;
 using LeanCloud.Core.Internal;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud {
   /// <summary>

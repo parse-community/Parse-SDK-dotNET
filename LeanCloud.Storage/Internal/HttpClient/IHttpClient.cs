@@ -5,7 +5,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   public interface IHttpClient {
     /// <summary>
     /// Executes HTTP request to a <see cref="HttpRequest.Uri"/> with <see cref="HttpRequest.Method"/> HTTP verb

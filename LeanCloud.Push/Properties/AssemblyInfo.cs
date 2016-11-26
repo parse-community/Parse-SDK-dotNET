@@ -3,7 +3,7 @@
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using LeanCloud.Push.Internal;
 
 // General Information about an assembly is controlled through the following

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using AssemblyLister;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// The class which controls the loading of other ParseModules
   /// </summary>

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud {
   /// <summary>
@@ -30,7 +30,7 @@ namespace LeanCloud {
     }
 
     /// <summary>
-    /// Constructs a <see cref="ParseQuery{ParseSession}"/> for AVSession.
+    /// Constructs a <see cref="AVQuery{ParseSession}"/> for AVSession.
     /// </summary>
     public static AVQuery<AVSession> Query {
       get {
@@ -45,14 +45,14 @@ namespace LeanCloud {
     }
 
     /// <summary>
-    /// Gets the current <see cref="ParseSession"/> object related to the current user.
+    /// Gets the current <see cref="AVSession"/> object related to the current user.
     /// </summary>
     public static Task<AVSession> GetCurrentSessionAsync() {
       return GetCurrentSessionAsync(CancellationToken.None);
     }
 
     /// <summary>
-    /// Gets the current <see cref="ParseSession"/> object related to the current user.
+    /// Gets the current <see cref="AVSession"/> object related to the current user.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token</param>
     public static Task<AVSession> GetCurrentSessionAsync(CancellationToken cancellationToken) {

@@ -3,7 +3,7 @@ using LeanCloud.Core.Internal;
 using Moq;
 using NUnit.Framework;
 using System;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 

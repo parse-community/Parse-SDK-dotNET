@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   public class HttpClient : IHttpClient {
     private static bool isCompiledByIL2CPP = System.AppDomain.CurrentDomain.FriendlyName.Equals("IL2CPP Root Domain");
 

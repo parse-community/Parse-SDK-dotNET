@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// Represents an object that can be converted into JSON.
   /// </summary>

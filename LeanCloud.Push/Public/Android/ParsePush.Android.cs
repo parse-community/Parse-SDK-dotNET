@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.App;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud {
   public partial class AVPush {

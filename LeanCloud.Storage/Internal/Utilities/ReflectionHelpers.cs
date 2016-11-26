@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   public static class ReflectionHelpers {
     public static IEnumerable<PropertyInfo> GetProperties(Type type) {
 #if MONO || UNITY

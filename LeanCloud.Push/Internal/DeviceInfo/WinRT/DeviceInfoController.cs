@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using LeanCloud.Core.Internal;
 using System.Collections.Generic;
 using Windows.ApplicationModel;

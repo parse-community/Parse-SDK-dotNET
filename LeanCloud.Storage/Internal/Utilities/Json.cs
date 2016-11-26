@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// A simple recursive-descent JSON Parser based on the grammar defined at http://www.json.org
   /// and http://tools.ietf.org/html/rfc4627

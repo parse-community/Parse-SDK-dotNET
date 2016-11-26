@@ -1,5 +1,5 @@
 using LeanCloud;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using NUnit.Framework;
 using System;
 using System.Collections;

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using System.Linq;
 
 namespace LeanCloud.Core.Internal {

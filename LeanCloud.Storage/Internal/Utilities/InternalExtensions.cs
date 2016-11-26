@@ -8,7 +8,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// Provides helper methods that allow us to use terser code elsewhere.
   /// </summary>

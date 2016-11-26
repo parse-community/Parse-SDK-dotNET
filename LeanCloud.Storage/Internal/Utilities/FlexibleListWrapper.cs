@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LeanCloud.Utilities;
 
-namespace LeanCloud.Common.Internal {
+namespace LeanCloud.Storage.Internal {
   /// <summary>
   /// Provides a List implementation that can delegate to any other
   /// list, regardless of its value type. Used for coercion of

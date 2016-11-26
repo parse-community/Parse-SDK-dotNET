@@ -3,7 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Threading;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud.Core.Internal {
   /// <summary>

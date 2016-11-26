@@ -1,7 +1,7 @@
 using Moq;
 using NUnit.Framework;
 using LeanCloud;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 using LeanCloud.Core.Internal;
 using System;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace ParseTest {
     public void SetUp() {
       AVClient.Initialize(new AVClient.Configuration {
         ApplicationId = "",
-        WindowsKey = ""
+        ApplicationKey = ""
       });
     }
 

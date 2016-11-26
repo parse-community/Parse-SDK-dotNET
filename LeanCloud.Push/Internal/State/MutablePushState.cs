@@ -3,7 +3,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud.Push.Internal {
   public class MutableAVState : IAVState {

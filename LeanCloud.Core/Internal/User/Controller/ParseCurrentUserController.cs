@@ -6,7 +6,7 @@ using System.Linq;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using LeanCloud.Common.Internal;
+using LeanCloud.Storage.Internal;
 
 namespace LeanCloud.Core.Internal {
   public class AVCurrentUserController : IAVCurrentUserController {
