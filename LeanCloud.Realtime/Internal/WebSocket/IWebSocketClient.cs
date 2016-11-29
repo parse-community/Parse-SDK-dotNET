@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace LeanCloud.Realtime.Internal
 {
-    interface IWebSocketClient
+    public interface IWebSocketClient
     {
         bool IsOpen { get; }
 

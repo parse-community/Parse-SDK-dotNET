@@ -62,7 +62,7 @@ namespace LeanCloud.Storage.Internal {
       }
     }
 
-    public void ParseDidInitialize() {
+    public void LeanCloudDidInitialize() {
       lock (mutex) {
         foreach (IAVModule module in modules) {
           module.OnParseInitialized();

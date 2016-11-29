@@ -1,4 +1,4 @@
-// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+﻿// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using LeanCloud.Core.Internal;
 using System;
@@ -163,6 +163,38 @@ namespace LeanCloud
         {
             get { return GetProperty<string>(null, "Email"); }
             set { SetProperty(value, "Email"); }
+        }
+
+        /// <summary>
+        /// 用户手机号。
+        /// </summary>
+        [AVFieldName("mobilePhoneNumber")]
+        public string MobilePhoneNumber
+        {
+            get
+            {
+                return GetProperty<string>(null, "MobilePhoneNumber");
+            }
+            set
+            {
+                SetProperty<string>(value, "MobilePhoneNumber");
+            }
+        }
+
+        /// <summary>
+        /// 判断用户是否为匿名用户
+        /// </summary>
+        public bool IsAnonymous
+        {
+            get
+            {
+                bool rtn = false;
+                if (this.AuthData != null)
+                {
+                    rtn = this.AuthData.Keys.Contains("anonymous");
+                }
+                return rtn;
+            }
         }
 
         internal Task SignUpAsync(Task toAwait, CancellationToken cancellationToken)
@@ -745,5 +777,290 @@ namespace LeanCloud
                 curUser.SynchronizeAuthData(provider);
             }
         }
+
+        #region 手机号登录
+
+        internal static Task<AVUser> LoginWithParametersAsync(Dictionary<string, object> strs, CancellationToken cancellationToken)
+        {
+            AVUser avUser = AVObject.CreateWithoutData<AVUser>(null);
+
+            return UserController.LogInWithParametersAsync("login", strs, cancellationToken).OnSuccess(t =>
+            {
+                var user = (AVUser)AVObject.CreateWithoutData<AVUser>(null);
+                user.HandleFetchResult(t.Result);
+                return SaveCurrentUserAsync(user).OnSuccess(_ => user);
+            }).Unwrap();
+        }
+
+        /// <summary>
+        /// 以手机号和密码实现登陆。
+        /// </summary>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <param name="password">密码</param>
+        /// <returns></returns>
+        public static Task<AVUser> LogInByMobilePhoneNumberAsync(string mobilePhoneNumber, string password)
+        {
+            return AVUser.LogInByMobilePhoneNumberAsync(mobilePhoneNumber, password, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// 以手机号和验证码匹配登陆
+        /// </summary>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <param name="smsCode">短信验证码</param>
+        /// <returns></returns>
+        public static Task<AVUser> LoginBySmsCodeAsync(string mobilePhoneNumber, string smsCode)
+        {
+            return AVUser.LogInBySmsCodeAsync(mobilePhoneNumber, smsCode, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// 用邮箱作和密码匹配登录
+        /// </summary>
+        /// <param name="email">邮箱</param>
+        /// <param name="password">密码</param>
+        /// <returns></returns>
+        public static Task<AVUser> LogInByEmailAsync(string email, string password)
+        {
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "username", email },
+                { "password", password }
+            };
+            return AVUser.LoginWithParametersAsync(strs, CancellationToken.None);
+        }
+
+
+        /// <summary>
+        /// 以手机号和密码匹配登陆
+        /// </summary>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <param name="password">密码</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static Task<AVUser> LogInByMobilePhoneNumberAsync(string mobilePhoneNumber, string password, CancellationToken cancellationToken)
+        {
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "mobilePhoneNumber", mobilePhoneNumber },
+                { "password", password }
+            };
+            return AVUser.LoginWithParametersAsync(strs, cancellationToken);
+        }
+
+        /// <summary>
+        /// 以手机号和验证码登陆
+        /// </summary>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <param name="smsCode">短信验证码</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static Task<AVUser> LogInBySmsCodeAsync(string mobilePhoneNumber, string smsCode, CancellationToken cancellationToken)
+        {
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "mobilePhoneNumber", mobilePhoneNumber },
+                { "smsCode", smsCode }
+            };
+            return AVUser.LoginWithParametersAsync(strs, cancellationToken);
+        }
+        /// <summary>
+        /// Logins the by SMS code asynchronous.
+        /// </summary>
+        /// <param name="mobilePhoneNumber">The mobile phone number.</param>
+        /// <param name="smsCode">The SMS code.</param>
+        /// <returns></returns>
+        public static Task<AVUser> LogInBySmsCodeAsync(string mobilePhoneNumber, string smsCode)
+        {
+            return LogInBySmsCodeAsync(mobilePhoneNumber, smsCode, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Requests the login SMS code asynchronous.
+        /// </summary>
+        /// <param name="mobilePhoneNumber">The mobile phone number.</param>
+        /// <returns></returns>
+        public static Task<bool> RequestLoginSmsCodeAsync(string mobilePhoneNumber)
+        {
+            return AVUser.RequestLoginSmsCodeAsync(mobilePhoneNumber, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Requests the login SMS code asynchronous.
+        /// </summary>
+        /// <param name="mobilePhoneNumber">The mobile phone number.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns></returns>
+        public static Task<bool> RequestLoginSmsCodeAsync(string mobilePhoneNumber, CancellationToken cancellationToken)
+        {
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "mobilePhoneNumber", mobilePhoneNumber }
+            };
+            var command = new AVCommand("requestLoginSmsCode",
+                method: "POST",
+                sessionToken: CurrentSessionToken,
+                data: strs);
+            return AVPlugins.Instance.CommandRunner.RunCommandAsync(command).ContinueWith(t =>
+            {
+                return AVClient.IsSuccessStatusCode(t.Result.Item1);
+            });
+        }
+
+        /// <summary>
+        /// 手机号一键登录
+        /// </summary>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <param name="smsCode">短信验证码</param>
+        /// <returns></returns>
+        public static Task<AVUser> SignUpOrLoginByMobilePhoneAsync(string mobilePhoneNumber, string smsCode, CancellationToken cancellationToken)
+        {
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "mobilePhoneNumber", mobilePhoneNumber },
+                { "smsCode", smsCode }
+            };
+            return UserController.LogInWithParametersAsync("usersByMobilePhone", strs, cancellationToken).OnSuccess(t =>
+            {
+                var user = (AVUser)AVObject.CreateWithoutData<AVUser>(null);
+                user.HandleFetchResult(t.Result);
+                return SaveCurrentUserAsync(user).OnSuccess(_ => user);
+            }).Unwrap();
+        }
+        #endregion
+        #region 重置密码
+        /// <summary>
+        ///  请求重置密码，需要传入注册时使用的手机号。
+        /// </summary>
+        /// <param name="mobilePhoneNumber">注册时使用的手机号</param>
+        /// <returns></returns>
+        public static Task RequestPasswordResetBySmsCode(string mobilePhoneNumber)
+        {
+            return AVUser.RequestPasswordResetBySmsCode(mobilePhoneNumber, CancellationToken.None);
+        }
+
+        /// <summary>
+        ///  请求重置密码，需要传入注册时使用的手机号。
+        /// </summary>
+        /// <param name="mobilePhoneNumber">注册时使用的手机号</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        public static Task RequestPasswordResetBySmsCode(string mobilePhoneNumber, CancellationToken cancellationToken)
+        {
+            string currentSessionToken = AVUser.CurrentSessionToken;
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "mobilePhoneNumber", mobilePhoneNumber }
+            };
+            var command = new AVCommand("requestPasswordResetBySmsCode",
+                method: "POST",
+                sessionToken: currentSessionToken,
+                data: strs);
+            return AVPlugins.Instance.CommandRunner.RunCommandAsync(command).ContinueWith(t =>
+            {
+                return AVClient.IsSuccessStatusCode(t.Result.Item1);
+            });
+            //return AVClient.RequestAsync("POST", "requestPasswordResetBySmsCode", currentSessionToken, strs, cancellationToken);
+        }
+
+        /// <summary>
+        /// 通过验证码重置密码。
+        /// </summary>
+        /// <param name="newPassword">新密码</param>
+        /// <param name="smsCode">6位数验证码</param>
+        /// <returns></returns>
+        public static Task<bool> ResetPasswordBySmsCodeAsync(string newPassword, string smsCode)
+        {
+            return AVUser.ResetPasswordBySmsCodeAsync(newPassword, smsCode, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// 通过验证码重置密码。
+        /// </summary>
+        /// <param name="newPassword">新密码</param>
+        /// <param name="smsCode">6位数验证码</param>
+        /// <param name="cancellationToken">cancellationToken</param>
+        /// <returns></returns>
+        public static Task<bool> ResetPasswordBySmsCodeAsync(string newPassword, string smsCode, CancellationToken cancellationToken)
+        {
+            string currentSessionToken = AVUser.CurrentSessionToken;
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "password", newPassword }
+            };
+            var command = new AVCommand("resetPasswordBySmsCode/" + smsCode,
+                method: "PUT",
+                sessionToken: currentSessionToken,
+                data: strs);
+            return AVPlugins.Instance.CommandRunner.RunCommandAsync(command).ContinueWith(t =>
+            {
+                return AVClient.IsSuccessStatusCode(t.Result.Item1);
+            });
+        }
+
+        /// <summary>
+        /// 发送认证码到需要认证的手机上
+        /// </summary>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <returns></returns>
+        public static Task<bool> RequestMobilePhoneVerifyAsync(string mobilePhoneNumber)
+        {
+            return AVUser.RequestMobilePhoneVerifyAsync(mobilePhoneNumber, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// 发送认证码到需要认证的手机上
+        /// </summary>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <param name="cancellationToken">CancellationToken</param>
+        /// <returns></returns>
+        public static Task<bool> RequestMobilePhoneVerifyAsync(string mobilePhoneNumber, CancellationToken cancellationToken)
+        {
+            string currentSessionToken = AVUser.CurrentSessionToken;
+            Dictionary<string, object> strs = new Dictionary<string, object>()
+            {
+                { "mobilePhoneNumber", mobilePhoneNumber }
+            };
+            var command = new AVCommand("requestMobilePhoneVerify",
+                method: "POST",
+                sessionToken: currentSessionToken,
+                data: strs);
+            return AVPlugins.Instance.CommandRunner.RunCommandAsync(command).ContinueWith(t =>
+            {
+                return AVClient.IsSuccessStatusCode(t.Result.Item1);
+            });
+        }
+
+        /// <summary>
+        /// 验证手机验证码是否为有效值
+        /// </summary>
+        /// <param name="code">手机收到的验证码</param>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <returns></returns>
+        public static Task<bool> VerifyMobilePhoneAsync(string code, string mobilePhoneNumber)
+        {
+            return AVUser.VerifyMobilePhoneAsync(code, mobilePhoneNumber, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// 验证手机验证码是否为有效值
+        /// </summary>
+        /// <param name="code">手机收到的验证码</param>
+        /// <param name="mobilePhoneNumber">手机号</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static Task<bool> VerifyMobilePhoneAsync(string code, string mobilePhoneNumber, CancellationToken cancellationToken)
+        {
+            var command = new AVCommand("verifyMobilePhone" + code.Trim() + "?mobilePhoneNumber=" + mobilePhoneNumber.Trim(),
+                method: "POST",
+                sessionToken: null,
+                data: null);
+            return AVPlugins.Instance.CommandRunner.RunCommandAsync(command).ContinueWith(t =>
+            {
+                return AVClient.IsSuccessStatusCode(t.Result.Item1);
+            });
+        }
+
+        #endregion
     }
 }

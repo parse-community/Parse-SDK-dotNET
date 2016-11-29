@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace LeanCloud.Realtime.Internal
 {
-    internal class ConversationCommand: AVIMCommand
+    internal class ConversationCommand : AVIMCommand
     {
         protected IList<string> members;
-        public ConversationCommand() 
+        public ConversationCommand()
             : base(cmd: "conv")
         {
 
         }
 
         public ConversationCommand(AVIMCommand source)
-            :base(source: source)
+            : base(source: source)
         {
         }
 
@@ -43,17 +43,31 @@ namespace LeanCloud.Realtime.Internal
 
         public ConversationCommand Unique(bool isUnique)
         {
-            return new ConversationCommand(this.Argument("unique ", isUnique));
+            return new ConversationCommand(this.Argument("unique", isUnique));
         }
 
         public ConversationCommand Attr(IDictionary<string, object> attr)
         {
-            return new ConversationCommand(this.Argument("attr ", attr));
+            return new ConversationCommand(this.Argument("attr", attr));
+        }
+
+        public ConversationCommand Set(string key, object value)
+        {
+            return new ConversationCommand(this.Argument(key, value));
         }
 
         public ConversationCommand ConId(string conversationId)
         {
             return new ConversationCommand(this.Argument("cid", conversationId));
+        }
+
+        public ConversationCommand Generate(AVIMConversation conversation)
+        {
+            var attr = conversation.EncodeAttributes();
+            var cmd = new ConversationCommand().Attr(attr)
+                .Members(conversation.MemberIds).Transient(conversation.IsTransient);
+
+            return cmd;
         }
 
     }

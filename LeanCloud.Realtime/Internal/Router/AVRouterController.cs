@@ -12,7 +12,7 @@ namespace LeanCloud.Realtime.Internal
     internal class AVRouterController : IAVRouterController
     {
         const string routerUrl = "http://router.g0.push.leancloud.cn/v1/route?appId={0}&secure=1";
-
+        const string routerKey = "RouterState";
         public Task<RouterState> GetAsync(CancellationToken cancellationToken)
         {
             return readCache(cancellationToken).OnSuccess(_ =>
@@ -36,7 +36,7 @@ namespace LeanCloud.Realtime.Internal
                  {
                      var currentCache = _.Result;
                      object routeCacheStr = null;
-                     if (currentCache.TryGetValue("RouterState", out routeCacheStr))
+                     if (currentCache.TryGetValue(routerKey, out routeCacheStr))
                      {
                          var routeCache = Json.Parse(routeCacheStr.ToString()) as IDictionary<string, object>;
                          var routerState = new RouterState()
@@ -79,8 +79,8 @@ namespace LeanCloud.Realtime.Internal
                         var expire = DateTime.Now.AddSeconds(long.Parse(routerState["ttl"].ToString()));
                         routerState["expire"] = expire.UnixTimeStampSeconds();
 
-                        //AVClient.ApplicationSettings["RouterState"] = Json.Encode(routerState);
-
+                        //save to local cache async.
+                        AVPlugins.Instance.StorageController.LoadAsync().OnSuccess(storage => storage.Result.AddAsync(routerKey, result));
                         var routerStateObj = new RouterState()
                         {
                             groupId = routerState["groupId"] as string,
@@ -91,7 +91,7 @@ namespace LeanCloud.Realtime.Internal
 
                         return routerStateObj;
                     }
-                    catch (Exception exception)
+                    catch (Exception)
                     {
                         return null;
                     }

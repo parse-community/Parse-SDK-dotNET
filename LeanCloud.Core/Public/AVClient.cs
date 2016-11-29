@@ -1,4 +1,4 @@
-// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+﻿// Copyright (c) 2015-present, LeanCloud, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using LeanCloud.Storage.Internal;
 using LeanCloud.Core.Internal;
@@ -36,6 +36,11 @@ namespace LeanCloud
         /// </summary>
         public struct Configuration
         {
+            public enum AVRegion
+            {
+                CN = 0,
+                US = 1,
+            }
             /// <summary>
             /// In the event that you would like to use the LeanCloud SDK
             /// from a completely portable project, with no platform-specific library required,
@@ -62,6 +67,8 @@ namespace LeanCloud
                 /// The operating system version of the platform the SDK is operating in..
                 /// </summary>
                 public String OSVersion { get; set; }
+
+
             }
 
             /// <summary>
@@ -72,9 +79,15 @@ namespace LeanCloud
             /// <summary>
             /// The LeanCloud.com API server to connect to.
             ///
-            /// Only needs to be set if you're using another server than https://api.parse.com/1.
+            /// Only needs to be set if you're using another server than https://api.leancloud.cn.
             /// </summary>
             public String Server { get; set; }
+
+
+            /// <summary>
+            /// LeanCloud 支持的服务节点，目前仅支持大陆和北美节点
+            /// </summary>
+            public AVRegion Region { get; set; }
 
             /// <summary>
             /// The LeanCloud.com .NET key for your app.
@@ -133,14 +146,14 @@ namespace LeanCloud
         /// </summary>
         /// <param name="applicationId">The Application ID provided in the LeanCloud dashboard.
         /// </param>
-        /// <param name="dotnetKey">The .NET API Key provided in the LeanCloud dashboard.
+        /// <param name="applicationKey">The .NET API Key provided in the LeanCloud dashboard.
         /// </param>
-        public static void Initialize(string applicationId, string dotnetKey)
+        public static void Initialize(string applicationId, string applicationKey)
         {
             Initialize(new Configuration
             {
                 ApplicationId = applicationId,
-                ApplicationKey = dotnetKey
+                ApplicationKey = applicationKey
             });
         }
 
@@ -154,16 +167,33 @@ namespace LeanCloud
         /// </param>
         public static void Initialize(Configuration configuration)
         {
+            string APIAddressCN = "https://api.leancloud.cn/1.1/";
+            string APIAddressUS = "https://us-api.leancloud.cn/1.1/";
+            string APIAddressQCloud = "https://e1-api.leancloud.cn/1.1/";
+
             lock (mutex)
             {
-                configuration.Server = configuration.Server ?? "https://api.leancloud.cn/1.1/";
+                configuration.Server = configuration.Server ?? APIAddressCN;
+                if (configuration.Region == Configuration.AVRegion.US)
+                {
+                    configuration.Server = APIAddressUS;
+                }
+                var nodeHash = configuration.ApplicationId.Split('-');
+                if (nodeHash.Length > 1)
+                {
+                    if (nodeHash[1].Trim() == "9Nh9j0Va")
+                    {
+                        configuration.Server = APIAddressQCloud;
+                    }
+                }
+
                 CurrentConfiguration = configuration;
 
                 AVObject.RegisterSubclass<AVUser>();
                 AVObject.RegisterSubclass<AVRole>();
                 AVObject.RegisterSubclass<AVSession>();
 
-                AVModuleController.Instance.ParseDidInitialize();
+                AVModuleController.Instance.LeanCloudDidInitialize();
             }
         }
 
@@ -199,7 +229,7 @@ namespace LeanCloud
             return Json.Encode(jsonData);
         }
 
-        public static Task<Tuple<HttpStatusCode, string>> RequestAsync(Uri uri, string method, IList<KeyValuePair<string, string>> headers, IDictionary<string, object> data, string contentType, CancellationToken cancellationToken)
+        internal static Task<Tuple<HttpStatusCode, string>> RequestAsync(Uri uri, string method, IList<KeyValuePair<string, string>> headers, IDictionary<string, object> data, string contentType, CancellationToken cancellationToken)
         {
             HttpRequest request = new HttpRequest()
             {
@@ -208,8 +238,13 @@ namespace LeanCloud
                 Method = method,
                 Uri = uri
             };
-
             return AVPlugins.Instance.HttpClient.ExecuteAsync(request, null, null, cancellationToken);
+        }
+
+        internal static bool IsSuccessStatusCode(HttpStatusCode responseStatus)
+        {
+            var codeValue = (int)responseStatus;
+            return (codeValue > 199) && (codeValue < 204);
         }
     }
 }

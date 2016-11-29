@@ -38,5 +38,26 @@ namespace LeanCloud.Realtime.Internal
                 }
             }
         }
+
+        private IWebSocketClient webSocketController;
+
+        public IWebSocketClient WebSocketController
+        {
+            get
+            {
+                lock (mutex)
+                {
+                    webSocketController = webSocketController ?? new WebSocketClient();
+                    return webSocketController;
+                }
+            }
+            internal set
+            {
+                lock (mutex)
+                {
+                    webSocketController = value;
+                }
+            }
+        }
     }
 }

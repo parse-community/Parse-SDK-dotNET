@@ -5,22 +5,27 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LeanCloud.Core.Internal {
-  public interface IAVUserController {
-    Task<IObjectState> SignUpAsync(IObjectState state,
-        IDictionary<string, IAVFieldOperation> operations,
-        CancellationToken cancellationToken);
+namespace LeanCloud.Core.Internal
+{
+    public interface IAVUserController
+    {
+        Task<IObjectState> SignUpAsync(IObjectState state,
+            IDictionary<string, IAVFieldOperation> operations,
+            CancellationToken cancellationToken);
 
-    Task<IObjectState> LogInAsync(string username,
-        string password,
-        CancellationToken cancellationToken);
+        Task<IObjectState> LogInAsync(string username,
+            string password,
+            CancellationToken cancellationToken);
 
-    Task<IObjectState> LogInAsync(string authType,
+        Task<IObjectState> LogInWithParametersAsync(string relativeUrl, IDictionary<string, object> data,
+    CancellationToken cancellationToken);
+
+        Task<IObjectState> LogInAsync(string authType,
         IDictionary<string, object> data,
         CancellationToken cancellationToken);
 
-    Task<IObjectState> GetUserAsync(string sessionToken, CancellationToken cancellationToken);
+        Task<IObjectState> GetUserAsync(string sessionToken, CancellationToken cancellationToken);
 
-    Task RequestPasswordResetAsync(string email, CancellationToken cancellationToken);
-  }
+        Task RequestPasswordResetAsync(string email, CancellationToken cancellationToken);
+    }
 }

@@ -7,38 +7,129 @@ using LeanCloud.Realtime.Internal;
 using LeanCloud;
 using LeanCloud.Storage.Internal;
 using System.Collections;
+using LeanCloud.Core.Internal;
 
 namespace LeanCloud.Realtime
 {
     /// <summary>
     /// 对话
     /// </summary>
-    public class AVIMConversation: IEnumerable<KeyValuePair<string, object>>
+    public class AVIMConversation : IEnumerable<KeyValuePair<string, object>>
     {
 
         private DateTime? updatedAt;
 
         private DateTime? createdAt;
 
+        private DateTime? lastMessageAt;
+
+        private AVObject convState;
+
         internal readonly Object mutex = new Object();
-        private readonly IDictionary<string, object> estimatedData = new Dictionary<string, object>();
+        //private readonly IDictionary<string, object> estimatedData = new Dictionary<string, object>();
 
         internal AVIMClient _currentClient;
+
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>
     .GetEnumerator()
         {
             lock (mutex)
             {
-                return estimatedData.GetEnumerator();
+                return ((IEnumerable<KeyValuePair<string, object>>)convState).GetEnumerator();
             }
         }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             lock (mutex)
             {
-                return ((IEnumerable<KeyValuePair<string, object>>)this).GetEnumerator();
+                return ((IEnumerable<KeyValuePair<string, object>>)convState).GetEnumerator();
             }
         }
+        virtual public object this[string key]
+        {
+            get
+            {
+                return convState[key];
+            }
+            set
+            {
+                convState[key] = value;
+            }
+        }
+        public ICollection<string> Keys
+        {
+            get
+            {
+                lock (mutex)
+                {
+                    return convState.Keys;
+                }
+            }
+        }
+
+        internal IDictionary<string, object> EncodeAttributes()
+        {
+            var currentOperations = convState.StartSave();
+            var jsonToSave = AVObject.ToJSONObjectForSaving(currentOperations);
+            return jsonToSave;
+        }
+        internal void MergeFromPushServer(IDictionary<string, object> json)
+        {
+            if (json.Keys.Contains("cdate"))
+            {
+                createdAt = DateTime.Parse(json["cdate"].ToString());
+                updatedAt = DateTime.Parse(json["cdate"].ToString());
+                json.Remove("cdate");
+            }
+            if (json.Keys.Contains("lm"))
+            {
+                var ts = double.Parse(json["lm"].ToString());
+                updatedAt = ts.UnixTimeStampSeconds();
+                lastMessageAt = ts.UnixTimeStampSeconds();
+                json.Remove("lm");
+            }
+            if (json.Keys.Contains("c"))
+            {
+                Creator = json["c"].ToString();
+                json.Remove("c");
+            }
+            if (json.Keys.Contains("m"))
+            {
+                MemberIds = json["m"] as IList<string>;
+                json.Remove("m");
+            }
+            if (json.Keys.Contains("mu"))
+            {
+                MuteMemberIds = json["mu"] as IList<string>;
+                json.Remove("mu");
+            }
+            if (json.Keys.Contains("tr"))
+            {
+                IsTransient = bool.Parse(json["tr"].ToString());
+                json.Remove("tr");
+            }
+            if (json.Keys.Contains("sys"))
+            {
+                IsSystem = bool.Parse(json["sys"].ToString());
+                json.Remove("sys");
+            }
+            if (json.Keys.Contains("cid"))
+            {
+                ConversationId = json["cid"].ToString();
+                json.Remove("cid");
+            }
+
+            if (json.Keys.Contains("name"))
+            {
+                Name = json["name"].ToString();
+                json.Remove("name");
+            }
+            if (json.Keys.Contains("attr"))
+            {
+
+            }
+        }
+
         /// <summary>
         /// 当前的AVIMClient，一个对话理论上只存在一个AVIMClient。
         /// </summary>
@@ -56,7 +147,7 @@ namespace LeanCloud.Realtime
         /// <summary>
         /// 对话的唯一ID
         /// </summary>
-        public string ConversationId { get; set; }
+        public string ConversationId { get; internal set; }
 
         /// <summary>
         /// 对话在全局的唯一的名字
@@ -66,7 +157,7 @@ namespace LeanCloud.Realtime
         /// <summary>
         /// 对话中存在的 Client 的 Id 列表
         /// </summary>
-        public IList<string> MemberIds { get; set; }
+        public IList<string> MemberIds { get; internal set; }
 
         /// <summary>
         /// 对该对话静音的成员列表
@@ -74,7 +165,7 @@ namespace LeanCloud.Realtime
         /// 对该对话设置了静音的成员，将不会收到离线消息的推送。
         /// </remarks>
         /// </summary>
-        public IList<string> MuteMemberIds { get; set; }
+        public IList<string> MuteMemberIds { get; internal set; }
 
         /// <summary>
         /// 对话的创建者
@@ -84,7 +175,12 @@ namespace LeanCloud.Realtime
         /// <summary>
         /// 是否为聊天室
         /// </summary>
-        public bool IsTransient { get; set; }
+        public bool IsTransient { get; internal set; }
+
+        /// <summary>
+        /// 是否系统对话
+        /// </summary>
+        public bool IsSystem { get; internal set; }
 
         /// <summary>
         /// 对话创建的时间
@@ -131,9 +227,31 @@ namespace LeanCloud.Realtime
                 }
             }
         }
+
+        public DateTime? LastMessageAt
+        {
+            get
+            {
+                DateTime? nullable;
+                lock (this.mutex)
+                {
+                    nullable = this.lastMessageAt;
+                }
+                return nullable;
+            }
+            private set
+            {
+                lock (this.mutex)
+                {
+                    this.lastMessageAt = value;
+                }
+            }
+        }
+
         /// <summary>
         /// 对话的自定义属性
         /// </summary>
+        [System.Obsolete("不再推荐使用，请使用 AVIMConversation[key] = value,新版的 ConversationQuery 不再支持查询 Attributes 字段的内部属性。")]
         public IDictionary<string, object> Attributes
         {
             get
@@ -149,11 +267,12 @@ namespace LeanCloud.Realtime
         internal IDictionary<string, object> pendingAttributes;
 
         /// <summary>
-        /// 创建一个默认的 AVIMConversation 对象
+        /// 已知 id，在本地构建一个 AVIMConversation 对象
         /// </summary>
-        public AVIMConversation()
+        public AVIMConversation(string id)
+            : this(null, null, null, null, null, false, false, null)
         {
-
+            this.ConversationId = id;
         }
 
         /// <summary>
@@ -166,29 +285,55 @@ namespace LeanCloud.Realtime
         /// <param name="attributes"></param>
         internal AVIMConversation(AVIMConversation source = null,
             string name = null,
+            string creator = null,
             IList<string> members = null,
+            IList<string> muteMembers = null,
             bool isTransient = false,
+            bool isSystem = false,
             IDictionary<string, object> attributes = null)
         {
-            this.Name = source.Name;
-            this.MemberIds = source.MemberIds;
-            this.IsTransient = source.IsTransient;
-            this.Attributes = source.Attributes;
+            convState = source != null ? source.convState : new AVObject("_Conversation");
+            this.Name = source?.Name;
+            this.MemberIds = source?.MemberIds;
+            this.Creator = source?.Creator;
+            this.MuteMemberIds = source?.MuteMemberIds;
 
-            if (string.IsNullOrEmpty(name))
+
+            if (!string.IsNullOrEmpty(name))
             {
                 this.Name = name;
+            }
+            if (!string.IsNullOrEmpty(creator))
+            {
+                this.Creator = creator;
             }
             if (members != null)
             {
                 this.MemberIds = members;
             }
-            this.IsTransient = isTransient;
-            if (attributes != null)
+            if (muteMembers != null)
             {
-                this.Attributes = attributes;
+                this.MuteMemberIds = muteMembers;
             }
+
+            this.IsTransient = isTransient;
+            this.IsSystem = isSystem;
         }
+
+        #region 属性操作
+        public Task SaveAsync()
+        {
+            var cmd = new ConversationCommand()
+               .Generate(this);
+
+            var convCmd = cmd.Option("update")
+                .AppId(AVClient.CurrentConfiguration.ApplicationId)
+                .PeerId(this.CurrentClient.Id);
+
+            return AVIMClient.AVCommandRunner.RunCommandAsync(convCmd);
+
+        }
+        #endregion
 
         ///// <summary>
         ///// 向该对话发送普通的文本消息。
@@ -232,6 +377,7 @@ namespace LeanCloud.Realtime
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
+        [System.Obsolete("不再推荐使用，请使用 AVIMConversation[key] = value,新版的 ConversationQuery 不再支持查询 attr 字段的内部属性。")]
         public void Attribute(string key, object value)
         {
             if (pendingAttributes == null)
@@ -241,7 +387,6 @@ namespace LeanCloud.Realtime
             pendingAttributes[key] = value;
         }
 
-
         #region 成员操作相关接口
         /// <summary>
         /// CurrentClient 主动加入到对话中
@@ -250,7 +395,7 @@ namespace LeanCloud.Realtime
         /// <returns></returns>
         public Task<bool> JoinAsync()
         {
-            return AddMembersAsync(CurrentClient.clientId);
+            return AddMembersAsync(CurrentClient.Id);
         }
 
         /// <summary>
@@ -267,7 +412,7 @@ namespace LeanCloud.Realtime
                 .AppId(AVClient.CurrentConfiguration.ApplicationId)
                 .PeerId(clientId);
             var memberList = new List<string>() { clientId };
-            return CurrentClient.AttachSignature(cmd, CurrentClient.SignatureFactory.CreateConversationSignature(this.ConversationId, CurrentClient.clientId, memberList, "invite")).OnSuccess(_ =>
+            return CurrentClient.AttachSignature(cmd, CurrentClient.SignatureFactory.CreateConversationSignature(this.ConversationId, CurrentClient.Id, memberList, "invite")).OnSuccess(_ =>
             {
                 return AVIMClient.AVCommandRunner.RunCommandAsync(cmd).OnSuccess(t =>
                 {

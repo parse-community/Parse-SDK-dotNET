@@ -56,10 +56,21 @@ namespace LeanCloud.Realtime
                 state = value;
             }
         }
+
+        public string Tag
+        {
+            get;
+            private set;
+        }
         /// <summary>
         /// 客户端的标识,在一个 Application 内唯一。
         /// </summary>
-        public readonly string clientId;
+        private readonly string clientId;
+
+        public string Id
+        {
+            get { return clientId; }
+        }
 
         private ISignatureFactory _signatureFactory;
 
@@ -97,7 +108,7 @@ namespace LeanCloud.Realtime
             useLeanEngineSignaturFactory = true;
         }
 
-        private static readonly IAVIMPlatformHooks platformHooks;
+        //private static readonly IAVIMPlatformHooks platformHooks;
 
         //internal static IAVIMPlatformHooks PlatformHooks { get { return platformHooks; } }
 
@@ -105,7 +116,7 @@ namespace LeanCloud.Realtime
         {
             get
             {
-                return platformHooks.WebSocketClient;
+                return AVIMCorePlugins.Instance.WebSocketController;
             }
         }
 
@@ -227,7 +238,7 @@ namespace LeanCloud.Realtime
         }
         private void WebsocketClient_OnMessage(string obj)
         {
-            var estimatedData = Json.Parse(obj) as IDictionary<string,object>;
+            var estimatedData = Json.Parse(obj) as IDictionary<string, object>;
             var cmd = estimatedData["cmd"].ToString();
             if (!AVIMNotice.noticeFactories.Keys.Contains(cmd)) return;
             var registerNoticeInterface = AVIMNotice.noticeFactories[cmd];
@@ -244,8 +255,19 @@ namespace LeanCloud.Realtime
         /// </summary>
         /// <param name="clientId"></param>
         public AVIMClient(string clientId)
+            : this(clientId, null)
+        {
+
+        }
+
+        /// <summary>
+        /// 创建 AVIMClient 对象
+        /// </summary>
+        /// <param name="clientId"></param>
+        public AVIMClient(string clientId, string tag)
         {
             this.clientId = clientId;
+            Tag = tag ?? tag;
         }
 
         /// <summary>
@@ -272,7 +294,7 @@ namespace LeanCloud.Realtime
             }).Unwrap().OnSuccess(t =>
             {
                 var cmd = new SessionCommand()
-                .UA(platformHooks.ua + Version)
+                .UA(AVRealtime.VersionString)
                 .Option("open")
                 .AppId(AVClient.CurrentConfiguration.ApplicationId)
                 .PeerId(clientId);
@@ -342,23 +364,23 @@ namespace LeanCloud.Realtime
         public Task<AVIMConversation> CreateConversationAsync(AVIMConversation conversation, bool isUnique = true)
         {
             var cmd = new ConversationCommand()
-                .Attr(conversation.Attributes)
-                .Members(conversation.MemberIds)
-                .Transient(conversation.IsTransient)
-                .Unique(isUnique)
-                .Option("start")
+                .Generate(conversation)
+                .Unique(isUnique);
+
+            var convCmd = cmd.Option("start")
                 .AppId(AVClient.CurrentConfiguration.ApplicationId)
                 .PeerId(clientId);
 
-            return AttachSignature(cmd, this.SignatureFactory.CreateStartConversationSignature(this.clientId, conversation.MemberIds)).OnSuccess(_ =>
+            return AttachSignature(convCmd, this.SignatureFactory.CreateStartConversationSignature(this.clientId, conversation.MemberIds)).OnSuccess(_ =>
              {
-                 return AVIMClient.AVCommandRunner.RunCommandAsync(cmd).OnSuccess(t =>
+                 return AVIMClient.AVCommandRunner.RunCommandAsync(convCmd).OnSuccess(t =>
                  {
-
                      var result = t.Result;
                      if (result.Item1 < 1)
                      {
-                         conversation.ConversationId = result.Item2["cid"].ToString();
+                         conversation.MemberIds.Add(Id);
+                         conversation = new AVIMConversation(source: conversation, creator: Id);
+                         conversation.MergeFromPushServer(result.Item2);
                      }
 
                      return conversation;
@@ -373,9 +395,13 @@ namespace LeanCloud.Realtime
         /// <param name="members">目标成员</param>
         /// <param name="isUnique">是否是唯一对话</param>
         /// <returns></returns>
-        public Task<AVIMConversation> CreateConversationAsync(IList<string> members = null, bool isUnique = true)
+        public Task<AVIMConversation> CreateConversationAsync(IList<string> members = null, bool isUnique = true, IDictionary<string, object> options = null)
         {
             var conversation = new AVIMConversation(members: members);
+            foreach (var key in options?.Keys)
+            {
+                conversation[key] = options[key];
+            }
 
             return CreateConversationAsync(conversation, isUnique);
         }
@@ -386,12 +412,11 @@ namespace LeanCloud.Realtime
         /// <param name="member">目标成员</param>
         /// <param name="isUnique">是否是唯一对话</param>
         /// <returns></returns>
-        public Task<AVIMConversation> CreateConversationAsync(string member = "", bool isUnique = true)
+        public Task<AVIMConversation> CreateConversationAsync(string member = "", bool isUnique = true, IDictionary<string, object> options = null)
         {
             var members = new List<string>() { member };
-            var conversation = new AVIMConversation(members: members);
 
-            return CreateConversationAsync(conversation, isUnique);
+            return CreateConversationAsync(members, isUnique, options);
         }
 
         /// <summary>
@@ -401,8 +426,17 @@ namespace LeanCloud.Realtime
         /// <returns></returns>
         public Task<AVIMConversation> CreateChatRoomAsync(string conversationName)
         {
-            var conversation = new AVIMConversation() { Name = conversationName };
+            var conversation = new AVIMConversation() { Name = conversationName, IsTransient = false };
             return CreateConversationAsync(conversation);
+        }
+
+        public Task<AVIMConversation> GetConversation(string id, bool noCache)
+        {
+            if (!noCache) return Task.FromResult(new AVIMConversation() { ConversationId = id });
+            else
+            {
+                return Task.FromResult(new AVIMConversation() { ConversationId = id });
+            }
         }
 
         /// <summary>
@@ -459,43 +493,12 @@ namespace LeanCloud.Realtime
             });
         }
 
-        private static readonly string[] assemblyNames = {
-            "Realtime.Phone","Realtime.WinRT","Realtime.NetFx45","Realtime.iOS","Realtime.Android","Realtime.Unity"
-        };
-        private static Type GetAVType(string name)
-        {
-            foreach (var assembly in assemblyNames)
-            {
-                var typeName = string.Format("Realtime.{0}, {1}", name, assembly);
-                Type type = Type.GetType(typeName);
-                if (type != null)
-                {
-                    return type;
-                }
-            }
-            return null;
-        }
-
         static AVIMClient()
         {
-            Type platformHookType = GetAVType("AVIMPlatformHooks");
-            if (platformHookType == null)
-            {
-                throw new InvalidOperationException("You must include a reference to a platform-specific LeanCloud library.");
-            }
-            platformHooks = Activator.CreateInstance(platformHookType) as IAVIMPlatformHooks;
-            commandRunner = new AVIMCommandRunner(platformHooks.WebSocketClient);
+            commandRunner = new AVIMCommandRunner(AVIMCorePlugins.Instance.WebSocketController);
 
             AVIMNotice.RegisterInterface<AVIMMessageNotice>(new AVIMMessageNotice());
         }
 
-        internal static System.Version Version
-        {
-            get
-            {
-                AssemblyName assemblyName = new AssemblyName(typeof(AVIMClient).GetTypeInfo().Assembly.FullName);
-                return assemblyName.Version;
-            }
-        }
     }
 }
