@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9DA3EC57-CDC7-4F9A-850D-8C63C7850409}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LeanCloud.Push</RootNamespace>
+    <AssemblyName>LeanCloud.Push</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile78</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DocumentationFile>bin\Debug\LeanCloud.Push.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\LeanCloud.Push.xml</DocumentationFile>
+  </PropertyGroup>
+  <!-- Used for setting excluded files -->
+  <PropertyGroup>
+    <ExcludedPlatformSpecificSourceFilesString>
+          **\Partial\**;
+          **\Android\**;
+          **\iOS\**;
+          **\Mono\**;
+          **\NetFx45\**;
+          **\Phone\**;
+          **\Unity\**;
+          **\Unity.iOS\**;
+          **\Unity.Android\**;
+          **\WinRT\**;
+          **\SettingsStorage\**;
+      </ExcludedPlatformSpecificSourceFilesString>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Assembly info, etc. -->
+    <Compile Include="Properties\*.cs" Exclude="Properties\Settings.Designer.cs" />
+    <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+    <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LeanCloud.Storage\LeanCloud.Storage.Portable.csproj">
+      <Project>{de07a443-9619-4bd7-b540-41296f8a2959}</Project>
+      <Name>LeanCloud.Storage.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LeanCloud.Core\LeanCloud.Core.Portable.csproj">
+      <Project>{f3f65351-2ce1-4412-84b4-c36f34eab928}</Project>
+      <Name>LeanCloud.Core.Portable</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" Condition="Exists('$(SolutionDir)\.nuget\nuget.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
