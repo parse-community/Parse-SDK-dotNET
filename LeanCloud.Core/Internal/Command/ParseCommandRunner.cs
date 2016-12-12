@@ -98,14 +98,14 @@ namespace LeanCloud.Core.Internal
 
             Task<AVCommand> installationIdTask = installationIdController.GetAsync().ContinueWith(t =>
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LeanCloud-Installation-Id", t.Result.ToString()));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-Installation-Id", t.Result.ToString()));
                 return newCommand;
             });
 
             // TODO (richardross): Inject configuration instead of using shared static here.
             AVClient.Configuration configuration = AVClient.CurrentConfiguration;
             newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-Id", configuration.ApplicationId));
-            newCommand.Headers.Add(new KeyValuePair<string, string>("X-LeanCloud-Client-Version", AVClient.VersionString));
+            newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-Client-Version", AVClient.VersionString));
 
             if (configuration.AdditionalHTTPHeaders != null)
             {
@@ -117,15 +117,15 @@ namespace LeanCloud.Core.Internal
 
             if (!string.IsNullOrEmpty(configuration.VersionInfo.BuildVersion))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LeanCloud-App-Build-Version", configuration.VersionInfo.BuildVersion));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-App-Build-Version", configuration.VersionInfo.BuildVersion));
             }
             if (!string.IsNullOrEmpty(configuration.VersionInfo.DisplayVersion))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LeanCloud-App-Display-Version", configuration.VersionInfo.DisplayVersion));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-App-Display-Version", configuration.VersionInfo.DisplayVersion));
             }
             if (!string.IsNullOrEmpty(configuration.VersionInfo.OSVersion))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LeanCloud-OS-Version", configuration.VersionInfo.OSVersion));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-LC-OS-Version", configuration.VersionInfo.OSVersion));
             }
 
             // TODO (richardross): I hate the idea of having this super tightly coupled static variable in here.

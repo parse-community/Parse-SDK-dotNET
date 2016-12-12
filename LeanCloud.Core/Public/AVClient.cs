@@ -38,8 +38,9 @@ namespace LeanCloud
         {
             public enum AVRegion
             {
-                CN = 0,
-                US = 1,
+                Public_CN = 0,
+                Public_US = 1,
+                Vendor_Tencent = 2
             }
             /// <summary>
             /// In the event that you would like to use the LeanCloud SDK
@@ -67,7 +68,6 @@ namespace LeanCloud
                 /// The operating system version of the platform the SDK is operating in..
                 /// </summary>
                 public String OSVersion { get; set; }
-
 
             }
 
@@ -103,6 +103,9 @@ namespace LeanCloud
             /// The version information of your application environment.
             /// </summary>
             public VersionInformation VersionInfo { get; set; }
+
+            #region Debug
+            #endregion
         }
 
         private static readonly object mutex = new object();
@@ -156,6 +159,11 @@ namespace LeanCloud
                 ApplicationKey = applicationKey
             });
         }
+        internal static Action<string> LogTracker { get; private set; }
+        public static void HttpLog(Action<string> trace)
+        {
+            LogTracker = trace;
+        }
 
         /// <summary>
         /// Authenticates this client as belonging to your application. This must be
@@ -174,7 +182,7 @@ namespace LeanCloud
             lock (mutex)
             {
                 configuration.Server = configuration.Server ?? APIAddressCN;
-                if (configuration.Region == Configuration.AVRegion.US)
+                if (configuration.Region == Configuration.AVRegion.Public_US)
                 {
                     configuration.Server = APIAddressUS;
                 }
@@ -185,6 +193,10 @@ namespace LeanCloud
                     {
                         configuration.Server = APIAddressQCloud;
                     }
+                }
+                if (!string.IsNullOrEmpty(configuration.Server))
+                {
+                    configuration.Server = configuration.Server;
                 }
 
                 CurrentConfiguration = configuration;
@@ -229,16 +241,72 @@ namespace LeanCloud
             return Json.Encode(jsonData);
         }
 
-        internal static Task<Tuple<HttpStatusCode, string>> RequestAsync(Uri uri, string method, IList<KeyValuePair<string, string>> headers, IDictionary<string, object> data, string contentType, CancellationToken cancellationToken)
+        internal static Task<Tuple<HttpStatusCode, string>> RequestAsync(Uri uri, string method, IList<KeyValuePair<string, string>> headers, IDictionary<string, object> body, string contentType, CancellationToken cancellationToken)
+        {
+            //HttpRequest request = new HttpRequest()
+            //{
+            //    Data = data != null ? new MemoryStream(Encoding.UTF8.GetBytes(Json.Encode(data))) : null,
+            //    Headers = headers,
+            //    Method = method,
+            //    Uri = uri
+            //};
+            var dataStream = body != null ? new MemoryStream(Encoding.UTF8.GetBytes(Json.Encode(body))) : null;
+            return AVClient.RequestAsync(uri, method, headers, dataStream, contentType, cancellationToken);
+            //return AVPlugins.Instance.HttpClient.ExecuteAsync(request, null, null, cancellationToken);
+        }
+
+        internal static Task<Tuple<HttpStatusCode, string>> RequestAsync(Uri uri, string method, IList<KeyValuePair<string, string>> headers, Stream data, string contentType, CancellationToken cancellationToken)
         {
             HttpRequest request = new HttpRequest()
             {
-                Data = data != null ? new MemoryStream(Encoding.UTF8.GetBytes(Json.Encode(data))) : null,
+                Data = data != null ? data : null,
                 Headers = headers,
                 Method = method,
                 Uri = uri
             };
             return AVPlugins.Instance.HttpClient.ExecuteAsync(request, null, null, cancellationToken);
+        }
+        internal static Tuple<HttpStatusCode, IDictionary<string, object>> ReponseResolve(Tuple<HttpStatusCode, string> response, CancellationToken cancellationToken)
+        {
+            Tuple<HttpStatusCode, string> result = response;
+            HttpStatusCode code = result.Item1;
+            string item2 = result.Item2;
+
+            if (item2 == null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                return new Tuple<HttpStatusCode, IDictionary<string, object>>(code, null);
+            }
+            IDictionary<string, object> strs = null;
+            try
+            {
+                strs = (!item2.StartsWith("[") ? AVClient.DeserializeJsonString(item2) : new Dictionary<string, object>()
+                    {
+                        { "results", Json.Parse(item2) }
+                    });
+            }
+            catch (Exception exception)
+            {
+                throw new AVException(AVException.ErrorCode.OtherCause, "Invalid response from server", exception);
+            }
+            var codeValue = (int)code;
+            if (codeValue > 203 || codeValue < 200)
+            {
+                throw new AVException((AVException.ErrorCode)((int)((strs.ContainsKey("code") ? (long)strs["code"] : (long)-1))), (strs.ContainsKey("error") ? strs["error"] as string : item2), null);
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            return new Tuple<HttpStatusCode, IDictionary<string, object>>(code, strs);
+        }
+        internal static Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RequestAsync(string method, Uri relativeUri, string sessionToken, IDictionary<string, object> data, CancellationToken cancellationToken)
+        {
+
+            var command = new AVCommand(relativeUri.ToString(),
+            method: method,
+            sessionToken: sessionToken,
+                data: data);
+
+            return AVPlugins.Instance.CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
         }
 
         internal static bool IsSuccessStatusCode(HttpStatusCode responseStatus)

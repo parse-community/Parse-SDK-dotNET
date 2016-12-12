@@ -68,6 +68,15 @@ namespace LeanCloud
                 cancellationToken);
         }
 
+
+        public static Task<T> RPCFunctionAsync<T>(String name, IDictionary<string, object> parameters, CancellationToken cancellationToken)
+        {
+            return CloudCodeController.RPCFunction<T>(name,
+                parameters,
+                AVUser.CurrentSessionToken,
+                cancellationToken);
+        }
+
         /// <summary>
         /// 获取 LeanCloud 服务器的时间
         /// <remarks>

@@ -5,6 +5,9 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using LeanCloud.Storage.Internal;
+using System.Net;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LeanCloud.Core.Internal
 {
@@ -16,7 +19,7 @@ namespace LeanCloud.Core.Internal
         {
             this.commandRunner = commandRunner;
         }
-        public Task<FileState> SaveAsync(FileState state,
+        public virtual Task<FileState> SaveAsync(FileState state,
         Stream dataStream,
         String sessionToken,
         IProgress<AVUploadProgressEventArgs> progress,
@@ -75,7 +78,22 @@ namespace LeanCloud.Core.Internal
 
             return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
         }
+        internal static Task<Tuple<HttpStatusCode, IDictionary<string, object>>> GetFileToken(FileState fileState, CancellationToken cancellationToken)
+        {
+            Task<Tuple<HttpStatusCode, IDictionary<string, object>>> rtn;
+            string currentSessionToken = AVUser.CurrentSessionToken;
+            string str = fileState.Name;
+            IDictionary<string, object> parameters = new Dictionary<string, object>();
+            parameters.Add("name", str);
+            parameters.Add("key", GetUniqueName(fileState));
+            parameters.Add("__type", "File");
+            parameters.Add("mime_type", AVFile.GetMIMEType(str));
+            parameters.Add("metaData", fileState.MetaData);
 
+            rtn = AVClient.RequestAsync("POST", new Uri("/fileTokens", UriKind.Relative), currentSessionToken, parameters, cancellationToken);
+
+            return rtn;
+        }
         public Task<FileState> GetAsync(string objectId, string sessionToken, CancellationToken cancellationToken)
         {
             var command = new AVCommand("files/" + objectId,
@@ -95,6 +113,26 @@ namespace LeanCloud.Core.Internal
                     Url = new Uri(jsonData["url"] as string, UriKind.Absolute),
                 };
             });
+        }
+        internal static string GetUniqueName(FileState fileState)
+        {
+            string key = Random(12);
+            string extension = Path.GetExtension(fileState.Name);
+            key += extension;
+            fileState.CloudName = key;
+            return key;
+        }
+        internal static string Random(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+        internal static double CalcProgress(double already, double total)
+        {
+            var pv = (1.0 * already / total);
+            return Math.Round(pv, 3);
         }
     }
 }

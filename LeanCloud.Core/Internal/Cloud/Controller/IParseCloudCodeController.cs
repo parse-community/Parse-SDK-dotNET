@@ -5,11 +5,17 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LeanCloud.Core.Internal {
-  public interface IAVCloudCodeController {
-    Task<T> CallFunctionAsync<T>(String name,
-        IDictionary<string, object> parameters,
-        string sessionToken,
-        CancellationToken cancellationToken);
-  }
+namespace LeanCloud.Core.Internal
+{
+    public interface IAVCloudCodeController
+    {
+        Task<T> CallFunctionAsync<T>(String name,
+            IDictionary<string, object> parameters,
+            string sessionToken,
+            CancellationToken cancellationToken);
+
+        Task<T> RPCFunction<T>(string name, IDictionary<string, object> parameters,
+            string sessionToken,
+            CancellationToken cancellationToken);
+    }
 }

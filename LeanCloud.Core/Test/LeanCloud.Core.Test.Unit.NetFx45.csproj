@@ -124,6 +124,7 @@
     <Compile Include="ObjectStateTests.cs" />
     <Compile Include="ObjectTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryTests.cs" />
     <Compile Include="RelationTests.cs" />
     <Compile Include="SessionTests.cs" />
     <Compile Include="SessionControllerTests.cs" />

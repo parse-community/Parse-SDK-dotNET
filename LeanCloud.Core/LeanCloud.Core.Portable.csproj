@@ -66,6 +66,7 @@
       <Name>LeanCloud.Storage.Portable</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
