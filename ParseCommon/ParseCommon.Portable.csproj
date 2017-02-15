@@ -37,17 +37,31 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Parse.Common.xml</DocumentationFile>
   </PropertyGroup>
-  <!-- Used for setting excluded files -->
-  <PropertyGroup>
-    <ExcludedPlatformSpecificSourceFilesString>
-          **\Unity\**
-      </ExcludedPlatformSpecificSourceFilesString>
-  </PropertyGroup>
   <ItemGroup>
     <!-- Assembly info, etc. -->
-    <Compile Include="Properties\*.cs" />
-    <Compile Include="Internal\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
-    <Compile Include="Public\**\*.cs" Exclude="$(ExcludedPlatformSpecificSourceFilesString)" />
+    <Compile Include="Public\Utilities\Conversion.cs" />
+    <Compile Include="Public\ParseUploadProgressEventArgs.cs" />
+    <Compile Include="Public\ParseDownloadProgressEventArgs.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Internal\HttpClient\Portable\HttpClient.Portable.cs" />
+    <Compile Include="Internal\HttpClient\IHttpClient.cs" />
+    <Compile Include="Internal\Modules\IParseModule.cs" />
+    <Compile Include="Internal\Modules\ParseModuleAttribute.cs" />
+    <Compile Include="Internal\Modules\ParseModuleController.cs" />
+    <Compile Include="Internal\Storage\Portable\StorageController.cs" />
+    <Compile Include="Internal\Storage\IStorageController.cs" />
+    <Compile Include="Internal\Utilities\FlexibleDictionaryWrapper.cs" />
+    <Compile Include="Internal\Utilities\FlexibleListWrapper.cs" />
+    <Compile Include="Internal\Utilities\IJsonConvertible.cs" />
+    <Compile Include="Internal\Utilities\IdentityEqualityComparer.cs" />
+    <Compile Include="Internal\Utilities\InternalExtensions.cs" />
+    <Compile Include="Internal\Utilities\Json.cs" />
+    <Compile Include="Internal\Utilities\LockSet.cs" />
+    <Compile Include="Internal\Utilities\ReflectionHelpers.cs" />
+    <Compile Include="Internal\Utilities\SynchronizedEventHandler.cs" />
+    <Compile Include="Internal\Utilities\TaskQueue.cs" />
+    <Compile Include="Internal\Utilities\XamarinAttributes.cs" />
+    <Compile Include="Internal\HttpClient\HttpRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
