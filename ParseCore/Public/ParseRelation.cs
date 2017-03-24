@@ -17,6 +17,12 @@ namespace Parse {
   /// </summary>
   [EditorBrowsable(EditorBrowsableState.Never)]
   public abstract class ParseRelationBase : IJsonConvertible {
+#if UNITY
+    private static readonly bool isCompiledByIL2CPP = AppDomain.CurrentDomain.FriendlyName.Equals("IL2CPP Root Domain");
+#else
+    private static readonly bool isCompiledByIL2CPP = false;
+#endif
+
     private ParseObject parent;
     private string key;
     private string targetClassName;
@@ -88,6 +94,12 @@ namespace Parse {
     internal static ParseRelationBase CreateRelation(ParseObject parent,
         string key,
         string targetClassName) {
+      // `Expression` is unstable in IL2CPP environment. Let's call the method directly!
+#if UNITY
+      if (isCompiledByIL2CPP) {
+        return CreateRelation<ParseObject>(parent, key, targetClassName);
+      }
+#endif
       var targetType = SubclassingController.GetType(targetClassName) ?? typeof(ParseObject);
 
       Expression<Func<ParseRelation<ParseObject>>> createRelationExpr =
