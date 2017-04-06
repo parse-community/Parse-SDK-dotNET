@@ -20,7 +20,7 @@ ParseClient.Initialize(new ParseClient.Configuration {
     WindowsKey = dotnetKey,
 
     // the serverURL of your hosted Parse Server
-    Server = string.IsNullOrEmpty(server) ? null : server
+    Server = "<YOUR SERVER URL>"
 });
 ```
 
