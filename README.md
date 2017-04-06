@@ -7,6 +7,23 @@
 ## Getting Started
 The SDK is available for download [on our website][parse-download-link] or our [NuGet package][nuget-link].
 
+## Using hosted Parse
+Before executing the following code, be sure to read the guide for Unity on [http://docs.parseplatform.org/unity/guide/](http://docs.parseplatform.org/unity/guide/)
+
+```cs
+using Parse;
+
+// some code of initialization..
+
+ParseClient.Initialize(new ParseClient.Configuration {
+    ApplicationId = applicationID,
+    WindowsKey = dotnetKey,
+
+    // the serverURL of your hosted Parse Server
+    Server = string.IsNullOrEmpty(server) ? null : server
+});
+```
+
 ## Building The Library
 You can build the library from Visual Studio 2013+ or Xamarin IDE. You can also build the library using the command line:
 
