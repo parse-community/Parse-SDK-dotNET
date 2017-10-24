@@ -62,4 +62,4 @@ of patent rights can be found in the PATENTS file in the same directory.
  [license-link]: https://github.com/ParsePlatform/Parse-SDK-dotNET/blob/master/LICENSE
  [nuget-link]: http://nuget.org/packages/parse
  [nuget-svg]: https://img.shields.io/nuget/v/parse.svg
- [parse-download-link]: https://parse.com/docs/downloads
+ [parse-download-link]: http://docs.parseplatform.org/
