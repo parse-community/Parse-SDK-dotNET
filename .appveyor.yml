@@ -1,3 +1,5 @@
 version: '1.7.{build}'
 before_build:
   - nuget restore Parse.sln
+build:
+  - msbuild "C:\projects\parse-sdk-dotnet\ParseCore\Test\ParseCore.Test.Unit.NetFx45.csproj" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
