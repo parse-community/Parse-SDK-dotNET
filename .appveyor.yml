@@ -4,3 +4,5 @@ before_build:
 build:
   project: Parse.sln
   verbosity: normal
+after_test:
+  - .\packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -target:nunit-console.exe -register:user "-targetargs:""ParseCore/Test/ParseCore.Test.Unit.NetFx45.csproj"" /noshadow" -filter:"" -output:opencoverCoverage.xml
