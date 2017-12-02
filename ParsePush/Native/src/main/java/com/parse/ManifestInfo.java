@@ -357,7 +357,6 @@ import android.util.Log;
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.WAKE_LOCK",
-        "android.permission.GET_ACCOUNTS",
         "com.google.android.c2dm.permission.RECEIVE",
         packageName + ".permission.C2D_MESSAGE"
     };
@@ -397,7 +396,6 @@ import android.util.Log;
         "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" +
         "<uses-permission android:name=\"android.permission.VIBRATE\" />\n" +
         "<uses-permission android:name=\"android.permission.WAKE_LOCK\" />\n" +
-        "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\" />\n" +
         "<uses-permission android:name=\"com.google.android.c2dm.permission.RECEIVE\" />\n" +
         "<permission android:name=\"" + gcmPackagePermission + "\" " +
         "android:protectionLevel=\"signature\" />\n" +
