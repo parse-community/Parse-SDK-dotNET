@@ -112,3 +112,6 @@ UpgradeLog*.XML
 
 # Include all files in Unity project templates.
 !**/UnityProjectTemplate/**
+
+# idea files
+.idea/
