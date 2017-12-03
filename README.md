@@ -1,5 +1,5 @@
 # Parse SDK for .NET
-[![Build status](https://ci.appveyor.com/api/projects/status/gbekejklsf9tn1fo?svg=true)](https://ci.appveyor.com/project/montymxb/parse-sdk-dotnet)
+[![Build status](https://ci.appveyor.com/api/projects/status/uoit0ona7m3x9bw6?svg=true)](https://ci.appveyor.com/project/ParseCommunity/parse-sdk-dotnet)
 [![codecov](https://codecov.io/gh/parse-community/Parse-SDK-dotNET/branch/master/graph/badge.svg)](https://codecov.io/gh/parse-community/Parse-SDK-dotNET)
 [![Nuget][nuget-svg]][nuget-link]
 [![License][license-svg]][license-link]
@@ -53,9 +53,9 @@ LICENSE file in the root directory of this source tree. An additional grant
 of patent rights can be found in the PATENTS file in the same directory.
 ```
 
- [contributing]: https://github.com/ParsePlatform/Parse-SDK-dotNET/blob/master/CONTRIBUTING.md
+ [contributing]: https://github.com/parse-community/Parse-SDK-dotNET/blob/master/CONTRIBUTING.md
  [license-svg]: https://img.shields.io/badge/license-BSD-lightgrey.svg
- [license-link]: https://github.com/ParsePlatform/Parse-SDK-dotNET/blob/master/LICENSE
+ [license-link]: https://github.com/parse-community/Parse-SDK-dotNET/blob/master/LICENSE
  [nuget-link]: http://nuget.org/packages/parse
  [nuget-svg]: https://img.shields.io/nuget/v/parse.svg
  [parse-download-link]: http://docs.parseplatform.org/
