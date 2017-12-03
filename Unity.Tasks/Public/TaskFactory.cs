@@ -18,11 +18,11 @@ namespace System.Threading.Tasks {
     }
 
     public TaskFactory(CancellationToken cancellationToken)
-      : this(TaskScheduler.FromCurrentSynchronizationContext(), cancellationToken) {
+      : this(new TaskScheduler(null), cancellationToken) {
     }
 
     public TaskFactory()
-      : this(TaskScheduler.FromCurrentSynchronizationContext(), CancellationToken.None) {
+      : this(new TaskScheduler(null), CancellationToken.None) {
     }
 
     public TaskFactory(CancellationToken cancellationToken,
@@ -161,11 +161,11 @@ namespace System.Threading.Tasks {
     }
 
     public TaskFactory(CancellationToken cancellationToken)
-      : this(TaskScheduler.FromCurrentSynchronizationContext(), cancellationToken) {
+      : this(new TaskScheduler(null), cancellationToken) {
     }
 
     public TaskFactory()
-      : this(TaskScheduler.FromCurrentSynchronizationContext(), CancellationToken.None) {
+      : this(new TaskScheduler(null), CancellationToken.None) {
     }
 
     public TaskScheduler Scheduler {
