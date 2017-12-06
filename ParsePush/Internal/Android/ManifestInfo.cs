@@ -29,7 +29,7 @@ namespace Parse {
 
     private const string MissingParsePushServiceMessage = "<service android:name=\"parse.ParsePushService\" />.\n";
 
-    private static string MissingParsePushBroadcastReceiverMessage {
+    private static string MissingApplicationPermissionMessage {
       get {
         string gcmPackagePermission = PackageName + ".permission.C2D_MESSAGE";
         return
@@ -45,7 +45,7 @@ namespace Parse {
       }
     }
 
-    private static string MissingApplicationPermissionMessage {
+    private static string MissingParsePushBroadcastReceiverMessage {
       get {
         return
           "<receiver android:name=\"parse.ParsePushBroadcastReceiver\" />.\n" +
