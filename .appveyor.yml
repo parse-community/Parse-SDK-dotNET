@@ -1,0 +1,13 @@
+version: '2.0.{build}'
+image: Visual Studio 2017
+before_build:
+  - nuget restore Parse.sln
+build_script:
+  - msbuild /verbosity:quiet "Parse.sln"
+test_script:
+  - .\Parse.Test\tools\OpenCover.4.6.519\tools\OpenCover.Console.exe -target:dotnet.exe -register:user -targetargs:""C:\projects\parse-sdk-dotnet\Parse.Test\bin\debug\Parse.Test.dll" /noshadow" -filter:"" -output:parse_sdk_dotnet_coverage.xml -oldstyle
+after_test:
+  - ps: |
+      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+      bash codecov.sh -f "parse_sdk_dotnet_coverage.xml"
