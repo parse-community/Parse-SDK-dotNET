@@ -3,9 +3,12 @@ image: Visual Studio 2017
 before_build:
   - nuget restore Parse.sln
 build_script:
-  - msbuild /verbosity:quiet "Parse.sln"
+  project: Parse.sln
+  verbosity: minimal
+before_test:  
+  - choco install opencover.portable
 test_script:
-  - .\Parse.Test\opencover\4.6.519\tools\OpenCover.Console.exe -target:dotnet.exe -register:user -targetargs:""C:\projects\parse-sdk-dotnet\Parse.Test\bin\debug\Parse.Test.dll" /noshadow" -filter:"" -output:parse_sdk_dotnet_coverage.xml -oldstyle
+  - OpenCover.Console.exe -target:dotnet.exe -targetargs:"test /p:DebugType=full .\Parse.Test\Parse.Test.csproj" -filter:"+[Parse*]* -[Parse.Test*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
 after_test:
   - ps: |
       $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
