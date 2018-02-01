@@ -1,13 +1,17 @@
-version: '1.7.{build}'
-image: Visual Studio 2015
+version: '2.0.0-{build}'
+image: Visual Studio 2017
 before_build:
   - nuget restore Parse.sln
 build_script:
-  - msbuild /verbosity:quiet "Parse.sln"
+  project: Parse.sln
+  verbosity: minimal
+before_test:  
+  - choco install opencover.portable
+  - choco install codecov
 test_script:
-  - .\packages\OpenCover.4.6.166\tools\OpenCover.Console.exe -target:nunit-console.exe -register:user -targetargs:""C:\projects\parse-sdk-dotnet\ParseAnalytics\Test\bin\Debug\ParseAnalytics.Test.Unit.NetFx45.dll" "C:\projects\parse-sdk-dotnet\ParseCommon\Test\bin\Debug\ParseCommon.Test.Unit.NetFx45.dll" "C:\projects\parse-sdk-dotnet\ParseCore\Test\bin\Debug\ParseTest.Unit.NetFx45.dll" "C:\projects\parse-sdk-dotnet\ParsePush\Test\bin\Debug\ParseTest.Unit.NetFx45.dll" /noshadow" -filter:"" -output:parse_sdk_dotnet_coverage.xml
+  - OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --test-adapter-path:. --logger:Appveyor /p:DebugType=full .\Parse.Test\Parse.Test.csproj" -filter:"+[Parse*]* -[Parse.Test*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
 after_test:
-  - ps: |
-      $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
-      Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
-      bash codecov.sh -f "parse_sdk_dotnet_coverage.xml"
+  - codecov -f "parse_sdk_dotnet_coverage.xml"
+artifacts:
+  - path: '**\*.nupkg'
+    name: Parse NuGet Package

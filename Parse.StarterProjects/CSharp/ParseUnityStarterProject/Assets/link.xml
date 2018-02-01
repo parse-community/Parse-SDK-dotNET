@@ -1,6 +1,0 @@
-﻿<linker>
-  <assembly fullname="Parse.Unity">
-    <namespace fullname="Parse" preserve="all"/>
-    <namespace fullname="Parse.Internal" preserve="all"/>
-  </assembly>
-</linker>

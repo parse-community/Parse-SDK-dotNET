@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Authors>Parse</Authors>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>This is the official package for the Parse .NET Standard SDK. Add a cloud backend to any platform supporting .NET Standard 2.0 with this simple-to-use SDK.</Description>
+    <Copyright>Copyright © Parse 2018. All rights reserved.</Copyright>
+    
+    <RepositoryUrl>https://github.com/parse-community/Parse-SDK-dotNET/</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    
+    <PackageTags>Parse platform library windows win8 wp8 phone winrt xamarin android ios sdk cloud api</PackageTags>
+    <PackageVersion>2.0.0</PackageVersion>
+    <PackageProjectUrl>https://parseplatform.org/</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/parse-community/parse-community.github.io/blob/master/img/favicon/favicon-194x194.png</PackageIconUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Version>2.0.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\Parse.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="2.0.4" />
+    <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
+    <PackageReference Include="OpenCover" Version="4.6.519" />
+    <PackageReference Include="StandardStorage" Version="0.1.1" />
+  </ItemGroup>
+
+</Project>
