@@ -6,9 +6,11 @@ using System.Collections;
 using System.Threading;
 using System.Collections.Generic;
 
-namespace Parse.Push.Internal {
-  public interface IParsePushChannelsController {
-    Task SubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken);
-    Task UnsubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken);
-  }
+namespace Parse.Push.Internal
+{
+    public interface IParsePushChannelsController
+    {
+        Task SubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken);
+        Task UnsubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken);
+    }
 }

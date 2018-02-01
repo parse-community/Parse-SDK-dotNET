@@ -3,16 +3,18 @@
 using System;
 using System.Collections.Generic;
 
-namespace Parse.Push.Internal {
-  public interface IPushState {
-    ParseQuery<ParseInstallation> Query { get; }
-    IEnumerable<string> Channels { get; }
-    DateTime? Expiration { get; }
-    TimeSpan? ExpirationInterval { get; }
-    DateTime? PushTime { get; }
-    IDictionary<string, object> Data { get; }
-    String Alert { get; }
+namespace Parse.Push.Internal
+{
+    public interface IPushState
+    {
+        ParseQuery<ParseInstallation> Query { get; }
+        IEnumerable<string> Channels { get; }
+        DateTime? Expiration { get; }
+        TimeSpan? ExpirationInterval { get; }
+        DateTime? PushTime { get; }
+        IDictionary<string, object> Data { get; }
+        String Alert { get; }
 
-    IPushState MutatedClone(Action<MutablePushState> func);
-  }
+        IPushState MutatedClone(Action<MutablePushState> func);
+    }
 }

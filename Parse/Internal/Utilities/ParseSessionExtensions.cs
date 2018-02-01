@@ -5,24 +5,28 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse.Core.Internal {
-  /// <summary>
-  /// So here's the deal. We have a lot of internal APIs for ParseObject, ParseUser, etc.
-  ///
-  /// These cannot be 'internal' anymore if we are fully modularizing things out, because
-  /// they are no longer a part of the same library, especially as we create things like
-  /// Installation inside push library.
-  ///
-  /// So this class contains a bunch of extension methods that can live inside another
-  /// namespace, which 'wrap' the intenral APIs that already exist.
-  /// </summary>
-  public static class ParseSessionExtensions {
-    public static Task<string> UpgradeToRevocableSessionAsync(string sessionToken, CancellationToken cancellationToken) {
-      return ParseSession.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken);
-    }
+namespace Parse.Core.Internal
+{
+    /// <summary>
+    /// So here's the deal. We have a lot of internal APIs for ParseObject, ParseUser, etc.
+    ///
+    /// These cannot be 'internal' anymore if we are fully modularizing things out, because
+    /// they are no longer a part of the same library, especially as we create things like
+    /// Installation inside push library.
+    ///
+    /// So this class contains a bunch of extension methods that can live inside another
+    /// namespace, which 'wrap' the intenral APIs that already exist.
+    /// </summary>
+    public static class ParseSessionExtensions
+    {
+        public static Task<string> UpgradeToRevocableSessionAsync(string sessionToken, CancellationToken cancellationToken)
+        {
+            return ParseSession.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken);
+        }
 
-    public static Task RevokeAsync(string sessionToken, CancellationToken cancellationToken) {
-      return ParseSession.RevokeAsync(sessionToken, cancellationToken);
+        public static Task RevokeAsync(string sessionToken, CancellationToken cancellationToken)
+        {
+            return ParseSession.RevokeAsync(sessionToken, cancellationToken);
+        }
     }
-  }
 }

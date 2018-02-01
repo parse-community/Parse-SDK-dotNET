@@ -3,11 +3,13 @@
 using Parse.Core.Internal;
 using System;
 
-namespace Parse.Analytics.Internal {
-  public interface IParseAnalyticsPlugins {
-    void Reset();
+namespace Parse.Analytics.Internal
+{
+    public interface IParseAnalyticsPlugins
+    {
+        void Reset();
 
-    IParseCorePlugins CorePlugins { get; }
-    IParseAnalyticsController AnalyticsController { get; }
-  }
+        IParseCorePlugins CorePlugins { get; }
+        IParseAnalyticsController AnalyticsController { get; }
+    }
 }

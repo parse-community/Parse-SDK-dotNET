@@ -6,50 +6,57 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parse.Core.Internal;
 
-namespace Parse.Analytics.Internal {
-  public class ParseAnalyticsController : IParseAnalyticsController {
-    private readonly IParseCommandRunner commandRunner;
+namespace Parse.Analytics.Internal
+{
+    public class ParseAnalyticsController : IParseAnalyticsController
+    {
+        private readonly IParseCommandRunner commandRunner;
 
-    public ParseAnalyticsController(IParseCommandRunner commandRunner) {
-      this.commandRunner = commandRunner;
-    }
+        public ParseAnalyticsController(IParseCommandRunner commandRunner)
+        {
+            this.commandRunner = commandRunner;
+        }
 
-    public Task TrackEventAsync(string name,
-        IDictionary<string, string> dimensions,
-        string sessionToken,
-        CancellationToken cancellationToken) {
-      IDictionary<string, object> data = new Dictionary<string, object> {
+        public Task TrackEventAsync(string name,
+            IDictionary<string, string> dimensions,
+            string sessionToken,
+            CancellationToken cancellationToken)
+        {
+            IDictionary<string, object> data = new Dictionary<string, object> {
         { "at", DateTime.Now },
         { "name", name },
       };
-      if (dimensions != null) {
-        data["dimensions"] = dimensions;
-      }
+            if (dimensions != null)
+            {
+                data["dimensions"] = dimensions;
+            }
 
-      var command = new ParseCommand("events/" + name,
-          method: "POST",
-          sessionToken: sessionToken,
-          data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);
+            var command = new ParseCommand("events/" + name,
+                method: "POST",
+                sessionToken: sessionToken,
+                data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);
 
-      return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
-    }
+            return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
+        }
 
-    public Task TrackAppOpenedAsync(string pushHash,
-        string sessionToken,
-        CancellationToken cancellationToken) {
-      IDictionary<string, object> data = new Dictionary<string, object> {
+        public Task TrackAppOpenedAsync(string pushHash,
+            string sessionToken,
+            CancellationToken cancellationToken)
+        {
+            IDictionary<string, object> data = new Dictionary<string, object> {
         { "at", DateTime.Now }
       };
-      if (pushHash != null) {
-        data["push_hash"] = pushHash;
-      }
+            if (pushHash != null)
+            {
+                data["push_hash"] = pushHash;
+            }
 
-      var command = new ParseCommand("events/AppOpened",
-          method: "POST",
-          sessionToken: sessionToken,
-          data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);
+            var command = new ParseCommand("events/AppOpened",
+                method: "POST",
+                sessionToken: sessionToken,
+                data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>);
 
-      return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
+            return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
+        }
     }
-  }
 }

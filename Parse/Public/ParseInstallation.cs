@@ -13,255 +13,299 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse {
+namespace Parse
+{
 
-  /// <summary>
-  ///  Represents this app installed on this device. Use this class to track information you want
-  ///  to sample from (i.e. if you update a field on app launch, you can issue a query to see
-  ///  the number of devices which were active in the last N hours).
-  /// </summary>
-  [ParseClassName("_Installation")]
-  public partial class ParseInstallation : ParseObject {
-    private static readonly HashSet<string> readOnlyKeys = new HashSet<string> {
+    /// <summary>
+    ///  Represents this app installed on this device. Use this class to track information you want
+    ///  to sample from (i.e. if you update a field on app launch, you can issue a query to see
+    ///  the number of devices which were active in the last N hours).
+    /// </summary>
+    [ParseClassName("_Installation")]
+    public partial class ParseInstallation : ParseObject
+    {
+        private static readonly HashSet<string> readOnlyKeys = new HashSet<string> {
       "deviceType", "deviceUris", "installationId", "timeZone", "localeIdentifier", "parseVersion", "appName", "appIdentifier", "appVersion", "pushType"
     };
 
-    internal static IParseCurrentInstallationController CurrentInstallationController {
-      get {
-        return ParsePushPlugins.Instance.CurrentInstallationController;
-      }
-    }
-
-    internal static IDeviceInfoController DeviceInfoController {
-      get {
-        return ParsePushPlugins.Instance.DeviceInfoController;
-      }
-    }
-
-    /// <summary>
-    /// Constructs a new ParseInstallation. Generally, you should not need to construct
-    /// ParseInstallations yourself. Instead use <see cref="CurrentInstallation"/>.
-    /// </summary>
-    public ParseInstallation()
-      : base() {
-    }
-
-    /// <summary>
-    /// Gets the ParseInstallation representing this app on this device.
-    /// </summary>
-    public static ParseInstallation CurrentInstallation {
-      get {
-        var task = CurrentInstallationController.GetAsync(CancellationToken.None);
-        // TODO (hallucinogen): this will absolutely break on Unity, but how should we resolve this?
-        task.Wait();
-        return task.Result;
-      }
-    }
-
-    internal static void ClearInMemoryInstallation() {
-      CurrentInstallationController.ClearFromMemory();
-    }
-
-    /// <summary>
-    /// Constructs a <see cref="ParseQuery{ParseInstallation}"/> for ParseInstallations.
-    /// </summary>
-    /// <remarks>
-    /// Only the following types of queries are allowed for installations:
-    ///
-    /// <code>
-    /// query.GetAsync(objectId)
-    /// query.WhereEqualTo(key, value)
-    /// query.WhereMatchesKeyInQuery&lt;TOther&gt;(key, keyInQuery, otherQuery)
-    /// </code>
-    ///
-    /// You can add additional query conditions, but one of the above must appear as a top-level <c>AND</c>
-    /// clause in the query.
-    /// </remarks>
-    public static ParseQuery<ParseInstallation> Query {
-      get {
-        return new ParseQuery<ParseInstallation>();
-      }
-    }
-
-    /// <summary>
-    /// A GUID that uniquely names this app installed on this device.
-    /// </summary>
-    [ParseFieldName("installationId")]
-    public Guid InstallationId {
-      get {
-        string installationIdString = GetProperty<string>("InstallationId");
-        Guid? installationId = null;
-        try {
-          installationId = new Guid(installationIdString);
-        } catch (Exception) {
-          // Do nothing.
+        internal static IParseCurrentInstallationController CurrentInstallationController
+        {
+            get
+            {
+                return ParsePushPlugins.Instance.CurrentInstallationController;
+            }
         }
 
-        return installationId.Value;
-      }
-      internal set {
-        Guid installationId = value;
-        SetProperty<string>(installationId.ToString(), "InstallationId");
-      }
-    }
-
-    /// <summary>
-    /// The runtime target of this installation object.
-    /// </summary>
-    [ParseFieldName("deviceType")]
-    public string DeviceType {
-      get { return GetProperty<string>("DeviceType"); }
-      internal set { SetProperty<string>(value, "DeviceType"); }
-    }
-
-    /// <summary>
-    /// The user-friendly display name of this application.
-    /// </summary>
-    [ParseFieldName("appName")]
-    public string AppName {
-      get { return GetProperty<string>("AppName"); }
-      internal set { SetProperty<string>(value, "AppName"); }
-    }
-
-    /// <summary>
-    /// A version string consisting of Major.Minor.Build.Revision.
-    /// </summary>
-    [ParseFieldName("appVersion")]
-    public string AppVersion {
-      get { return GetProperty<string>("AppVersion"); }
-      internal set { SetProperty<string>(value, "AppVersion"); }
-    }
-
-    /// <summary>
-    /// The system-dependent unique identifier of this installation. This identifier should be
-    /// sufficient to distinctly name an app on stores which may allow multiple apps with the
-    /// same display name.
-    /// </summary>
-    [ParseFieldName("appIdentifier")]
-    public string AppIdentifier {
-      get { return GetProperty<string>("AppIdentifier"); }
-      internal set { SetProperty<string>(value, "AppIdentifier"); }
-    }
-
-    /// <summary>
-    /// The time zone in which this device resides. This string is in the tz database format
-    /// Parse uses for local-time pushes. Due to platform restrictions, the mapping is less
-    /// granular on Windows than it may be on other systems. E.g. The zones
-    /// America/Vancouver America/Dawson America/Whitehorse, America/Tijuana, PST8PDT, and
-    /// America/Los_Angeles are all reported as America/Los_Angeles.
-    /// </summary>
-    [ParseFieldName("timeZone")]
-    public string TimeZone {
-      get { return GetProperty<string>("TimeZone"); }
-      private set { SetProperty<string>(value, "TimeZone"); }
-    }
-
-    /// <summary>
-    /// The users locale. This field gets automatically populated by the SDK.
-    /// Can be null (Parse Push uses default language in this case).
-    /// </summary>
-    [ParseFieldName("localeIdentifier")]
-    public string LocaleIdentifier {
-      get { return GetProperty<string>("LocaleIdentifier"); }
-      private set { SetProperty<string>(value, "LocaleIdentifier"); }
-    }
-
-    /// <summary>
-    /// Gets the locale identifier in the format: [language code]-[COUNTRY CODE].
-    /// </summary>
-    /// <returns>The locale identifier in the format: [language code]-[COUNTRY CODE].</returns>
-    private string GetLocaleIdentifier() {
-      String languageCode = null;
-      String countryCode = null;
-      if (CultureInfo.CurrentCulture != null) {
-        languageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-      }
-      if (RegionInfo.CurrentRegion != null) {
-        countryCode = RegionInfo.CurrentRegion.TwoLetterISORegionName;
-      }
-      if (string.IsNullOrEmpty(countryCode)) {
-        return languageCode;
-      } else {
-        return string.Format("{0}-{1}", languageCode, countryCode);
-      }
-    }
-
-    /// <summary>
-    /// The version of the Parse SDK used to build this application.
-    /// </summary>
-    [ParseFieldName("parseVersion")]
-    public Version ParseVersion {
-      get {
-        var versionString = GetProperty<string>("ParseVersion");
-        Version version = null;
-        try {
-          version = new Version(versionString);
-        } catch (Exception) {
-          // Do nothing.
+        internal static IDeviceInfoController DeviceInfoController
+        {
+            get
+            {
+                return ParsePushPlugins.Instance.DeviceInfoController;
+            }
         }
 
-        return version;
-      }
-      private set {
-        Version version = value;
-        SetProperty<string>(version.ToString(), "ParseVersion");
-      }
-    }
-
-    /// <summary>
-    /// A sequence of arbitrary strings which are used to identify this installation for push notifications.
-    /// By convention, the empty string is known as the "Broadcast" channel.
-    /// </summary>
-    [ParseFieldName("channels")]
-    public IList<string> Channels {
-      get { return GetProperty<IList<string>>("Channels"); }
-      set { SetProperty(value, "Channels"); }
-    }
-
-    protected override bool IsKeyMutable(string key) {
-      return !readOnlyKeys.Contains(key);
-    }
-
-    protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken) {
-      Task platformHookTask = null;
-      if (CurrentInstallationController.IsCurrent(this)) {
-        var configuration = ParseClient.CurrentConfiguration;
-
-        // 'this' is required in order for the extension method to be used.
-        this.SetIfDifferent("deviceType", DeviceInfoController.DeviceType);
-        this.SetIfDifferent("timeZone", DeviceInfoController.DeviceTimeZone);
-        this.SetIfDifferent("localeIdentifier", GetLocaleIdentifier());
-        this.SetIfDifferent("parseVersion", GetParseVersion().ToString());
-        this.SetIfDifferent("appVersion", configuration.VersionInfo.BuildVersion ?? DeviceInfoController.AppBuildVersion);
-        this.SetIfDifferent("appIdentifier", DeviceInfoController.AppIdentifier);
-        this.SetIfDifferent("appName", DeviceInfoController.AppName);
-
-        platformHookTask = DeviceInfoController.ExecuteParseInstallationSaveHookAsync(this);
-      }
-
-      return platformHookTask.Safe().OnSuccess(_ => {
-        return base.SaveAsync(toAwait, cancellationToken);
-      }).Unwrap().OnSuccess(_ => {
-        if (CurrentInstallationController.IsCurrent(this)) {
-          return Task.FromResult(0);
+        /// <summary>
+        /// Constructs a new ParseInstallation. Generally, you should not need to construct
+        /// ParseInstallations yourself. Instead use <see cref="CurrentInstallation"/>.
+        /// </summary>
+        public ParseInstallation()
+          : base()
+        {
         }
-        return CurrentInstallationController.SetAsync(this, cancellationToken);
-      }).Unwrap();
-    }
 
-    private Version GetParseVersion() {
-      return new AssemblyName(typeof(ParseInstallation).GetTypeInfo().Assembly.FullName).Version;
-    }
+        /// <summary>
+        /// Gets the ParseInstallation representing this app on this device.
+        /// </summary>
+        public static ParseInstallation CurrentInstallation
+        {
+            get
+            {
+                var task = CurrentInstallationController.GetAsync(CancellationToken.None);
+                // TODO (hallucinogen): this will absolutely break on Unity, but how should we resolve this?
+                task.Wait();
+                return task.Result;
+            }
+        }
 
-    /// <summary>
-    /// This mapping of Windows names to a standard everyone else uses is maintained
-    /// by the Unicode consortium, which makes this officially the first helpful
-    /// interaction between Unicode and Microsoft.
-    /// Unfortunately this is a little lossy in that we only store the first mapping in each zone because
-    /// Microsoft does not give us more granular location information.
-    /// Built from http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/zone_tzid.html
-    /// </summary>
-    internal static readonly Dictionary<string, string> TimeZoneNameMap = new Dictionary<string, string>() {
+        internal static void ClearInMemoryInstallation()
+        {
+            CurrentInstallationController.ClearFromMemory();
+        }
+
+        /// <summary>
+        /// Constructs a <see cref="ParseQuery{ParseInstallation}"/> for ParseInstallations.
+        /// </summary>
+        /// <remarks>
+        /// Only the following types of queries are allowed for installations:
+        ///
+        /// <code>
+        /// query.GetAsync(objectId)
+        /// query.WhereEqualTo(key, value)
+        /// query.WhereMatchesKeyInQuery&lt;TOther&gt;(key, keyInQuery, otherQuery)
+        /// </code>
+        ///
+        /// You can add additional query conditions, but one of the above must appear as a top-level <c>AND</c>
+        /// clause in the query.
+        /// </remarks>
+        public static ParseQuery<ParseInstallation> Query
+        {
+            get
+            {
+                return new ParseQuery<ParseInstallation>();
+            }
+        }
+
+        /// <summary>
+        /// A GUID that uniquely names this app installed on this device.
+        /// </summary>
+        [ParseFieldName("installationId")]
+        public Guid InstallationId
+        {
+            get
+            {
+                string installationIdString = GetProperty<string>("InstallationId");
+                Guid? installationId = null;
+                try
+                {
+                    installationId = new Guid(installationIdString);
+                }
+                catch (Exception)
+                {
+                    // Do nothing.
+                }
+
+                return installationId.Value;
+            }
+            internal set
+            {
+                Guid installationId = value;
+                SetProperty<string>(installationId.ToString(), "InstallationId");
+            }
+        }
+
+        /// <summary>
+        /// The runtime target of this installation object.
+        /// </summary>
+        [ParseFieldName("deviceType")]
+        public string DeviceType
+        {
+            get { return GetProperty<string>("DeviceType"); }
+            internal set { SetProperty<string>(value, "DeviceType"); }
+        }
+
+        /// <summary>
+        /// The user-friendly display name of this application.
+        /// </summary>
+        [ParseFieldName("appName")]
+        public string AppName
+        {
+            get { return GetProperty<string>("AppName"); }
+            internal set { SetProperty<string>(value, "AppName"); }
+        }
+
+        /// <summary>
+        /// A version string consisting of Major.Minor.Build.Revision.
+        /// </summary>
+        [ParseFieldName("appVersion")]
+        public string AppVersion
+        {
+            get { return GetProperty<string>("AppVersion"); }
+            internal set { SetProperty<string>(value, "AppVersion"); }
+        }
+
+        /// <summary>
+        /// The system-dependent unique identifier of this installation. This identifier should be
+        /// sufficient to distinctly name an app on stores which may allow multiple apps with the
+        /// same display name.
+        /// </summary>
+        [ParseFieldName("appIdentifier")]
+        public string AppIdentifier
+        {
+            get { return GetProperty<string>("AppIdentifier"); }
+            internal set { SetProperty<string>(value, "AppIdentifier"); }
+        }
+
+        /// <summary>
+        /// The time zone in which this device resides. This string is in the tz database format
+        /// Parse uses for local-time pushes. Due to platform restrictions, the mapping is less
+        /// granular on Windows than it may be on other systems. E.g. The zones
+        /// America/Vancouver America/Dawson America/Whitehorse, America/Tijuana, PST8PDT, and
+        /// America/Los_Angeles are all reported as America/Los_Angeles.
+        /// </summary>
+        [ParseFieldName("timeZone")]
+        public string TimeZone
+        {
+            get { return GetProperty<string>("TimeZone"); }
+            private set { SetProperty<string>(value, "TimeZone"); }
+        }
+
+        /// <summary>
+        /// The users locale. This field gets automatically populated by the SDK.
+        /// Can be null (Parse Push uses default language in this case).
+        /// </summary>
+        [ParseFieldName("localeIdentifier")]
+        public string LocaleIdentifier
+        {
+            get { return GetProperty<string>("LocaleIdentifier"); }
+            private set { SetProperty<string>(value, "LocaleIdentifier"); }
+        }
+
+        /// <summary>
+        /// Gets the locale identifier in the format: [language code]-[COUNTRY CODE].
+        /// </summary>
+        /// <returns>The locale identifier in the format: [language code]-[COUNTRY CODE].</returns>
+        private string GetLocaleIdentifier()
+        {
+            String languageCode = null;
+            String countryCode = null;
+            if (CultureInfo.CurrentCulture != null)
+            {
+                languageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            }
+            if (RegionInfo.CurrentRegion != null)
+            {
+                countryCode = RegionInfo.CurrentRegion.TwoLetterISORegionName;
+            }
+            if (string.IsNullOrEmpty(countryCode))
+            {
+                return languageCode;
+            }
+            else
+            {
+                return string.Format("{0}-{1}", languageCode, countryCode);
+            }
+        }
+
+        /// <summary>
+        /// The version of the Parse SDK used to build this application.
+        /// </summary>
+        [ParseFieldName("parseVersion")]
+        public Version ParseVersion
+        {
+            get
+            {
+                var versionString = GetProperty<string>("ParseVersion");
+                Version version = null;
+                try
+                {
+                    version = new Version(versionString);
+                }
+                catch (Exception)
+                {
+                    // Do nothing.
+                }
+
+                return version;
+            }
+            private set
+            {
+                Version version = value;
+                SetProperty<string>(version.ToString(), "ParseVersion");
+            }
+        }
+
+        /// <summary>
+        /// A sequence of arbitrary strings which are used to identify this installation for push notifications.
+        /// By convention, the empty string is known as the "Broadcast" channel.
+        /// </summary>
+        [ParseFieldName("channels")]
+        public IList<string> Channels
+        {
+            get { return GetProperty<IList<string>>("Channels"); }
+            set { SetProperty(value, "Channels"); }
+        }
+
+        protected override bool IsKeyMutable(string key)
+        {
+            return !readOnlyKeys.Contains(key);
+        }
+
+        protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
+        {
+            Task platformHookTask = null;
+            if (CurrentInstallationController.IsCurrent(this))
+            {
+                var configuration = ParseClient.CurrentConfiguration;
+
+                // 'this' is required in order for the extension method to be used.
+                this.SetIfDifferent("deviceType", DeviceInfoController.DeviceType);
+                this.SetIfDifferent("timeZone", DeviceInfoController.DeviceTimeZone);
+                this.SetIfDifferent("localeIdentifier", GetLocaleIdentifier());
+                this.SetIfDifferent("parseVersion", GetParseVersion().ToString());
+                this.SetIfDifferent("appVersion", configuration.VersionInfo.BuildVersion ?? DeviceInfoController.AppBuildVersion);
+                this.SetIfDifferent("appIdentifier", DeviceInfoController.AppIdentifier);
+                this.SetIfDifferent("appName", DeviceInfoController.AppName);
+
+                platformHookTask = DeviceInfoController.ExecuteParseInstallationSaveHookAsync(this);
+            }
+
+            return platformHookTask.Safe().OnSuccess(_ =>
+            {
+                return base.SaveAsync(toAwait, cancellationToken);
+            }).Unwrap().OnSuccess(_ =>
+            {
+                if (CurrentInstallationController.IsCurrent(this))
+                {
+                    return Task.FromResult(0);
+                }
+                return CurrentInstallationController.SetAsync(this, cancellationToken);
+            }).Unwrap();
+        }
+
+        private Version GetParseVersion()
+        {
+            return new AssemblyName(typeof(ParseInstallation).GetTypeInfo().Assembly.FullName).Version;
+        }
+
+        /// <summary>
+        /// This mapping of Windows names to a standard everyone else uses is maintained
+        /// by the Unicode consortium, which makes this officially the first helpful
+        /// interaction between Unicode and Microsoft.
+        /// Unfortunately this is a little lossy in that we only store the first mapping in each zone because
+        /// Microsoft does not give us more granular location information.
+        /// Built from http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/zone_tzid.html
+        /// </summary>
+        internal static readonly Dictionary<string, string> TimeZoneNameMap = new Dictionary<string, string>() {
       {"Dateline Standard Time", "Etc/GMT+12"},
       {"UTC-11", "Etc/GMT+11"},
       {"Hawaiian Standard Time", "Pacific/Honolulu"},
@@ -363,12 +407,12 @@ namespace Parse {
       {"Samoa Standard Time", "Pacific/Apia"}
     };
 
-    /// <summary>
-    /// This is a mapping of odd TimeZone offsets to their respective IANA codes across the world.
-    /// This list was compiled from painstakingly pouring over the information available at
-    /// https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
-    /// </summary>
-    internal static readonly Dictionary<TimeSpan, String> TimeZoneOffsetMap = new Dictionary<TimeSpan, string>() {
+        /// <summary>
+        /// This is a mapping of odd TimeZone offsets to their respective IANA codes across the world.
+        /// This list was compiled from painstakingly pouring over the information available at
+        /// https://en.wikipedia.org/wiki/List_of_tz_database_time_zones.
+        /// </summary>
+        internal static readonly Dictionary<TimeSpan, String> TimeZoneOffsetMap = new Dictionary<TimeSpan, string>() {
       { new TimeSpan(12, 45, 0), "Pacific/Chatham" },
       { new TimeSpan(10, 30, 0), "Australia/Lord_Howe" },
       { new TimeSpan(9, 30, 0),  "Australia/Adelaide" },
@@ -383,5 +427,5 @@ namespace Parse {
       { new TimeSpan(-4, 30, 0), "America/Caracas" },
       { new TimeSpan(-9, 30, 0), "Pacific/Marquesas" },
     };
-  }
+    }
 }

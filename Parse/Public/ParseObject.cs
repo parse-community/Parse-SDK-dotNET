@@ -345,7 +345,7 @@ namespace Parse
         /// <param name="traverseParseObjects">Whether to traverse into ParseObjects' children</param>
         /// <param name="yieldRoot">Whether to include the root in the result</param>
         /// <returns></returns>
-        internal static IEnumerable<object> DeepTraversal( object root, bool traverseParseObjects = false, bool yieldRoot = false)
+        internal static IEnumerable<object> DeepTraversal(object root, bool traverseParseObjects = false, bool yieldRoot = false)
         {
             var items = DeepTraversalInternal(root, traverseParseObjects, new HashSet<object>(new IdentityEqualityComparer<object>()));
             if (yieldRoot) return new[] { root }.Concat(items);

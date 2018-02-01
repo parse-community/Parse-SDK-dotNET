@@ -2,16 +2,18 @@
 
 using System;
 
-namespace Parse {
-  /// <summary>
-  /// Represents upload progress.
-  /// </summary>
-  public class ParseUploadProgressEventArgs : EventArgs {
-    public ParseUploadProgressEventArgs() { }
-
+namespace Parse
+{
     /// <summary>
-    /// Gets the progress (a number between 0.0 and 1.0) of an upload.
+    /// Represents upload progress.
     /// </summary>
-    public double Progress { get; set; }
-  }
+    public class ParseUploadProgressEventArgs : EventArgs
+    {
+        public ParseUploadProgressEventArgs() { }
+
+        /// <summary>
+        /// Gets the progress (a number between 0.0 and 1.0) of an upload.
+        /// </summary>
+        public double Progress { get; set; }
+    }
 }

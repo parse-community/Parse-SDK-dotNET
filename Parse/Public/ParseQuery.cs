@@ -328,7 +328,7 @@ namespace Parse
         /// </summary>
         /// <param name="key">The key that should exist.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereExists(string key) => new ParseQuery<T>(this, where: new Dictionary<string, object>{ { key, new Dictionary<string, object> { { "$exists", true } } } });
+        public ParseQuery<T> WhereExists(string key) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$exists", true } } } });
 
         /// <summary>
         /// Adds a constraint to the query that requires a particular key's value to be
@@ -418,7 +418,7 @@ namespace Parse
         /// <param name="keyInQuery">The key in the objects from the subquery to look in.</param>
         /// <param name="query">The subquery to run</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object>{{"$select", new Dictionary<string, object> { { "query", query.BuildParameters(true) }, { "key", keyInQuery } } } } } });
+        public ParseQuery<T> WhereMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$select", new Dictionary<string, object> { { "query", query.BuildParameters(true) }, { "key", keyInQuery } } } } } });
 
         /// <summary>
         /// Adds a constraint to the query that requires a particular key's value
@@ -428,7 +428,7 @@ namespace Parse
         /// <param name="keyInQuery">The key in the objects from the subquery to look in.</param>
         /// <param name="query">The subquery to run</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereDoesNotMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object>{ {"$dontSelect", new Dictionary<string, object> { { "query", query.BuildParameters(true) }, { "key" , keyInQuery } } } } } });
+        public ParseQuery<T> WhereDoesNotMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$dontSelect", new Dictionary<string, object> { { "query", query.BuildParameters(true) }, { "key", keyInQuery } } } } } });
 
         /// <summary>
         /// Adds a constraint to the query that requires that a particular key's value
@@ -438,7 +438,7 @@ namespace Parse
         /// <param name="key">The key to check.</param>
         /// <param name="query">The query that the value should match.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereMatchesQuery<TOther>(string key, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object>{ { "$inQuery", query.BuildParameters(true) } } } });
+        public ParseQuery<T> WhereMatchesQuery<TOther>(string key, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$inQuery", query.BuildParameters(true) } } } });
 
         /// <summary>
         /// Adds a proximity-based constraint for finding objects with keys whose GeoPoint
@@ -447,7 +447,7 @@ namespace Parse
         /// <param name="key">The key that the ParseGeoPoint is stored in.</param>
         /// <param name="point">The reference ParseGeoPoint.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereNear(string key, ParseGeoPoint point) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object>{ { "$nearSphere" , point } } } });
+        public ParseQuery<T> WhereNear(string key, ParseGeoPoint point) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$nearSphere", point } } } });
 
         /// <summary>
         /// Adds a constraint to the query that requires a particular key's value to be
@@ -484,7 +484,7 @@ namespace Parse
         /// <param name="southwest">The lower-left inclusive corner of the box.</param>
         /// <param name="northeast">The upper-right inclusive corner of the box.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereWithinGeoBox(string key, ParseGeoPoint southwest, ParseGeoPoint northeast) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$within", new Dictionary<string, object> { { "$box", new[] {southwest, northeast } } } } } } });
+        public ParseQuery<T> WhereWithinGeoBox(string key, ParseGeoPoint southwest, ParseGeoPoint northeast) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$within", new Dictionary<string, object> { { "$box", new[] { southwest, northeast } } } } } } });
 
         /// <summary>
         /// Adds a proximity-based constraint for finding objects with keys whose GeoPoint

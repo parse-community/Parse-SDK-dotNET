@@ -206,34 +206,34 @@ namespace Parse.Common.Internal
                     switch (escape.Value[1])
                     {
                         case '\"':
-                        builder[index] = '\"';
-                        break;
+                            builder[index] = '\"';
+                            break;
                         case '\\':
-                        builder[index] = '\\';
-                        break;
+                            builder[index] = '\\';
+                            break;
                         case '/':
-                        builder[index] = '/';
-                        break;
+                            builder[index] = '/';
+                            break;
                         case 'b':
-                        builder[index] = '\b';
-                        break;
+                            builder[index] = '\b';
+                            break;
                         case 'f':
-                        builder[index] = '\f';
-                        break;
+                            builder[index] = '\f';
+                            break;
                         case 'n':
-                        builder[index] = '\n';
-                        break;
+                            builder[index] = '\n';
+                            break;
                         case 'r':
-                        builder[index] = '\r';
-                        break;
+                            builder[index] = '\r';
+                            break;
                         case 't':
-                        builder[index] = '\t';
-                        break;
+                            builder[index] = '\t';
+                            break;
                         case 'u':
-                        builder[index] = (char)ushort.Parse(escape.Value.Substring(2), NumberStyles.AllowHexSpecifier);
-                        break;
+                            builder[index] = (char)ushort.Parse(escape.Value.Substring(2), NumberStyles.AllowHexSpecifier);
+                            break;
                         default:
-                        throw new ArgumentException("Unexpected escape character in string: " + escape.Value);
+                            throw new ArgumentException("Unexpected escape character in string: " + escape.Value);
                     }
                 }
                 output = builder.ToString();
@@ -456,21 +456,21 @@ namespace Parse.Common.Internal
                     switch (m.Value[0])
                     {
                         case '\\':
-                        return "\\\\";
+                            return "\\\\";
                         case '\"':
-                        return "\\\"";
+                            return "\\\"";
                         case '\b':
-                        return "\\b";
+                            return "\\b";
                         case '\f':
-                        return "\\f";
+                            return "\\f";
                         case '\n':
-                        return "\\n";
+                            return "\\n";
                         case '\r':
-                        return "\\r";
+                            return "\\r";
                         case '\t':
-                        return "\\t";
+                            return "\\t";
                         default:
-                        return "\\u" + ((ushort)m.Value[0]).ToString("x4");
+                            return "\\u" + ((ushort)m.Value[0]).ToString("x4");
                     }
                 });
                 return "\"" + str + "\"";

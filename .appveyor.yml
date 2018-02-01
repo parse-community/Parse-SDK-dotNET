@@ -1,4 +1,4 @@
-version: '2.0.{build}'
+version: '2.0.0-{build}'
 image: Visual Studio 2017
 before_build:
   - nuget restore Parse.sln
@@ -12,3 +12,6 @@ test_script:
   - OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --test-adapter-path:. --logger:Appveyor /p:DebugType=full .\Parse.Test\Parse.Test.csproj" -filter:"+[Parse*]* -[Parse.Test*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
 after_test:
   - codecov -f "parse_sdk_dotnet_coverage.xml"
+artifacts:
+  - path: '**\*.nupkg'
+    name: Parse NuGet Package

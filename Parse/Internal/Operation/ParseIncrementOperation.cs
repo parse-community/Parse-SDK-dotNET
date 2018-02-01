@@ -4,13 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Parse.Core.Internal {
-  public class ParseIncrementOperation : IParseFieldOperation {
-    private static readonly IDictionary<Tuple<Type, Type>, Func<object, object, object>> adders;
+namespace Parse.Core.Internal
+{
+    public class ParseIncrementOperation : IParseFieldOperation
+    {
+        private static readonly IDictionary<Tuple<Type, Type>, Func<object, object, object>> adders;
 
-    static ParseIncrementOperation() {
-      // Defines adders for all of the implicit conversions: http://msdn.microsoft.com/en-US/library/y5b434w4(v=vs.80).aspx
-      adders = new Dictionary<Tuple<Type, Type>, Func<object, object, object>> {
+        static ParseIncrementOperation()
+        {
+            // Defines adders for all of the implicit conversions: http://msdn.microsoft.com/en-US/library/y5b434w4(v=vs.80).aspx
+            adders = new Dictionary<Tuple<Type, Type>, Func<object, object, object>> {
         {new Tuple<Type, Type>(typeof(sbyte), typeof(sbyte)), (left, right) => (sbyte)left + (sbyte)right},
         {new Tuple<Type, Type>(typeof(sbyte), typeof(short)), (left, right) => (sbyte)left + (short)right},
         {new Tuple<Type, Type>(typeof(sbyte), typeof(int)), (left, right) => (sbyte)left + (int)right},
@@ -75,74 +78,90 @@ namespace Parse.Core.Internal {
         {new Tuple<Type, Type>(typeof(double), typeof(double)), (left, right) => (double)left + (double)right},
         {new Tuple<Type, Type>(typeof(decimal), typeof(decimal)), (left, right) => (decimal)left + (decimal)right}
       };
-      // Generate the adders in the other direction
-      foreach (var pair in adders.Keys.ToList()) {
-        if (pair.Item1.Equals(pair.Item2)) {
-          continue;
+            // Generate the adders in the other direction
+            foreach (var pair in adders.Keys.ToList())
+            {
+                if (pair.Item1.Equals(pair.Item2))
+                {
+                    continue;
+                }
+                var reversePair = new Tuple<Type, Type>(pair.Item2, pair.Item1);
+                var func = adders[pair];
+                adders[reversePair] = (left, right) => func(right, left);
+            }
         }
-        var reversePair = new Tuple<Type, Type>(pair.Item2, pair.Item1);
-        var func = adders[pair];
-        adders[reversePair] = (left, right) => func(right, left);
-      }
-    }
 
-    private object amount;
+        private object amount;
 
-    public ParseIncrementOperation(object amount) {
-      this.amount = amount;
-    }
+        public ParseIncrementOperation(object amount)
+        {
+            this.amount = amount;
+        }
 
-    public object Encode() {
-      return new Dictionary<string, object> {
+        public object Encode()
+        {
+            return new Dictionary<string, object> {
         {"__op", "Increment"},
         {"amount", amount}
       };
-    }
-
-    private static object Add(object obj1, object obj2) {
-      Func<object, object, object> adder;
-      if (adders.TryGetValue(new Tuple<Type, Type>(obj1.GetType(), obj2.GetType()), out adder)) {
-        return adder(obj1, obj2);
-      }
-      throw new InvalidCastException("Cannot add " + obj1.GetType() + " to " + obj2.GetType());
-    }
-
-    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) {
-      if (previous == null) {
-        return this;
-      }
-      if (previous is ParseDeleteOperation) {
-        return new ParseSetOperation(amount);
-      }
-      if (previous is ParseSetOperation) {
-        var otherAmount = ((ParseSetOperation)previous).Value;
-        if (otherAmount is string) {
-          throw new InvalidOperationException("Cannot increment a non-number type.");
         }
-        var myAmount = amount;
-        return new ParseSetOperation(Add(otherAmount, myAmount));
-      }
-      if (previous is ParseIncrementOperation) {
-        object otherAmount = ((ParseIncrementOperation)previous).Amount;
-        object myAmount = amount;
-        return new ParseIncrementOperation(Add(otherAmount, myAmount));
-      }
-      throw new InvalidOperationException("Operation is invalid after previous operation.");
-    }
 
-    public object Apply(object oldValue, string key) {
-      if (oldValue is string) {
-        throw new InvalidOperationException("Cannot increment a non-number type.");
-      }
-      object otherAmount = oldValue ?? 0;
-      object myAmount = amount;
-      return Add(otherAmount, myAmount);
-    }
+        private static object Add(object obj1, object obj2)
+        {
+            Func<object, object, object> adder;
+            if (adders.TryGetValue(new Tuple<Type, Type>(obj1.GetType(), obj2.GetType()), out adder))
+            {
+                return adder(obj1, obj2);
+            }
+            throw new InvalidCastException("Cannot add " + obj1.GetType() + " to " + obj2.GetType());
+        }
 
-    public object Amount {
-      get {
-        return amount;
-      }
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+        {
+            if (previous == null)
+            {
+                return this;
+            }
+            if (previous is ParseDeleteOperation)
+            {
+                return new ParseSetOperation(amount);
+            }
+            if (previous is ParseSetOperation)
+            {
+                var otherAmount = ((ParseSetOperation)previous).Value;
+                if (otherAmount is string)
+                {
+                    throw new InvalidOperationException("Cannot increment a non-number type.");
+                }
+                var myAmount = amount;
+                return new ParseSetOperation(Add(otherAmount, myAmount));
+            }
+            if (previous is ParseIncrementOperation)
+            {
+                object otherAmount = ((ParseIncrementOperation)previous).Amount;
+                object myAmount = amount;
+                return new ParseIncrementOperation(Add(otherAmount, myAmount));
+            }
+            throw new InvalidOperationException("Operation is invalid after previous operation.");
+        }
+
+        public object Apply(object oldValue, string key)
+        {
+            if (oldValue is string)
+            {
+                throw new InvalidOperationException("Cannot increment a non-number type.");
+            }
+            object otherAmount = oldValue ?? 0;
+            object myAmount = amount;
+            return Add(otherAmount, myAmount);
+        }
+
+        public object Amount
+        {
+            get
+            {
+                return amount;
+            }
+        }
     }
-  }
 }

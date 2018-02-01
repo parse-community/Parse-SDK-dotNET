@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse.Core.Internal {
-  public interface IParseCloudCodeController {
-    Task<T> CallFunctionAsync<T>(String name,
-        IDictionary<string, object> parameters,
-        string sessionToken,
-        CancellationToken cancellationToken);
-  }
+namespace Parse.Core.Internal
+{
+    public interface IParseCloudCodeController
+    {
+        Task<T> CallFunctionAsync<T>(String name,
+            IDictionary<string, object> parameters,
+            string sessionToken,
+            CancellationToken cancellationToken);
+    }
 }

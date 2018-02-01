@@ -82,13 +82,13 @@ namespace Parse
             switch (kind)
             {
                 case AccessKind.Read:
-                target = readers;
-                break;
+                    target = readers;
+                    break;
                 case AccessKind.Write:
-                target = writers;
-                break;
+                    target = writers;
+                    break;
                 default:
-                throw new NotImplementedException("Unknown AccessKind");
+                    throw new NotImplementedException("Unknown AccessKind");
             }
             if (allowed)
             {
@@ -109,11 +109,11 @@ namespace Parse
             switch (kind)
             {
                 case AccessKind.Read:
-                return readers.Contains(userId);
+                    return readers.Contains(userId);
                 case AccessKind.Write:
-                return writers.Contains(userId);
+                    return writers.Contains(userId);
                 default:
-                throw new NotImplementedException("Unknown AccessKind");
+                    throw new NotImplementedException("Unknown AccessKind");
             }
         }
 

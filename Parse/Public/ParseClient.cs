@@ -21,7 +21,7 @@ namespace Parse
     /// </summary>
     public static partial class ParseClient
     {
-        internal static readonly string[] DateFormatStrings = 
+        internal static readonly string[] DateFormatStrings =
         {
             // Official ISO format
             "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'",

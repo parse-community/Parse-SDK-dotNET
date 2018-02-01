@@ -5,12 +5,14 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse.Core.Internal {
-  public interface IParseFileController {
-    Task<FileState> SaveAsync(FileState state,
-        Stream dataStream,
-        String sessionToken,
-        IProgress<ParseUploadProgressEventArgs> progress,
-        CancellationToken cancellationToken);
-  }
+namespace Parse.Core.Internal
+{
+    public interface IParseFileController
+    {
+        Task<FileState> SaveAsync(FileState state,
+            Stream dataStream,
+            String sessionToken,
+            IProgress<ParseUploadProgressEventArgs> progress,
+            CancellationToken cancellationToken);
+    }
 }

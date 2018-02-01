@@ -7,25 +7,30 @@ using System.Collections.Generic;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 
-namespace Parse.Push.Internal {
-  internal class ParsePushController : IParsePushController {
-    private readonly IParseCommandRunner commandRunner;
-    private readonly IParseCurrentUserController currentUserController;
+namespace Parse.Push.Internal
+{
+    internal class ParsePushController : IParsePushController
+    {
+        private readonly IParseCommandRunner commandRunner;
+        private readonly IParseCurrentUserController currentUserController;
 
-    public ParsePushController(IParseCommandRunner commandRunner, IParseCurrentUserController currentUserController) {
-      this.commandRunner = commandRunner;
-      this.currentUserController = currentUserController;
+        public ParsePushController(IParseCommandRunner commandRunner, IParseCurrentUserController currentUserController)
+        {
+            this.commandRunner = commandRunner;
+            this.currentUserController = currentUserController;
+        }
+
+        public Task SendPushNotificationAsync(IPushState state, CancellationToken cancellationToken)
+        {
+            return currentUserController.GetCurrentSessionTokenAsync(cancellationToken).OnSuccess(sessionTokenTask =>
+            {
+                var command = new ParseCommand("push",
+                    method: "POST",
+                    sessionToken: sessionTokenTask.Result,
+                    data: ParsePushEncoder.Instance.Encode(state));
+
+                return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
+            }).Unwrap();
+        }
     }
-
-    public Task SendPushNotificationAsync(IPushState state, CancellationToken cancellationToken) {
-      return currentUserController.GetCurrentSessionTokenAsync(cancellationToken).OnSuccess(sessionTokenTask => {
-        var command = new ParseCommand("push",
-            method: "POST",
-            sessionToken: sessionTokenTask.Result,
-            data: ParsePushEncoder.Instance.Encode(state));
-
-        return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
-      }).Unwrap();
-    }
-  }
 }

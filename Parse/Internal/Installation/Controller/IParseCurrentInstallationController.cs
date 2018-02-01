@@ -3,7 +3,9 @@
 using Parse.Core.Internal;
 using System;
 
-namespace Parse.Push.Internal {
-  public interface IParseCurrentInstallationController : IParseObjectCurrentController<ParseInstallation> {
-  }
+namespace Parse.Push.Internal
+{
+    public interface IParseCurrentInstallationController : IParseObjectCurrentController<ParseInstallation>
+    {
+    }
 }
