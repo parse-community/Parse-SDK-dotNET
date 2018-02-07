@@ -1,4 +1,4 @@
-﻿using Parse;
+using Parse;
 using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
@@ -201,19 +201,19 @@ namespace Parse.Test
             obj["obj"] = new ParseObject("Corgi");
 
             Assert.IsTrue(obj.ContainsKey("gogo"));
-            Assert.IsInstanceOfType(obj["gogo"], typeof (bool));
+            Assert.IsInstanceOfType(obj["gogo"], typeof(bool));
 
             Assert.IsTrue(obj.ContainsKey("list"));
-            Assert.IsInstanceOfType(obj["list"], typeof (IList<string>));
+            Assert.IsInstanceOfType(obj["list"], typeof(IList<string>));
 
             Assert.IsTrue(obj.ContainsKey("dict"));
-            Assert.IsInstanceOfType(obj["dict"], typeof (IDictionary<string, object>));
+            Assert.IsInstanceOfType(obj["dict"], typeof(IDictionary<string, object>));
 
             Assert.IsTrue(obj.ContainsKey("fakeACL"));
-            Assert.IsInstanceOfType(obj["fakeACL"], typeof (ParseACL));
+            Assert.IsInstanceOfType(obj["fakeACL"], typeof(ParseACL));
 
             Assert.IsTrue(obj.ContainsKey("obj"));
-            Assert.IsInstanceOfType(obj["obj"], typeof (ParseObject));
+            Assert.IsInstanceOfType(obj["obj"], typeof(ParseObject));
 
             Assert.ThrowsException<KeyNotFoundException>(() => { var gogo = obj["missingItem"]; });
         }

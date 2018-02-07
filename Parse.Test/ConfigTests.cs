@@ -23,7 +23,7 @@ namespace Parse.Test
                 var mockedConfigController = new Mock<IParseConfigController>();
                 var mockedCurrentConfigController = new Mock<IParseCurrentConfigController>();
 
-                ParseConfig theConfig = ParseConfigExtensions.Create(new Dictionary<string, object> { { "params", new Dictionary<string, object> { { "testKey", "testValue" } } }});
+                ParseConfig theConfig = ParseConfigExtensions.Create(new Dictionary<string, object> { { "params", new Dictionary<string, object> { { "testKey", "testValue" } } } });
 
                 mockedCurrentConfigController.Setup(obj => obj.GetCurrentConfigAsync()).Returns(Task.FromResult(theConfig));
 

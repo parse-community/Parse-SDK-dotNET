@@ -120,7 +120,7 @@ namespace Parse.Common.Internal
                 {
                     return false;
                 }
-                output = new Tuple<string, object>((string)key, value);
+                output = new Tuple<string, object>((string) key, value);
                 return true;
             }
 
@@ -230,7 +230,7 @@ namespace Parse.Common.Internal
                             builder[index] = '\t';
                             break;
                         case 'u':
-                            builder[index] = (char)ushort.Parse(escape.Value.Substring(2), NumberStyles.AllowHexSpecifier);
+                            builder[index] = (char) ushort.Parse(escape.Value.Substring(2), NumberStyles.AllowHexSpecifier);
                             break;
                         default:
                             throw new ArgumentException("Unexpected escape character in string: " + escape.Value);
@@ -470,7 +470,7 @@ namespace Parse.Common.Internal
                         case '\t':
                             return "\\t";
                         default:
-                            return "\\u" + ((ushort)m.Value[0]).ToString("x4");
+                            return "\\u" + ((ushort) m.Value[0]).ToString("x4");
                     }
                 });
                 return "\"" + str + "\"";
@@ -481,7 +481,7 @@ namespace Parse.Common.Internal
             }
             if (obj is bool)
             {
-                if ((bool)obj)
+                if ((bool) obj)
                 {
                     return "true";
                 }

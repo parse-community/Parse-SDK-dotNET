@@ -29,7 +29,7 @@ namespace ParseTest
         [TestMethod]
         public void TestGetInstallationQuery()
         {
-            Assert.IsInstanceOfType(ParseInstallation.Query, typeof (ParseQuery<ParseInstallation>));
+            Assert.IsInstanceOfType(ParseInstallation.Query, typeof(ParseQuery<ParseInstallation>));
         }
 
         [TestMethod]

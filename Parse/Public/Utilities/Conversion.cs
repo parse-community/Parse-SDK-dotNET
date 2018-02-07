@@ -38,7 +38,7 @@ namespace Parse.Utilities
         /// </summary>
         public static T To<T>(object value)
         {
-            return (T)ConvertTo<T>(value);
+            return (T) ConvertTo<T>(value);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Parse.Utilities
 
             if (ReflectionHelpers.IsPrimitive(typeof(T)))
             {
-                return (T)Convert.ChangeType(value, typeof(T));
+                return (T) Convert.ChangeType(value, typeof(T));
             }
 
             if (ReflectionHelpers.IsConstructedGenericType(typeof(T)))
@@ -71,7 +71,7 @@ namespace Parse.Utilities
                     var innerType = ReflectionHelpers.GetGenericTypeArguments(typeof(T))[0];
                     if (ReflectionHelpers.IsPrimitive(innerType))
                     {
-                        return (T)Convert.ChangeType(value, innerType);
+                        return (T) Convert.ChangeType(value, innerType);
                     }
                 }
                 Type listType = GetInterfaceType(value.GetType(), typeof(IList<>));

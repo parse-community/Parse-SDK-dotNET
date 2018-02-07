@@ -214,8 +214,8 @@ namespace Parse.Core.Internal
                     else if (result.ContainsKey("error"))
                     {
                         var error = result["error"] as IDictionary<string, object>;
-                        long errorCode = (long)error["code"];
-                        tcs.TrySetException(new ParseException((ParseException.ErrorCode)errorCode, error["error"] as string));
+                        long errorCode = (long) error["code"];
+                        tcs.TrySetException(new ParseException((ParseException.ErrorCode) errorCode, error["error"] as string));
                     }
                     else
                     {

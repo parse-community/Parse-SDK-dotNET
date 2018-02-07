@@ -54,7 +54,7 @@ namespace Parse.Test
 
                 var session = t.Result;
                 Assert.AreEqual(2, session.Count());
-                Assert.IsTrue((bool)session["restricted"]);
+                Assert.IsTrue((bool) session["restricted"]);
                 Assert.AreEqual("S0m3Se551on", session["sessionToken"]);
             });
         }
@@ -103,7 +103,7 @@ namespace Parse.Test
 
                 var session = t.Result;
                 Assert.AreEqual(2, session.Count());
-                Assert.IsTrue((bool)session["restricted"]);
+                Assert.IsTrue((bool) session["restricted"]);
                 Assert.AreEqual("S0m3Se551on", session["sessionToken"]);
             });
         }

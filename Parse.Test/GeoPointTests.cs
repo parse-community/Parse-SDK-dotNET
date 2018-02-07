@@ -23,7 +23,7 @@ namespace Parse.Test
                 var point = new ParseGeoPoint(1.234, 1.234);
                 var serialized = Json.Encode(new Dictionary<string, object> { { "point", NoObjectsEncoder.Instance.Encode(point) } });
                 var deserialized = ParseDecoder.Instance.Decode(Json.Parse(serialized)) as IDictionary<string, object>;
-                var pointAgain = (ParseGeoPoint)deserialized["point"];
+                var pointAgain = (ParseGeoPoint) deserialized["point"];
                 Assert.AreEqual(1.234, pointAgain.Latitude);
                 Assert.AreEqual(1.234, pointAgain.Longitude);
             }

@@ -73,10 +73,10 @@ namespace Parse.Test
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Result.Item2, typeof (IDictionary<string, object>));
+                Assert.IsInstanceOfType(t.Result.Item2, typeof(IDictionary<string, object>));
                 Assert.AreEqual(1, t.Result.Item2.Count);
                 Assert.IsTrue(t.Result.Item2.ContainsKey("results"));
-                Assert.IsInstanceOfType(t.Result.Item2["results"], typeof (IList<object>));
+                Assert.IsInstanceOfType(t.Result.Item2["results"], typeof(IList<object>));
             });
         }
 
@@ -100,7 +100,7 @@ namespace Parse.Test
             {
                 Assert.IsTrue(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof (ParseException));
+                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseException));
                 Assert.AreEqual(ParseException.ErrorCode.OtherCause, (t.Exception.InnerException as ParseException).Code);
             });
         }
@@ -125,7 +125,7 @@ namespace Parse.Test
             {
                 Assert.IsTrue(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof (ParseException));
+                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseException));
                 var parseException = t.Exception.InnerException as ParseException;
                 Assert.AreEqual(ParseException.ErrorCode.ObjectNotFound, parseException.Code);
                 Assert.AreEqual("Object not found.", parseException.Message);
@@ -152,7 +152,7 @@ namespace Parse.Test
             {
                 Assert.IsTrue(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof (ParseException));
+                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseException));
                 Assert.AreEqual(ParseException.ErrorCode.InternalServerError, (t.Exception.InnerException as ParseException).Code);
             });
         }

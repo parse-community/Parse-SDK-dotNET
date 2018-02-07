@@ -36,7 +36,8 @@ namespace Parse.Test
             };
             ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
             Assert.ThrowsException<ArgumentException>(() => user.Remove("username"));
-            try { user.Remove("name"); }
+            try
+            { user.Remove("name"); }
             catch { Assert.Fail(); }
             Assert.IsFalse(user.ContainsKey("name"));
         }
@@ -119,11 +120,11 @@ namespace Parse.Test
             };
             ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
             Assert.AreEqual(1, user.GetAuthData().Count);
-            Assert.IsInstanceOfType(user.GetAuthData()["facebook"], typeof (IDictionary<string, object>));
+            Assert.IsInstanceOfType(user.GetAuthData()["facebook"], typeof(IDictionary<string, object>));
         }
 
         [TestMethod]
-        public void TestGetUserQuery() => Assert.IsInstanceOfType(ParseUser.Query, typeof (ParseQuery<ParseUser>));
+        public void TestGetUserQuery() => Assert.IsInstanceOfType(ParseUser.Query, typeof(ParseQuery<ParseUser>));
 
         [TestMethod]
         public void TestIsAuthenticated()
@@ -196,7 +197,7 @@ namespace Parse.Test
             return user.SignUpAsync().ContinueWith(t =>
             {
                 Assert.IsTrue(t.IsFaulted);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof (InvalidOperationException));
+                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(InvalidOperationException));
             });
         }
 

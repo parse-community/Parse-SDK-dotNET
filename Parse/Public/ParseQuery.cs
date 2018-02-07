@@ -70,7 +70,8 @@ namespace Parse
         /// </summary>
         private ParseQuery(ParseQuery<T> source, IDictionary<string, object> where = null, IEnumerable<string> replacementOrderBy = null, IEnumerable<string> thenBy = null, int? skip = null, int? limit = null, IEnumerable<string> includes = null, IEnumerable<string> selectedKeys = null, String redirectClassNameForKey = null)
         {
-            if (source == null) throw new ArgumentNullException("source");
+            if (source == null)
+                throw new ArgumentNullException("source");
 
             className = source.className;
             this.where = where != null ? new Dictionary<string, object>(MergeWhereClauses(where)) : source.where;
@@ -83,7 +84,8 @@ namespace Parse
 
             if (thenBy != null)
             {
-                if (orderBy == null) throw new ArgumentException("You must call OrderBy before calling ThenBy.");
+                if (orderBy == null)
+                    throw new ArgumentException("You must call OrderBy before calling ThenBy.");
                 (thenBy as List<string>).AddRange(orderBy);
                 orderBy = new ReadOnlyCollection<string>(thenBy as List<string>);
             }
@@ -91,36 +93,46 @@ namespace Parse
             // Remove duplicates.
             orderBy = orderBy != null ? new ReadOnlyCollection<string>(new HashSet<string>(orderBy).ToList()) : orderBy;
 
-            if (skip != null) this.skip = (this.skip ?? 0) + skip;
+            if (skip != null)
+                this.skip = (this.skip ?? 0) + skip;
 
-            if (limit != null) this.limit = limit;
+            if (limit != null)
+                this.limit = limit;
 
-            if (includes != null) this.includes = new ReadOnlyCollection<string>(MergeIncludes(includes).ToList());
+            if (includes != null)
+                this.includes = new ReadOnlyCollection<string>(MergeIncludes(includes).ToList());
 
-            if (selectedKeys != null) this.selectedKeys = new ReadOnlyCollection<string>(MergeSelectedKeys(selectedKeys).ToList());
+            if (selectedKeys != null)
+                this.selectedKeys = new ReadOnlyCollection<string>(MergeSelectedKeys(selectedKeys).ToList());
 
-            if (redirectClassNameForKey != null) this.redirectClassNameForKey = redirectClassNameForKey;
+            if (redirectClassNameForKey != null)
+                this.redirectClassNameForKey = redirectClassNameForKey;
         }
 
         private HashSet<string> MergeIncludes(IEnumerable<string> includes)
         {
-            if (this.includes == null) return new HashSet<string>(includes);
+            if (this.includes == null)
+                return new HashSet<string>(includes);
             var newIncludes = new HashSet<string>(this.includes);
-            foreach (var item in includes) newIncludes.Add(item);
+            foreach (var item in includes)
+                newIncludes.Add(item);
             return newIncludes;
         }
 
         private HashSet<String> MergeSelectedKeys(IEnumerable<String> selectedKeys)
         {
-            if (this.selectedKeys == null) return new HashSet<string>(selectedKeys);
+            if (this.selectedKeys == null)
+                return new HashSet<string>(selectedKeys);
             var newSelectedKeys = new HashSet<String>(this.selectedKeys);
-            foreach (var item in selectedKeys) newSelectedKeys.Add(item);
+            foreach (var item in selectedKeys)
+                newSelectedKeys.Add(item);
             return newSelectedKeys;
         }
 
         private IDictionary<string, object> MergeWhereClauses(IDictionary<string, object> where)
         {
-            if (this.where == null) return where;
+            if (this.where == null)
+                return where;
             var newWhere = new Dictionary<string, object>(this.where);
             foreach (var pair in where)
             {
@@ -128,16 +140,19 @@ namespace Parse
                 if (newWhere.ContainsKey(pair.Key))
                 {
                     var oldCondition = newWhere[pair.Key] as IDictionary<string, object>;
-                    if (oldCondition == null || condition == null) throw new ArgumentException("More than one where clause for the given key provided.");
+                    if (oldCondition == null || condition == null)
+                        throw new ArgumentException("More than one where clause for the given key provided.");
                     var newCondition = new Dictionary<string, object>(oldCondition);
                     foreach (var conditionPair in condition)
                     {
-                        if (newCondition.ContainsKey(conditionPair.Key)) throw new ArgumentException("More than one condition for the given key provided.");
+                        if (newCondition.ContainsKey(conditionPair.Key))
+                            throw new ArgumentException("More than one condition for the given key provided.");
                         newCondition[conditionPair.Key] = conditionPair.Value;
                     }
                     newWhere[pair.Key] = newCondition;
                 }
-                else newWhere[pair.Key] = pair.Value;
+                else
+                    newWhere[pair.Key] = pair.Value;
             }
             return newWhere;
         }
@@ -164,15 +179,18 @@ namespace Parse
             string className = null;
             var orValue = new List<IDictionary<string, object>>();
             // We need to cast it to non-generic IEnumerable because of AOT-limitation
-            var nonGenericQueries = (IEnumerable)queries;
+            var nonGenericQueries = (IEnumerable) queries;
             foreach (var obj in nonGenericQueries)
             {
                 var q = obj as ParseQuery<T>;
-                if (className != null && q.className != className) throw new ArgumentException("All of the queries in an or query must be on the same class.");
+                if (className != null && q.className != className)
+                    throw new ArgumentException("All of the queries in an or query must be on the same class.");
                 className = q.className;
                 var parameters = q.BuildParameters();
-                if (parameters.Count == 0) continue;
-                if (!parameters.TryGetValue("where", out object where) || parameters.Count > 1) throw new ArgumentException("None of the queries in an or query can have non-filtering clauses");
+                if (parameters.Count == 0)
+                    continue;
+                if (!parameters.TryGetValue("where", out object where) || parameters.Count > 1)
+                    throw new ArgumentException("None of the queries in an or query can have non-filtering clauses");
                 orValue.Add(where as IDictionary<string, object>);
             }
             return new ParseQuery<T>(new ParseQuery<T>(className), where: new Dictionary<string, object> { { "$or", orValue } });
@@ -593,14 +611,22 @@ namespace Parse
         internal IDictionary<string, object> BuildParameters(bool includeClassName = false)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
-            if (where != null) result["where"] = PointerOrLocalIdEncoder.Instance.Encode(where);
-            if (orderBy != null) result["order"] = string.Join(",", orderBy.ToArray());
-            if (skip != null) result["skip"] = skip.Value;
-            if (limit != null) result["limit"] = limit.Value;
-            if (includes != null) result["include"] = string.Join(",", includes.ToArray());
-            if (selectedKeys != null) result["keys"] = string.Join(",", selectedKeys.ToArray());
-            if (includeClassName) result["className"] = className;
-            if (redirectClassNameForKey != null) result["redirectClassNameForKey"] = redirectClassNameForKey;
+            if (where != null)
+                result["where"] = PointerOrLocalIdEncoder.Instance.Encode(where);
+            if (orderBy != null)
+                result["order"] = string.Join(",", orderBy.ToArray());
+            if (skip != null)
+                result["skip"] = skip.Value;
+            if (limit != null)
+                result["limit"] = limit.Value;
+            if (includes != null)
+                result["include"] = string.Join(",", includes.ToArray());
+            if (selectedKeys != null)
+                result["keys"] = string.Join(",", selectedKeys.ToArray());
+            if (includeClassName)
+                result["className"] = className;
+            if (redirectClassNameForKey != null)
+                result["redirectClassNameForKey"] = redirectClassNameForKey;
             return result;
         }
 
@@ -609,8 +635,10 @@ namespace Parse
         private string GetRegexOptions(Regex regex, string modifiers)
         {
             string result = modifiers ?? "";
-            if (regex.Options.HasFlag(RegexOptions.IgnoreCase) && !modifiers.Contains("i")) result += "i";
-            if (regex.Options.HasFlag(RegexOptions.Multiline) && !modifiers.Contains("m")) result += "m";
+            if (regex.Options.HasFlag(RegexOptions.IgnoreCase) && !modifiers.Contains("i"))
+                result += "i";
+            if (regex.Options.HasFlag(RegexOptions.Multiline) && !modifiers.Contains("m"))
+                result += "m";
             return result;
         }
 
@@ -618,14 +646,16 @@ namespace Parse
         {
             var options = GetRegexOptions(regex, modifiers);
             var dict = new Dictionary<string, object> { ["$regex"] = regex.ToString() };
-            if (!string.IsNullOrEmpty(options)) dict["$options"] = options;
+            if (!string.IsNullOrEmpty(options))
+                dict["$options"] = options;
             return dict;
         }
 
         private void EnsureNotInstallationQuery()
         {
             // The ParseInstallation class is not accessible from this project; using string literal.
-            if (className.Equals("_Installation")) throw new InvalidOperationException("Cannot directly query the Installation class.");
+            if (className.Equals("_Installation"))
+                throw new InvalidOperationException("Cannot directly query the Installation class.");
         }
 
         /// <summary>

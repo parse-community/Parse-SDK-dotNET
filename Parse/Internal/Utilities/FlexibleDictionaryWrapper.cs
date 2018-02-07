@@ -24,7 +24,7 @@ namespace Parse.Common.Internal
 
         public void Add(string key, TOut value)
         {
-            toWrap.Add(key, (TIn)Conversion.ConvertTo<TIn>(value));
+            toWrap.Add(key, (TIn) Conversion.ConvertTo<TIn>(value));
         }
 
         public bool ContainsKey(string key)
@@ -46,7 +46,7 @@ namespace Parse.Common.Internal
         {
             TIn outValue;
             bool result = toWrap.TryGetValue(key, out outValue);
-            value = (TOut)Conversion.ConvertTo<TOut>(outValue);
+            value = (TOut) Conversion.ConvertTo<TOut>(outValue);
             return result;
         }
 
@@ -55,7 +55,7 @@ namespace Parse.Common.Internal
             get
             {
                 return toWrap.Values
-                    .Select(item => (TOut)Conversion.ConvertTo<TOut>(item)).ToList();
+                    .Select(item => (TOut) Conversion.ConvertTo<TOut>(item)).ToList();
             }
         }
 
@@ -63,18 +63,18 @@ namespace Parse.Common.Internal
         {
             get
             {
-                return (TOut)Conversion.ConvertTo<TOut>(toWrap[key]);
+                return (TOut) Conversion.ConvertTo<TOut>(toWrap[key]);
             }
             set
             {
-                toWrap[key] = (TIn)Conversion.ConvertTo<TIn>(value);
+                toWrap[key] = (TIn) Conversion.ConvertTo<TIn>(value);
             }
         }
 
         public void Add(KeyValuePair<string, TOut> item)
         {
             toWrap.Add(new KeyValuePair<string, TIn>(item.Key,
-                (TIn)Conversion.ConvertTo<TIn>(item.Value)));
+                (TIn) Conversion.ConvertTo<TIn>(item.Value)));
         }
 
         public void Clear()
@@ -85,14 +85,14 @@ namespace Parse.Common.Internal
         public bool Contains(KeyValuePair<string, TOut> item)
         {
             return toWrap.Contains(new KeyValuePair<string, TIn>(item.Key,
-                (TIn)Conversion.ConvertTo<TIn>(item.Value)));
+                (TIn) Conversion.ConvertTo<TIn>(item.Value)));
         }
 
         public void CopyTo(KeyValuePair<string, TOut>[] array, int arrayIndex)
         {
             var converted = from pair in toWrap
                             select new KeyValuePair<string, TOut>(pair.Key,
-                                (TOut)Conversion.ConvertTo<TOut>(pair.Value));
+                                (TOut) Conversion.ConvertTo<TOut>(pair.Value));
             converted.ToList().CopyTo(array, arrayIndex);
         }
 
@@ -109,7 +109,7 @@ namespace Parse.Common.Internal
         public bool Remove(KeyValuePair<string, TOut> item)
         {
             return toWrap.Remove(new KeyValuePair<string, TIn>(item.Key,
-                (TIn)Conversion.ConvertTo<TIn>(item.Value)));
+                (TIn) Conversion.ConvertTo<TIn>(item.Value)));
         }
 
         public IEnumerator<KeyValuePair<string, TOut>> GetEnumerator()
@@ -117,7 +117,7 @@ namespace Parse.Common.Internal
             foreach (var pair in toWrap)
             {
                 yield return new KeyValuePair<string, TOut>(pair.Key,
-                    (TOut)Conversion.ConvertTo<TOut>(pair.Value));
+                    (TOut) Conversion.ConvertTo<TOut>(pair.Value));
             }
         }
 

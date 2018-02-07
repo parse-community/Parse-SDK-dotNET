@@ -32,9 +32,9 @@ namespace Parse.Test
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Result, typeof (IDictionary<string, object>));
+                Assert.IsInstanceOfType(t.Result, typeof(IDictionary<string, object>));
                 Assert.AreEqual("ben", t.Result["fosco"]);
-                Assert.IsInstanceOfType(t.Result["list"], typeof (IList<object>));
+                Assert.IsInstanceOfType(t.Result["list"], typeof(IList<object>));
             });
         }
     }

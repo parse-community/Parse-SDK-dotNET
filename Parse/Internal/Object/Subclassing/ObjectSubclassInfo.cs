@@ -24,7 +24,7 @@ namespace Parse.Core.Internal
         public IDictionary<String, String> PropertyMappings { get; private set; }
         private ConstructorInfo Constructor { get; set; }
 
-        public ParseObject Instantiate() => (ParseObject)Constructor.Invoke(null);
+        public ParseObject Instantiate() => (ParseObject) Constructor.Invoke(null);
 
         internal static String GetClassName(TypeInfo type) => type.GetCustomAttribute<ParseClassNameAttribute>()?.ClassName;
     }

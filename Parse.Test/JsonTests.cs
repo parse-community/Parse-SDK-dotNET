@@ -71,7 +71,7 @@ namespace Parse.Test
             parsed = Json.Parse("{\"1\" : 6060}");
             Assert.IsTrue(parsed is IDictionary);
             parsedDict = parsed as IDictionary;
-            Assert.AreEqual((Int64)6060, parsedDict["1"]);
+            Assert.AreEqual((Int64) 6060, parsedDict["1"]);
 
             parsed = Json.Parse("{\"1\" : null}");
             Assert.IsTrue(parsed is IDictionary);
@@ -81,12 +81,12 @@ namespace Parse.Test
             parsed = Json.Parse("{\"1\" : true}");
             Assert.IsTrue(parsed is IDictionary);
             parsedDict = parsed as IDictionary;
-            Assert.IsTrue((bool)parsedDict["1"]);
+            Assert.IsTrue((bool) parsedDict["1"]);
 
             parsed = Json.Parse("{\"1\" : false}");
             Assert.IsTrue(parsed is IDictionary);
             parsedDict = parsed as IDictionary;
-            Assert.IsFalse((bool)parsedDict["1"]);
+            Assert.IsFalse((bool) parsedDict["1"]);
         }
 
         [TestMethod]
@@ -110,7 +110,7 @@ namespace Parse.Test
             var parsed = Json.Parse("[ 1 ]");
             Assert.IsTrue(parsed is IList);
             var parsedList = parsed as IList;
-            Assert.AreEqual((Int64)1, parsedList[0]);
+            Assert.AreEqual((Int64) 1, parsedList[0]);
 
             parsed = Json.Parse("[ \n ]");
             Assert.IsTrue(parsed is IList);
@@ -154,7 +154,7 @@ namespace Parse.Test
             parsedDict = parsed as IDictionary;
             Assert.IsTrue(parsedDict["6060"] is IList);
             var parsedList = parsedDict["6060"] as IList;
-            Assert.AreEqual((Int64)6060, parsedList[0]);
+            Assert.AreEqual((Int64) 6060, parsedList[0]);
         }
 
         [TestMethod]

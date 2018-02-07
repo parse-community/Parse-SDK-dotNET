@@ -33,7 +33,7 @@ namespace Parse.Core.Internal
 
                     var response = t.Result;
                     var contentString = response.Item2;
-                    int responseCode = (int)response.Item1;
+                    int responseCode = (int) response.Item1;
                     if (responseCode >= 500)
                     {
                         // Server error, return InternalServerError.
@@ -61,11 +61,11 @@ namespace Parse.Core.Internal
                         }
                         if (responseCode < 200 || responseCode > 299)
                         {
-                            int code = (int)(contentJson.ContainsKey("code") ? (long)contentJson["code"] : (int)ParseException.ErrorCode.OtherCause);
+                            int code = (int) (contentJson.ContainsKey("code") ? (long) contentJson["code"] : (int) ParseException.ErrorCode.OtherCause);
                             string error = contentJson.ContainsKey("error") ?
                                 contentJson["error"] as string :
                                 contentString;
-                            throw new ParseException((ParseException.ErrorCode)code, error);
+                            throw new ParseException((ParseException.ErrorCode) code, error);
                         }
                         return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1,
                             contentJson);

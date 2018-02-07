@@ -90,7 +90,7 @@ namespace Parse
                 {
                     throw new ArgumentException("A role's name must be a string.", "value");
                 }
-                if (!namePattern.IsMatch((string)value))
+                if (!namePattern.IsMatch((string) value))
                 {
                     throw new ArgumentException(
                         "A role's name can only contain alphanumeric characters, _, -, and spaces.",

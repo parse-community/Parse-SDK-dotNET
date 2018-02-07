@@ -64,7 +64,7 @@ namespace Parse.Core.Internal
                   {
                       lock (mutex)
                       {
-                          installationId = new Guid((string)id);
+                          installationId = new Guid((string) id);
                           return Task.FromResult(installationId);
                       }
                   }

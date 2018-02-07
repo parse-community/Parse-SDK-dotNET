@@ -109,11 +109,11 @@ namespace Parse
             Expression<Func<ParseRelation<ParseObject>>> createRelationExpr =
                 () => CreateRelation<ParseObject>(parent, key, targetClassName);
             var createRelationMethod =
-                ((MethodCallExpression)createRelationExpr.Body)
+                ((MethodCallExpression) createRelationExpr.Body)
                 .Method
                 .GetGenericMethodDefinition()
                 .MakeGenericMethod(targetType);
-            return (ParseRelationBase)createRelationMethod.Invoke(null, new object[] { parent, key, targetClassName });
+            return (ParseRelationBase) createRelationMethod.Invoke(null, new object[] { parent, key, targetClassName });
         }
 
         private static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName)

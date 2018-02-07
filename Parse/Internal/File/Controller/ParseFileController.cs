@@ -59,8 +59,8 @@ namespace Parse.Core.Internal
                     };
                 }).ContinueWith(t =>
                 {
-              // Rewind the stream on failure or cancellation (if possible)
-              if ((t.IsFaulted || t.IsCanceled) && dataStream.CanSeek)
+                    // Rewind the stream on failure or cancellation (if possible)
+                    if ((t.IsFaulted || t.IsCanceled) && dataStream.CanSeek)
                     {
                         dataStream.Seek(oldPosition, SeekOrigin.Begin);
                     }

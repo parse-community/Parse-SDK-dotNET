@@ -13,7 +13,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestParseDate()
         {
-            DateTime dateTime = (DateTime)ParseDecoder.Instance.Decode(ParseDecoder.ParseDate("1990-08-30T12:03:59.000Z"));
+            DateTime dateTime = (DateTime) ParseDecoder.Instance.Decode(ParseDecoder.ParseDate("1990-08-30T12:03:59.000Z"));
             Assert.AreEqual(1990, dateTime.Year);
             Assert.AreEqual(8, dateTime.Month);
             Assert.AreEqual(30, dateTime.Day);
@@ -40,7 +40,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestDecodeDate()
         {
-            DateTime dateTime = (DateTime)ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "Date" }, { "iso", "1990-08-30T12:03:59.000Z" } });
+            DateTime dateTime = (DateTime) ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "Date" }, { "iso", "1990-08-30T12:03:59.000Z" } });
             Assert.AreEqual(1990, dateTime.Year);
             Assert.AreEqual(8, dateTime.Month);
             Assert.AreEqual(30, dateTime.Day);
@@ -55,7 +55,7 @@ namespace Parse.Test
         {
             IDictionary<string, object> value = new Dictionary<string, object>() { { "__type", "Date" }, { "iso", "1990-08-30T12:03:59.0Z" } };
 
-            DateTime dateTime = (DateTime)ParseDecoder.Instance.Decode(value);
+            DateTime dateTime = (DateTime) ParseDecoder.Instance.Decode(value);
             Assert.AreEqual(1990, dateTime.Year);
             Assert.AreEqual(8, dateTime.Month);
             Assert.AreEqual(30, dateTime.Day);
@@ -67,7 +67,7 @@ namespace Parse.Test
             // Test multiple trailing zeroes
             value = new Dictionary<string, object>() { { "__type", "Date" }, { "iso", "1990-08-30T12:03:59.00Z" } };
 
-            dateTime = (DateTime)ParseDecoder.Instance.Decode(value);
+            dateTime = (DateTime) ParseDecoder.Instance.Decode(value);
             Assert.AreEqual(1990, dateTime.Year);
             Assert.AreEqual(8, dateTime.Month);
             Assert.AreEqual(30, dateTime.Day);
@@ -104,7 +104,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestDecodeGeoPoint()
         {
-            ParseGeoPoint point1 = (ParseGeoPoint)ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "GeoPoint" }, { "latitude", 0.9 }, { "longitude", 0.3 } });
+            ParseGeoPoint point1 = (ParseGeoPoint) ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "GeoPoint" }, { "latitude", 0.9 }, { "longitude", 0.3 } });
             Assert.IsNotNull(point1);
             Assert.AreEqual(0.9, point1.Latitude);
             Assert.AreEqual(0.3, point1.Longitude);

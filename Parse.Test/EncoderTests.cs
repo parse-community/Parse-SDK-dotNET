@@ -30,7 +30,7 @@ namespace Parse.Test
         {
             var corgi = new ParseObject("Corgi");
             var corgiRelation = corgi.GetRelation<ParseObject>("corgi");
-            
+
             Assert.IsTrue(ParseEncoder.IsValidType(322));
             Assert.IsTrue(ParseEncoder.IsValidType(0.3f));
             Assert.IsTrue(ParseEncoder.IsValidType(new byte[] { 1, 2, 3, 4 }));
@@ -122,8 +122,8 @@ namespace Parse.Test
             Assert.AreEqual(1, value2.Keys.Count);
             IDictionary<string, object> publicAccess = value2["*"] as IDictionary<string, object>;
             Assert.AreEqual(2, publicAccess.Keys.Count);
-            Assert.IsTrue((bool)publicAccess["read"]);
-            Assert.IsTrue((bool)publicAccess["write"]);
+            Assert.IsTrue((bool) publicAccess["read"]);
+            Assert.IsTrue((bool) publicAccess["write"]);
 
             // TODO (hallucinogen): mock ParseUser and test SetReadAccess and SetWriteAccess
         }

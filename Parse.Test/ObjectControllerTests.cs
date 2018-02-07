@@ -510,7 +510,7 @@ namespace Parse.Test
                     if (i % 2 == 0)
                     {
                         Assert.IsTrue(tasks[i].IsFaulted);
-                        Assert.IsInstanceOfType(tasks[i].Exception.InnerException, typeof (ParseException));
+                        Assert.IsInstanceOfType(tasks[i].Exception.InnerException, typeof(ParseException));
                         ParseException exception = tasks[i].Exception.InnerException as ParseException;
                         Assert.AreEqual(ParseException.ErrorCode.ObjectNotFound, exception.Code);
                     }
@@ -565,7 +565,7 @@ namespace Parse.Test
             return Task.WhenAll(tasks).ContinueWith(_ =>
             {
                 Assert.IsTrue(tasks.All(task => task.IsFaulted));
-                Assert.IsInstanceOfType(tasks[0].Exception.InnerException, typeof (InvalidOperationException));
+                Assert.IsInstanceOfType(tasks[0].Exception.InnerException, typeof(InvalidOperationException));
 
                 mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
                     It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),

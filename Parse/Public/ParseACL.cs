@@ -29,10 +29,10 @@ namespace Parse
         internal ParseACL(IDictionary<string, object> jsonObject)
         {
             readers = new HashSet<string>(from pair in jsonObject
-                                          where ((IDictionary<string, object>)pair.Value).ContainsKey("read")
+                                          where ((IDictionary<string, object>) pair.Value).ContainsKey("read")
                                           select pair.Key);
             writers = new HashSet<string>(from pair in jsonObject
-                                          where ((IDictionary<string, object>)pair.Value).ContainsKey("write")
+                                          where ((IDictionary<string, object>) pair.Value).ContainsKey("write")
                                           select pair.Key);
         }
 

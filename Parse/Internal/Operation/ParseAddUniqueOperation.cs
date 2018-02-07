@@ -36,15 +36,15 @@ namespace Parse.Core.Internal
             }
             if (previous is ParseSetOperation)
             {
-                var setOp = (ParseSetOperation)previous;
+                var setOp = (ParseSetOperation) previous;
                 var oldList = Conversion.To<IList<object>>(setOp.Value);
                 var result = this.Apply(oldList, null);
                 return new ParseSetOperation(result);
             }
             if (previous is ParseAddUniqueOperation)
             {
-                var oldList = ((ParseAddUniqueOperation)previous).Objects;
-                return new ParseAddUniqueOperation((IList<object>)this.Apply(oldList, null));
+                var oldList = ((ParseAddUniqueOperation) previous).Objects;
+                return new ParseAddUniqueOperation((IList<object>) this.Apply(oldList, null));
             }
             throw new InvalidOperationException("Operation is invalid after previous operation.");
         }

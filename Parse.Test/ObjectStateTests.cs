@@ -18,7 +18,7 @@ namespace Parse.Test
             Assert.IsNull(state.ObjectId);
             Assert.IsNull(state.CreatedAt);
             Assert.IsNull(state.UpdatedAt);
-            
+
             foreach (var pair in state)
             {
                 Assert.IsNotNull(pair);

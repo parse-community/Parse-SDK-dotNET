@@ -66,7 +66,7 @@ namespace Parse.Core.Internal
             {
                 currentConfig = config;
 
-                var jsonObject = ((IJsonConvertible)config).ToJSON();
+                var jsonObject = ((IJsonConvertible) config).ToJSON();
                 var jsonString = ParseClient.SerializeJsonString(jsonObject);
 
                 return storageController.LoadAsync().OnSuccess(t => t.Result.AddAsync(CurrentConfigKey, jsonString));
