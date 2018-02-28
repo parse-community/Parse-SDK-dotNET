@@ -9,26 +9,27 @@ The latest stable release of the SDK is available on our [NuGet package][nuget-l
 To use the most up-to-date code, build this project and reference the generated NuGet package.
 
 ## Using the Code
-Make sure you are using the namespace:
+Make sure you are using the project's root namespace:
 
 ```cs
 using Parse;
 ```
 
-Then, in your program's entry point, paste the following code, with 
+Then, in your program's entry point, paste the following code, with the bolded parts replaced to reflect your application and Parse Server setup.
 
-```cs
-ParseClient.Initialize(new ParseClient.Configuration {
-    ApplicationId = "*App ID*",
-    WindowsKey = "*DotNet Key*",
-    Server = "*Complete Hosted Parse Server URL*"
+<pre lang="cs">
+ParseClient.Initialize(new ParseClient.Configuration
+{
+    ApplicationId = "<b>App ID</b>",
+    WindowsKey = "<b>DotNet Key</b>",
+    Server = "<b>Full URL pointing to <i>Hosted Parse</i> Server</b>"
 });
-```
+</pre>
 
 ## Building The Library
 You can build the library from Visual Studio Code (with the proper extensions), Visual Studio 2017 Community and higher, or Visual Studio for Mac 7 and higher. You can also build the library using the command line:
 
-# On Windows or Unix-based systems with Dotnet SDK installed:
+### On Windows or Unix-based systems with Dotnet SDK installed:
 ```batch
 dotnet build Parse.sln
 ```
