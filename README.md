@@ -15,16 +15,22 @@ Make sure you are using the project's root namespace:
 using Parse;
 ```
 
-Then, in your program's entry point, paste the following code, with the bolded parts replaced to reflect your application and Parse Server setup.
+Then, in your program's entry point, paste the following code, with the text reflecting your application and Parse Server setup emplaced between the quotation marks.
 
-<pre lang="cs">
+```cs
 ParseClient.Initialize(new ParseClient.Configuration
 {
-    ApplicationId = "<b>App ID</b>",
-    WindowsKey = "<b>DotNet Key</b>",
-    Server = "<b>Full URL pointing to <i>Hosted Parse</i> Server</b>"
+    ApplicationId = "",
+    WindowsKey = "",
+    Server = ""
 });
-</pre>
+```
+
+`ApplicationId` is your app's `ApplicationId` field from your Parse Server.
+`WindowsKey` is your app's `DotNetKey` field from your Parse Server.
+`Server` is the full URL to your web-hosted Parse Server. 
+
+To find full usage instructions for the latest stable release, please visit the [Parse docs website][parse-docs-link]
 
 ## Building The Library
 You can build the library from Visual Studio Code (with the proper extensions), Visual Studio 2017 Community and higher, or Visual Studio for Mac 7 and higher. You can also build the library using the command line:
@@ -55,4 +61,4 @@ of patent rights can be found in the PATENTS file in the same directory.
  [license-link]: https://github.com/parse-community/Parse-SDK-dotNET/blob/master/LICENSE
  [nuget-link]: http://nuget.org/packages/parse
  [nuget-svg]: https://img.shields.io/nuget/v/parse.svg
- [parse-download-link]: http://docs.parseplatform.org/
+ [parse-docs-link]: http://docs.parseplatform.org/
