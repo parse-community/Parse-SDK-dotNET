@@ -20,13 +20,14 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(CloudTests))]
         public Task TestCloudFunctions()
         {
-            IDictionary<string, object> response = new Dictionary<string, object>() { { "fosco", "ben" }, { "list", new List<object> { 1, 2, 3 } } };
-            var mockController = new Mock<IParseCloudCodeController>();
-            mockController.Setup(obj => obj.CallFunctionAsync<IDictionary<string, object>>(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
-            var mockCurrentUserController = new Mock<IParseCurrentUserController>();
+            Mock<IParseCloudCodeController> mockController = new Mock<IParseCloudCodeController>();
+            mockController.Setup(obj => obj.CallFunctionAsync<IDictionary<string, object>>(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult<IDictionary<string, object>>(new Dictionary<string, object> { ["fosco"] = "ben", ["list"] = new List<object> { 1, 2, 3 } }));
 
-            ParseCorePlugins plugins = new ParseCorePlugins { CloudCodeController = mockController.Object, CurrentUserController = mockCurrentUserController.Object };
-            ParseCorePlugins.Instance = plugins;
+            ParseCorePlugins.Instance = new ParseCorePlugins
+            {
+                CloudCodeController = mockController.Object,
+                CurrentUserController = new Mock<IParseCurrentUserController>().Object
+            };
 
             return ParseCloud.CallFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None).ContinueWith(t =>
             {

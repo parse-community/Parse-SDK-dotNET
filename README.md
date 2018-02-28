@@ -5,36 +5,32 @@
 [![License][license-svg]][license-link]
 
 ## Getting Started
-The SDK is available for download [on our website][parse-download-link] or our [NuGet package][nuget-link].
+The latest stable release of the SDK is available on our [NuGet package][nuget-link].
+To use the most up-to-date code, build this project and reference the generated NuGet package.
 
-## Using hosted Parse
-Before executing the following code, be sure to read the guide for Unity on [http://docs.parseplatform.org/unity/guide/](http://docs.parseplatform.org/unity/guide/)
+## Using the Code
+Make sure you are using the namespace:
 
 ```cs
 using Parse;
+```
 
-// some code of initialization..
+Then, in your program's entry point, paste the following code, with 
 
+```cs
 ParseClient.Initialize(new ParseClient.Configuration {
-    ApplicationId = applicationID,
-    WindowsKey = dotnetKey,
-
-    // the serverURL of your hosted Parse Server
-    Server = "<YOUR SERVER URL>"
+    ApplicationId = "*App ID*",
+    WindowsKey = "*DotNet Key*",
+    Server = "*Complete Hosted Parse Server URL*"
 });
 ```
 
 ## Building The Library
-You can build the library from Visual Studio 2013+ or Xamarin IDE. You can also build the library using the command line:
+You can build the library from Visual Studio Code (with the proper extensions), Visual Studio 2017 Community and higher, or Visual Studio for Mac 7 and higher. You can also build the library using the command line:
 
+# On Windows or Unix-based systems with Dotnet SDK installed:
 ```batch
-:: In Windows:
-MSBuild Parse.sln
-```
-
-```bash
-# In Unix with Xamarin SDK installed:
-xbuild Parse.sln
+dotnet build Parse.sln
 ```
 
 Results can be found in `Parse/bin`

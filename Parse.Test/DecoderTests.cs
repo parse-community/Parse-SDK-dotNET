@@ -53,28 +53,19 @@ namespace Parse.Test
         [TestMethod]
         public void TestDecodeImproperDate()
         {
-            IDictionary<string, object> value = new Dictionary<string, object>() { { "__type", "Date" }, { "iso", "1990-08-30T12:03:59.0Z" } };
+            IDictionary<string, object> value = new Dictionary<string, object> { ["__type"] = "Date", ["iso"] = "1990-08-30T12:03:59.0Z" };
 
-            DateTime dateTime = (DateTime) ParseDecoder.Instance.Decode(value);
-            Assert.AreEqual(1990, dateTime.Year);
-            Assert.AreEqual(8, dateTime.Month);
-            Assert.AreEqual(30, dateTime.Day);
-            Assert.AreEqual(12, dateTime.Hour);
-            Assert.AreEqual(3, dateTime.Minute);
-            Assert.AreEqual(59, dateTime.Second);
-            Assert.AreEqual(0, dateTime.Millisecond);
-
-            // Test multiple trailing zeroes
-            value = new Dictionary<string, object>() { { "__type", "Date" }, { "iso", "1990-08-30T12:03:59.00Z" } };
-
-            dateTime = (DateTime) ParseDecoder.Instance.Decode(value);
-            Assert.AreEqual(1990, dateTime.Year);
-            Assert.AreEqual(8, dateTime.Month);
-            Assert.AreEqual(30, dateTime.Day);
-            Assert.AreEqual(12, dateTime.Hour);
-            Assert.AreEqual(3, dateTime.Minute);
-            Assert.AreEqual(59, dateTime.Second);
-            Assert.AreEqual(0, dateTime.Millisecond);
+            for (int i = 0; i < 2; i++, value["iso"] = (value["iso"] as string).Substring(0, (value["iso"] as string).Length - 1) + "0Z")
+            {
+                DateTime dateTime = (DateTime) ParseDecoder.Instance.Decode(value);
+                Assert.AreEqual(1990, dateTime.Year);
+                Assert.AreEqual(8, dateTime.Month);
+                Assert.AreEqual(30, dateTime.Day);
+                Assert.AreEqual(12, dateTime.Hour);
+                Assert.AreEqual(3, dateTime.Minute);
+                Assert.AreEqual(59, dateTime.Second);
+                Assert.AreEqual(0, dateTime.Millisecond);
+            }
         }
 
         [TestMethod]
@@ -83,7 +74,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestDecodePointer()
         {
-            ParseObject obj = ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "Pointer" }, { "className", "Corgi" }, { "objectId", "lLaKcolnu" } }) as ParseObject;
+            ParseObject obj = ParseDecoder.Instance.Decode(new Dictionary<string, object> { ["__type"] = "Pointer", ["className"] = "Corgi", ["objectId"] = "lLaKcolnu" }) as ParseObject;
             Assert.IsFalse(obj.IsDataAvailable);
             Assert.AreEqual("Corgi", obj.ClassName);
             Assert.AreEqual("lLaKcolnu", obj.ObjectId);
@@ -93,23 +84,23 @@ namespace Parse.Test
         public void TestDecodeFile()
         {
 
-            ParseFile file1 = ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "File" }, { "name", "Corgi.png" }, { "url", "http://corgi.xyz/gogo.png" } }) as ParseFile;
+            ParseFile file1 = ParseDecoder.Instance.Decode(new Dictionary<string, object> { ["__type"] = "File", ["name"] = "Corgi.png", ["url"] = "http://corgi.xyz/gogo.png" }) as ParseFile;
             Assert.AreEqual("Corgi.png", file1.Name);
             Assert.AreEqual("http://corgi.xyz/gogo.png", file1.Url.AbsoluteUri);
             Assert.IsFalse(file1.IsDirty);
 
-            Assert.ThrowsException<KeyNotFoundException>(() => ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "File" }, { "name", "Corgi.png" } }));
+            Assert.ThrowsException<KeyNotFoundException>(() => ParseDecoder.Instance.Decode(new Dictionary<string, object> { ["__type"] = "File", ["name"] = "Corgi.png" }));
         }
 
         [TestMethod]
         public void TestDecodeGeoPoint()
         {
-            ParseGeoPoint point1 = (ParseGeoPoint) ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "GeoPoint" }, { "latitude", 0.9 }, { "longitude", 0.3 } });
+            ParseGeoPoint point1 = (ParseGeoPoint) ParseDecoder.Instance.Decode(new Dictionary<string, object> { ["__type"] = "GeoPoint", ["latitude"] = 0.9, ["longitude"] = 0.3 });
             Assert.IsNotNull(point1);
             Assert.AreEqual(0.9, point1.Latitude);
             Assert.AreEqual(0.3, point1.Longitude);
 
-            Assert.ThrowsException<KeyNotFoundException>(() => ParseDecoder.Instance.Decode(new Dictionary<string, object>() { { "__type", "GeoPoint" }, { "latitude", 0.9 } }));
+            Assert.ThrowsException<KeyNotFoundException>(() => ParseDecoder.Instance.Decode(new Dictionary<string, object> { ["__type"] = "GeoPoint", ["latitude"] = 0.9 }));
         }
 
         [TestMethod]
@@ -117,11 +108,11 @@ namespace Parse.Test
         {
             IDictionary<string, object> value = new Dictionary<string, object>()
             {
-                { "__type", "Object" },
-                { "className", "Corgi" },
-                { "objectId", "lLaKcolnu" },
-                { "createdAt", "2015-06-22T21:23:41.733Z" },
-                { "updatedAt", "2015-06-22T22:06:41.733Z" }
+                ["__type"] = "Object",
+                ["className"] = "Corgi",
+                ["objectId"] = "lLaKcolnu",
+                ["createdAt"] = "2015-06-22T21:23:41.733Z",
+                ["updatedAt"] = "2015-06-22T22:06:41.733Z"
             };
 
             ParseObject obj = ParseDecoder.Instance.Decode(value) as ParseObject;
@@ -137,9 +128,9 @@ namespace Parse.Test
         {
             IDictionary<string, object> value = new Dictionary<string, object>()
             {
-                { "__type", "Relation" },
-                { "className", "Corgi" },
-                { "objectId", "lLaKcolnu" }
+                ["__type"] = "Relation",
+                ["className"] = "Corgi",
+                ["objectId"] = "lLaKcolnu"
             };
 
             ParseRelation<ParseObject> relation = ParseDecoder.Instance.Decode(value) as ParseRelation<ParseObject>;
@@ -152,25 +143,21 @@ namespace Parse.Test
         {
             IDictionary<string, object> value = new Dictionary<string, object>()
             {
-                { "megurine", "luka" },
-                { "hatsune", new ParseObject("Miku") },
+                ["megurine"] = "luka",
+                ["hatsune"] = new ParseObject("Miku"),
+                ["decodedGeoPoint"] = new Dictionary<string, object>
                 {
-                    "decodedGeoPoint", new Dictionary<string, object>()
-                    {
-                        { "__type", "GeoPoint" },
-                        { "latitude", 0.9 },
-                        { "longitude", 0.3 }
-                    }
+                    ["__type"] = "GeoPoint",
+                    ["latitude"] = 0.9,
+                    ["longitude"] = 0.3
                 },
+                ["listWithSomething"] = new List<object>
                 {
-                    "listWithSomething", new List<object>()
+                    new Dictionary<string, object>
                     {
-                        new Dictionary<string, object>()
-                        {
-                            { "__type", "GeoPoint" },
-                            { "latitude", 0.9 },
-                            { "longitude", 0.3 }
-                        }
+                        ["__type"] = "GeoPoint",
+                        ["latitude"] = 0.9,
+                        ["longitude"] = 0.3
                     }
                 }
             };
@@ -180,13 +167,13 @@ namespace Parse.Test
             Assert.IsTrue(dict["hatsune"] is ParseObject);
             Assert.IsTrue(dict["decodedGeoPoint"] is ParseGeoPoint);
             Assert.IsTrue(dict["listWithSomething"] is IList<object>);
-            var decodedList = dict["listWithSomething"] as IList<object>;
+            IList<object> decodedList = dict["listWithSomething"] as IList<object>;
             Assert.IsTrue(decodedList[0] is ParseGeoPoint);
 
             IDictionary<object, string> randomValue = new Dictionary<object, string>()
             {
-                { "ultimate", "elements" },
-                { new ParseACL(), "lLaKcolnu" }
+                ["ultimate"] = "elements",
+                [new ParseACL()] = "lLaKcolnu"
             };
 
             IDictionary<object, string> randomDict = ParseDecoder.Instance.Decode(randomValue) as IDictionary<object, string>;
@@ -202,17 +189,17 @@ namespace Parse.Test
                 1, new ParseACL(), "wiz",
                 new Dictionary<string, object>()
                 {
-                    { "__type", "GeoPoint" },
-                    { "latitude", 0.9 },
-                    { "longitude", 0.3 }
+                    ["__type"] = "GeoPoint",
+                    ["latitude"] = 0.9,
+                    ["longitude"] = 0.3
                 },
                 new List<object>()
                 {
                     new Dictionary<string, object>()
                     {
-                        { "__type", "GeoPoint" },
-                        { "latitude", 0.9 },
-                        { "longitude", 0.3 }
+                        ["__type"] = "GeoPoint",
+                        ["latitude"] =  0.9,
+                        ["longitude"] = 0.3
                     }
                 }
             };
@@ -223,7 +210,7 @@ namespace Parse.Test
             Assert.AreEqual("wiz", list[2]);
             Assert.IsTrue(list[3] is ParseGeoPoint);
             Assert.IsTrue(list[4] is IList<object>);
-            var decodedList = list[4] as IList<object>;
+            IList<object> decodedList = list[4] as IList<object>;
             Assert.IsTrue(decodedList[0] is ParseGeoPoint);
         }
 

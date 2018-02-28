@@ -28,10 +28,10 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
         public Task TestGetSetAsync()
         {
-            var storageController = new Mock<IStorageController>(MockBehavior.Strict);
-            var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-            var controller = new ParseCurrentUserController(storageController.Object);
-            var user = new ParseUser();
+            Mock<IStorageController> storageController = new Mock<IStorageController>(MockBehavior.Strict);
+            Mock<IStorageDictionary<string, object>> mockedStorage = new Mock<IStorageDictionary<string, object>>();
+            ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object);
+            ParseUser user = new ParseUser();
 
             storageController.Setup(s => s.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
 
@@ -73,23 +73,17 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
         public Task TestExistsAsync()
         {
-            var storageController = new Mock<IStorageController>();
-            var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-            var controller = new ParseCurrentUserController(storageController.Object);
-            var user = new ParseUser();
+            Mock<IStorageController> storageController = new Mock<IStorageController>();
+            Mock<IStorageDictionary<string, object>> mockedStorage = new Mock<IStorageDictionary<string, object>>();
+            ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object);
+            ParseUser user = new ParseUser();
 
             storageController.Setup(c => c.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
 
             bool contains = false;
-            mockedStorage.Setup(s => s.AddAsync("CurrentUser", It.IsAny<object>())).Callback(() =>
-            {
-                contains = true;
-            }).Returns(Task.FromResult<object>(null)).Verifiable();
+            mockedStorage.Setup(s => s.AddAsync("CurrentUser", It.IsAny<object>())).Callback(() => contains = true).Returns(Task.FromResult<object>(null)).Verifiable();
 
-            mockedStorage.Setup(s => s.RemoveAsync("CurrentUser")).Callback(() =>
-            {
-                contains = false;
-            }).Returns(Task.FromResult<object>(null)).Verifiable();
+            mockedStorage.Setup(s => s.RemoveAsync("CurrentUser")).Callback(() => contains = false).Returns(Task.FromResult<object>(null)).Verifiable();
 
             mockedStorage.Setup(s => s.ContainsKey("CurrentUser")).Returns(() => contains);
 
@@ -124,13 +118,12 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
         public Task TestIsCurrent()
         {
-            var storageController = new Mock<IStorageController>(MockBehavior.Strict);
-            var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-            var controller = new ParseCurrentUserController(storageController.Object);
-            var user = new ParseUser();
-            var user2 = new ParseUser();
+            Mock<IStorageController> storageController = new Mock<IStorageController>(MockBehavior.Strict);
+            ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object);
+            ParseUser user = new ParseUser();
+            ParseUser user2 = new ParseUser();
 
-            storageController.Setup(s => s.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
+            storageController.Setup(s => s.LoadAsync()).Returns(Task.FromResult(new Mock<IStorageDictionary<string, object>>().Object));
 
             return controller.SetAsync(user, CancellationToken.None).OnSuccess(t =>
             {
@@ -165,9 +158,9 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
         public Task TestCurrentSessionToken()
         {
-            var storageController = new Mock<IStorageController>();
-            var mockedStorage = new Mock<IStorageDictionary<string, object>>();
-            var controller = new ParseCurrentUserController(storageController.Object);
+            Mock<IStorageController> storageController = new Mock<IStorageController>();
+            Mock<IStorageDictionary<string, object>> mockedStorage = new Mock<IStorageDictionary<string, object>>();
+            ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object);
 
             storageController.Setup(c => c.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
 
@@ -176,29 +169,19 @@ namespace Parse.Test
                 Assert.IsNull(t.Result);
 
                 // We should probably mock this.
-                var userState = new MutableObjectState
-                {
-                    ServerData = new Dictionary<string, object>() {
-            { "sessionToken", "randomString" }
-          }
-                };
-                var user = ParseObject.CreateWithoutData<ParseUser>(null);
-                user.HandleFetchResult(userState);
+                ParseUser user = ParseObject.CreateWithoutData<ParseUser>(null);
+                user.HandleFetchResult(new MutableObjectState { ServerData = new Dictionary<string, object> { ["sessionToken"] = "randomString" } });
 
                 return controller.SetAsync(user, CancellationToken.None);
             }).Unwrap()
             .OnSuccess(_ => controller.GetCurrentSessionTokenAsync(CancellationToken.None)).Unwrap()
-            .OnSuccess(t =>
-            {
-                Assert.AreEqual("randomString", t.Result);
-            });
+            .OnSuccess(t => Assert.AreEqual("randomString", t.Result));
         }
 
         public Task TestLogOut()
         {
-            var storageController = new Mock<IStorageController>(MockBehavior.Strict);
-            var controller = new ParseCurrentUserController(storageController.Object);
-            var user = new ParseUser();
+            ParseCurrentUserController controller = new ParseCurrentUserController(new Mock<IStorageController>(MockBehavior.Strict).Object);
+            ParseUser user = new ParseUser();
 
             return controller.SetAsync(user, CancellationToken.None).OnSuccess(_ =>
             {
@@ -217,10 +200,7 @@ namespace Parse.Test
 
                 return controller.ExistsAsync(CancellationToken.None);
             }).Unwrap()
-            .OnSuccess(t =>
-            {
-                Assert.IsFalse(t.Result);
-            });
+            .OnSuccess(t => Assert.IsFalse(t.Result));
         }
     }
 }

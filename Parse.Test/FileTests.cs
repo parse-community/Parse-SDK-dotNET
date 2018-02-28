@@ -21,9 +21,9 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(FileTests))]
         public Task TestFileSave()
         {
-            var mockController = new Mock<IParseFileController>();
+            Mock<IParseFileController> mockController = new Mock<IParseFileController>();
             mockController.Setup(obj => obj.SaveAsync(It.IsAny<FileState>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new FileState { Name = "newBekti.png", Url = new Uri("https://www.parse.com/newBekti.png"), MimeType = "image/png" }));
-            var mockCurrentUserController = new Mock<IParseCurrentUserController>();
+            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
             ParseCorePlugins.Instance = new ParseCorePlugins { FileController = mockController.Object, CurrentUserController = mockCurrentUserController.Object };
 
             ParseFile file = new ParseFile("bekti.jpeg", new MemoryStream(), "image/jpeg");

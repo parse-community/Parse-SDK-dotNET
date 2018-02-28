@@ -28,8 +28,8 @@ namespace Parse.Test
         [TestMethod]
         public void TestIsValidType()
         {
-            var corgi = new ParseObject("Corgi");
-            var corgiRelation = corgi.GetRelation<ParseObject>("corgi");
+            ParseObject corgi = new ParseObject("Corgi");
+            ParseRelation<ParseObject> corgiRelation = corgi.GetRelation<ParseObject>("corgi");
 
             Assert.IsTrue(ParseEncoder.IsValidType(322));
             Assert.IsTrue(ParseEncoder.IsValidType(0.3f));
@@ -131,7 +131,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestEncodeParseRelation()
         {
-            var obj = new ParseObject("Corgi");
+            ParseObject obj = new ParseObject("Corgi");
             ParseRelation<ParseObject> relation = ParseRelationExtensions.Create<ParseObject>(obj, "nano", "Husky");
             IDictionary<string, object> value = ParseEncoderTestClass.Instance.Encode(relation) as IDictionary<string, object>;
             Assert.AreEqual("Relation", value["__type"]);
@@ -141,7 +141,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestEncodeParseFieldOperation()
         {
-            var incOps = new ParseIncrementOperation(1);
+            ParseIncrementOperation incOps = new ParseIncrementOperation(1);
             IDictionary<string, object> value = ParseEncoderTestClass.Instance.Encode(incOps) as IDictionary<string, object>;
             Assert.AreEqual("Increment", value["__op"]);
             Assert.AreEqual(1, value["amount"]);
@@ -159,29 +159,29 @@ namespace Parse.Test
                 new string[] { "hikaru", "hanatan", "ultimate" },
                 new Dictionary<string, object>()
                 {
-                    { "elements", new int[] { 1, 2, 3 } },
-                    { "mystic", "cage" },
-                    { "listAgain", new List<object>() { "xilia", "zestiria", "symphonia" } }
+                    ["elements"] = new int[] { 1, 2, 3 },
+                    ["mystic"] = "cage",
+                    ["listAgain"] = new List<object> { "xilia", "zestiria", "symphonia" }
                 }
             };
 
             IList<object> value = ParseEncoderTestClass.Instance.Encode(list) as IList<object>;
-            var item0 = value[0] as IDictionary<string, object>;
+            IDictionary<string, object> item0 = value[0] as IDictionary<string, object>;
             Assert.AreEqual("GeoPoint", item0["__type"]);
             Assert.AreEqual(0.0, item0["latitude"]);
             Assert.AreEqual(0.0, item0["longitude"]);
 
             Assert.AreEqual("item", value[1]);
 
-            var item2 = value[2] as IDictionary<string, object>;
+            IDictionary<string, object> item2 = value[2] as IDictionary<string, object>;
             Assert.AreEqual("Bytes", item2["__type"]);
 
-            var item3 = value[3] as IList<object>;
+            IList<object> item3 = value[3] as IList<object>;
             Assert.AreEqual("hikaru", item3[0]);
             Assert.AreEqual("hanatan", item3[1]);
             Assert.AreEqual("ultimate", item3[2]);
 
-            var item4 = value[4] as IDictionary<string, object>;
+            IDictionary<string, object> item4 = value[4] as IDictionary<string, object>;
             Assert.IsTrue(item4["elements"] is IList<object>);
             Assert.AreEqual("cage", item4["mystic"]);
             Assert.IsTrue(item4["listAgain"] is IList<object>);
@@ -190,13 +190,14 @@ namespace Parse.Test
         [TestMethod]
         public void TestEncodeDictionary()
         {
-            IDictionary<string, object> dict = new Dictionary<string, object>() {
-        { "item", "random" },
-        { "list", new List<object>(){ "vesperia", "abyss", "legendia" } },
-        { "array", new int[] { 1, 2, 3 } },
-        { "geo", new ParseGeoPoint(0, 0) },
-        { "validDict", new Dictionary<string, object>(){ { "phantasia", "jbf" } } }
-      };
+            IDictionary<string, object> dict = new Dictionary<string, object>()
+            {
+                ["item"] = "random",
+                ["list"] = new List<object>() { "vesperia", "abyss", "legendia" },
+                ["array"] = new int[] { 1, 2, 3 },
+                ["geo"] = new ParseGeoPoint(0, 0),
+                ["validDict"] = new Dictionary<string, object> { ["phantasia"] = "jbf" }
+            };
 
             IDictionary<string, object> value = ParseEncoderTestClass.Instance.Encode(dict) as IDictionary<string, object>;
             Assert.AreEqual("random", value["item"]);
@@ -205,13 +206,9 @@ namespace Parse.Test
             Assert.IsTrue(value["geo"] is IDictionary<string, object>);
             Assert.IsTrue(value["validDict"] is IDictionary<string, object>);
 
-            IDictionary<object, string> invalidDict = new Dictionary<object, string>();
-            Assert.ThrowsException<MissingMethodException>(() => ParseEncoderTestClass.Instance.Encode(invalidDict));
+            Assert.ThrowsException<MissingMethodException>(() => ParseEncoderTestClass.Instance.Encode(new Dictionary<object, string> { }));
 
-            IDictionary<string, object> childInvalidDict = new Dictionary<string, object>() {
-         { "validDict", new Dictionary<object, string>(){ { new ParseACL(), "jbf" } } }
-      };
-            Assert.ThrowsException<MissingMethodException>(() => ParseEncoderTestClass.Instance.Encode(childInvalidDict));
+            Assert.ThrowsException<MissingMethodException>(() => ParseEncoderTestClass.Instance.Encode(new Dictionary<string, object> { ["validDict"] = new Dictionary<object, string> { [new ParseACL()] = "jbf" } }));
         }
     }
 }

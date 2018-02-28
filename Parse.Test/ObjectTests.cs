@@ -215,13 +215,13 @@ namespace Parse.Test
             Assert.IsTrue(obj.ContainsKey("obj"));
             Assert.IsInstanceOfType(obj["obj"], typeof(ParseObject));
 
-            Assert.ThrowsException<KeyNotFoundException>(() => { var gogo = obj["missingItem"]; });
+            Assert.ThrowsException<KeyNotFoundException>(() => { object gogo = obj["missingItem"]; });
         }
 
         [TestMethod]
         public void TestPropertiesGetterSetter()
         {
-            var now = new DateTime();
+            DateTime now = new DateTime();
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "waGiManPutr4Pet1r",
@@ -414,7 +414,7 @@ namespace Parse.Test
             ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
 
             int count = 0;
-            foreach (var key in obj)
+            foreach (KeyValuePair<string, object> key in obj)
             {
                 count++;
             }
@@ -422,7 +422,7 @@ namespace Parse.Test
 
             obj["newDirtyItem"] = "newItem";
             count = 0;
-            foreach (var key in obj)
+            foreach (KeyValuePair<string, object> key in obj)
             {
                 count++;
             }
