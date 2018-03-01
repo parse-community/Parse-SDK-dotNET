@@ -21,10 +21,7 @@ namespace Parse.Utilities
         /// JSON deserialization can be safely assumed to be lists or dictionaries of
         /// objects.
         /// </summary>
-        public static T As<T>(object value) where T : class
-        {
-            return ConvertTo<T>(value) as T;
-        }
+        public static T As<T>(object value) where T : class => ConvertTo<T>(value) as T;
 
         /// <summary>
         /// Converts a value to the requested type -- coercing primitives to
@@ -36,10 +33,7 @@ namespace Parse.Utilities
         /// JSON deserialization can be safely assumed to be lists or dictionaries of
         /// objects.
         /// </summary>
-        public static T To<T>(object value)
-        {
-            return (T) ConvertTo<T>(value);
-        }
+        public static T To<T>(object value) => (T) ConvertTo<T>(value);
 
         /// <summary>
         /// Converts a value to the requested type -- coercing primitives to
@@ -68,7 +62,7 @@ namespace Parse.Utilities
                 // Add lifting for nullables. Only supports conversions between primitives.
                 if (ReflectionHelpers.IsNullable(typeof(T)))
                 {
-                    var innerType = ReflectionHelpers.GetGenericTypeArguments(typeof(T))[0];
+                    Type innerType = ReflectionHelpers.GetGenericTypeArguments(typeof(T))[0];
                     if (ReflectionHelpers.IsPrimitive(innerType))
                     {
                         return (T) Convert.ChangeType(value, innerType);
@@ -78,16 +72,15 @@ namespace Parse.Utilities
                 if (listType != null &&
                     typeof(T).GetGenericTypeDefinition() == typeof(IList<>))
                 {
-                    var wrapperType = typeof(FlexibleListWrapper<,>)
+                    Type wrapperType = typeof(FlexibleListWrapper<,>)
                       .MakeGenericType(ReflectionHelpers.GetGenericTypeArguments(typeof(T))[0],
                                        ReflectionHelpers.GetGenericTypeArguments(listType)[0]);
                     return Activator.CreateInstance(wrapperType, value);
                 }
                 Type dictType = GetInterfaceType(value.GetType(), typeof(IDictionary<,>));
-                if (dictType != null &&
-                  typeof(T).GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                if (dictType != null && typeof(T).GetGenericTypeDefinition() == typeof(IDictionary<,>))
                 {
-                    var wrapperType = typeof(FlexibleDictionaryWrapper<,>)
+                    Type wrapperType = typeof(FlexibleDictionaryWrapper<,>)
                       .MakeGenericType(ReflectionHelpers.GetGenericTypeArguments(typeof(T))[1],
                                        ReflectionHelpers.GetGenericTypeArguments(dictType)[1]);
                     return Activator.CreateInstance(wrapperType, value);
@@ -107,21 +100,15 @@ namespace Parse.Utilities
         /// </summary>
         private static readonly Dictionary<Tuple<Type, Type>, Type> interfaceLookupCache =
             new Dictionary<Tuple<Type, Type>, Type>();
+
         private static Type GetInterfaceType(Type objType, Type genericInterfaceType)
         {
-            // Side note: It so sucks to have to do this. What a piece of crap bit of code
-            // Unfortunately, .NET doesn't provide any of the right hooks to do this for you
-            // *sigh*
-            if (ReflectionHelpers.IsConstructedGenericType(genericInterfaceType))
-            {
-                genericInterfaceType = genericInterfaceType.GetGenericTypeDefinition();
-            }
-            var cacheKey = new Tuple<Type, Type>(objType, genericInterfaceType);
+            Tuple<Type, Type> cacheKey = new Tuple<Type, Type>(objType, genericInterfaceType);
             if (interfaceLookupCache.ContainsKey(cacheKey))
             {
                 return interfaceLookupCache[cacheKey];
             }
-            foreach (var type in ReflectionHelpers.GetInterfaces(objType))
+            foreach (Type type in ReflectionHelpers.GetInterfaces(objType))
             {
                 if (ReflectionHelpers.IsConstructedGenericType(type) &&
                     type.GetGenericTypeDefinition() == genericInterfaceType)
