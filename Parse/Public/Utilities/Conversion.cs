@@ -98,8 +98,7 @@ namespace Parse.Utilities
         /// The map is:
         ///    (object type, generic interface type) => constructed generic type
         /// </summary>
-        private static readonly Dictionary<Tuple<Type, Type>, Type> interfaceLookupCache =
-            new Dictionary<Tuple<Type, Type>, Type>();
+        private static readonly Dictionary<Tuple<Type, Type>, Type> interfaceLookupCache = new Dictionary<Tuple<Type, Type>, Type>();
 
         private static Type GetInterfaceType(Type objType, Type genericInterfaceType)
         {
@@ -110,8 +109,7 @@ namespace Parse.Utilities
             }
             foreach (Type type in ReflectionHelpers.GetInterfaces(objType))
             {
-                if (ReflectionHelpers.IsConstructedGenericType(type) &&
-                    type.GetGenericTypeDefinition() == genericInterfaceType)
+                if (ReflectionHelpers.IsConstructedGenericType(type) && type.GetGenericTypeDefinition() == genericInterfaceType)
                 {
                     return interfaceLookupCache[cacheKey] = type;
                 }
