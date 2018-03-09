@@ -28,36 +28,24 @@ namespace Parse.Core.Internal
             RegisterSubclass(typeof(ParseObject));
         }
 
-        public String GetClassName(Type type)
-        {
-            return type == typeof(ParseObject)
-              ? parseObjectClassName
-              : ObjectSubclassInfo.GetClassName(type.GetTypeInfo());
-        }
+        public string GetClassName(Type type) => type == typeof(ParseObject) ? parseObjectClassName : ObjectSubclassInfo.GetClassName(type.GetTypeInfo());
 
-        public Type GetType(String className)
+        public Type GetType(string className)
         {
-            ObjectSubclassInfo info = null;
             mutex.EnterReadLock();
-            registeredSubclasses.TryGetValue(className, out info);
+            registeredSubclasses.TryGetValue(className, out ObjectSubclassInfo info);
             mutex.ExitReadLock();
 
-            return info != null
-              ? info.TypeInfo.AsType()
-              : null;
+            return info?.TypeInfo.AsType();
         }
 
-        public bool IsTypeValid(String className, Type type)
+        public bool IsTypeValid(string className, Type type)
         {
-            ObjectSubclassInfo subclassInfo = null;
-
             mutex.EnterReadLock();
-            registeredSubclasses.TryGetValue(className, out subclassInfo);
+            registeredSubclasses.TryGetValue(className, out ObjectSubclassInfo subclassInfo);
             mutex.ExitReadLock();
 
-            return subclassInfo == null
-              ? type == typeof(ParseObject)
-              : subclassInfo.TypeInfo == type.GetTypeInfo();
+            return subclassInfo == null ? type == typeof(ParseObject) : subclassInfo.TypeInfo == type.GetTypeInfo();
         }
 
         public void RegisterSubclass(Type type)

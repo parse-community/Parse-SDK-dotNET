@@ -21,7 +21,7 @@ namespace ParseTest
 
         [TestMethod]
         [AsyncStateMachine(typeof(AnalyticsControllerTests))]
-        public Task TestTrackEventWithEmptyDimension()
+        public Task TestTrackEventWithEmptyDimensions()
         {
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { }));
 
@@ -30,6 +30,22 @@ namespace ParseTest
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
                 mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/events/SomeEvent"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+            });
+        }
+
+        [TestMethod]
+        [AsyncStateMachine(typeof(AnalyticsControllerTests))]
+        public Task TestTrackEventWithNonEmptyDimensions()
+        {
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { }));
+
+            Dictionary<string, string> dimensions = new Dictionary<string, string> { ["njwerjk12"] = "5523dd" };
+
+            return new ParseAnalyticsController(mockRunner.Object).TrackEventAsync("SomeEvent", dimensions: dimensions, sessionToken: null, cancellationToken: CancellationToken.None).ContinueWith(t =>
+            {
+                Assert.IsFalse(t.IsFaulted);
+                Assert.IsFalse(t.IsCanceled);
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.DataObject["dimensions"].Equals(dimensions)), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -47,7 +63,23 @@ namespace ParseTest
             });
         }
 
-        private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
+        [TestMethod]
+        [AsyncStateMachine(typeof(AnalyticsControllerTests))]
+        public Task TestTrackAppOpenedWithNonEmptyPushHash()
+        {
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>()));
+
+            string pushHash = "32j4hll12lkk";
+
+            return new ParseAnalyticsController(mockRunner.Object).TrackAppOpenedAsync(pushHash, sessionToken: null, cancellationToken: CancellationToken.None).ContinueWith(t =>
+            {
+                Assert.IsFalse(t.IsFaulted);
+                Assert.IsFalse(t.IsCanceled);
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.DataObject["push_hash"].Equals(pushHash)), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+            });
+        }
+
+        Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
         {
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
             mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
