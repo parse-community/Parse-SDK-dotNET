@@ -1,17 +1,32 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parse.Test
 {
     [TestClass]
     public class ACLTests
     {
+        [TestInitialize]
+        public void SetUp()
+        {
+            ParseObject.RegisterSubclass<ParseUser>();
+            ParseObject.RegisterSubclass<ParseSession>();
+        }
+
+        [TestCleanup]
+        public void TearDown() => ParseCorePlugins.Instance = null;
+
         [TestMethod]
         public void TestCheckPermissionsWithParseUserConstructor()
         {
-            ParseUser owner = new ParseUser { Username = "TestOwnerUser" };
+            ParseUser owner = GenerateUser("OwnerUser");
+            ParseUser user = GenerateUser("OtherUser");
             ParseACL acl = new ParseACL(owner);
             Assert.IsTrue(acl.GetReadAccess(owner.ObjectId));
             Assert.IsTrue(acl.GetWriteAccess(owner.ObjectId));
@@ -22,8 +37,8 @@ namespace Parse.Test
         [TestMethod]
         public void TestReadWriteMutationWithParseUserConstructor()
         {
-            ParseUser owner = new ParseUser { Username = "TestOwnerUser" };
-            ParseUser otherUser = new ParseUser { Username = "OtherTestUser" };
+            ParseUser owner = GenerateUser("OwnerUser");
+            ParseUser otherUser = GenerateUser("OtherUser");
             ParseACL acl = new ParseACL(owner);
             acl.SetReadAccess(otherUser, true);
             acl.SetWriteAccess(otherUser, true);
@@ -38,14 +53,8 @@ namespace Parse.Test
         }
 
         [TestMethod]
-        public void TestReadWriteMutationWithNullObjectIdParseUser()
-        {
-            ParseUser owner = new ParseUser { ObjectId = null };
-            ParseACL acl = new ParseACL(owner);
-            Assert.ThrowsException<ArgumentException>(() => acl.SetReadAccess(owner, false));
-            Assert.ThrowsException<ArgumentException>(() => acl.SetWriteAccess(owner, false));
-            Assert.ThrowsException<ArgumentException>(() => acl.SetReadAccess(owner.ObjectId, false));
-            Assert.ThrowsException<ArgumentException>(() => acl.SetWriteAccess(owner.ObjectId, false));
-        }
+        public void TestParseACLCreationWithNullObjectIdParseUser() => Assert.ThrowsException<ArgumentException>(() => new ParseACL(GenerateUser(null)));
+
+        ParseUser GenerateUser(string objectID) => ParseObjectExtensions.FromState<ParseUser>(new MutableObjectState { ObjectId = objectID }, "_User");
     }
 }
