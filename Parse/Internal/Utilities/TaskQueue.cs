@@ -50,7 +50,7 @@ namespace Parse.Common.Internal
         /// <param name="cancellationToken">A cancellation token that can be used to
         /// cancel waiting in the queue.</param>
         /// <returns>The task created by the taskStart function.</returns>
-        public T Enqueue<T>(Func<Task, T> taskStart, CancellationToken cancellationToken) where T : Task
+        public T Enqueue<T>(Func<Task, T> taskStart, CancellationToken cancellationToken = default) where T : Task
         {
             Task oldTail;
             T task;

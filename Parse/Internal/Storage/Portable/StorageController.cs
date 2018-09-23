@@ -1,9 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using System.Linq;
-using StandardStorage;
 using System.Collections.Generic;
 using System.Threading;
+using System.IO;
+using Parse.Internal.Utilities;
 
 namespace Parse.Common.Internal
 {
@@ -16,13 +17,13 @@ namespace Parse.Common.Internal
         {
             private object mutex;
             private Dictionary<string, object> dictionary;
-            private IFile file;
+            private FileInfo file;
 
-            public StorageDictionary(IFile file)
+            public StorageDictionary(FileInfo file)
             {
                 this.file = file;
 
-                mutex = new Object();
+                mutex = new object();
                 dictionary = new Dictionary<string, object>();
             }
 
@@ -30,10 +31,9 @@ namespace Parse.Common.Internal
             {
                 string json;
                 lock (mutex)
-                {
                     json = Json.Encode(dictionary);
-                }
-                return file.WriteAllTextAsync(json);
+
+                return file.WriteToAsync(json);
             }
 
             internal Task LoadAsync()
@@ -138,52 +138,37 @@ namespace Parse.Common.Internal
         }
 
         private const string ParseStorageFileName = "ApplicationSettings";
-        private readonly TaskQueue taskQueue = new TaskQueue();
-        private readonly Task<IFile> fileTask;
-        private StorageDictionary storageDictionary;
 
-        public StorageController() => fileTask = taskQueue.Enqueue(t => t.ContinueWith(_ =>
+        FileInfo File { get; }
+        StorageDictionary Storage { get; set; }
+        TaskQueue Queue { get; } = new TaskQueue { };
+
+        /// <summary>
+        /// Creates a Parse storage controller and attempts to extract a previously created settings storage file from the persistent storage location.
+        /// </summary>
+        public StorageController() => File = StorageManager.GetPersistentStorageFileWrapperAsync(ParseStorageFileName);
+
+        /// <summary>
+        /// Creates a Parse storage controller with the provided <paramref name="file"/> wrapper.
+        /// </summary>
+        /// <param name="file">The file wrapper that the storage controller instance should target</param>
+        public StorageController(FileInfo file) => File = file;
+
+        /// <summary>
+        /// Loads a settings dictionary from the file wrapped by <see cref="File"/>.
+        /// </summary>
+        /// <returns>A storage dictionary containing the deserialized content of the storage file targeted by the <see cref="StorageController"/> instance</returns>
+        public Task<IStorageDictionary<string, object>> LoadAsync() => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Task.FromResult((IStorageDictionary<string, object>) Storage) ?? (Storage = new StorageDictionary(File)).LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="contents"></param>
+        /// <returns></returns>
+        public Task<IStorageDictionary<string, object>> SaveAsync(IDictionary<string, object> contents) => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
         {
-            return FileSystem.Current.LocalStorage.CreateFileAsync(ParseStorageFileName, CreationCollisionOption.OpenIfExists);
-        }).Unwrap(), CancellationToken.None);
-
-        public StorageController(IFile file)
-        {
-            this.fileTask = Task.FromResult(file);
-        }
-
-        public Task<IStorageDictionary<string, object>> LoadAsync()
-        {
-            return taskQueue.Enqueue(toAwait =>
-            {
-                return toAwait.ContinueWith(_ =>
-                {
-                    if (storageDictionary != null)
-                    {
-                        return Task.FromResult<IStorageDictionary<string, object>>(storageDictionary);
-                    }
-
-                    storageDictionary = new StorageDictionary(fileTask.Result);
-                    return storageDictionary.LoadAsync().OnSuccess(__ => storageDictionary as IStorageDictionary<string, object>);
-                }).Unwrap();
-            }, CancellationToken.None);
-        }
-
-        public Task<IStorageDictionary<string, object>> SaveAsync(IDictionary<string, object> contents)
-        {
-            return taskQueue.Enqueue(toAwait =>
-            {
-                return toAwait.ContinueWith(_ =>
-                {
-                    if (storageDictionary == null)
-                    {
-                        storageDictionary = new StorageDictionary(fileTask.Result);
-                    }
-
-                    storageDictionary.Update(contents);
-                    return storageDictionary.SaveAsync().OnSuccess(__ => storageDictionary as IStorageDictionary<string, object>);
-                }).Unwrap();
-            }, CancellationToken.None);
-        }
+            (Storage ?? (Storage = new StorageDictionary(File))).Update(contents);
+            return Storage.SaveAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>);
+        }).Unwrap());
     }
 }
