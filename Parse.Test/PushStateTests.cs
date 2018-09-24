@@ -2,7 +2,7 @@ using Parse.Push.Internal;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ParseTest
+namespace Parse.Test
 {
     [TestClass]
     public class PushStateTests

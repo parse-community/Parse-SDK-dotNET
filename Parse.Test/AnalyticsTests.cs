@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ParseTest
+namespace Parse.Test
 {
     [TestClass]
     public class AnalyticsTests

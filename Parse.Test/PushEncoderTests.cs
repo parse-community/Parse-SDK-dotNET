@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace ParseTest
+namespace Parse.Test
 {
     [TestClass]
     public class PushEncoderTests
