@@ -146,7 +146,7 @@ namespace Parse.Common.Internal
         /// <summary>
         /// Creates a Parse storage controller and attempts to extract a previously created settings storage file from the persistent storage location.
         /// </summary>
-        public StorageController() => File = StorageManager.GetPersistentStorageFileWrapperAsync(ParseStorageFileName);
+        public StorageController() => Storage = new StorageDictionary(File = StorageManager.GetPersistentStorageFileWrapperAsync(ParseStorageFileName));
 
         /// <summary>
         /// Creates a Parse storage controller with the provided <paramref name="file"/> wrapper.

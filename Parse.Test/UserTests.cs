@@ -292,9 +292,7 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object> { ["sessionToken"] = "llaKcolnu" }
             };
             Mock<IParseUserController> mockController = new Mock<IParseUserController>();
             mockController.Setup(obj => obj.GetUserAsync("llaKcolnu", It.IsAny<CancellationToken>())).Returns(Task.FromResult(state));
