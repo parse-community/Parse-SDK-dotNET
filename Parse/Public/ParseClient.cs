@@ -98,7 +98,7 @@ namespace Parse
                     get
                     {
                         FileInfo file = default;
-                        while ((file = StorageManager.GetWrapperForRelativePersistentStorageFilePath(GeneratePath())).Exists);
+                        while ((file = StorageManager.GetWrapperForRelativePersistentStorageFilePath(GeneratePath())).Exists && IsFallback);
 
                         return file.FullName;
                     }
