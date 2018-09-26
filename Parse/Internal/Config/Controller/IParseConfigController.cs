@@ -20,6 +20,6 @@ namespace Parse.Core.Internal
         /// <returns>The config async.</returns>
         /// <param name="sessionToken">Session token.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        Task<ParseConfig> FetchConfigAsync(String sessionToken, CancellationToken cancellationToken);
+        Task<ParseConfig> FetchConfigAsync(string sessionToken, CancellationToken cancellationToken);
     }
 }

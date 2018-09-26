@@ -196,8 +196,8 @@ namespace Parse
         /// <returns>The locale identifier in the format: [language code]-[COUNTRY CODE].</returns>
         private string GetLocaleIdentifier()
         {
-            String languageCode = null;
-            String countryCode = null;
+            string languageCode = null;
+            string countryCode = null;
             if (CultureInfo.CurrentCulture != null)
             {
                 languageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;

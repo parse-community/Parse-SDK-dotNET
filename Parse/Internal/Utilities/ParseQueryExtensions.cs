@@ -22,7 +22,7 @@ namespace Parse.Core.Internal
             return query.ClassName;
         }
 
-        public static IDictionary<String, object> BuildParameters<T>(this ParseQuery<T> query) where T : ParseObject
+        public static IDictionary<string, object> BuildParameters<T>(this ParseQuery<T> query) where T : ParseObject
         {
             return query.BuildParameters(false);
         }

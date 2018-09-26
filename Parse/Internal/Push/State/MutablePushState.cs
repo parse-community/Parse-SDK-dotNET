@@ -15,7 +15,7 @@ namespace Parse.Push.Internal
         public TimeSpan? ExpirationInterval { get; set; }
         public DateTime? PushTime { get; set; }
         public IDictionary<string, object> Data { get; set; }
-        public String Alert { get; set; }
+        public string Alert { get; set; }
 
         public IPushState MutatedClone(Action<MutablePushState> func)
         {

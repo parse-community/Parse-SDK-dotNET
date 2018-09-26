@@ -18,7 +18,7 @@ namespace Parse.Test
     public class CommandTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new ParseClient.Configuration { ApplicationId = "", WindowsKey = "" });
+        public void SetUp() => ParseClient.Initialize(new ParseClient.Configuration { ApplicationID = "", Key = "" });
 
         [TestCleanup]
         public void TearDown() => ParseCorePlugins.Instance.Reset();

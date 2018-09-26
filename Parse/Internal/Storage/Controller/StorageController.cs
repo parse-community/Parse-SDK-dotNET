@@ -137,8 +137,6 @@ namespace Parse.Common.Internal
             }
         }
 
-        private const string ParseStorageFileName = "ApplicationSettings";
-
         FileInfo File { get; }
         StorageDictionary Storage { get; set; }
         TaskQueue Queue { get; } = new TaskQueue { };
@@ -146,7 +144,7 @@ namespace Parse.Common.Internal
         /// <summary>
         /// Creates a Parse storage controller and attempts to extract a previously created settings storage file from the persistent storage location.
         /// </summary>
-        public StorageController() => Storage = new StorageDictionary(File = StorageManager.GetPersistentStorageFileWrapperAsync(ParseStorageFileName));
+        public StorageController() => Storage = new StorageDictionary(File = StorageManager.PersistentStorageFileWrapper);
 
         /// <summary>
         /// Creates a Parse storage controller with the provided <paramref name="file"/> wrapper.

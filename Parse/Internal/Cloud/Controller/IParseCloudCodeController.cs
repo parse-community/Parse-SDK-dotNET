@@ -9,7 +9,7 @@ namespace Parse.Core.Internal
 {
     public interface IParseCloudCodeController
     {
-        Task<T> CallFunctionAsync<T>(String name,
+        Task<T> CallFunctionAsync<T>(string name,
             IDictionary<string, object> parameters,
             string sessionToken,
             CancellationToken cancellationToken);

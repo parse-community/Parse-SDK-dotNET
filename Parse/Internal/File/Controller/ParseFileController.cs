@@ -19,7 +19,7 @@ namespace Parse.Core.Internal
 
         public Task<FileState> SaveAsync(FileState state,
             Stream dataStream,
-            String sessionToken,
+            string sessionToken,
             IProgress<ParseUploadProgressEventArgs> progress,
             CancellationToken cancellationToken = default(CancellationToken))
         {

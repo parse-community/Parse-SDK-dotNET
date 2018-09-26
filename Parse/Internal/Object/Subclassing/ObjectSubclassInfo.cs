@@ -20,12 +20,12 @@ namespace Parse.Core.Internal
         }
 
         public TypeInfo TypeInfo { get; private set; }
-        public String ClassName { get; private set; }
-        public IDictionary<String, String> PropertyMappings { get; private set; }
+        public string ClassName { get; private set; }
+        public IDictionary<string, string> PropertyMappings { get; private set; }
         private ConstructorInfo Constructor { get; set; }
 
         public ParseObject Instantiate() => (ParseObject) Constructor.Invoke(null);
 
-        internal static String GetClassName(TypeInfo type) => type.GetCustomAttribute<ParseClassNameAttribute>()?.ClassName;
+        internal static string GetClassName(TypeInfo type) => type.GetCustomAttribute<ParseClassNameAttribute>()?.ClassName;
     }
 }

@@ -20,10 +20,6 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.PlatformAbstractions" Version="1.1.0" />
-    </ItemGroup>
-
     <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <PackageReference Include="OpenCover" Version="4.6.519" />
     </ItemGroup>

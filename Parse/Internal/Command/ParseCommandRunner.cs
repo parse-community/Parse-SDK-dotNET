@@ -88,12 +88,12 @@ namespace Parse.Core.Internal
 
             // TODO (richardross): Inject configuration instead of using shared static here.
             ParseClient.Configuration configuration = ParseClient.CurrentConfiguration;
-            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", configuration.ApplicationId));
+            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", configuration.ApplicationID));
             newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.VersionString));
 
-            if (configuration.AdditionalHTTPHeaders != null)
+            if (configuration.AuxiliaryHeaders != null)
             {
-                foreach (var header in configuration.AdditionalHTTPHeaders)
+                foreach (var header in configuration.AuxiliaryHeaders)
                 {
                     newCommand.Headers.Add(header);
                 }
@@ -120,7 +120,7 @@ namespace Parse.Core.Internal
             }
             else
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Windows-Key", configuration.WindowsKey));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Windows-Key", configuration.Key));
             }
 
             // TODO (richardross): Inject this instead of using static here.

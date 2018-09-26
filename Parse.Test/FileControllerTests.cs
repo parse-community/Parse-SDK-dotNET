@@ -17,7 +17,7 @@ namespace Parse.Test
     public class FileControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new ParseClient.Configuration { ApplicationId = "", WindowsKey = "" });
+        public void SetUp() => ParseClient.Initialize(new ParseClient.Configuration { ApplicationID = "", Key = "" });
 
         [TestMethod]
         [AsyncStateMachine(typeof(FileControllerTests))]

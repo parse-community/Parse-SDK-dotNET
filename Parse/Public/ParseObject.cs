@@ -170,7 +170,7 @@ namespace Parse
 
         #endregion
 
-        private static string GetFieldForPropertyName(String className, string propertyName) => SubclassingController.GetPropertyMappings(className).TryGetValue(propertyName, out string fieldName) ? fieldName : fieldName;
+        private static string GetFieldForPropertyName(string className, string propertyName) => SubclassingController.GetPropertyMappings(className).TryGetValue(propertyName, out string fieldName) ? fieldName : fieldName;
 
         /// <summary>
         /// Sets the value of a property based upon its associated ParseFieldName attribute.
@@ -1362,8 +1362,8 @@ namespace Parse
             lock (mutex)
             {
                 return other != null &&
-                    object.Equals(ClassName, other.ClassName) &&
-                    object.Equals(ObjectId, other.ObjectId);
+                    Equals(ClassName, other.ClassName) &&
+                    Equals(ObjectId, other.ObjectId);
             }
         }
 
@@ -1625,7 +1625,7 @@ namespace Parse
         protected void OnFieldsChanged(IEnumerable<string> fieldNames)
         {
             var mappings = SubclassingController.GetPropertyMappings(ClassName);
-            IEnumerable<String> properties;
+            IEnumerable<string> properties;
 
             if (fieldNames != null && mappings != null)
             {
@@ -1639,7 +1639,7 @@ namespace Parse
             }
             else
             {
-                properties = Enumerable.Empty<String>();
+                properties = Enumerable.Empty<string>();
             }
 
             foreach (var property in properties)

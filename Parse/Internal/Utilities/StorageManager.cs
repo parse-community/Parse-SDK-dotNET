@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Parse.Internal.Utilities
@@ -11,12 +10,17 @@ namespace Parse.Internal.Utilities
     /// </summary>
     internal static class StorageManager
     {
-        static StorageManager() => Directory.CreateDirectory(PersistentStoragePath);
+        static StorageManager() => AppDomain.CurrentDomain.ProcessExit += (_, __) => { if (new FileInfo(FallbackPersistentStorageFilePath) is FileInfo file && file.Exists) file.Delete(); };
 
         /// <summary>
         /// The path to a persistent user-specific storage location specific to the final client assembly of the Parse library.
         /// </summary>
-        public static string PersistentStoragePath { get; } = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationName, Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion));
+        public static string PersistentStorageFilePath => Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ParseClient.CurrentConfiguration.StorageConfiguration?.RelativeStorageFilePath ?? FallbackPersistentStorageFilePath));
+
+        /// <summary>
+        /// Gets the calculated persistent storage file fallback path for this app execution.
+        /// </summary>
+        public static string FallbackPersistentStorageFilePath { get; } = ParseClient.Configuration.IdentifierBasedStorageConfiguration.Fallback.RelativeStorageFilePath;
 
         /// <summary>
         /// Asynchronously writes the provided little-endian 16-bit character string <paramref name="content"/> to the file wrapped by the provided <see cref="FileInfo"/> instance.
@@ -42,22 +46,41 @@ namespace Parse.Internal.Utilities
         }
 
         /// <summary>
-        /// Get or Create a file with it's path based in the <see cref="PersistentStoragePath"/>, named and relatively positioned according to the <paramref name="relativePath"/> parameter.
+        /// Gets or creates the file pointed to by <see cref="PersistentStorageFilePath"/> and returns it's wrapper as a <see cref="FileInfo"/> instance.
         /// </summary>
-        /// <param name="relativePath">The relative path from the <see cref="PersistentStoragePath"/>, including the name, of the target persistent storage file</param>
-        /// <returns>A file wrapper for the target file</returns>
-        public static FileInfo GetPersistentStorageFileWrapperAsync(string relativePath)
+        public static FileInfo PersistentStorageFileWrapper
         {
-            FileInfo file = new FileInfo(Path.GetFullPath(Path.Combine(PersistentStoragePath, relativePath)));
-            if (!file.Exists) using (file.Create()) ; // Hopefully the JIT doesn't no-op this. The behaviour of the "using" clause should dictate how the stream is closed, to make sure it happens properly.
+            get
+            {
+                Directory.CreateDirectory(PersistentStorageFilePath.Substring(0, PersistentStorageFilePath.LastIndexOf(Path.DirectorySeparatorChar)));
 
-            return file;
+                FileInfo file = new FileInfo(PersistentStorageFilePath);
+                if (!file.Exists)
+                    using (file.Create())
+                        ; // Hopefully the JIT doesn't no-op this. The behaviour of the "using" clause should dictate how the stream is closed, to make sure it happens properly.
+
+                return file;
+            }
         }
 
-        private static FileInfo CreatePersistentStorageFileAsync(string path)
+        /// <summary>
+        /// Gets the file wrapper for the specified <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">The relative path to the target file</param>
+        /// <returns>An instance of <see cref="FileInfo"/> wrapping the the <paramref name="path"/> value</returns>
+        public static FileInfo GetWrapperForRelativePersistentStorageFilePath(string path)
         {
-            new FileStream(path = Path.GetFullPath(Path.Combine(PersistentStoragePath, path)), FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan).Dispose();
+            path = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path));
+
+            Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.VolumeSeparatorChar)));
             return new FileInfo(path);
+        }
+
+        public static async Task TransferAsync(string originFilePath, string targetFilePath)
+        {
+            if (!String.IsNullOrWhiteSpace(originFilePath) && !String.IsNullOrWhiteSpace(targetFilePath) && new FileInfo(originFilePath) is FileInfo originFile && originFile.Exists && new FileInfo(targetFilePath) is FileInfo targetFile)
+                using (StreamWriter writer = targetFile.CreateText()) using (StreamReader reader = originFile.OpenText())
+                    await writer.WriteAsync(await reader.ReadToEndAsync());
         }
     }
 }

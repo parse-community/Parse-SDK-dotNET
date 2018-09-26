@@ -14,13 +14,13 @@ namespace Parse.Core.Internal
         private static readonly string parseObjectClassName = "_ParseObject";
 
         private readonly ReaderWriterLockSlim mutex;
-        private readonly IDictionary<String, ObjectSubclassInfo> registeredSubclasses;
-        private Dictionary<String, Action> registerActions;
+        private readonly IDictionary<string, ObjectSubclassInfo> registeredSubclasses;
+        private Dictionary<string, Action> registerActions;
 
         public ObjectSubclassingController()
         {
             mutex = new ReaderWriterLockSlim();
-            registeredSubclasses = new Dictionary<String, ObjectSubclassInfo>();
+            registeredSubclasses = new Dictionary<string, ObjectSubclassInfo>();
             registerActions = new Dictionary<string, Action>();
 
             // Register the ParseObject subclass, so we get access to the ACL,
@@ -56,7 +56,7 @@ namespace Parse.Core.Internal
                 throw new ArgumentException("Cannot register a type that is not a subclass of ParseObject");
             }
 
-            String className = GetClassName(type);
+            string className = GetClassName(type);
 
             try
             {
@@ -125,7 +125,7 @@ namespace Parse.Core.Internal
             mutex.ExitWriteLock();
         }
 
-        public ParseObject Instantiate(String className)
+        public ParseObject Instantiate(string className)
         {
             ObjectSubclassInfo info = null;
 
@@ -138,7 +138,7 @@ namespace Parse.Core.Internal
               : new ParseObject(className);
         }
 
-        public IDictionary<String, String> GetPropertyMappings(String className)
+        public IDictionary<string, string> GetPropertyMappings(string className)
         {
             ObjectSubclassInfo info = null;
             mutex.EnterReadLock();

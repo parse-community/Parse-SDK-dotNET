@@ -14,7 +14,7 @@ namespace Parse.Common.Internal
     {
         public bool Equals(T x, T y)
         {
-            return object.ReferenceEquals(x, y);
+            return ReferenceEquals(x, y);
         }
 
         public int GetHashCode(T obj)
