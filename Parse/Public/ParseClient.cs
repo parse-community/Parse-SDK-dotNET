@@ -54,7 +54,16 @@ namespace Parse
                 /// An instance of <see cref="MetadataBasedStorageConfiguration"/> with inferred values based on the entry assembly. Should be used with <see cref="VersionInformation.Inferred"/>.
                 /// </summary>
                 /// <remarks>Should not be used with Unity.</remarks>
-                public static MetadataBasedStorageConfiguration NoCompanyInferred { get; } = new MetadataBasedStorageConfiguration { CompanyName = Assembly.GetEntryAssembly().GetName().Name, ProductName = String.Empty };
+                public static MetadataBasedStorageConfiguration NoCompanyInferred { get; } = new MetadataBasedStorageConfiguration
+                {
+#if UNITY
+                    CompanyName = UnityEngine.Application.companyName,
+                    ProductName = UnityEngine.Application.productName
+#else
+                    CompanyName = Assembly.GetEntryAssembly().GetName().Name,
+                    ProductName = String.Empty
+#endif
+                };
 
                 /// <summary>
                 /// The name of the company that owns the product specified by <see cref="ProductName"/>.
@@ -108,7 +117,7 @@ namespace Parse
                 /// Generates a path for use in the <see cref="RelativeStorageFilePath"/> getter.
                 /// </summary>
                 /// <returns>A potential path to the cachefile</returns>
-                string GeneratePath() => Path.Combine("Parse", IsFallback ? "_fallback" : "_global", $"{(IsFallback ? new Random { }.Next().ToString() : Identifier)}.cachefile");
+                private string GeneratePath() => Path.Combine("Parse", IsFallback ? "_fallback" : "_global", $"{(IsFallback ? new Random { }.Next().ToString() : Identifier)}.cachefile");
             }
 
             /// <summary>
@@ -127,7 +136,17 @@ namespace Parse
                 /// An instance of <see cref="VersionInformation"/> with inferred values based on the entry assembly.
                 /// </summary>
                 /// <remarks>Should not be used with Unity.</remarks>
-                public static VersionInformation Inferred { get; } = new VersionInformation { BuildVersion = Assembly.GetEntryAssembly().GetName().Version.Build.ToString(), DisplayVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(), OSVersion = Environment.OSVersion.ToString() };
+                public static VersionInformation Inferred { get; } = new VersionInformation
+                {
+#if UNITY
+                    BuildVersion = "0",
+                    DisplayVersion = UnityEngine.Application.version,
+#else
+                    BuildVersion = Assembly.GetEntryAssembly().GetName().Version.Build.ToString(),
+                    DisplayVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(),
+#endif
+                    OSVersion = Environment.OSVersion.ToString()
+                };
 
                 /// <summary>
                 /// The build number of your app.
@@ -221,6 +240,20 @@ namespace Parse
         /// <param name="key">The .NET API Key provided in the Parse dashboard.
         /// </param>
         public static void Initialize(string identifier, string key) => Initialize(new Configuration { ApplicationID = identifier, Key = key });
+
+        /// <summary>
+        /// Authenticates this client as belonging to your application. This must be
+        /// called before your application can use the Parse library. The recommended
+        /// way is to put a call to <c>ParseFramework.Initialize</c> in your
+        /// Application startup.
+        /// </summary>
+        /// <param name="identifier">The Application ID provided in the Parse dashboard.
+        /// </param>
+        /// <param name="key">The .NET API Key provided in the Parse dashboard.
+        /// </param>
+        /// <param name="serverURI">The server URI provided in the Parse dashboard.
+        /// </param>
+        public static void Initialize(string identifier, string key, string serverURI) => Initialize(new Configuration { ApplicationID = identifier, Key = key, ServerURI = serverURI });
 
         /// <summary>
         /// Authenticates this client as belonging to your application. This must be

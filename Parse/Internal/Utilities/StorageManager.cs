@@ -15,7 +15,12 @@ namespace Parse.Internal.Utilities
         /// <summary>
         /// The path to a persistent user-specific storage location specific to the final client assembly of the Parse library.
         /// </summary>
+#if UNITY
+        public static string PersistentStorageFilePath => Path.Combine(UnityEngine.Application.persistentDataPath, ParseClient.CurrentConfiguration.StorageConfiguration?.RelativeStorageFilePath ?? FallbackPersistentStorageFilePath);
+#else
         public static string PersistentStorageFilePath => Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ParseClient.CurrentConfiguration.StorageConfiguration?.RelativeStorageFilePath ?? FallbackPersistentStorageFilePath));
+#endif
+
 
         /// <summary>
         /// Gets the calculated persistent storage file fallback path for this app execution.
@@ -70,7 +75,11 @@ namespace Parse.Internal.Utilities
         /// <returns>An instance of <see cref="FileInfo"/> wrapping the the <paramref name="path"/> value</returns>
         public static FileInfo GetWrapperForRelativePersistentStorageFilePath(string path)
         {
+#if UNITY
+            path = Path.Combine(UnityEngine.Application.persistentDataPath, path);
+#else
             path = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path));
+#endif
 
             Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.VolumeSeparatorChar)));
             return new FileInfo(path);
@@ -79,7 +88,8 @@ namespace Parse.Internal.Utilities
         public static async Task TransferAsync(string originFilePath, string targetFilePath)
         {
             if (!String.IsNullOrWhiteSpace(originFilePath) && !String.IsNullOrWhiteSpace(targetFilePath) && new FileInfo(originFilePath) is FileInfo originFile && originFile.Exists && new FileInfo(targetFilePath) is FileInfo targetFile)
-                using (StreamWriter writer = targetFile.CreateText()) using (StreamReader reader = originFile.OpenText())
+                using (StreamWriter writer = targetFile.CreateText())
+                using (StreamReader reader = originFile.OpenText())
                     await writer.WriteAsync(await reader.ReadToEndAsync());
         }
     }
