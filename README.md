@@ -35,6 +35,14 @@ To find full usage instructions for the latest stable release, please visit the 
 ## Building The Library
 You can build the library from Visual Studio Code (with the proper extensions), Visual Studio 2017 Community and higher, or Visual Studio for Mac 7 and higher. You can also build the library using the command line:
 
+### For Unity support:
+You need to update/add a reference in the Parse.Unity C# project file to your targeted Unity version 'UnityEngine.dll' (found inside the Unity installation folder).
+
+After adding the reference the build process is the same as below (or by opening VS and build it manually).
+
+Remark: As Parse for .NET library is targeted .NET Standard 2.0 you may need to check compatibility with older Unity versions since support was introduced during 5.x cycle.
+
+
 ### On Windows or Unix-based systems with Dotnet SDK installed:
 ```batch
 dotnet build Parse.sln
