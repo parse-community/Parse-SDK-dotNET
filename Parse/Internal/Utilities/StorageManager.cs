@@ -79,9 +79,8 @@ namespace Parse.Internal.Utilities
             path = Path.Combine(UnityEngine.Application.persistentDataPath, path);
 #else
             path = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path));
-#endif
-
             Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.VolumeSeparatorChar)));
+#endif
             return new FileInfo(path);
         }
 
