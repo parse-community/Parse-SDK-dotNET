@@ -15,7 +15,9 @@ namespace Parse.Internal.Utilities
         /// <summary>
         /// The path to a persistent user-specific storage location specific to the final client assembly of the Parse library.
         /// </summary>
-#if UNITY
+#if UNITY_EDITOR
+        public static string PersistentStorageFilePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ParseClient.CurrentConfiguration.StorageConfiguration?.RelativeStorageFilePath ?? FallbackPersistentStorageFilePath);
+#elif UNITY
         public static string PersistentStorageFilePath => Path.Combine(UnityEngine.Application.persistentDataPath, ParseClient.CurrentConfiguration.StorageConfiguration?.RelativeStorageFilePath ?? FallbackPersistentStorageFilePath);
 #else
         public static string PersistentStorageFilePath => Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), ParseClient.CurrentConfiguration.StorageConfiguration?.RelativeStorageFilePath ?? FallbackPersistentStorageFilePath));
@@ -77,11 +79,14 @@ namespace Parse.Internal.Utilities
         /// <returns>An instance of <see cref="FileInfo"/> wrapping the the <paramref name="path"/> value</returns>
         public static FileInfo GetWrapperForRelativePersistentStorageFilePath(string path)
         {
-#if UNITY
+#if UNITY_EDITOR
+            path = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path));
+            Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar)));
+#elif UNITY
             path = Path.Combine(UnityEngine.Application.persistentDataPath, path);
 #else
             path = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path));
-            Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.VolumeSeparatorChar)));
+            Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar)));
 #endif
             return new FileInfo(path);
         }

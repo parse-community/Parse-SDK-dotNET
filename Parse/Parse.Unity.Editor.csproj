@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.xml</DocumentationFile>
+        <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.Editor.xml</DocumentationFile>
         <Version>2.0.0.0-develop-00120180926</Version>
         <AssemblyVersion>2.0.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
@@ -18,12 +18,12 @@
         <PackageTags>Parse;netstandard2.0;parse-platform;backend;sdk;netstandard;app</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<AssemblyName>Parse.Unity</AssemblyName>
+        <AssemblyName>Parse.Unity.Editor</AssemblyName>
         <RootNamespace>Parse</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <DefineConstants>TRACE;UNITY</DefineConstants>
+      <DefineConstants>TRACE;UNITY_EDITOR;UNITY</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,9 +31,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="netstandard">
+        <HintPath>..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\netstandard.library\2.0.3\build\netstandard2.0\ref\netstandard.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEditor">
+        <HintPath>..\UnityEditor.dll</HintPath>
+      </Reference>
       <Reference Include="UnityEngine">
         <HintPath>..\UnityEngine.dll</HintPath>
       </Reference>
     </ItemGroup>
-
+	
 </Project>

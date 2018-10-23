@@ -370,10 +370,6 @@ namespace Parse.Common.Internal
             input = input.Trim();
             JsonStringParser parser = new JsonStringParser(input);
 
-#if UNITY
-            //UnityEngine.Debug.Log("Json.Parse: " + input);
-#endif
-
             if ((parser.ParseObject(out output) ||
                 parser.ParseArray(out output)) &&
                 parser.CurrentIndex == input.Length)
@@ -407,9 +403,6 @@ namespace Parse.Common.Internal
                 builder.Append(",");
             }
             builder[builder.Length - 1] = '}';
-#if UNITY
-            //UnityEngine.Debug.Log("JSON.Encode: " + builder.ToString());
-#endif
 
             return builder.ToString();
         }

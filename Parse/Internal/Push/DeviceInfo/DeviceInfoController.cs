@@ -22,7 +22,7 @@ namespace Parse.Push.Internal
         /// <summary>
         /// The version number of the application.
         /// </summary>
-#if UNITY
+#if UNITY || UNITY_EDITOR
         public string AppBuildVersion { get; } = "0"; // Unity compiled assembly does not receive build number and remains default value of 0
 #else
         public string AppBuildVersion { get; } = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Build.ToString();
