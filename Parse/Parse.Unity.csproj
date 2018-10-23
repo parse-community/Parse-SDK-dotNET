@@ -33,6 +33,7 @@
     <ItemGroup>
       <Reference Include="UnityEngine">
         <HintPath>..\UnityEngine.dll</HintPath>
+        <Private>false</Private>
       </Reference>
     </ItemGroup>
 

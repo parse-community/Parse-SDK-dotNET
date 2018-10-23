@@ -33,12 +33,15 @@
     <ItemGroup>
       <Reference Include="netstandard">
         <HintPath>..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\netstandard.library\2.0.3\build\netstandard2.0\ref\netstandard.dll</HintPath>
+        <Private>false</Private>
       </Reference>
       <Reference Include="UnityEditor">
         <HintPath>..\UnityEditor.dll</HintPath>
+        <Private>false</Private>
       </Reference>
       <Reference Include="UnityEngine">
         <HintPath>..\UnityEngine.dll</HintPath>
+        <Private>false</Private>
       </Reference>
     </ItemGroup>
 	
