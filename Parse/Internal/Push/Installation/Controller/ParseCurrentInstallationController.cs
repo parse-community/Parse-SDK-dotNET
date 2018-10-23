@@ -91,13 +91,12 @@ namespace Parse.Push.Internal
                         Task fetchTask;
                         object temp;
                         stroage.Result.TryGetValue(ParseInstallationKey, out temp);
-                        var installationDataString = temp as string;
-                        ParseInstallation installation = null;
-                        if (installationDataString != null)
-                        {
-                            var installationData = Json.Parse(installationDataString) as IDictionary<string, object>;
-                            installation = installationCoder.Decode(installationData);
 
+                        IDictionary<string, object> installationData = temp as IDictionary<string, object>;
+                        ParseInstallation installation = null;
+                        if (installationData != null)
+                        {
+                            installation = installationCoder.Decode(installationData);
                             fetchTask = Task.FromResult<object>(null);
                         }
                         else

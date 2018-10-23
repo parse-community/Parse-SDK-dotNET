@@ -9,7 +9,7 @@ before_test:
   - choco install opencover.portable
   - choco install codecov
 test_script:
-  - OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --test-adapter-path:. --logger:Appveyor /p:DebugType=full .\Parse.Test\Parse.Test.csproj" -filter:"+[Parse*]* +[Parse.Unity*]* -[Parse.Test*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
+  - OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --test-adapter-path:. --logger:Appveyor /p:DebugType=full .\Parse.Test\Parse.Test.csproj" -filter:"+[Parse*]* -[Parse.Test*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
 after_test:
   - codecov -f "parse_sdk_dotnet_coverage.xml"
 artifacts:

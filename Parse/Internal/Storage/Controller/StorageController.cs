@@ -1,9 +1,9 @@
 using System;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
-using System.Threading;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Parse.Internal.Utilities;
 
 namespace Parse.Common.Internal
@@ -40,6 +40,7 @@ namespace Parse.Common.Internal
             {
                 return file.ReadAllTextAsync().ContinueWith(t =>
                 {
+
                     string text = t.Result;
                     Dictionary<string, object> result = null;
                     try
@@ -156,7 +157,14 @@ namespace Parse.Common.Internal
         /// Loads a settings dictionary from the file wrapped by <see cref="File"/>.
         /// </summary>
         /// <returns>A storage dictionary containing the deserialized content of the storage file targeted by the <see cref="StorageController"/> instance</returns>
-        public Task<IStorageDictionary<string, object>> LoadAsync() => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Task.FromResult((IStorageDictionary<string, object>) Storage) ?? (Storage = new StorageDictionary(File)).LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
+        public Task<IStorageDictionary<string, object>> LoadAsync()
+        {
+            //return Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Task.FromResult((IStorageDictionary<string, object>) Storage) ?? (Storage = new StorageDictionary(File)).LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None)
+            // unwrapped the single-liner a bit as the null-check operator check against the Task.FromResult return value instead of 'Storage' field
+            if (Storage == null)
+                Storage = new StorageDictionary(File);
+            return Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Storage.LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
+        }
 
         /// <summary>
         /// 

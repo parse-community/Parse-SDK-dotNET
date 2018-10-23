@@ -38,13 +38,12 @@ namespace Parse.Core.Internal
                 {
                     return storageController.LoadAsync().OnSuccess(t =>
                     {
-                        object tmp;
-                        t.Result.TryGetValue(CurrentConfigKey, out tmp);
+                        object temp;
+                        t.Result.TryGetValue(CurrentConfigKey, out temp);
 
-                        string propertiesString = tmp as string;
-                        if (propertiesString != null)
+                        IDictionary<string, object> dictionary = temp as IDictionary<string, object>;
+                        if (dictionary != null)
                         {
-                            var dictionary = ParseClient.DeserializeJsonString(propertiesString);
                             currentConfig = new ParseConfig(dictionary);
                         }
                         else

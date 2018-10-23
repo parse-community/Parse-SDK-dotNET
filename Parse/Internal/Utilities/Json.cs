@@ -3,11 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Parse.Common.Internal
 {
@@ -372,6 +370,10 @@ namespace Parse.Common.Internal
             input = input.Trim();
             JsonStringParser parser = new JsonStringParser(input);
 
+#if UNITY
+            //UnityEngine.Debug.Log("Json.Parse: " + input);
+#endif
+
             if ((parser.ParseObject(out output) ||
                 parser.ParseArray(out output)) &&
                 parser.CurrentIndex == input.Length)
@@ -405,6 +407,10 @@ namespace Parse.Common.Internal
                 builder.Append(",");
             }
             builder[builder.Length - 1] = '}';
+#if UNITY
+            //UnityEngine.Debug.Log("JSON.Encode: " + builder.ToString());
+#endif
+
             return builder.ToString();
         }
 
@@ -438,6 +444,7 @@ namespace Parse.Common.Internal
         /// </summary>
         public static string Encode(object obj)
         {
+            // TODO (TobiasPott): minor adjustments applied for now to create valid JSON again (did wrap sub-objects in "" causing online-parseer to fail and require the read-in to unbox dictionaries from string without being necessary)
             var dict = obj as IDictionary<string, object>;
             if (dict != null)
             {
@@ -457,8 +464,8 @@ namespace Parse.Common.Internal
                     {
                         case '\\':
                             return "\\\\";
-                        case '\"':
-                            return "\\\"";
+                        //case '\"':
+                        //    return "\\\"";
                         case '\b':
                             return "\\b";
                         case '\f':
@@ -469,10 +476,15 @@ namespace Parse.Common.Internal
                             return "\\r";
                         case '\t':
                             return "\\t";
+                        //default:
+                        //    return "\\u" + ((ushort) m.Value[0]).ToString("x4");
                         default:
-                            return "\\u" + ((ushort) m.Value[0]).ToString("x4");
+                            return "" + m.Value[0];
                     }
                 });
+                // skip "-wrapping of dictionary objects to JSON
+                if (str.StartsWith("{"))
+                    return str;
                 return "\"" + str + "\"";
             }
             if (obj == null)
