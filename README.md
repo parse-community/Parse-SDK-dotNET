@@ -1,4 +1,4 @@
-# Parse SDK for .NET
+# Parse SDK for .NET Standard & Unity
 [![Build status](https://ci.appveyor.com/api/projects/status/uoit0ona7m3x9bw6?svg=true)](https://ci.appveyor.com/project/ParseCommunity/parse-sdk-dotnet)
 [![codecov](https://codecov.io/gh/parse-community/Parse-SDK-dotNET/branch/master/graph/badge.svg)](https://codecov.io/gh/parse-community/Parse-SDK-dotNET)
 [![Nuget][nuget-svg]][nuget-link]
@@ -7,6 +7,14 @@
 ## Getting Started
 The latest stable release of the SDK is available on our [NuGet package][nuget-link].
 To use the most up-to-date code, build this project and reference the generated NuGet package.
+
+## Unity support:
+You need to update/add a reference in the Parse.Unity C# project file to your targeted Unity version 'UnityEngine.dll' (found inside the Unity installation folder).
+
+After adding the reference the build process is the same as below (or by opening VS and build it manually).
+
+Remark: As Parse for .NET library is targeted .NET Standard 2.0 you may need to check compatibility with older Unity versions since support was introduced during 5.x cycle.
+
 
 ## Using the Code
 Make sure you are using the project's root namespace:
@@ -34,13 +42,6 @@ To find full usage instructions for the latest stable release, please visit the 
 
 ## Building The Library
 You can build the library from Visual Studio Code (with the proper extensions), Visual Studio 2017 Community and higher, or Visual Studio for Mac 7 and higher. You can also build the library using the command line:
-
-### For Unity support:
-You need to update/add a reference in the Parse.Unity C# project file to your targeted Unity version 'UnityEngine.dll' (found inside the Unity installation folder).
-
-After adding the reference the build process is the same as below (or by opening VS and build it manually).
-
-Remark: As Parse for .NET library is targeted .NET Standard 2.0 you may need to check compatibility with older Unity versions since support was introduced during 5.x cycle.
 
 
 ### On Windows or Unix-based systems with Dotnet SDK installed:
