@@ -2,20 +2,40 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.1</LangVersion>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Debug-Editor;Release-Editor</Configurations>
+    <AssemblyName>Parse.Unity</AssemblyName>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE;UNITY</DefineConstants>
+    <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Editor|AnyCPU'">
+    <DefineConstants>TRACE;UNITY;UNITY_EDITOR</DefineConstants>
+    <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.Editor.xml</DocumentationFile>
+    <AssemblyName>Parse.Unity.Editor</AssemblyName>
+    <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE;UNITY</DefineConstants>
+    <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|AnyCPU'">
+    <DefineConstants>TRACE;UNITY;UNITY_EDITOR</DefineConstants>
+    <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.Editor.xml</DocumentationFile>
+    <AssemblyName>Parse.Unity.Editor</AssemblyName>
+    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>..\UnityEngine.dll</HintPath>
+      <Private>false</Private>
     </Reference>
   </ItemGroup>
 
