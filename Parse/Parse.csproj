@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
+        
         <Version>2.0.0.0-develop-00120180926</Version>
         <AssemblyVersion>2.0.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
@@ -18,10 +18,67 @@
         <PackageTags>Parse;netstandard2.0;parse-platform;backend;sdk;netstandard;app</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Configurations>Debug;Release;Debug-Editor;Release-Editor;Debug-Unity;Release-Unity</Configurations>
     </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DefineConstants>TRACE</DefineConstants>
+        <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Unity|AnyCPU'">
+        <DefineConstants>TRACE; UNITY</DefineConstants>
+        <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.xml</DocumentationFile>
+        <AssemblyName>Parse.Unity</AssemblyName>
+        <OutputPath>bin\Release\</OutputPath>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Editor|AnyCPU'">
+        <DefineConstants>TRACE; UNITY; UNITY_EDITOR</DefineConstants>
+        <DocumentationFile>bin\Release\netstandard2.0\Parse.Unity.Editor.xml</DocumentationFile>
+        <AssemblyName>Parse.Unity.Editor</AssemblyName>
+        <OutputPath>bin\Release\</OutputPath>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DefineConstants>TRACE; DEBUG</DefineConstants>
+        <DocumentationFile>bin\Debug\netstandard2.0\Parse.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Unity|AnyCPU'">
+        <DefineConstants>TRACE; DEBUG; UNITY</DefineConstants>
+        <DocumentationFile>bin\Debug\netstandard2.0\Parse.Unity.xml</DocumentationFile>
+        <AssemblyName>Parse.Unity</AssemblyName>
+        <OutputPath>bin\Debug\</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|AnyCPU'">
+        <DefineConstants>TRACE; DEBUG; UNITY; UNITY_EDITOR</DefineConstants>
+        <DocumentationFile>bin\Debug\netstandard2.0\Parse.Unity.Editor.xml</DocumentationFile>
+        <AssemblyName>Parse.Unity.Editor</AssemblyName>
+        <OutputPath>bin\Debug\</OutputPath>
+    </PropertyGroup>
+
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <PackageReference Include="OpenCover" Version="4.6.519" />
     </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Unity|AnyCPU'">
+        <Reference Include="UnityEngine">
+            <HintPath>..\UnityEngine.dll</HintPath>
+            <Private>true</Private>
+        </Reference>
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release-Unity|AnyCPU'">
+        <Reference Include="UnityEngine">
+            <HintPath>..\UnityEngine.dll</HintPath>
+            <Private>true</Private>
+        </Reference>
+    </ItemGroup>
+
 
 </Project>
