@@ -76,7 +76,7 @@ namespace Parse
             className = source.className;
             this.where = source.where;
             orderBy = replacementOrderBy is null ? source.orderBy : new ReadOnlyCollection<string>(replacementOrderBy.ToList());
-            this.skip = (source.skip ?? 0) + (skip ?? 0);
+            this.skip = skip is null ? (source.skip ?? 0) + skip : source.skip; // 0 could be handled differently from null
             this.limit = limit ?? source.limit;
             this.includes = source.includes;
             this.selectedKeys = source.selectedKeys;
