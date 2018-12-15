@@ -31,7 +31,7 @@ namespace Parse.Internal.Utilities
         public static async Task WriteToAsync(this FileInfo file, string content)
         {
             using (FileStream stream = new FileStream(Path.GetFullPath(file.FullName), FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.SequentialScan | FileOptions.Asynchronous))
-                await stream.WriteAsync(Encoding.Unicode.GetBytes(content), 0, content.Length);
+                await stream.WriteAsync(Encoding.Unicode.GetBytes(content), 0, content.Length * 2 /* UTF-16, so two bytes per character of length. */);
         }
 
         /// <summary>
