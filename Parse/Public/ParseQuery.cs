@@ -74,57 +74,52 @@ namespace Parse
                 throw new ArgumentNullException("source");
 
             className = source.className;
-            this.where = where != null ? new Dictionary<string, object>(MergeWhereClauses(where)) : source.where;
-            orderBy = replacementOrderBy != null ? new ReadOnlyCollection<string>(replacementOrderBy.ToList()) : source.orderBy;
-            this.skip = source.skip;
-            this.limit = source.limit;
+            this.where = source.where;
+            orderBy = replacementOrderBy is null ? source.orderBy : new ReadOnlyCollection<string>(replacementOrderBy.ToList());
+            this.skip = (source.skip ?? 0) + (skip ?? 0);
+            this.limit = limit ?? source.limit;
             this.includes = source.includes;
             this.selectedKeys = source.selectedKeys;
-            this.redirectClassNameForKey = source.redirectClassNameForKey;
+            this.redirectClassNameForKey = redirectClassNameForKey ?? source.redirectClassNameForKey;
 
             if (thenBy != null)
             {
-                if (orderBy == null)
-                    throw new ArgumentException("You must call OrderBy before calling ThenBy.");
-                (thenBy as List<string>).AddRange(orderBy);
-                orderBy = new ReadOnlyCollection<string>(thenBy as List<string>);
+                List<string> newOrderBy = new List<string>(orderBy ?? throw new ArgumentException("You must call OrderBy before calling ThenBy."));
+
+                newOrderBy.AddRange(thenBy);
+                orderBy = new ReadOnlyCollection<string>(newOrderBy);
             }
-
+            
             // Remove duplicates.
-            orderBy = orderBy != null ? new ReadOnlyCollection<string>(new HashSet<string>(orderBy).ToList()) : orderBy;
+            if (orderBy != null)
+                orderBy = new ReadOnlyCollection<string>(new HashSet<string>(orderBy).ToList());
 
-            if (skip != null)
-                this.skip = (this.skip ?? 0) + skip;
-
-            if (limit != null)
-                this.limit = limit;
+            if (where != null)
+                this.where = new Dictionary<string, object>(MergeWhereClauses(where));
 
             if (includes != null)
                 this.includes = new ReadOnlyCollection<string>(MergeIncludes(includes).ToList());
 
             if (selectedKeys != null)
                 this.selectedKeys = new ReadOnlyCollection<string>(MergeSelectedKeys(selectedKeys).ToList());
-
-            if (redirectClassNameForKey != null)
-                this.redirectClassNameForKey = redirectClassNameForKey;
         }
 
         private HashSet<string> MergeIncludes(IEnumerable<string> includes)
         {
             if (this.includes == null)
                 return new HashSet<string>(includes);
-            var newIncludes = new HashSet<string>(this.includes);
-            foreach (var item in includes)
+            HashSet<string> newIncludes = new HashSet<string>(this.includes);
+            foreach (string item in includes)
                 newIncludes.Add(item);
             return newIncludes;
         }
 
-        private HashSet<String> MergeSelectedKeys(IEnumerable<String> selectedKeys)
+        private HashSet<string> MergeSelectedKeys(IEnumerable<string> selectedKeys)
         {
             if (this.selectedKeys == null)
                 return new HashSet<string>(selectedKeys);
-            var newSelectedKeys = new HashSet<String>(this.selectedKeys);
-            foreach (var item in selectedKeys)
+            HashSet<string> newSelectedKeys = new HashSet<string>(this.selectedKeys);
+            foreach (string item in selectedKeys)
                 newSelectedKeys.Add(item);
             return newSelectedKeys;
         }
