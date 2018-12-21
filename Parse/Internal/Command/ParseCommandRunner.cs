@@ -9,21 +9,34 @@ using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
 {
+    /// <summary>
+    /// The command runner for all SDK operations that need to interact with the targeted deployment of Parse Server.
+    /// </summary>
     public class ParseCommandRunner : IParseCommandRunner
     {
         private readonly IHttpClient httpClient;
         private readonly IInstallationIdController installationIdController;
 
+        /// <summary>
+        /// Creates a new Parse SDK command runner.
+        /// </summary>
+        /// <param name="httpClient">The <see cref="IHttpClient"/> implementation instance to use.</param>
+        /// <param name="installationIdController">The <see cref="IInstallationIdController"/> implementation instance to use.</param>
         public ParseCommandRunner(IHttpClient httpClient, IInstallationIdController installationIdController)
         {
             this.httpClient = httpClient;
             this.installationIdController = installationIdController;
         }
 
-        public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command,
-            IProgress<ParseUploadProgressEventArgs> uploadProgress = null,
-            IProgress<ParseDownloadProgressEventArgs> downloadProgress = null,
-            CancellationToken cancellationToken = default(CancellationToken))
+        /// <summary>
+        /// Runs a specified <see cref="ParseCommand"/>.
+        /// </summary>
+        /// <param name="command">The <see cref="ParseCommand"/> to run.</param>
+        /// <param name="uploadProgress">An <see cref="IProgress{ParseUploadProgressEventArgs}"/> instance to push upload progress data to.</param>
+        /// <param name="downloadProgress">An <see cref="IProgress{ParseDownloadProgressEventArgs}"/> instance to push download progress data to.</param>
+        /// <param name="cancellationToken">An asynchronous operation cancellation token that dictates if and when the operation should be cancelled.</param>
+        /// <returns></returns>
+        public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command, IProgress<ParseUploadProgressEventArgs> uploadProgress = null, IProgress<ParseDownloadProgressEventArgs> downloadProgress = null, CancellationToken cancellationToken = default)
         {
             return PrepareCommand(command).ContinueWith(commandTask =>
             {
@@ -31,8 +44,8 @@ namespace Parse.Core.Internal
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var response = t.Result;
-                    var contentString = response.Item2;
+                    Tuple<HttpStatusCode, string> response = t.Result;
+                    string contentString = response.Item2;
                     int responseCode = (int) response.Item1;
                     if (responseCode >= 500)
                     {
@@ -44,20 +57,14 @@ namespace Parse.Core.Internal
                         IDictionary<string, object> contentJson = null;
                         try
                         {
-                            if (contentString.StartsWith("["))
-                            {
-                                var arrayJson = Json.Parse(contentString);
-                                contentJson = new Dictionary<string, object> { { "results", arrayJson } };
-                            }
-                            else
-                            {
-                                contentJson = Json.Parse(contentString) as IDictionary<string, object>;
-                            }
+                            // TODO: Newer versions of Parse Server send the failure results back as HTML.
+                            contentJson = contentString.StartsWith("[")
+                                ? new Dictionary<string, object> { ["results"] = Json.Parse(contentString) }
+                                : Json.Parse(contentString) as IDictionary<string, object>;
                         }
                         catch (Exception e)
                         {
-                            throw new ParseException(ParseException.ErrorCode.OtherCause,
-                                "Invalid response from server", e);
+                            throw new ParseException(ParseException.ErrorCode.OtherCause, "Invalid or alternatively-formatted response recieved from server.", e);
                         }
                         if (responseCode < 200 || responseCode > 299)
                         {
@@ -67,8 +74,7 @@ namespace Parse.Core.Internal
                                 contentString;
                             throw new ParseException((ParseException.ErrorCode) code, error);
                         }
-                        return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1,
-                            contentJson);
+                        return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, contentJson);
                     }
                     return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, null);
                 });
@@ -93,28 +99,28 @@ namespace Parse.Core.Internal
 
             if (configuration.AuxiliaryHeaders != null)
             {
-                foreach (var header in configuration.AuxiliaryHeaders)
+                foreach (KeyValuePair<string, string> header in configuration.AuxiliaryHeaders)
                 {
                     newCommand.Headers.Add(header);
                 }
             }
 
-            if (!string.IsNullOrEmpty(configuration.VersionInfo.BuildVersion))
+            if (!String.IsNullOrEmpty(configuration.VersionInfo.BuildVersion))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", configuration.VersionInfo.BuildVersion));
             }
-            if (!string.IsNullOrEmpty(configuration.VersionInfo.DisplayVersion))
+            if (!String.IsNullOrEmpty(configuration.VersionInfo.DisplayVersion))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", configuration.VersionInfo.DisplayVersion));
             }
-            if (!string.IsNullOrEmpty(configuration.VersionInfo.OSVersion))
+            if (!String.IsNullOrEmpty(configuration.VersionInfo.OSVersion))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", configuration.VersionInfo.OSVersion));
             }
 
             // TODO (richardross): I hate the idea of having this super tightly coupled static variable in here.
             // Lets eventually get rid of it.
-            if (!string.IsNullOrEmpty(ParseClient.MasterKey))
+            if (!String.IsNullOrEmpty(ParseClient.MasterKey))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", ParseClient.MasterKey));
             }
