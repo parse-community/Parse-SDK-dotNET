@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
-        <Version>2.0.0.0-develop-00120180926</Version>
+        <Version>2.0.0-develop</Version>
         <AssemblyVersion>2.0.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
         
