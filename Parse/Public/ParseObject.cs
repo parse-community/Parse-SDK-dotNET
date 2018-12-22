@@ -90,10 +90,13 @@ namespace Parse
             var isPointer = isCreatingPointer.Value;
             isCreatingPointer.Value = false;
 
-            if (className == null) throw new ArgumentException("You must specify a Parse class name when creating a new ParseObject.");
-            if (AutoClassName.Equals(className)) className = SubclassingController.GetClassName(GetType());
+            if (className == null)
+                throw new ArgumentException("You must specify a Parse class name when creating a new ParseObject.");
+            if (AutoClassName.Equals(className))
+                className = SubclassingController.GetClassName(GetType());
             // If this is supposed to be created by a factory but wasn't, throw an exception
-            if (!SubclassingController.IsTypeValid(className, GetType())) throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
+            if (!SubclassingController.IsTypeValid(className, GetType()))
+                throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
             state = new MutableObjectState { ClassName = className };
             OnPropertyChanged("ClassName");
 
@@ -145,7 +148,7 @@ namespace Parse
         /// Creates a new ParseObject based upon a given subclass type.
         /// </summary>
         /// <returns>A new ParseObject for the given class name.</returns>
-        public static T Create<T>() where T : ParseObject => (T)SubclassingController.Instantiate(SubclassingController.GetClassName(typeof(T)));
+        public static T Create<T>() where T : ParseObject => (T) SubclassingController.Instantiate(SubclassingController.GetClassName(typeof(T)));
 
         /// <summary>
         /// Creates a reference to an existing ParseObject for use in creating associations between
@@ -155,19 +158,19 @@ namespace Parse
         /// </summary>
         /// <param name="objectId">The object id for the referenced object.</param>
         /// <returns>A ParseObject without data.</returns>
-        public static T CreateWithoutData<T>(string objectId) where T : ParseObject => (T)CreateWithoutData(SubclassingController.GetClassName(typeof(T)), objectId);
+        public static T CreateWithoutData<T>(string objectId) where T : ParseObject => (T) CreateWithoutData(SubclassingController.GetClassName(typeof(T)), objectId);
 
         // TODO (hallucinogen): add unit test
         internal static T FromState<T>(IObjectState state, string defaultClassName) where T : ParseObject
         {
-            T obj = (T)CreateWithoutData(state.ClassName ?? defaultClassName, state.ObjectId);
+            T obj = (T) CreateWithoutData(state.ClassName ?? defaultClassName, state.ObjectId);
             obj.HandleFetchResult(state);
             return obj;
         }
 
         #endregion
 
-        private static string GetFieldForPropertyName(String className, string propertyName) => SubclassingController.GetPropertyMappings(className).TryGetValue(propertyName, out string fieldName) ? fieldName : fieldName;
+        private static string GetFieldForPropertyName(string className, string propertyName) => SubclassingController.GetPropertyMappings(className).TryGetValue(propertyName, out string fieldName) ? fieldName : fieldName;
 
         /// <summary>
         /// Sets the value of a property based upon its associated ParseFieldName attribute.
@@ -255,11 +258,14 @@ namespace Parse
                 {
                     var operation1 = pair.Value;
                     nextOperations.TryGetValue(pair.Key, out IParseFieldOperation operation2);
-                    if (operation2 != null) operation2 = operation2.MergeWithPrevious(operation1);
-                    else operation2 = operation1;
+                    if (operation2 != null)
+                        operation2 = operation2.MergeWithPrevious(operation1);
+                    else
+                        operation2 = operation1;
                     nextOperations[pair.Key] = operation2;
                 }
-                if (!wasDirty && nextOperations == CurrentOperations && operationsBeforeSave.Count > 0) OnPropertyChanged("IsDirty");
+                if (!wasDirty && nextOperations == CurrentOperations && operationsBeforeSave.Count > 0)
+                    OnPropertyChanged("IsDirty");
             }
         }
 
@@ -290,8 +296,10 @@ namespace Parse
                     hasBeenFetched = true;
                     OnPropertyChanged("IsDataAvailable");
                 }
-                if (serverState.UpdatedAt != null) OnPropertyChanged("UpdatedAt");
-                if (serverState.CreatedAt != null) OnPropertyChanged("CreatedAt");
+                if (serverState.UpdatedAt != null)
+                    OnPropertyChanged("UpdatedAt");
+                if (serverState.CreatedAt != null)
+                    OnPropertyChanged("CreatedAt");
 
                 // We cache the fetched object because subsequent Save operation might flush
                 // the fetched objects into Pointers.
@@ -304,7 +312,8 @@ namespace Parse
                     {
                         // Resolve fetched object.
                         var parseObject = value as ParseObject;
-                        if (fetchedObject.ContainsKey(parseObject.ObjectId)) value = fetchedObject[parseObject.ObjectId];
+                        if (fetchedObject.ContainsKey(parseObject.ObjectId))
+                            value = fetchedObject[parseObject.ObjectId];
                     }
                     newServerData[pair.Key] = value;
                 }
@@ -318,14 +327,19 @@ namespace Parse
         internal void MergeFromObject(ParseObject other)
         {
             // If they point to the same instance, we don't need to merge
-            lock (mutex) if (this == other) return;
+            lock (mutex)
+                if (this == other)
+                    return;
 
             // Clear out any changes on this object.
-            if (operationSetQueue.Count != 1) throw new InvalidOperationException("Attempt to MergeFromObject during save.");
+            if (operationSetQueue.Count != 1)
+                throw new InvalidOperationException("Attempt to MergeFromObject during save.");
             operationSetQueue.Clear();
-            foreach (var operationSet in other.operationSetQueue) operationSetQueue.AddLast(operationSet.ToDictionary(entry => entry.Key, entry => entry.Value));
+            foreach (var operationSet in other.operationSetQueue)
+                operationSetQueue.AddLast(operationSet.ToDictionary(entry => entry.Key, entry => entry.Value));
 
-            lock (mutex) state = other.State;
+            lock (mutex)
+                state = other.State;
             RebuildEstimatedData();
         }
 
@@ -333,7 +347,8 @@ namespace Parse
         {
             get
             {
-                lock (mutex) return FindUnsavedChildren().FirstOrDefault() != null;
+                lock (mutex)
+                    return FindUnsavedChildren().FirstOrDefault() != null;
             }
         }
 
@@ -348,14 +363,16 @@ namespace Parse
         internal static IEnumerable<object> DeepTraversal(object root, bool traverseParseObjects = false, bool yieldRoot = false)
         {
             var items = DeepTraversalInternal(root, traverseParseObjects, new HashSet<object>(new IdentityEqualityComparer<object>()));
-            if (yieldRoot) return new[] { root }.Concat(items);
-            else return items;
+            if (yieldRoot)
+                return new[] { root }.Concat(items);
+            else
+                return items;
         }
 
         private static IEnumerable<object> DeepTraversalInternal(object root, bool traverseParseObjects, ICollection<object> seen)
         {
             seen.Add(root);
-            var itemsToVisit = isCompiledByIL2CPP ? (System.Collections.IEnumerable)null : (IEnumerable<object>)null;
+            var itemsToVisit = isCompiledByIL2CPP ? (System.Collections.IEnumerable) null : (IEnumerable<object>) null;
             var dict = Conversion.As<IDictionary<string, object>>(root);
             if (dict != null)
             {
@@ -406,7 +423,8 @@ namespace Parse
         internal static IDictionary<string, object> ToJSONObjectForSaving(IDictionary<string, IParseFieldOperation> operations)
         {
             var result = new Dictionary<string, object>();
-            foreach (var pair in operations) result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value);
+            foreach (var pair in operations)
+                result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value);
             return result;
         }
 
@@ -431,7 +449,8 @@ namespace Parse
         protected virtual Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
         {
             IDictionary<string, IParseFieldOperation> currentOperations = null;
-            if (!IsDirty) return Task.FromResult(0);
+            if (!IsDirty)
+                return Task.FromResult(0);
 
             Task deepSaveTask;
             string sessionToken;
@@ -447,8 +466,10 @@ namespace Parse
 
             return deepSaveTask.OnSuccess(_ => toAwait).Unwrap().OnSuccess(_ => ObjectController.SaveAsync(state, currentOperations, sessionToken, cancellationToken)).Unwrap().ContinueWith(t =>
             {
-                if (t.IsFaulted || t.IsCanceled) HandleFailedSave(currentOperations);
-                else HandleSave(t.Result);
+                if (t.IsFaulted || t.IsCanceled)
+                    HandleFailedSave(currentOperations);
+                else
+                    HandleSave(t.Result);
                 return t;
             }).Unwrap();
         }
@@ -534,7 +555,7 @@ namespace Parse
                                 cancellationToken.ThrowIfCancellationRequested();
                                 return t;
                             }).Unwrap();
-                        }).Unwrap().OnSuccess(t => (object)null);
+                        }).Unwrap().OnSuccess(t => (object) null);
                     }, cancellationToken);
                 });
             }).Unwrap();
@@ -782,7 +803,7 @@ namespace Parse
                         obj.IsDirty = true;
                     }
 
-                    return (object)null;
+                    return (object) null;
                 });
             }, cancellationToken);
         }
@@ -1341,8 +1362,8 @@ namespace Parse
             lock (mutex)
             {
                 return other != null &&
-                    object.Equals(ClassName, other.ClassName) &&
-                    object.Equals(ObjectId, other.ObjectId);
+                    Equals(ClassName, other.ClassName) &&
+                    Equals(ObjectId, other.ObjectId);
             }
         }
 
@@ -1448,7 +1469,8 @@ namespace Parse
         {
             get
             {
-                lock (mutex) { return CheckIsDirty(true); }
+                lock (mutex)
+                { return CheckIsDirty(true); }
             }
             internal set
             {
@@ -1570,7 +1592,7 @@ namespace Parse
         {
             lock (mutex)
             {
-                return ((IEnumerable<KeyValuePair<string, object>>)this).GetEnumerator();
+                return ((IEnumerable<KeyValuePair<string, object>>) this).GetEnumerator();
             }
         }
 
@@ -1603,7 +1625,7 @@ namespace Parse
         protected void OnFieldsChanged(IEnumerable<string> fieldNames)
         {
             var mappings = SubclassingController.GetPropertyMappings(ClassName);
-            IEnumerable<String> properties;
+            IEnumerable<string> properties;
 
             if (fieldNames != null && mappings != null)
             {
@@ -1617,7 +1639,7 @@ namespace Parse
             }
             else
             {
-                properties = Enumerable.Empty<String>();
+                properties = Enumerable.Empty<string>();
             }
 
             foreach (var property in properties)

@@ -32,11 +32,8 @@ namespace Parse.Common.Internal
         private static readonly char[] falseValue = "false".ToCharArray();
         private static readonly char[] trueValue = "true".ToCharArray();
         private static readonly char[] nullValue = "null".ToCharArray();
-        private static readonly Regex numberValue = new Regex(startOfString +
-          @"-?(?:0|[1-9]\d*)(?<frac>\.\d+)?(?<exp>(?:e|E)(?:-|\+)?\d+)?");
-        private static readonly Regex stringValue = new Regex(startOfString +
-          "\"(?<content>(?:[^\\\\\"]|(?<escape>\\\\(?:[\\\\\"/bfnrt]|u[0-9a-fA-F]{4})))*)\"",
-          RegexOptions.Multiline);
+        private static readonly Regex numberValue = new Regex(startOfString + @"-?(?:0|[1-9]\d*)(?<frac>\.\d+)?(?<exp>(?:e|E)(?:-|\+)?\d+)?");
+        private static readonly Regex stringValue = new Regex(startOfString + "\"(?<content>(?:[^\\\\\"]|(?<escape>\\\\(?:[\\\\\"/bfnrt]|u[0-9a-fA-F]{4})))*)\"", RegexOptions.Multiline);
 
         private static readonly Regex escapePattern = new Regex("\\\\|\"|[\u0000-\u001F]");
 
@@ -45,20 +42,9 @@ namespace Parse.Common.Internal
             public string Input { get; private set; }
 
             public char[] InputAsArray { get; private set; }
+            public int CurrentIndex { get; private set; }
 
-            private int currentIndex;
-            public int CurrentIndex
-            {
-                get
-                {
-                    return currentIndex;
-                }
-            }
-
-            public void Skip(int skip)
-            {
-                currentIndex += skip;
-            }
+            public void Skip(int skip) => CurrentIndex += skip;
 
             public JsonStringParser(string input)
             {
@@ -77,15 +63,16 @@ namespace Parse.Common.Internal
                 {
                     return false;
                 }
-                var dict = new Dictionary<string, object>();
+
+                Dictionary<string, object> dict = new Dictionary<string, object> { };
                 while (true)
                 {
-                    object pairValue;
-                    if (!ParseMember(out pairValue))
+                    if (!ParseMember(out object pairValue))
                     {
                         break;
                     }
-                    var pair = pairValue as Tuple<string, object>;
+
+                    Tuple<string, object> pair = pairValue as Tuple<string, object>;
                     dict[pair.Item1] = pair.Item2;
                     if (!Accept(valueSeparator))
                     {
@@ -106,8 +93,7 @@ namespace Parse.Common.Internal
             private bool ParseMember(out object output)
             {
                 output = null;
-                object key;
-                if (!ParseString(out key))
+                if (!ParseString(out object key))
                 {
                     return false;
                 }
@@ -115,12 +101,11 @@ namespace Parse.Common.Internal
                 {
                     return false;
                 }
-                object value;
-                if (!ParseValue(out value))
+                if (!ParseValue(out object value))
                 {
                     return false;
                 }
-                output = new Tuple<string, object>((string)key, value);
+                output = new Tuple<string, object>((string) key, value);
                 return true;
             }
 
@@ -134,11 +119,10 @@ namespace Parse.Common.Internal
                 {
                     return false;
                 }
-                var list = new List<object>();
+                List<object> list = new List<object>();
                 while (true)
                 {
-                    object value;
-                    if (!ParseValue(out value))
+                    if (!ParseValue(out object value))
                     {
                         break;
                     }
@@ -189,15 +173,14 @@ namespace Parse.Common.Internal
             private bool ParseString(out object output)
             {
                 output = null;
-                Match m;
-                if (!Accept(stringValue, out m))
+                if (!Accept(stringValue, out Match m))
                 {
                     return false;
                 }
                 // handle escapes:
                 int offset = 0;
-                var contentCapture = m.Groups["content"];
-                var builder = new StringBuilder(contentCapture.Value);
+                Group contentCapture = m.Groups["content"];
+                StringBuilder builder = new StringBuilder(contentCapture.Value);
                 foreach (Capture escape in m.Groups["escape"].Captures)
                 {
                     int index = (escape.Index - contentCapture.Index) - offset;
@@ -230,7 +213,7 @@ namespace Parse.Common.Internal
                             builder[index] = '\t';
                             break;
                         case 'u':
-                            builder[index] = (char)ushort.Parse(escape.Value.Substring(2), NumberStyles.AllowHexSpecifier);
+                            builder[index] = (char) UInt16.Parse(escape.Value.Substring(2), NumberStyles.AllowHexSpecifier);
                             break;
                         default:
                             throw new ArgumentException("Unexpected escape character in string: " + escape.Value);
@@ -247,20 +230,19 @@ namespace Parse.Common.Internal
             private bool ParseNumber(out object output)
             {
                 output = null;
-                Match m;
-                if (!Accept(numberValue, out m))
+                if (!Accept(numberValue, out Match m))
                 {
                     return false;
                 }
                 if (m.Groups["frac"].Length > 0 || m.Groups["exp"].Length > 0)
                 {
                     // It's a double.
-                    output = double.Parse(m.Value, CultureInfo.InvariantCulture);
+                    output = Double.Parse(m.Value, CultureInfo.InvariantCulture);
                     return true;
                 }
                 else
                 {
-                    output = long.Parse(m.Value, CultureInfo.InvariantCulture);
+                    output = Int64.Parse(m.Value, CultureInfo.InvariantCulture);
                     return true;
                 }
             }
@@ -285,7 +267,7 @@ namespace Parse.Common.Internal
             {
                 int step = 0;
                 int strLen = InputAsArray.Length;
-                int currentStep = currentIndex;
+                int currentStep = CurrentIndex;
                 char currentChar;
 
                 // Remove whitespace
@@ -328,7 +310,7 @@ namespace Parse.Common.Internal
             {
                 int step = 0;
                 int strLen = InputAsArray.Length;
-                int currentStep = currentIndex;
+                int currentStep = CurrentIndex;
                 char currentChar;
 
                 // Remove whitespace
@@ -368,11 +350,10 @@ namespace Parse.Common.Internal
         /// </summary>
         public static object Parse(string input)
         {
-            object output;
             input = input.Trim();
             JsonStringParser parser = new JsonStringParser(input);
 
-            if ((parser.ParseObject(out output) ||
+            if ((parser.ParseObject(out object output) ||
                 parser.ParseArray(out output)) &&
                 parser.CurrentIndex == input.Length)
             {
@@ -396,8 +377,8 @@ namespace Parse.Common.Internal
             {
                 return "{}";
             }
-            var builder = new StringBuilder("{");
-            foreach (var pair in dict)
+            StringBuilder builder = new StringBuilder("{");
+            foreach (KeyValuePair<string, object> pair in dict)
             {
                 builder.Append(Encode(pair.Key));
                 builder.Append(":");
@@ -423,8 +404,8 @@ namespace Parse.Common.Internal
             {
                 return "[]";
             }
-            var builder = new StringBuilder("[");
-            foreach (var item in list)
+            StringBuilder builder = new StringBuilder("[");
+            foreach (object item in list)
             {
                 builder.Append(Encode(item));
                 builder.Append(",");
@@ -438,18 +419,15 @@ namespace Parse.Common.Internal
         /// </summary>
         public static string Encode(object obj)
         {
-            var dict = obj as IDictionary<string, object>;
-            if (dict != null)
+            if (obj is IDictionary<string, object> dict)
             {
                 return Encode(dict);
             }
-            var list = obj as IList<object>;
-            if (list != null)
+            if (obj is IList<object> list)
             {
                 return Encode(list);
             }
-            var str = obj as string;
-            if (str != null)
+            if (obj is string str)
             {
                 str = escapePattern.Replace(str, m =>
                 {
@@ -470,25 +448,18 @@ namespace Parse.Common.Internal
                         case '\t':
                             return "\\t";
                         default:
-                            return "\\u" + ((ushort)m.Value[0]).ToString("x4");
+                            return "\\u" + ((ushort) m.Value[0]).ToString("x4");
                     }
                 });
                 return "\"" + str + "\"";
             }
-            if (obj == null)
+            if (obj is null)
             {
                 return "null";
             }
             if (obj is bool)
             {
-                if ((bool)obj)
-                {
-                    return "true";
-                }
-                else
-                {
-                    return "false";
-                }
+                return (bool) obj ? "true" : "false";
             }
             if (!obj.GetType().GetTypeInfo().IsPrimitive)
             {

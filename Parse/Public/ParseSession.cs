@@ -71,13 +71,13 @@ namespace Parse
                 ParseUser user = t1.Result;
                 if (user == null)
                 {
-                    return Task<ParseSession>.FromResult((ParseSession)null);
+                    return Task<ParseSession>.FromResult((ParseSession) null);
                 }
 
                 string sessionToken = user.SessionToken;
                 if (sessionToken == null)
                 {
-                    return Task<ParseSession>.FromResult((ParseSession)null);
+                    return Task<ParseSession>.FromResult((ParseSession) null);
                 }
 
                 return SessionController.GetSessionAsync(sessionToken, cancellationToken).OnSuccess(t =>

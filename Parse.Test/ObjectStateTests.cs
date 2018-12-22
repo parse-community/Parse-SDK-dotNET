@@ -18,8 +18,8 @@ namespace Parse.Test
             Assert.IsNull(state.ObjectId);
             Assert.IsNull(state.CreatedAt);
             Assert.IsNull(state.UpdatedAt);
-            
-            foreach (var pair in state)
+
+            foreach (KeyValuePair<string, object> pair in state)
             {
                 Assert.IsNotNull(pair);
             }
@@ -28,7 +28,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestProperties()
         {
-            var now = new DateTime();
+            DateTime now = new DateTime();
             IObjectState state = new MutableObjectState
             {
                 ClassName = "Corgi",
@@ -75,7 +75,7 @@ namespace Parse.Test
             IParseFieldOperation op1 = new ParseIncrementOperation(7);
             IParseFieldOperation op2 = new ParseSetOperation("legendia");
             IParseFieldOperation op3 = new ParseSetOperation("vesperia");
-            var operations = new Dictionary<string, IParseFieldOperation>() {
+            Dictionary<string, IParseFieldOperation> operations = new Dictionary<string, IParseFieldOperation>() {
         { "exist", op1 },
         { "missing", op2 },
         { "change", op3 }
@@ -106,7 +106,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestApplyState()
         {
-            var now = new DateTime();
+            DateTime now = new DateTime();
             IObjectState state = new MutableObjectState
             {
                 ClassName = "Corgi",

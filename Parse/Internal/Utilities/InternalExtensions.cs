@@ -60,16 +60,16 @@ namespace Parse.Common.Internal
         public static Task<TResult> OnSuccess<TIn, TResult>(this Task<TIn> task,
             Func<Task<TIn>, TResult> continuation)
         {
-            return ((Task)task).OnSuccess(t => continuation((Task<TIn>)t));
+            return ((Task) task).OnSuccess(t => continuation((Task<TIn>) t));
         }
 
         public static Task OnSuccess<TIn>(this Task<TIn> task, Action<Task<TIn>> continuation)
         {
-            return task.OnSuccess((Func<Task<TIn>, object>)(t =>
-            {
-                continuation(t);
-                return null;
-            }));
+            return task.OnSuccess((Func<Task<TIn>, object>) (t =>
+             {
+                 continuation(t);
+                 return null;
+             }));
         }
 
         public static Task<TResult> OnSuccess<TResult>(this Task task,
@@ -106,11 +106,11 @@ namespace Parse.Common.Internal
 
         public static Task OnSuccess(this Task task, Action<Task> continuation)
         {
-            return task.OnSuccess((Func<Task, object>)(t =>
-            {
-                continuation(t);
-                return null;
-            }));
+            return task.OnSuccess((Func<Task, object>) (t =>
+             {
+                 continuation(t);
+                 return null;
+             }));
         }
 
         public static Task WhileAsync(Func<Task<bool>> predicate, Func<Task> body)

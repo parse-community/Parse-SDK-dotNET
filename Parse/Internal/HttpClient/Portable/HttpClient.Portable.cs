@@ -34,14 +34,17 @@ namespace Parse.Common.Internal
 
             // Fill in zero-length data if method is post.
             Stream data = httpRequest.Data == null && httpRequest.Method.ToLower().Equals("post") ? new MemoryStream(new byte[0]) : httpRequest.Data;
-            if (data != null) message.Content = new StreamContent(data);
+            if (data != null)
+                message.Content = new StreamContent(data);
 
             if (httpRequest.Headers != null)
             {
                 foreach (var header in httpRequest.Headers)
                 {
-                    if (HttpContentHeaders.Contains(header.Key)) message.Content.Headers.Add(header.Key, header.Value);
-                    else message.Headers.Add(header.Key, header.Value);
+                    if (HttpContentHeaders.Contains(header.Key))
+                        message.Content.Headers.Add(header.Key, header.Value);
+                    else
+                        message.Headers.Add(header.Key, header.Value);
                 }
             }
 
@@ -68,7 +71,9 @@ namespace Parse.Common.Internal
                     long totalLength = -1;
                     long readSoFar = 0;
 
-                    try { totalLength = responseStream.Length; } catch { };
+                    try
+                    { totalLength = responseStream.Length; }
+                    catch { };
 
                     return InternalExtensions.WhileAsync(() => responseStream.ReadAsync(buffer, 0, bufferSize, cancellationToken).OnSuccess(readTask => (bytesRead = readTask.Result) > 0), () =>
                     {
@@ -79,7 +84,8 @@ namespace Parse.Common.Internal
                             cancellationToken.ThrowIfCancellationRequested();
                             readSoFar += bytesRead;
 
-                            if (totalLength > -1) downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1.0 * readSoFar / totalLength });
+                            if (totalLength > -1)
+                                downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1.0 * readSoFar / totalLength });
                         });
                     }).ContinueWith(_ =>
                     {
@@ -88,7 +94,8 @@ namespace Parse.Common.Internal
                     }).Unwrap().OnSuccess(_ =>
                     {
                         // If getting stream size is not supported, then report download only once.
-                        if (totalLength == -1) downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1.0 });
+                        if (totalLength == -1)
+                            downloadProgress.Report(new ParseDownloadProgressEventArgs { Progress = 1.0 });
                         var resultAsArray = resultStream.ToArray();
                         resultStream.Dispose();
                         // Assume UTF-8 encoding.

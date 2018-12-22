@@ -128,7 +128,7 @@ namespace Parse.Core.Internal
             }
             if (previous is ParseSetOperation)
             {
-                var otherAmount = ((ParseSetOperation)previous).Value;
+                var otherAmount = ((ParseSetOperation) previous).Value;
                 if (otherAmount is string)
                 {
                     throw new InvalidOperationException("Cannot increment a non-number type.");
@@ -138,7 +138,7 @@ namespace Parse.Core.Internal
             }
             if (previous is ParseIncrementOperation)
             {
-                object otherAmount = ((ParseIncrementOperation)previous).Amount;
+                object otherAmount = ((ParseIncrementOperation) previous).Amount;
                 object myAmount = amount;
                 return new ParseIncrementOperation(Add(otherAmount, myAmount));
             }

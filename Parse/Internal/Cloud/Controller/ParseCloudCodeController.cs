@@ -18,7 +18,7 @@ namespace Parse.Core.Internal
             this.commandRunner = commandRunner;
         }
 
-        public Task<T> CallFunctionAsync<T>(String name,
+        public Task<T> CallFunctionAsync<T>(string name,
             IDictionary<string, object> parameters,
             string sessionToken,
             CancellationToken cancellationToken)

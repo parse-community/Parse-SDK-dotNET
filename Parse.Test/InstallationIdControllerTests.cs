@@ -13,16 +13,13 @@ namespace Parse.Test
     public class InstallationIdControllerTests
     {
         [TestCleanup]
-        public void TearDown()
-        {
-            ParseCorePlugins.Instance = null;
-        }
+        public void TearDown() => ParseCorePlugins.Instance = null;
 
         [TestMethod]
         public void TestConstructor()
         {
-            var storageMock = new Mock<IStorageController>(MockBehavior.Strict);
-            var controller = new InstallationIdController(storageMock.Object);
+            Mock<IStorageController> storageMock = new Mock<IStorageController>(MockBehavior.Strict);
+            InstallationIdController controller = new InstallationIdController(storageMock.Object);
 
             // Make sure it didn't touch storageMock.
             storageMock.Verify();
@@ -32,12 +29,12 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(InstallationIdControllerTests))]
         public Task TestGet()
         {
-            var storageMock = new Mock<IStorageController>(MockBehavior.Strict);
-            var storageDictionary = new Mock<IStorageDictionary<string, object>>();
+            Mock<IStorageController> storageMock = new Mock<IStorageController>(MockBehavior.Strict);
+            Mock<IStorageDictionary<string, object>> storageDictionary = new Mock<IStorageDictionary<string, object>>();
 
             storageMock.Setup(s => s.LoadAsync()).Returns(Task.FromResult(storageDictionary.Object));
 
-            var controller = new InstallationIdController(storageMock.Object);
+            InstallationIdController controller = new InstallationIdController(storageMock.Object);
             return controller.GetAsync().ContinueWith(installationIdTask =>
             {
                 Assert.IsFalse(installationIdTask.IsFaulted);
@@ -79,12 +76,12 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(InstallationIdControllerTests))]
         public Task TestSet()
         {
-            var storageMock = new Mock<IStorageController>(MockBehavior.Strict);
-            var storageDictionary = new Mock<IStorageDictionary<string, object>>();
+            Mock<IStorageController> storageMock = new Mock<IStorageController>(MockBehavior.Strict);
+            Mock<IStorageDictionary<string, object>> storageDictionary = new Mock<IStorageDictionary<string, object>>();
 
             storageMock.Setup(s => s.LoadAsync()).Returns(Task.FromResult(storageDictionary.Object));
 
-            var controller = new InstallationIdController(storageMock.Object);
+            InstallationIdController controller = new InstallationIdController(storageMock.Object);
 
             return controller.GetAsync().ContinueWith(installationIdTask =>
             {
@@ -94,8 +91,8 @@ namespace Parse.Test
                 storageDictionary.Verify(s => s.TryGetValue("InstallationId", out verified));
                 storageDictionary.Verify(s => s.AddAsync("InstallationId", It.IsAny<object>()));
 
-                var installationId = installationIdTask.Result;
-                var installationId2 = Guid.NewGuid();
+                Guid? installationId = installationIdTask.Result;
+                Guid installationId2 = Guid.NewGuid();
 
                 return controller.SetAsync(installationId2).ContinueWith(setTask =>
                 {
@@ -110,7 +107,7 @@ namespace Parse.Test
 
                     storageDictionary.Verify(s => s.TryGetValue("InstallationId", out verified));
 
-                    var installationId3 = installationId3Task.Result;
+                    Guid? installationId3 = installationId3Task.Result;
                     Assert.AreEqual(installationId2, installationId3);
 
                     return controller.SetAsync(installationId);

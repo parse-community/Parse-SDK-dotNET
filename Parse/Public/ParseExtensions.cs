@@ -108,7 +108,7 @@ namespace Parse
         /// </summary>
         public static Task<T> FetchAsync<T>(this T obj) where T : ParseObject
         {
-            return obj.FetchAsyncInternal(CancellationToken.None).OnSuccess(t => (T)t.Result);
+            return obj.FetchAsyncInternal(CancellationToken.None).OnSuccess(t => (T) t.Result);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace Parse
         public static Task<T> FetchAsync<T>(this T obj, CancellationToken cancellationToken)
             where T : ParseObject
         {
-            return obj.FetchAsyncInternal(cancellationToken).OnSuccess(t => (T)t.Result);
+            return obj.FetchAsyncInternal(cancellationToken).OnSuccess(t => (T) t.Result);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Parse
         /// <param name="obj">The ParseObject to fetch.</param>
         public static Task<T> FetchIfNeededAsync<T>(this T obj) where T : ParseObject
         {
-            return obj.FetchIfNeededAsyncInternal(CancellationToken.None).OnSuccess(t => (T)t.Result);
+            return obj.FetchIfNeededAsyncInternal(CancellationToken.None).OnSuccess(t => (T) t.Result);
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Parse
         public static Task<T> FetchIfNeededAsync<T>(this T obj, CancellationToken cancellationToken)
             where T : ParseObject
         {
-            return obj.FetchIfNeededAsyncInternal(cancellationToken).OnSuccess(t => (T)t.Result);
+            return obj.FetchIfNeededAsyncInternal(cancellationToken).OnSuccess(t => (T) t.Result);
         }
     }
 }

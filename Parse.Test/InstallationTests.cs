@@ -9,44 +9,29 @@ using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ParseTest
+namespace Parse.Test
 {
     [TestClass]
     public class InstallationTests
     {
         [TestInitialize]
-        public void SetUp()
-        {
-            ParseObject.RegisterSubclass<ParseInstallation>();
-        }
+        public void SetUp() => ParseObject.RegisterSubclass<ParseInstallation>();
 
         [TestCleanup]
-        public void TearDown()
-        {
-            ParseCorePlugins.Instance = null;
-        }
+        public void TearDown() => ParseCorePlugins.Instance = null;
 
         [TestMethod]
-        public void TestGetInstallationQuery()
-        {
-            Assert.IsInstanceOfType(ParseInstallation.Query, typeof (ParseQuery<ParseInstallation>));
-        }
+        public void TestGetInstallationQuery() => Assert.IsInstanceOfType(ParseInstallation.Query, typeof(ParseQuery<ParseInstallation>));
 
         [TestMethod]
         public void TestInstallationIdGetterSetter()
         {
-            var guid = Guid.NewGuid();
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "installationId", guid.ToString() }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            Guid guid = Guid.NewGuid();
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["installationId"] = guid.ToString() } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual(guid, installation.InstallationId);
 
-            var newGuid = Guid.NewGuid();
+            Guid newGuid = Guid.NewGuid();
             Assert.ThrowsException<InvalidOperationException>(() => installation["installationId"] = newGuid);
             installation.SetIfDifferent("installationId", newGuid.ToString());
             Assert.AreEqual(newGuid, installation.InstallationId);
@@ -55,13 +40,7 @@ namespace ParseTest
         [TestMethod]
         public void TestDeviceTypeGetterSetter()
         {
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "deviceType", "parseOS" }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["deviceType"] = "parseOS" } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual("parseOS", installation.DeviceType);
 
@@ -73,13 +52,7 @@ namespace ParseTest
         [TestMethod]
         public void TestAppNameGetterSetter()
         {
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "appName", "parseApp" }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["appName"] = "parseApp" } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual("parseApp", installation.AppName);
 
@@ -91,13 +64,7 @@ namespace ParseTest
         [TestMethod]
         public void TestAppVersionGetterSetter()
         {
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "appVersion", "1.2.3" }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["appVersion"] = "1.2.3" } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual("1.2.3", installation.AppVersion);
 
@@ -109,13 +76,7 @@ namespace ParseTest
         [TestMethod]
         public void TestAppIdentifierGetterSetter()
         {
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "appIdentifier", "com.parse.app" }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["appIdentifier"] = "com.parse.app" } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual("com.parse.app", installation.AppIdentifier);
 
@@ -127,13 +88,7 @@ namespace ParseTest
         [TestMethod]
         public void TestTimeZoneGetter()
         {
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "timeZone", "America/Los_Angeles" }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["timeZone"] = "America/Los_Angeles" } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual("America/Los_Angeles", installation.TimeZone);
         }
@@ -141,13 +96,7 @@ namespace ParseTest
         [TestMethod]
         public void TestLocaleIdentifierGetter()
         {
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "localeIdentifier", "en-US" }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["localeIdentifier"] = "en-US" } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual("en-US", installation.LocaleIdentifier);
         }
@@ -155,14 +104,7 @@ namespace ParseTest
         [TestMethod]
         public void TestChannelGetterSetter()
         {
-            var channels = new List<string>() { "the", "richard" };
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "channels", channels }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["channels"] = new List<string> { "the", "richard" } } }, "_Installation");
             Assert.IsNotNull(installation);
             Assert.AreEqual("the", installation.Channels[0]);
             Assert.AreEqual("richard", installation.Channels[1]);
@@ -175,23 +117,14 @@ namespace ParseTest
         [TestMethod]
         public void TestGetCurrentInstallation()
         {
-            var guid = Guid.NewGuid();
-            IObjectState state = new MutableObjectState
-            {
-                ServerData = new Dictionary<string, object>() {
-          { "installationId", guid.ToString() }
-        }
-            };
-            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
-            var mockController = new Mock<IParseCurrentInstallationController>();
+            Guid guid = Guid.NewGuid();
+            ParseInstallation installation = ParseObjectExtensions.FromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["installationId"] = guid.ToString() } }, "_Installation");
+            Mock<IParseCurrentInstallationController> mockController = new Mock<IParseCurrentInstallationController>();
             mockController.Setup(obj => obj.GetAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(installation));
 
-            ParsePushPlugins.Instance = new ParsePushPlugins
-            {
-                CurrentInstallationController = mockController.Object
-            };
+            ParsePushPlugins.Instance = new ParsePushPlugins { CurrentInstallationController = mockController.Object };
 
-            var currentInstallation = ParseInstallation.CurrentInstallation;
+            ParseInstallation currentInstallation = ParseInstallation.CurrentInstallation;
             Assert.IsNotNull(currentInstallation);
             Assert.AreEqual(guid, currentInstallation.InstallationId);
         }

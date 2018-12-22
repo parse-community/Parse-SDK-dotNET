@@ -102,7 +102,7 @@ namespace Parse.Core.Internal
             }
             if (oldValue is ParseRelationBase)
             {
-                var oldRelation = (ParseRelationBase)oldValue;
+                var oldRelation = (ParseRelationBase) oldValue;
                 var oldClassName = oldRelation.TargetClassName;
                 if (oldClassName != null && oldClassName != targetClassName)
                 {

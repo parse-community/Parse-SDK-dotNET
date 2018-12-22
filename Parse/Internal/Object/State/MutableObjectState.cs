@@ -110,7 +110,7 @@ namespace Parse.Core.Internal
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable<KeyValuePair<string, object>>)this).GetEnumerator();
+            return ((IEnumerable<KeyValuePair<string, object>>) this).GetEnumerator();
         }
     }
 }

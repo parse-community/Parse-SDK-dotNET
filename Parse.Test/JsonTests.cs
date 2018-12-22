@@ -43,9 +43,9 @@ namespace Parse.Test
             Assert.ThrowsException<ArgumentException>(() => Json.Parse("{ 1 : 1 }"));
             Assert.ThrowsException<ArgumentException>(() => Json.Parse("{ 1 : \"abc\" }"));
 
-            var parsed = Json.Parse("{\"abc\" : \"def\"}");
+            object parsed = Json.Parse("{\"abc\" : \"def\"}");
             Assert.IsTrue(parsed is IDictionary);
-            var parsedDict = parsed as IDictionary;
+            IDictionary parsedDict = parsed as IDictionary;
             Assert.AreEqual("def", parsedDict["abc"]);
 
             parsed = Json.Parse("{\"abc\" : {} }");
@@ -71,7 +71,7 @@ namespace Parse.Test
             parsed = Json.Parse("{\"1\" : 6060}");
             Assert.IsTrue(parsed is IDictionary);
             parsedDict = parsed as IDictionary;
-            Assert.AreEqual((Int64)6060, parsedDict["1"]);
+            Assert.AreEqual((long) 6060, parsedDict["1"]);
 
             parsed = Json.Parse("{\"1\" : null}");
             Assert.IsTrue(parsed is IDictionary);
@@ -81,12 +81,12 @@ namespace Parse.Test
             parsed = Json.Parse("{\"1\" : true}");
             Assert.IsTrue(parsed is IDictionary);
             parsedDict = parsed as IDictionary;
-            Assert.IsTrue((bool)parsedDict["1"]);
+            Assert.IsTrue((bool) parsedDict["1"]);
 
             parsed = Json.Parse("{\"1\" : false}");
             Assert.IsTrue(parsed is IDictionary);
             parsedDict = parsed as IDictionary;
-            Assert.IsFalse((bool)parsedDict["1"]);
+            Assert.IsFalse((bool) parsedDict["1"]);
         }
 
         [TestMethod]
@@ -107,10 +107,10 @@ namespace Parse.Test
             Assert.ThrowsException<ArgumentException>(() => Json.Parse("[ 1 : \"1\" ]"));
             Assert.ThrowsException<ArgumentException>(() => Json.Parse("[ \"1\" : \"1\" ]"));
 
-            var parsed = Json.Parse("[ 1 ]");
+            object parsed = Json.Parse("[ 1 ]");
             Assert.IsTrue(parsed is IList);
-            var parsedList = parsed as IList;
-            Assert.AreEqual((Int64)1, parsedList[0]);
+            IList parsedList = parsed as IList;
+            Assert.AreEqual((long) 1, parsedList[0]);
 
             parsed = Json.Parse("[ \n ]");
             Assert.IsTrue(parsed is IList);
@@ -144,17 +144,17 @@ namespace Parse.Test
             Assert.ThrowsException<ArgumentException>(() => Json.Parse("{ [], [] }"));
             Assert.ThrowsException<ArgumentException>(() => Json.Parse("{ \"abc\": [], [] }"));
 
-            var parsed = Json.Parse("{ \"abc\": [] }");
+            object parsed = Json.Parse("{ \"abc\": [] }");
             Assert.IsTrue(parsed is IDictionary);
-            var parsedDict = parsed as IDictionary;
+            IDictionary parsedDict = parsed as IDictionary;
             Assert.IsTrue(parsedDict["abc"] is IList);
 
             parsed = Json.Parse("{ \"6060\" :\n[ 6060 ]\t}");
             Assert.IsTrue(parsed is IDictionary);
             parsedDict = parsed as IDictionary;
             Assert.IsTrue(parsedDict["6060"] is IList);
-            var parsedList = parsedDict["6060"] as IList;
-            Assert.AreEqual((Int64)6060, parsedList[0]);
+            IList parsedList = parsedDict["6060"] as IList;
+            Assert.AreEqual((long) 6060, parsedList[0]);
         }
 
         [TestMethod]
@@ -163,9 +163,9 @@ namespace Parse.Test
             Assert.ThrowsException<ArgumentException>(() => Json.Parse("[ {} : {} ]"));
 
             // whitespace test
-            var parsed = Json.Parse("[\t\n{}\r\t]");
+            object parsed = Json.Parse("[\t\n{}\r\t]");
             Assert.IsTrue(parsed is IList);
-            var parsedList = parsed as IList;
+            IList parsedList = parsed as IList;
             Assert.IsTrue(parsedList[0] is IDictionary);
 
             parsed = Json.Parse("[ {}, { \"final\" : \"fantasy\"} ]");
@@ -173,7 +173,7 @@ namespace Parse.Test
             parsedList = parsed as IList;
             Assert.IsTrue(parsedList[0] is IDictionary);
             Assert.IsTrue(parsedList[1] is IDictionary);
-            var parsedDictionary = parsedList[1] as IDictionary;
+            IDictionary parsedDictionary = parsedList[1] as IDictionary;
             Assert.AreEqual("fantasy", parsedDictionary["final"]);
         }
 
@@ -204,15 +204,15 @@ namespace Parse.Test
         [TestMethod]
         public void TestEncodeJson()
         {
-            var dict = new Dictionary<string, object>();
+            Dictionary<string, object> dict = new Dictionary<string, object>();
             string encoded = Json.Encode(dict);
             Assert.AreEqual("{}", encoded);
 
-            var list = new List<object>();
+            List<object> list = new List<object>();
             encoded = Json.Encode(list);
             Assert.AreEqual("[]", encoded);
 
-            var dictChild = new Dictionary<string, object>();
+            Dictionary<string, object> dictChild = new Dictionary<string, object>();
             list.Add(dictChild);
             encoded = Json.Encode(list);
             Assert.AreEqual("[{}]", encoded);

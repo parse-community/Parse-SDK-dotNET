@@ -12,7 +12,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestDownloadProgressEventGetterSetter()
         {
-            var downloadProgressEvent = new ParseDownloadProgressEventArgs { Progress = 0.5f };
+            ParseDownloadProgressEventArgs downloadProgressEvent = new ParseDownloadProgressEventArgs { Progress = 0.5f };
             Assert.AreEqual(0.5f, downloadProgressEvent.Progress);
 
             downloadProgressEvent.Progress = 1.0f;
@@ -22,7 +22,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestUploadProgressEventGetterSetter()
         {
-            var uploadProgressEvent = new ParseDownloadProgressEventArgs { Progress = 0.5f };
+            ParseDownloadProgressEventArgs uploadProgressEvent = new ParseDownloadProgressEventArgs { Progress = 0.5f };
             Assert.AreEqual(0.5f, uploadProgressEvent.Progress);
 
             uploadProgressEvent.Progress = 1.0f;
@@ -33,7 +33,7 @@ namespace Parse.Test
         public void TestObservingDownloadProgress()
         {
             int called = 0;
-            var mockProgress = new Mock<IProgress<ParseDownloadProgressEventArgs>>();
+            Mock<IProgress<ParseDownloadProgressEventArgs>> mockProgress = new Mock<IProgress<ParseDownloadProgressEventArgs>>();
             mockProgress.Setup(obj => obj.Report(It.IsAny<ParseDownloadProgressEventArgs>())).Callback(() => called++);
             IProgress<ParseDownloadProgressEventArgs> progress = mockProgress.Object;
 
@@ -50,7 +50,7 @@ namespace Parse.Test
         public void TestObservingUploadProgress()
         {
             int called = 0;
-            var mockProgress = new Mock<IProgress<ParseUploadProgressEventArgs>>();
+            Mock<IProgress<ParseUploadProgressEventArgs>> mockProgress = new Mock<IProgress<ParseUploadProgressEventArgs>>();
             mockProgress.Setup(obj => obj.Report(It.IsAny<ParseUploadProgressEventArgs>())).Callback(() => called++);
             IProgress<ParseUploadProgressEventArgs> progress = mockProgress.Object;
 

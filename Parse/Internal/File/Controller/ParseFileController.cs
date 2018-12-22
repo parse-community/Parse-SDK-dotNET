@@ -19,7 +19,7 @@ namespace Parse.Core.Internal
 
         public Task<FileState> SaveAsync(FileState state,
             Stream dataStream,
-            String sessionToken,
+            string sessionToken,
             IProgress<ParseUploadProgressEventArgs> progress,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -59,8 +59,8 @@ namespace Parse.Core.Internal
                     };
                 }).ContinueWith(t =>
                 {
-              // Rewind the stream on failure or cancellation (if possible)
-              if ((t.IsFaulted || t.IsCanceled) && dataStream.CanSeek)
+                    // Rewind the stream on failure or cancellation (if possible)
+                    if ((t.IsFaulted || t.IsCanceled) && dataStream.CanSeek)
                     {
                         dataStream.Seek(oldPosition, SeekOrigin.Begin);
                     }

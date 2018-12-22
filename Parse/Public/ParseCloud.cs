@@ -42,7 +42,7 @@ namespace Parse
         /// dictionary can contain anything that could be passed into a ParseObject except for
         /// ParseObjects themselves.</param>
         /// <returns>The result of the cloud call.</returns>
-        public static Task<T> CallFunctionAsync<T>(String name, IDictionary<string, object> parameters)
+        public static Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters)
         {
             return CallFunctionAsync<T>(name, parameters, CancellationToken.None);
         }
@@ -59,7 +59,7 @@ namespace Parse
         /// ParseObjects themselves.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result of the cloud call.</returns>
-        public static Task<T> CallFunctionAsync<T>(String name,
+        public static Task<T> CallFunctionAsync<T>(string name,
             IDictionary<string, object> parameters, CancellationToken cancellationToken)
         {
             return CloudCodeController.CallFunctionAsync<T>(name,

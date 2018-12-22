@@ -16,14 +16,14 @@ namespace Parse.Test
         [TestMethod]
         public void TestGeoPointCultureInvariantParsing()
         {
-            var originalCulture = Thread.CurrentThread.CurrentCulture;
-            foreach (var c in CultureInfo.GetCultures(CultureTypes.AllCultures))
+            CultureInfo originalCulture = Thread.CurrentThread.CurrentCulture;
+            foreach (CultureInfo c in CultureInfo.GetCultures(CultureTypes.AllCultures))
             {
                 Thread.CurrentThread.CurrentCulture = c;
-                var point = new ParseGeoPoint(1.234, 1.234);
-                var serialized = Json.Encode(new Dictionary<string, object> { { "point", NoObjectsEncoder.Instance.Encode(point) } });
-                var deserialized = ParseDecoder.Instance.Decode(Json.Parse(serialized)) as IDictionary<string, object>;
-                var pointAgain = (ParseGeoPoint)deserialized["point"];
+                ParseGeoPoint point = new ParseGeoPoint(1.234, 1.234);
+                string serialized = Json.Encode(new Dictionary<string, object> { { "point", NoObjectsEncoder.Instance.Encode(point) } });
+                IDictionary<string, object> deserialized = ParseDecoder.Instance.Decode(Json.Parse(serialized)) as IDictionary<string, object>;
+                ParseGeoPoint pointAgain = (ParseGeoPoint) deserialized["point"];
                 Assert.AreEqual(1.234, pointAgain.Latitude);
                 Assert.AreEqual(1.234, pointAgain.Longitude);
             }
@@ -32,7 +32,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestGeoPointConstructor()
         {
-            var point = new ParseGeoPoint();
+            ParseGeoPoint point = new ParseGeoPoint();
             Assert.AreEqual(0.0, point.Latitude);
             Assert.AreEqual(0.0, point.Longitude);
 
@@ -58,9 +58,9 @@ namespace Parse.Test
         [TestMethod]
         public void TestGeoDistanceInRadians()
         {
-            var d2r = Math.PI / 180.0;
-            var pointA = new ParseGeoPoint();
-            var pointB = new ParseGeoPoint();
+            double d2r = Math.PI / 180.0;
+            ParseGeoPoint pointA = new ParseGeoPoint();
+            ParseGeoPoint pointB = new ParseGeoPoint();
 
             // Zero
             Assert.AreEqual(0.0, pointA.DistanceTo(pointB).Radians, 0.00001);

@@ -10,16 +10,8 @@ namespace Parse.Core.Internal
 {
     public class ParseDecoder
     {
-        // This class isn't really a Singleton, but since it has no state, it's more efficient to get
-        // the default instance.
-        private static readonly ParseDecoder instance = new ParseDecoder();
-        public static ParseDecoder Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        // This class isn't really a Singleton, but since it has no state, it's more efficient to get the default instance.
+        public static ParseDecoder Instance { get; } = new ParseDecoder();
 
         // Prevent default constructor.
         private ParseDecoder() { }

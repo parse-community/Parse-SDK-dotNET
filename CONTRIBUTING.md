@@ -48,7 +48,6 @@ Facebook has a [bounty program](https://www.facebook.com/whitehat/) for the safe
 ## Style Guide
 We're still working on providing a more concise code style for your IDE and getting a linter on GitHub, but for now try to keep the following:
 
-* If you're developing on Visual Studio, please use `Parse.vssettings`.
 * We use [editorconfig](https://editorconfig.org) to manage basic editor settings, please install a compatible plugin for your preferred environment.
 * Most importantly, match the existing code style as much as possible.
 * Try to keep lines under 120 characters, if possible.
@@ -62,4 +61,4 @@ By contributing to Parse .NET SDK, you agree that your contributions will be lic
  [rest-api]: https://www.parse.com/docs/rest/guide
  [parse-api-console]: http://blog.parse.com/announcements/introducing-the-parse-api-console/
  [stacktrace-or-gtfo]: http://i.imgur.com/jacoj.jpg
- [tests-dir]: /ParseTest.Unit
+ [tests-dir]: /Parse.Test

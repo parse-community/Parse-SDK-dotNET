@@ -13,9 +13,9 @@ namespace Parse.Core.Internal
             var parseObj2 = p2 as ParseObject;
             if (parseObj1 != null && parseObj2 != null)
             {
-                return object.Equals(parseObj1.ObjectId, parseObj2.ObjectId);
+                return Equals(parseObj1.ObjectId, parseObj2.ObjectId);
             }
-            return object.Equals(p1, p2);
+            return Equals(p1, p2);
         }
 
         public int GetHashCode(object p)

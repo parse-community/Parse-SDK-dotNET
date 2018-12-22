@@ -507,7 +507,7 @@ namespace Parse
                     if (IsParseObjectGet(node.Arguments[0] as MethodCallExpression))
                     {
                         return source.WhereEqualTo(
-                            GetValue(((MethodCallExpression)node.Arguments[0]).Arguments[0]) as string,
+                            GetValue(((MethodCallExpression) node.Arguments[0]).Arguments[0]) as string,
                             GetValue(node.Arguments[1]));
                     }
                     // someList.Contains(obj.Get<T>("path"))
@@ -515,7 +515,7 @@ namespace Parse
                     {
                         var collection = GetValue(node.Arguments[0]) as System.Collections.IEnumerable;
                         return source.WhereContainedIn(
-                            GetValue(((MethodCallExpression)node.Arguments[1]).Arguments[0]) as string,
+                            GetValue(((MethodCallExpression) node.Arguments[1]).Arguments[0]) as string,
                             collection.Cast<object>());
                     }
                 }
@@ -526,7 +526,7 @@ namespace Parse
                     if (IsParseObjectGet(node.Arguments[0] as MethodCallExpression))
                     {
                         return source.WhereNotEqualTo(
-                            GetValue(((MethodCallExpression)node.Arguments[0]).Arguments[0]) as string,
+                            GetValue(((MethodCallExpression) node.Arguments[0]).Arguments[0]) as string,
                             GetValue(node.Arguments[1]));
                     }
                     // !someList.Contains(obj.Get<T>("path"))
@@ -534,7 +534,7 @@ namespace Parse
                     {
                         var collection = GetValue(node.Arguments[0]) as System.Collections.IEnumerable;
                         return source.WhereNotContainedIn(
-                            GetValue(((MethodCallExpression)node.Arguments[1]).Arguments[0]) as string,
+                            GetValue(((MethodCallExpression) node.Arguments[1]).Arguments[0]) as string,
                             collection.Cast<object>());
                     }
                 }
