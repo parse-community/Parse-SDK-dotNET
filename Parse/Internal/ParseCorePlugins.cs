@@ -7,6 +7,10 @@ using System.Text;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 
+#if DEBUG
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Parse.Test")]
+#endif
+
 namespace Parse.Core.Internal
 {
     public class ParseCorePlugins : IParseCorePlugins
