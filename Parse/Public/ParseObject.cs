@@ -218,7 +218,18 @@ namespace Parse
         /// <typeparam name="T">The ParseObject subclass type to register.</typeparam>
         public static void RegisterSubclass<T>() where T : ParseObject, new() => SubclassingController.RegisterSubclass(typeof(T));
 
+        /// <summary>
+        /// Registers a custom subclass type with the Parse SDK, enabling strong-typing of those ParseObjects whenever
+        /// they appear. Subclasses must specify the ParseClassName attribute, have a default constructor, and properties
+        /// backed by ParseObject fields should have ParseFieldName attributes supplied.
+        /// </summary>
+        /// <param name="type">The ParseObject subclass type to register.</param>
+        public static void RegisterSubclass(Type type) { if (typeof(ParseObject).IsAssignableFrom(type)) SubclassingController.RegisterSubclass(type); }
+
         internal static void UnregisterSubclass<T>() where T : ParseObject, new() => SubclassingController.UnregisterSubclass(typeof(T));
+        internal static void UnregisterSubclass(Type type) { if (typeof(ParseObject).IsAssignableFrom(type)) SubclassingController.UnregisterSubclass(type); }
+
+
 
         /// <summary>
         /// Clears any changes to this object made since the last call to <see cref="SaveAsync()"/>.
