@@ -18,5 +18,22 @@ namespace Parse.Test
 
         [TestMethod]
         public void TestToWithConstructedNullableNonPrimitive() => Assert.ThrowsException<InvalidCastException>(() => Conversion.To<DummyValueTypeA?>(new DummyValueTypeB { }));
+
+
+
+        [TestMethod]
+        public void TestConvertToFloatUsingNonInvariantNumberFormat()
+        {
+            try
+            {
+                float inputValue = 1234.56f;
+                string jsonEncoded = Common.Internal.Json.Encode(inputValue);
+                float convertedValue = (float) Conversion.ConvertTo<float>(jsonEncoded);
+                Assert.IsTrue(inputValue == convertedValue);
+            }
+            catch (Exception ex)
+            { throw ex; }
+        }
+
     }
 }
