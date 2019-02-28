@@ -54,7 +54,7 @@ namespace Parse.Utilities
 
             if (ReflectionHelpers.IsPrimitive(typeof(T)))
             {
-                return (T) Convert.ChangeType(value, typeof(T));
+                return (T) Convert.ChangeType(value, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
             }
 
             if (ReflectionHelpers.IsConstructedGenericType(typeof(T)))
@@ -65,7 +65,7 @@ namespace Parse.Utilities
                     Type innerType = ReflectionHelpers.GetGenericTypeArguments(typeof(T))[0];
                     if (ReflectionHelpers.IsPrimitive(innerType))
                     {
-                        return (T) Convert.ChangeType(value, innerType);
+                        return (T) Convert.ChangeType(value, innerType, System.Globalization.CultureInfo.InvariantCulture);
                     }
                 }
                 Type listType = GetInterfaceType(value.GetType(), typeof(IList<>));
