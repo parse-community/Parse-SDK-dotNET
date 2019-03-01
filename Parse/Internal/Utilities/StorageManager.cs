@@ -31,7 +31,10 @@ namespace Parse.Internal.Utilities
         public static async Task WriteToAsync(this FileInfo file, string content)
         {
             using (FileStream stream = new FileStream(Path.GetFullPath(file.FullName), FileMode.Create, FileAccess.Write, FileShare.Read, 4096, FileOptions.SequentialScan | FileOptions.Asynchronous))
-                await stream.WriteAsync(Encoding.Unicode.GetBytes(content), 0, content.Length * 2 /* UTF-16, so two bytes per character of length. */);
+            {
+                byte[] data = Encoding.Unicode.GetBytes(content);
+                await stream.WriteAsync(data, 0, data.Length);
+            }
         }
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace Parse.Internal.Utilities
         /// <returns>A task that should contain the little-endian 16-bit character string (UTF-16) extracted from the <paramref name="file"/> if the read completes successfully</returns>
         public static async Task<string> ReadAllTextAsync(this FileInfo file)
         {
-            using (StreamReader reader = file.OpenText())
+            using (StreamReader reader = new StreamReader(file.OpenRead(), Encoding.Unicode))
                 return await reader.ReadToEndAsync();
         }
 
@@ -72,14 +75,15 @@ namespace Parse.Internal.Utilities
         {
             path = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path));
 
-            Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.VolumeSeparatorChar)));
+            Directory.CreateDirectory(path.Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar)));
             return new FileInfo(path);
         }
 
         public static async Task TransferAsync(string originFilePath, string targetFilePath)
         {
             if (!String.IsNullOrWhiteSpace(originFilePath) && !String.IsNullOrWhiteSpace(targetFilePath) && new FileInfo(originFilePath) is FileInfo originFile && originFile.Exists && new FileInfo(targetFilePath) is FileInfo targetFile)
-                using (StreamWriter writer = targetFile.CreateText()) using (StreamReader reader = originFile.OpenText())
+                using (StreamWriter writer = new StreamWriter(targetFile.OpenWrite(), Encoding.Unicode))
+                using (StreamReader reader = new StreamReader(originFile.OpenRead(), Encoding.Unicode))
                     await writer.WriteAsync(await reader.ReadToEndAsync());
         }
     }

@@ -156,7 +156,14 @@ namespace Parse.Common.Internal
         /// Loads a settings dictionary from the file wrapped by <see cref="File"/>.
         /// </summary>
         /// <returns>A storage dictionary containing the deserialized content of the storage file targeted by the <see cref="StorageController"/> instance</returns>
-        public Task<IStorageDictionary<string, object>> LoadAsync() => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Task.FromResult((IStorageDictionary<string, object>) Storage) ?? (Storage = new StorageDictionary(File)).LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
+        public Task<IStorageDictionary<string, object>> LoadAsync()
+        {
+            // check if storage dictionary is already created from the controllers file (create if not)
+            if (Storage == null)
+                Storage = new StorageDictionary(File);
+            // load storage dictionary content async and return the resulting dictionary type
+            return Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Storage.LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
+        }
 
         /// <summary>
         /// 
