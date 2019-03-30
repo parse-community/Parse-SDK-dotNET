@@ -3,6 +3,10 @@
 [![codecov](https://codecov.io/gh/parse-community/Parse-SDK-dotNET/branch/master/graph/badge.svg)](https://codecov.io/gh/parse-community/Parse-SDK-dotNET)
 [![Nuget][nuget-svg]][nuget-link]
 [![License][license-svg]][license-link]
+[![Join The Conversation](https://img.shields.io/discourse/https/community.parseplatform.org/topics.svg)](https://community.parseplatform.org/c/parse-server)
+[![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/parse-server/sponsors/badge.svg)](#sponsors)
+![Twitter Follow](https://img.shields.io/twitter/follow/ParsePlatform.svg?label=Follow%20us%20on%20Twitter&style=social)
 
 ## Getting Started
 The latest stable release of the SDK is available as a [NuGet package][nuget-link]. Note that the latest package currently available on the official distribution channel is quite old.
