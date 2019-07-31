@@ -54,8 +54,8 @@ namespace Parse
                 /// An instance of <see cref="MetadataBasedStorageConfiguration"/> with inferred values based on the entry assembly. Should be used with <see cref="VersionInformation.Inferred"/>.
                 /// </summary>
                 /// <remarks>Should not be used with Unity.</remarks>
-                public static MetadataBasedStorageConfiguration NoCompanyInferred { get; } = new MetadataBasedStorageConfiguration { CompanyName = Assembly.GetEntryAssembly().GetName().Name, ProductName = String.Empty };
-
+                //public static MetadataBasedStorageConfiguration NoCompanyInferred { get; } = new MetadataBasedStorageConfiguration { CompanyName = Assembly.GetEntryAssembly().GetName().Name, ProductName = String.Empty };
+                public static MetadataBasedStorageConfiguration NoCompanyInferred { get; } = new MetadataBasedStorageConfiguration { CompanyName = Assembly.GetExecutingAssembly().GetName().Name, ProductName = String.Empty };
                 /// <summary>
                 /// The name of the company that owns the product specified by <see cref="ProductName"/>.
                 /// </summary>
@@ -127,8 +127,13 @@ namespace Parse
                 /// An instance of <see cref="VersionInformation"/> with inferred values based on the entry assembly.
                 /// </summary>
                 /// <remarks>Should not be used with Unity.</remarks>
-                public static VersionInformation Inferred { get; } = new VersionInformation { BuildVersion = Assembly.GetEntryAssembly().GetName().Version.Build.ToString(), DisplayVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(), OSVersion = Environment.OSVersion.ToString() };
-
+                //public static VersionInformation Inferred { get; } = new VersionInformation { BuildVersion = Assembly.GetEntryAssembly().GetName().Version.Build.ToString(), DisplayVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(), OSVersion = Environment.OSVersion.ToString() };
+                public static VersionInformation Inferred { get; } = new VersionInformation
+                {                  
+                    BuildVersion = Assembly.GetExecutingAssembly().GetName().Version.Build.ToString(),
+                    DisplayVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString(),
+                    OSVersion = Environment.OSVersion.ToString()
+                };
                 /// <summary>
                 /// The build number of your app.
                 /// </summary>
