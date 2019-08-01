@@ -1,12 +1,32 @@
-# Parse SDK for .NET
+<p align="center">
+    <img alt="Parse Platform" src="Assets/logo large.png" width="200">
+  </a>
+</p>
+
+<h2 align="center">Parse SDK for .NET</h2>
+
+<p align="center">
+    The Parse .NET SDK gives you access to the powerful Parse Server backend from your Parse SDK for .NET, Xamarin or Unity app.
+</p>
+
+<p align="center">
+    <a href="https://twitter.com/intent/follow?screen_name=parseplatform"><img alt="Follow on Twitter" src="https://img.shields.io/twitter/follow/parseplatform?style=social&label=Follow"></a>
+    <a href="https://community.parseplatform.org/"><img alt="Join the conversation" src="https://img.shields.io/discourse/https/community.parseplatform.org/topics.svg"></a>
+    <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-BSD-lightgrey.svg"></a>
+    <a href="https://travis-ci.org/parse-community/parse-php-sdk"><img alt="Build status" src="https://travis-ci.org/parse-community/parse-php-sdk.svg?branch=master"></a>
+</p>
+
+<p align="center">
+    <a href="https://codecov.io/gh/parse-community/parse-php-sdk"><img alt="Test coverage" src="https://codecov.io/gh/parse-community/parse-php-sdk/branch/master/graph/badge.svg"></a>
+    <a href="#backers"><img alt="Backers on Open Collective" src="https://opencollective.com/parse-server/backers/badge.svg" /></a>
+    <a href="#sponsors"><img alt="Sponsors on Open Collective" src="https://opencollective.com/parse-server/sponsors/badge.svg" /></a>
+</p>
+<br>
+
 [![Build status](https://ci.appveyor.com/api/projects/status/uoit0ona7m3x9bw6?svg=true)](https://ci.appveyor.com/project/ParseCommunity/parse-sdk-dotnet)
 [![codecov](https://codecov.io/gh/parse-community/Parse-SDK-dotNET/branch/master/graph/badge.svg)](https://codecov.io/gh/parse-community/Parse-SDK-dotNET)
 [![Nuget][nuget-svg]][nuget-link]
 [![License][license-svg]][license-link]
-[![Join The Conversation](https://img.shields.io/discourse/https/community.parseplatform.org/topics.svg)](https://community.parseplatform.org/c/parse-server)
-[![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/parse-server/sponsors/badge.svg)](#sponsors)
-![Twitter Follow](https://img.shields.io/twitter/follow/ParsePlatform.svg?label=Follow%20us%20on%20Twitter&style=social)
 
 ## Getting Started
 The latest stable release of the SDK is available as a [NuGet package][nuget-link]. Note that the latest package currently available on the official distribution channel is quite old.
