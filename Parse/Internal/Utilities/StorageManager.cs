@@ -41,7 +41,7 @@ namespace Parse.Internal.Utilities
         /// <returns>A task that should contain the little-endian 16-bit character string (UTF-16) extracted from the <paramref name="file"/> if the read completes successfully</returns>
         public static async Task<string> ReadAllTextAsync(this FileInfo file)
         {
-            using (StreamReader reader = file.OpenText())
+            using (var reader = new StreamReader(file.FullName, Encoding.Unicode))
                 return await reader.ReadToEndAsync();
         }
 

@@ -142,9 +142,9 @@ namespace Parse.Common.Internal
         TaskQueue Queue { get; } = new TaskQueue { };
 
         /// <summary>
-        /// Creates a Parse storage controller and attempts to extract a previously created settings storage file from the persistent storage location.
+        /// Creates a Parse storage controller with the default file wrapper.
         /// </summary>
-        public StorageController() => Storage = new StorageDictionary(File = StorageManager.PersistentStorageFileWrapper);
+        public StorageController() => File = StorageManager.PersistentStorageFileWrapper;
 
         /// <summary>
         /// Creates a Parse storage controller with the provided <paramref name="file"/> wrapper.
@@ -156,7 +156,7 @@ namespace Parse.Common.Internal
         /// Loads a settings dictionary from the file wrapped by <see cref="File"/>.
         /// </summary>
         /// <returns>A storage dictionary containing the deserialized content of the storage file targeted by the <see cref="StorageController"/> instance</returns>
-        public Task<IStorageDictionary<string, object>> LoadAsync() => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Task.FromResult((IStorageDictionary<string, object>) Storage) ?? (Storage = new StorageDictionary(File)).LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
+        public Task<IStorageDictionary<string, object>> LoadAsync() => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => (Storage != null) ? Task.FromResult((IStorageDictionary<string, object>) Storage) : (Storage = new StorageDictionary(File)).LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
 
         /// <summary>
         /// 
