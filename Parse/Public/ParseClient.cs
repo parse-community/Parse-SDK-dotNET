@@ -251,10 +251,10 @@ namespace Parse
 
                 switch (configuration.StorageConfiguration)
                 {
-                    case IStorageController controller when !(controller is null):
+                    case null:
+                        configuration.StorageConfiguration = Configuration.MetadataBasedStorageConfiguration.NoCompanyInferred;
                         break;
                     default:
-                        configuration.StorageConfiguration = Configuration.MetadataBasedStorageConfiguration.NoCompanyInferred;
                         break;
                 }
 
@@ -263,6 +263,7 @@ namespace Parse
                 ParseObject.RegisterSubclass<ParseUser>();
                 ParseObject.RegisterSubclass<ParseRole>();
                 ParseObject.RegisterSubclass<ParseSession>();
+                ParseObject.RegisterSubclass<ParseInstallation>();
 
                 ParseModuleController.Instance.ParseDidInitialize();
             }
