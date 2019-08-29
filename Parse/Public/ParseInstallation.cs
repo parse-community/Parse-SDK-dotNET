@@ -284,7 +284,7 @@ namespace Parse
                 return base.SaveAsync(toAwait, cancellationToken);
             }).Unwrap().OnSuccess(_ =>
             {
-                if (!CurrentInstallationController.IsCurrent(this))
+                if (CurrentInstallationController.IsCurrent(this))
                 {
                     return Task.FromResult(0);
                 }
