@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
-        <Version>2.0.0-develop</Version>
+        <Version>2.0.0-develop-0001</Version>
         <AssemblyVersion>2.0.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
         
@@ -13,7 +13,7 @@
         <PackageIconUrl>https://raw.githubusercontent.com/parse-community/parse-community.github.io/master/img/favicon/favicon-194x194.png</PackageIconUrl>
         <RepositoryType>GitHub</RepositoryType>
         <Description>This is the official package for the Parse .NET Standard SDK. Add a cloud backend to any platform supporting .NET Standard 2.0 with this simple-to-use SDK.</Description>
-        <Copyright>Copyright © Parse 2018. All rights reserved.</Copyright>
+        <Copyright>Copyright © Parse 2020. All rights reserved.</Copyright>
 
         <PackageTags>Parse;netstandard2.0;parse-platform;backend;sdk;netstandard;app</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -22,6 +22,10 @@
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <PackageReference Include="OpenCover" Version="4.6.519" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!--<ProjectReference Include="..\Parse.Core\Parse.Core.csproj" />-->
     </ItemGroup>
 
 </Project>

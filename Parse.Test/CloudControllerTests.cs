@@ -1,14 +1,12 @@
-using Moq;
-using Parse;
-using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Parse.Core.Internal;
 
 namespace Parse.Test
 {
@@ -56,7 +54,7 @@ namespace Parse.Test
 
         [TestMethod]
         [AsyncStateMachine(typeof(CloudControllerTests))]
-        public Task TestCallFunctionWithWrongType() => new ParseCloudCodeController(this.CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>() { { "result", "gogo" } })).Object).CallFunctionAsync<int>("someFunction", null, null, CancellationToken.None).ContinueWith(t =>
+        public Task TestCallFunctionWithWrongType() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>() { { "result", "gogo" } })).Object).CallFunctionAsync<int>("someFunction", null, null, CancellationToken.None).ContinueWith(t =>
         {
             Assert.IsTrue(t.IsFaulted);
             Assert.IsFalse(t.IsCanceled);

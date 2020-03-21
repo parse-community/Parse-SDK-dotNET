@@ -1,6 +1,6 @@
-﻿using Moq.Language;
+﻿using System.Reflection;
+using Moq.Language;
 using Moq.Language.Flow;
-using System.Reflection;
 
 namespace Parse.Test
 {

@@ -1,6 +1,3 @@
-using Moq;
-using Parse;
-using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +5,9 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Parse.Core.Internal;
 
 namespace Parse.Test
 {
@@ -21,14 +19,11 @@ namespace Parse.Test
 
         [TestMethod]
         [AsyncStateMachine(typeof(SessionControllerTests))]
-        public Task TestGetSessionWithEmptyResult()
-        {
-            return new ParseSessionController(this.CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null)).Object).GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
-            {
-                Assert.IsTrue(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-            });
-        }
+        public Task TestGetSessionWithEmptyResult() => new ParseSessionController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null)).Object).GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
+                                                                 {
+                                                                     Assert.IsTrue(t.IsFaulted);
+                                                                     Assert.IsFalse(t.IsCanceled);
+                                                                 });
 
         [TestMethod]
         [AsyncStateMachine(typeof(SessionControllerTests))]

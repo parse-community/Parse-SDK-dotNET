@@ -1,14 +1,6 @@
-using System.Xml.XPath;
-using System.Linq;
-using System.Diagnostics;
-using Castle.DynamicProxy.Generators.Emitters;
-using Parse.Core.Internal;
-using System;
 using System.Collections.Generic;
-using System.Text;
-using Parse;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Parse.Core.Internal;
 
 namespace Parse.Test
 {

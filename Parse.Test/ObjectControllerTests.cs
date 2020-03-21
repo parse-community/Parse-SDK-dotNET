@@ -1,6 +1,3 @@
-using Moq;
-using Parse;
-using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +5,9 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Parse.Core.Internal;
 
 namespace Parse.Test
 {
@@ -389,7 +387,8 @@ namespace Parse.Test
                         }
                     });
                 }
-                else results.Add(new Dictionary<string, object> { ["success"] = null });
+                else
+                    results.Add(new Dictionary<string, object> { ["success"] = null });
             }
 
             Dictionary<string, object> responseDict = new Dictionary<string, object> { ["results"] = results };

@@ -1,11 +1,9 @@
-using Parse;
-using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Parse.Core.Internal;
 
 // TODO (hallucinogen): mock ParseACL, ParseObject, ParseUser once we have their Interfaces
 namespace Parse.Test

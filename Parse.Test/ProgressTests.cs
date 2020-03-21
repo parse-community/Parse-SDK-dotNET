@@ -1,8 +1,6 @@
-using Moq;
-using Parse;
 using System;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 
 namespace Parse.Test
 {

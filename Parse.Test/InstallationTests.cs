@@ -1,13 +1,11 @@
-using Moq;
-using Parse;
-using Parse.Core.Internal;
-using Parse.Push.Internal;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Parse.Core.Internal;
+using Parse.Push.Internal;
 
 namespace Parse.Test
 {

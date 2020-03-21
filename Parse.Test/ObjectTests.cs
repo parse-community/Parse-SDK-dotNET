@@ -1,12 +1,10 @@
-using Parse;
-using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Parse.Core.Internal;
 
 namespace Parse.Test
 {
@@ -450,50 +448,38 @@ namespace Parse.Test
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectTests))]
-        public Task TestSave()
-        {
+        public Task TestSave() =>
             // TODO (hallucinogen): do this
-            return Task.FromResult(0);
-        }
+            Task.FromResult(0);
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectTests))]
-        public Task TestSaveAll()
-        {
+        public Task TestSaveAll() =>
             // TODO (hallucinogen): do this
-            return Task.FromResult(0);
-        }
+            Task.FromResult(0);
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectTests))]
-        public Task TestDelete()
-        {
+        public Task TestDelete() =>
             // TODO (hallucinogen): do this
-            return Task.FromResult(0);
-        }
+            Task.FromResult(0);
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectTests))]
-        public Task TestDeleteAll()
-        {
+        public Task TestDeleteAll() =>
             // TODO (hallucinogen): do this
-            return Task.FromResult(0);
-        }
+            Task.FromResult(0);
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectTests))]
-        public Task TestFetch()
-        {
+        public Task TestFetch() =>
             // TODO (hallucinogen): do this
-            return Task.FromResult(0);
-        }
+            Task.FromResult(0);
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectTests))]
-        public Task TestFetchAll()
-        {
+        public Task TestFetchAll() =>
             // TODO (hallucinogen): do this
-            return Task.FromResult(0);
-        }
+            Task.FromResult(0);
     }
 }

@@ -1,10 +1,8 @@
-using Parse.Push.Internal;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using Parse.Push.Internal;
 
 namespace Parse.Test
 {

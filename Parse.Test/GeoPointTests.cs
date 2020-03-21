@@ -1,12 +1,10 @@
-using Parse;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Parse.Common.Internal;
+using Parse.Core.Internal;
 
 namespace Parse.Test
 {

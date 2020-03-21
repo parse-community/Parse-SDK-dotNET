@@ -1,6 +1,5 @@
-using Parse.Push.Internal;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Parse.Push.Internal;
 
 namespace Parse.Test
 {
