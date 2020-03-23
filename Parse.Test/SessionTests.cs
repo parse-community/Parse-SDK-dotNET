@@ -14,8 +14,8 @@ namespace Parse.Test
         [TestInitialize]
         public void SetUp()
         {
-            ParseObject.RegisterSubclass<ParseSession>();
-            ParseObject.RegisterSubclass<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
         }
 
         [TestCleanup]
@@ -61,7 +61,7 @@ namespace Parse.Test
                 SessionController = mockController.Object,
                 CurrentUserController = mockCurrentUserController.Object,
             };
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return ParseSession.GetCurrentSessionAsync().ContinueWith(t =>
             {
@@ -139,8 +139,8 @@ namespace Parse.Test
                 SessionController = mockController.Object,
                 CurrentUserController = mockCurrentUserController.Object,
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             CancellationTokenSource source = new CancellationTokenSource();
             return ParseSessionExtensions.UpgradeToRevocableSessionAsync("someSession", source.Token).ContinueWith(t =>

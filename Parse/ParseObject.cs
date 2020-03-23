@@ -214,7 +214,7 @@ namespace Parse
         /// backed by ParseObject fields should have ParseFieldName attributes supplied.
         /// </summary>
         /// <typeparam name="T">The ParseObject subclass type to register.</typeparam>
-        public static void RegisterSubclass<T>() where T : ParseObject, new() => SubclassingController.RegisterSubclass(typeof(T));
+        public static void RegisterDerivative<T>() where T : ParseObject, new() => SubclassingController.RegisterSubclass(typeof(T));
 
         /// <summary>
         /// Registers a custom subclass type with the Parse SDK, enabling strong-typing of those ParseObjects whenever

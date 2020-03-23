@@ -10,8 +10,8 @@ namespace Parse.Test
         [TestInitialize]
         public void SetUp()
         {
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
         }
 
         [TestCleanup]

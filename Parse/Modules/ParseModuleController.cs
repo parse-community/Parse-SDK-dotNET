@@ -11,8 +11,7 @@ namespace Parse.Common.Internal
     /// </summary>
     public class ParseModuleController
     {
-        private static readonly ParseModuleController instance = new ParseModuleController();
-        public static ParseModuleController Instance => instance;
+        public static ParseModuleController Instance { get; } = new ParseModuleController();
 
         private readonly object mutex = new object();
         private readonly List<IParseModule> modules = new List<IParseModule>();

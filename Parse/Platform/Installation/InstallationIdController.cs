@@ -6,14 +6,14 @@ using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
 {
-    public class InstallationIdController : IInstallationIdController
+    public class ParseInstallationController : IParseInstallationController
     {
         private const string InstallationIdKey = "InstallationId";
         private readonly object mutex = new object();
         private Guid? installationId;
 
         private readonly IStorageController storageController;
-        public InstallationIdController(IStorageController storageController) => this.storageController = storageController;
+        public ParseInstallationController(IStorageController storageController) => this.storageController = storageController;
 
         public Task SetAsync(Guid? installationId)
         {

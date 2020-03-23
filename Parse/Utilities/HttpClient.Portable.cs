@@ -8,19 +8,35 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NetHttpClient = System.Net.Http.HttpClient;
+using BuiltInClient = System.Net.Http.HttpClient;
 
 namespace Parse.Common.Internal
 {
-    public class HttpClient : IHttpClient
+    /// <summary>
+    /// 
+    /// </summary>
+    public class UniversalWebClient : IWebClient
     {
-        private static HashSet<string> HttpContentHeaders = new HashSet<string> { { "Allow" }, { "Content-Disposition" }, { "Content-Encoding" }, { "Content-Language" }, { "Content-Length" }, { "Content-Location" }, { "Content-MD5" }, { "Content-Range" }, { "Content-Type" }, { "Expires" }, { "Last-Modified" } };
+        static HashSet<string> ContentHeaders = new HashSet<string>
+        {
+            { "Allow" },
+            { "Content-Disposition" },
+            { "Content-Encoding" },
+            { "Content-Language" },
+            { "Content-Length" },
+            { "Content-Location" },
+            { "Content-MD5" },
+            { "Content-Range" },
+            { "Content-Type" },
+            { "Expires" },
+            { "Last-Modified" }
+        };
 
-        public HttpClient() : this(new NetHttpClient { }) { }
+        public UniversalWebClient() : this(new BuiltInClient { }) { }
 
-        public HttpClient(NetHttpClient client) => this.client = client;
+        public UniversalWebClient(BuiltInClient client) => this.client = client;
 
-        private NetHttpClient client;
+        private BuiltInClient client;
 
         public Task<Tuple<HttpStatusCode, string>> ExecuteAsync(HttpRequest httpRequest, IProgress<ParseUploadProgressEventArgs> uploadProgress, IProgress<ParseDownloadProgressEventArgs> downloadProgress, CancellationToken cancellationToken)
         {
@@ -38,7 +54,7 @@ namespace Parse.Common.Internal
             {
                 foreach (KeyValuePair<string, string> header in httpRequest.Headers)
                 {
-                    if (HttpContentHeaders.Contains(header.Key))
+                    if (ContentHeaders.Contains(header.Key))
                         message.Content.Headers.Add(header.Key, header.Value);
                     else
                         message.Headers.Add(header.Key, header.Value);

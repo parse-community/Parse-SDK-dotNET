@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Core.Internal;
+using Parse.Library;
 
 namespace Parse.Test
 {
@@ -15,7 +16,7 @@ namespace Parse.Test
     public class FileControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new ParseClient.Configuration { ApplicationID = "", Key = "" });
+        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "" });
 
         [TestMethod]
         [AsyncStateMachine(typeof(FileControllerTests))]

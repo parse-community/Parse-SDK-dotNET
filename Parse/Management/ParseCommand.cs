@@ -50,7 +50,7 @@ namespace Parse.Core.Internal
             Stream stream = null,
             string contentType = null)
         {
-            Uri = new Uri(new Uri(ParseClient.CurrentConfiguration.ServerURI), relativeUri);
+            Uri = new Uri(new Uri(ParseClient.Configuration.ServerURI), relativeUri);
             Method = method;
             Data = stream;
             Headers = new List<KeyValuePair<string, string>>(headers ?? Enumerable.Empty<KeyValuePair<string, string>>());

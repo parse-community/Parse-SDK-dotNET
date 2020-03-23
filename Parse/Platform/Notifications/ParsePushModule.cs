@@ -11,7 +11,7 @@ namespace Parse.Push.Internal
 
         public void OnParseInitialized()
         {
-            ParseObject.RegisterSubclass<ParseInstallation>();
+            ParseObject.RegisterDerivative<ParseInstallation>();
 
             ParseCorePlugins.Instance.SubclassingController.AddRegisterHook(typeof(ParseInstallation), () =>
             {

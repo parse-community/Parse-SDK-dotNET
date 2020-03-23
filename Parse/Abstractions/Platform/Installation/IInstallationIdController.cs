@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Parse.Core.Internal
 {
-    public interface IInstallationIdController
+    public interface IParseInstallationController
     {
         /// <summary>
         /// Sets current <code>installationId</code> and saves it to local storage.

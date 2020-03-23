@@ -4,7 +4,6 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
         <Version>2.0.0-develop-0001</Version>
-        <AssemblyVersion>2.0.0</AssemblyVersion>
         <LangVersion>latest</LangVersion>
         
         <Authors>Parse</Authors>
@@ -25,7 +24,18 @@
     </ItemGroup>
 
     <ItemGroup>
-      <!--<ProjectReference Include="..\Parse.Core\Parse.Core.csproj" />-->
+      <Compile Update="Properties\Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Properties\Resources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

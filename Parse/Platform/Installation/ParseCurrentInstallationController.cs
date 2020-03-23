@@ -14,11 +14,11 @@ namespace Parse.Push.Internal
 
         private readonly object mutex = new object();
         private readonly TaskQueue taskQueue = new TaskQueue();
-        private readonly IInstallationIdController installationIdController;
+        private readonly IParseInstallationController installationIdController;
         private readonly IStorageController storageController;
         private readonly IParseInstallationCoder installationCoder;
 
-        public ParseCurrentInstallationController(IInstallationIdController installationIdController, IStorageController storageController, IParseInstallationCoder installationCoder)
+        public ParseCurrentInstallationController(IParseInstallationController installationIdController, IStorageController storageController, IParseInstallationCoder installationCoder)
         {
             this.installationIdController = installationIdController;
             this.storageController = storageController;

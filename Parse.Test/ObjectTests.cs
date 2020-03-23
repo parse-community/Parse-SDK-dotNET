@@ -50,7 +50,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestParseObjectCreateWithGeneric()
         {
-            ParseObject.RegisterSubclass<SubClass>();
+            ParseObject.RegisterDerivative<SubClass>();
 
             ParseObject obj = ParseObject.Create<SubClass>();
             Assert.AreEqual("SubClass", obj.ClassName);
@@ -99,7 +99,7 @@ namespace Parse.Test
 
             try
             {
-                ParseObject.RegisterSubclass<SubClass>();
+                ParseObject.RegisterDerivative<SubClass>();
                 ParseObject.Create<SubClass>();
 
                 ParseCorePlugins.Instance.SubclassingController.UnregisterSubclass(typeof(UnregisteredSubClass));
@@ -430,7 +430,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestGetQuery()
         {
-            ParseObject.RegisterSubclass<SubClass>();
+            ParseObject.RegisterDerivative<SubClass>();
 
             ParseQuery<ParseObject> query = ParseObject.GetQuery("UnregisteredSubClass");
             Assert.AreEqual("UnregisteredSubClass", query.GetClassName());

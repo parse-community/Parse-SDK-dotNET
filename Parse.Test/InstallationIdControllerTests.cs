@@ -18,7 +18,7 @@ namespace Parse.Test
         public void TestConstructor()
         {
             Mock<IStorageController> storageMock = new Mock<IStorageController>(MockBehavior.Strict);
-            InstallationIdController controller = new InstallationIdController(storageMock.Object);
+            ParseInstallationController controller = new ParseInstallationController(storageMock.Object);
 
             // Make sure it didn't touch storageMock.
             storageMock.Verify();
@@ -33,7 +33,7 @@ namespace Parse.Test
 
             storageMock.Setup(s => s.LoadAsync()).Returns(Task.FromResult(storageDictionary.Object));
 
-            InstallationIdController controller = new InstallationIdController(storageMock.Object);
+            ParseInstallationController controller = new ParseInstallationController(storageMock.Object);
             return controller.GetAsync().ContinueWith(installationIdTask =>
             {
                 Assert.IsFalse(installationIdTask.IsFaulted);
@@ -80,7 +80,7 @@ namespace Parse.Test
 
             storageMock.Setup(s => s.LoadAsync()).Returns(Task.FromResult(storageDictionary.Object));
 
-            InstallationIdController controller = new InstallationIdController(storageMock.Object);
+            ParseInstallationController controller = new ParseInstallationController(storageMock.Object);
 
             return controller.GetAsync().ContinueWith(installationIdTask =>
             {

@@ -15,8 +15,8 @@ namespace Parse.Test
         [TestInitialize]
         public void SetUp()
         {
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
         }
 
         [TestCleanup]
@@ -142,8 +142,8 @@ namespace Parse.Test
             {
                 CurrentUserController = mockCurrentUserController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             Assert.IsTrue(user.IsAuthenticated);
         }
@@ -174,8 +174,8 @@ namespace Parse.Test
             {
                 CurrentUserController = mockCurrentUserController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             Assert.IsFalse(user2.IsAuthenticated);
         }
@@ -224,8 +224,8 @@ namespace Parse.Test
             {
                 UserController = mockController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return user.SignUpAsync().ContinueWith(t =>
             {
@@ -265,8 +265,8 @@ namespace Parse.Test
             {
                 UserController = mockController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return ParseUser.LogInAsync("ihave", "adream").ContinueWith(t =>
             {
@@ -298,8 +298,8 @@ namespace Parse.Test
             {
                 UserController = mockController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return ParseUser.BecomeAsync("llaKcolnu").ContinueWith(t =>
             {
@@ -335,8 +335,8 @@ namespace Parse.Test
                 CurrentUserController = mockCurrentUserController.Object,
                 SessionController = mockSessionController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return ParseUser.LogOutAsync().ContinueWith(t =>
             {
@@ -364,8 +364,8 @@ namespace Parse.Test
             {
                 CurrentUserController = mockCurrentUserController.Object,
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             Assert.AreEqual(user, ParseUser.CurrentUser);
         }
@@ -378,8 +378,8 @@ namespace Parse.Test
             {
                 CurrentUserController = mockCurrentUserController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             Assert.IsNull(ParseUser.CurrentUser);
         }
@@ -408,8 +408,8 @@ namespace Parse.Test
             {
                 SessionController = mockSessionController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return user.UpgradeToRevocableSessionAsync(CancellationToken.None).ContinueWith(t =>
             {
@@ -430,8 +430,8 @@ namespace Parse.Test
             {
                 UserController = mockController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return ParseUser.RequestPasswordResetAsync("gogo@parse.com").ContinueWith(t =>
             {
@@ -472,8 +472,8 @@ namespace Parse.Test
                 ObjectController = mockObjectController.Object,
                 CurrentUserController = new Mock<IParseCurrentUserController>().Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
             user["Alliance"] = "rekt";
 
             return user.SaveAsync().ContinueWith(t =>
@@ -521,8 +521,8 @@ namespace Parse.Test
                 ObjectController = mockObjectController.Object,
                 CurrentUserController = new Mock<IParseCurrentUserController>().Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
             user["Alliance"] = "rekt";
 
             return user.FetchAsync().ContinueWith(t =>
@@ -568,8 +568,8 @@ namespace Parse.Test
                 ObjectController = mockObjectController.Object,
                 CurrentUserController = new Mock<IParseCurrentUserController>().Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return user.LinkWithAsync("parse", new Dictionary<string, object>(), CancellationToken.None).ContinueWith(t =>
             {
@@ -620,8 +620,8 @@ namespace Parse.Test
                 ObjectController = mockObjectController.Object,
                 CurrentUserController = mockCurrentUserController.Object,
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(t =>
             {
@@ -672,8 +672,8 @@ namespace Parse.Test
                 ObjectController = mockObjectController.Object,
                 CurrentUserController = mockCurrentUserController.Object,
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(t =>
             {
@@ -712,8 +712,8 @@ namespace Parse.Test
             {
                 UserController = mockController.Object
             };
-            ParseObject.RegisterSubclass<ParseUser>();
-            ParseObject.RegisterSubclass<ParseSession>();
+            ParseObject.RegisterDerivative<ParseUser>();
+            ParseObject.RegisterDerivative<ParseSession>();
 
             return ParseUserExtensions.LogInWithAsync("parse", new Dictionary<string, object>(), CancellationToken.None).ContinueWith(t =>
             {

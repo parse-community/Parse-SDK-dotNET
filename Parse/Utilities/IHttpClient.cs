@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Parse.Common.Internal
 {
-    public interface IHttpClient
+    public interface IWebClient
     {
         /// <summary>
         /// Executes HTTP request to a <see cref="HttpRequest.Uri"/> with <see cref="HttpRequest.Method"/> HTTP verb

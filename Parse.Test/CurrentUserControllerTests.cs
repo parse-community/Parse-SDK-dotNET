@@ -14,7 +14,7 @@ namespace Parse.Test
     public class CurrentUserControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseObject.RegisterSubclass<ParseUser>();
+        public void SetUp() => ParseObject.RegisterDerivative<ParseUser>();
 
         [TestCleanup]
         public void TearDown() => ParseCorePlugins.Instance.Reset();

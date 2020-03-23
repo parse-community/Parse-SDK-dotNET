@@ -1,10 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Core.Internal;
 using Parse.Internal.Utilities;
+using Parse.Management;
+using Parse.Storage;
 
 namespace Parse.Common.Internal
 {
@@ -15,122 +20,111 @@ namespace Parse.Common.Internal
     {
         private class StorageDictionary : IStorageDictionary<string, object>
         {
-            private object mutex;
-            private Dictionary<string, object> dictionary;
-            private FileInfo file;
+            public StorageDictionary(FileInfo file) => File = file;
 
-            public StorageDictionary(FileInfo file)
+            internal Task SaveAsync() => Lock(() => File.WriteContentAsync(Json.Encode(Storage)));
+
+            internal Task LoadAsync() => File.ReadAllTextAsync().ContinueWith(task =>
             {
-                this.file = file;
-
-                mutex = new object();
-                dictionary = new Dictionary<string, object>();
-            }
-
-            internal Task SaveAsync()
-            {
-                string json;
-                lock (mutex)
-                    json = Json.Encode(dictionary);
-
-                return file.WriteToAsync(json);
-            }
-
-            internal Task LoadAsync() => file.ReadAllTextAsync().ContinueWith(t =>
-                                                       {
-                                                           string text = t.Result;
-                                                           Dictionary<string, object> result = null;
-                                                           try
-                                                           {
-                                                               result = Json.Parse(text) as Dictionary<string, object>;
-                                                           }
-                                                           catch (Exception)
-                                                           {
-                                                               // Do nothing, JSON error. Probaby was empty string.
-                                                           }
-
-                                                           lock (mutex)
-                                                           {
-                                                               dictionary = result ?? new Dictionary<string, object>();
-                                                           }
-                                                       });
-
-            internal void Update(IDictionary<string, object> contents)
-            {
-                lock (mutex)
+                lock (Mutex)
                 {
-                    dictionary = contents.ToDictionary(p => p.Key, p => p.Value);
+                    try
+                    {
+                        Storage = Json.Parse(task.Result) as Dictionary<string, object>;
+                    }
+                    catch
+                    {
+                        Storage = new Dictionary<string, object> { };
+                    }
                 }
-            }
+            });
+
+            internal void Update(IDictionary<string, object> contents) => Lock(() => Storage = contents.ToDictionary(element => element.Key, element => element.Value));
 
             public Task AddAsync(string key, object value)
             {
-                lock (mutex)
+                lock (Mutex)
                 {
-                    dictionary[key] = value;
+                    Storage[key] = value;
+                    return SaveAsync();
                 }
-                return SaveAsync();
             }
 
             public Task RemoveAsync(string key)
             {
-                lock (mutex)
+                lock (Mutex)
                 {
-                    dictionary.Remove(key);
-                }
-                return SaveAsync();
-            }
-
-            public bool ContainsKey(string key)
-            {
-                lock (mutex)
-                {
-                    return dictionary.ContainsKey(key);
+                    Storage.Remove(key);
+                    return SaveAsync();
                 }
             }
 
-            public IEnumerable<string> Keys
-            {
-                get { lock (mutex) { return dictionary.Keys; } }
-            }
+            public void Add(string key, object value) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+
+            public bool Remove(string key) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+
+            public void Add(KeyValuePair<string, object> item) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+
+            public bool Remove(KeyValuePair<string, object> item) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+
+            public bool ContainsKey(string key) => Lock(() => Storage.ContainsKey(key));
 
             public bool TryGetValue(string key, out object value)
             {
-                lock (mutex)
+                lock (Mutex)
                 {
-                    return dictionary.TryGetValue(key, out value);
+                    return (Result: Storage.TryGetValue(key, out object found), value = found).Result;
                 }
             }
 
-            public IEnumerable<object> Values
+            public void Clear() => Lock(() => Storage.Clear());
+
+            public bool Contains(KeyValuePair<string, object> item) => Lock(() => Elements.Contains(item));
+
+            public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) => Lock(() => Elements.CopyTo(array, arrayIndex));
+
+            public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => Storage.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => Storage.GetEnumerator();
+
+            public FileInfo File { get; set; }
+
+            public object Mutex { get; set; } = new object { };
+
+            // ALTNAME: Operate
+
+            TResult Lock<TResult>(Func<TResult> operation)
             {
-                get { lock (mutex) { return dictionary.Values; } }
+                lock (Mutex)
+                {
+                    return operation.Invoke();
+                }
             }
+
+            void Lock(Action operation)
+            {
+                lock (Mutex)
+                {
+                    operation.Invoke();
+                }
+            }
+
+            ICollection<KeyValuePair<string, object>> Elements => Storage as ICollection<KeyValuePair<string, object>>;
+
+            Dictionary<string, object> Storage { get; set; } = new Dictionary<string, object> { };
+
+            public ICollection<string> Keys => Storage.Keys;
+
+            public ICollection<object> Values => Storage.Values;
+
+            public int Count => Storage.Count;
+
+            public bool IsReadOnly => Elements.IsReadOnly;
 
             public object this[string key]
             {
-                get { lock (mutex) { return dictionary[key]; } }
-            }
-
-            public int Count
-            {
-                get { lock (mutex) { return dictionary.Count; } }
-            }
-
-            public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-            {
-                lock (mutex)
-                {
-                    return dictionary.GetEnumerator();
-                }
-            }
-
-            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-            {
-                lock (mutex)
-                {
-                    return dictionary.GetEnumerator();
-                }
+                get => Storage[key];
+                set => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
             }
         }
 
@@ -141,7 +135,7 @@ namespace Parse.Common.Internal
         /// <summary>
         /// Creates a Parse storage controller and attempts to extract a previously created settings storage file from the persistent storage location.
         /// </summary>
-        public StorageController() => Storage = new StorageDictionary(File = StorageManager.PersistentStorageFileWrapper);
+        public StorageController() => Storage = new StorageDictionary(File = PersistentStorageFileWrapper);
 
         /// <summary>
         /// Creates a Parse storage controller with the provided <paramref name="file"/> wrapper.
@@ -155,10 +149,10 @@ namespace Parse.Common.Internal
         /// <returns>A storage dictionary containing the deserialized content of the storage file targeted by the <see cref="StorageController"/> instance</returns>
         public Task<IStorageDictionary<string, object>> LoadAsync()
         {
-            // check if storage dictionary is already created from the controllers file (create if not)
-            if (Storage == null)
-                Storage = new StorageDictionary(File);
-            // load storage dictionary content async and return the resulting dictionary type
+            // Check if storage dictionary is already created from the controllers file (create if not)
+            Storage ??= new StorageDictionary(File);
+
+            // Load storage dictionary content async and return the resulting dictionary type
             return Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Storage.LoadAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>)).Unwrap(), CancellationToken.None);
         }
 
@@ -169,8 +163,81 @@ namespace Parse.Common.Internal
         /// <returns></returns>
         public Task<IStorageDictionary<string, object>> SaveAsync(IDictionary<string, object> contents) => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
         {
-            (Storage ?? (Storage = new StorageDictionary(File))).Update(contents);
+            (Storage ??= new StorageDictionary(File)).Update(contents);
             return Storage.SaveAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>);
         }).Unwrap());
+
+        // TODO: Attach the following method to AppDomain.CurrentDomain.ProcessExit.
+
+        public void Clean()
+        {
+            if (new FileInfo(FallbackPersistentStorageFilePath) is { Exists: true } file)
+            {
+                file.Delete();
+            }
+        }
+
+        /// <summary>
+        /// The relative path from the <see cref="Environment.SpecialFolder.LocalApplicationData"/> on the device an to application-specific persistent storage folder.
+        /// </summary>
+        public string RelativeStorageFilePath { get; set; }
+
+        /// <summary>
+        /// The path to a persistent user-specific storage location specific to the final client assembly of the Parse library.
+        /// </summary>
+        public string PersistentStorageFilePath => Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), RelativeStorageFilePath ?? FallbackPersistentStorageFilePath));
+
+        /// <summary>
+        /// Gets the calculated persistent storage file fallback path for this app execution.
+        /// </summary>
+        public string FallbackPersistentStorageFilePath => StoredFallbackPersistentStorageFilePath ??= IdentifierBasedCacheLocationConfiguration.Fallback.GetRelativeStorageFilePath(new LightParseCorePlugins { StorageController = this });
+
+        string StoredFallbackPersistentStorageFilePath { get; set; }
+
+        /// <summary>
+        /// Gets or creates the file pointed to by <see cref="PersistentStorageFilePath"/> and returns it's wrapper as a <see cref="FileInfo"/> instance.
+        /// </summary>
+        public FileInfo PersistentStorageFileWrapper
+        {
+            get
+            {
+                Directory.CreateDirectory(PersistentStorageFilePath.Substring(0, PersistentStorageFilePath.LastIndexOf(Path.DirectorySeparatorChar)));
+
+                FileInfo file = new FileInfo(PersistentStorageFilePath);
+                if (!file.Exists)
+                    using (file.Create())
+                        ; // Hopefully the JIT doesn't no-op this. The behaviour of the "using" clause should dictate how the stream is closed, to make sure it happens properly.
+
+                return file;
+            }
+        }
+
+        /// <summary>
+        /// Gets the file wrapper for the specified <paramref name="path"/>.
+        /// </summary>
+        /// <param name="path">The relative path to the target file</param>
+        /// <returns>An instance of <see cref="FileInfo"/> wrapping the the <paramref name="path"/> value</returns>
+        public FileInfo GetWrapperForRelativePersistentStorageFilePath(string path)
+        {
+            Directory.CreateDirectory((path = Path.GetFullPath(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), path))).Substring(0, path.LastIndexOf(Path.DirectorySeparatorChar)));
+            return new FileInfo(path);
+        }
+
+        /// <summary>
+        /// Transfers a file from <paramref name="originFilePath"/> to <paramref name="targetFilePath"/>.
+        /// </summary>
+        /// <param name="originFilePath"></param>
+        /// <param name="targetFilePath"></param>
+        /// <returns>A task that completes once the file move operation form <paramref name="originFilePath"/> to <paramref name="targetFilePath"/> completes.</returns>
+        public async Task TransferAsync(string originFilePath, string targetFilePath)
+        {
+            if (!String.IsNullOrWhiteSpace(originFilePath) && !String.IsNullOrWhiteSpace(targetFilePath) && new FileInfo(originFilePath) is { Exists: true } originFile && new FileInfo(targetFilePath) is { } targetFile)
+            {
+                using StreamWriter writer = new StreamWriter(targetFile.OpenWrite(), Encoding.Unicode);
+                using StreamReader reader = new StreamReader(originFile.OpenRead(), Encoding.Unicode);
+
+                await writer.WriteAsync(await reader.ReadToEndAsync());
+            }
+        }
     }
 }

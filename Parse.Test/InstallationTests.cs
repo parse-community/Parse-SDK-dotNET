@@ -13,7 +13,7 @@ namespace Parse.Test
     public class InstallationTests
     {
         [TestInitialize]
-        public void SetUp() => ParseObject.RegisterSubclass<ParseInstallation>();
+        public void SetUp() => ParseObject.RegisterDerivative<ParseInstallation>();
 
         [TestCleanup]
         public void TearDown() => ParseCorePlugins.Instance = null;

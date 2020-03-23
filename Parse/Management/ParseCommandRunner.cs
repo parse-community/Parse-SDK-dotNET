@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
+using Parse.Library;
 
 namespace Parse.Core.Internal
 {
@@ -14,18 +16,20 @@ namespace Parse.Core.Internal
     /// </summary>
     public class ParseCommandRunner : IParseCommandRunner
     {
-        private readonly IHttpClient httpClient;
-        private readonly IInstallationIdController installationIdController;
+        IWebClient WebClient { get; }
+        IParseInstallationController InstallationController { get; }
+        IMetadataController MetadataController { get; }
 
         /// <summary>
         /// Creates a new Parse SDK command runner.
         /// </summary>
-        /// <param name="httpClient">The <see cref="IHttpClient"/> implementation instance to use.</param>
-        /// <param name="installationIdController">The <see cref="IInstallationIdController"/> implementation instance to use.</param>
-        public ParseCommandRunner(IHttpClient httpClient, IInstallationIdController installationIdController)
+        /// <param name="webClient">The <see cref="IWebClient"/> implementation instance to use.</param>
+        /// <param name="installationIdController">The <see cref="IParseInstallationController"/> implementation instance to use.</param>
+        public ParseCommandRunner(IWebClient webClient, IParseInstallationController installationIdController, IMetadataController metadataController)
         {
-            this.httpClient = httpClient;
-            this.installationIdController = installationIdController;
+            WebClient = webClient;
+            InstallationController = installationIdController;
+            MetadataController = metadataController;
         }
 
         /// <summary>
@@ -37,62 +41,62 @@ namespace Parse.Core.Internal
         /// <param name="cancellationToken">An asynchronous operation cancellation token that dictates if and when the operation should be cancelled.</param>
         /// <returns></returns>
         public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command, IProgress<ParseUploadProgressEventArgs> uploadProgress = null, IProgress<ParseDownloadProgressEventArgs> downloadProgress = null, CancellationToken cancellationToken = default) => PrepareCommand(command).ContinueWith(commandTask =>
-                                                                                                                                                                                                                                                                                                            {
-                                                                                                                                                                                                                                                                                                                return httpClient.ExecuteAsync(commandTask.Result, uploadProgress, downloadProgress, cancellationToken).OnSuccess(t =>
-                                                                                                                                                                                                                                                                                                                {
-                                                                                                                                                                                                                                                                                                                    cancellationToken.ThrowIfCancellationRequested();
+        {
+            return WebClient.ExecuteAsync(commandTask.Result, uploadProgress, downloadProgress, cancellationToken).OnSuccess(t =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-                                                                                                                                                                                                                                                                                                                    Tuple<HttpStatusCode, string> response = t.Result;
-                                                                                                                                                                                                                                                                                                                    string contentString = response.Item2;
-                                                                                                                                                                                                                                                                                                                    int responseCode = (int) response.Item1;
-                                                                                                                                                                                                                                                                                                                    if (responseCode >= 500)
-                                                                                                                                                                                                                                                                                                                    {
-                                                                                                                                                                                                                                                                                                                        // Server error, return InternalServerError.
-                                                                                                                                                                                                                                                                                                                        throw new ParseException(ParseException.ErrorCode.InternalServerError, response.Item2);
-                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                    else if (contentString != null)
-                                                                                                                                                                                                                                                                                                                    {
-                                                                                                                                                                                                                                                                                                                        IDictionary<string, object> contentJson = null;
-                                                                                                                                                                                                                                                                                                                        try
-                                                                                                                                                                                                                                                                                                                        {
-                                                                                                                                                                                                                                                                                                                            // TODO: Newer versions of Parse Server send the failure results back as HTML.
-                                                                                                                                                                                                                                                                                                                            contentJson = contentString.StartsWith("[")
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ? new Dictionary<string, object> { ["results"] = Json.Parse(contentString) }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                : Json.Parse(contentString) as IDictionary<string, object>;
-                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                        catch (Exception e)
-                                                                                                                                                                                                                                                                                                                        {
-                                                                                                                                                                                                                                                                                                                            throw new ParseException(ParseException.ErrorCode.OtherCause, "Invalid or alternatively-formatted response recieved from server.", e);
-                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                        if (responseCode < 200 || responseCode > 299)
-                                                                                                                                                                                                                                                                                                                        {
-                                                                                                                                                                                                                                                                                                                            int code = (int) (contentJson.ContainsKey("code") ? (long) contentJson["code"] : (int) ParseException.ErrorCode.OtherCause);
-                                                                                                                                                                                                                                                                                                                            string error = contentJson.ContainsKey("error") ?
-                                                                                                                                                                                                                                                                                                                                contentJson["error"] as string :
-                                                                                                                                                                                                                                                                                                                                contentString;
-                                                                                                                                                                                                                                                                                                                            throw new ParseException((ParseException.ErrorCode) code, error);
-                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                        return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, contentJson);
-                                                                                                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                                                                                                    return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, null);
-                                                                                                                                                                                                                                                                                                                });
-                                                                                                                                                                                                                                                                                                            }).Unwrap();
+                Tuple<HttpStatusCode, string> response = t.Result;
+                string contentString = response.Item2;
+                int responseCode = (int) response.Item1;
+                if (responseCode >= 500)
+                {
+                    // Server error, return InternalServerError.
+                    throw new ParseException(ParseException.ErrorCode.InternalServerError, response.Item2);
+                }
+                else if (contentString != null)
+                {
+                    IDictionary<string, object> contentJson = null;
+                    try
+                    {
+                        // TODO: Newer versions of Parse Server send the failure results back as HTML.
+                        contentJson = contentString.StartsWith("[")
+                                                                                                                                                                                                                                                                                                                            ? new Dictionary<string, object> { ["results"] = Json.Parse(contentString) }
+                                                                                                                                                                                                                                                                                                                            : Json.Parse(contentString) as IDictionary<string, object>;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new ParseException(ParseException.ErrorCode.OtherCause, "Invalid or alternatively-formatted response recieved from server.", e);
+                    }
+                    if (responseCode < 200 || responseCode > 299)
+                    {
+                        int code = (int) (contentJson.ContainsKey("code") ? (long) contentJson["code"] : (int) ParseException.ErrorCode.OtherCause);
+                        string error = contentJson.ContainsKey("error") ?
+                            contentJson["error"] as string :
+                            contentString;
+                        throw new ParseException((ParseException.ErrorCode) code, error);
+                    }
+                    return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, contentJson);
+                }
+                return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, null);
+            });
+        }).Unwrap();
 
         private const string revocableSessionTokentrueValue = "1";
         private Task<ParseCommand> PrepareCommand(ParseCommand command)
         {
             ParseCommand newCommand = new ParseCommand(command);
 
-            Task<ParseCommand> installationIdTask = installationIdController.GetAsync().ContinueWith(t =>
+            Task<ParseCommand> installationIdTask = InstallationController.GetAsync().ContinueWith(t =>
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Installation-Id", t.Result.ToString()));
                 return newCommand;
             });
 
             // TODO (richardross): Inject configuration instead of using shared static here.
-            ParseClient.Configuration configuration = ParseClient.CurrentConfiguration;
+            Configuration configuration = ParseClient.Configuration;
             newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", configuration.ApplicationID));
-            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.VersionString));
+            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.Version.ToString()));
 
             if (configuration.AuxiliaryHeaders != null)
             {
@@ -102,24 +106,22 @@ namespace Parse.Core.Internal
                 }
             }
 
-            if (!String.IsNullOrEmpty(configuration.VersionInfo.BuildVersion))
+            if (!String.IsNullOrEmpty(MetadataController.HostVersioningData.BuildVersion))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", configuration.VersionInfo.BuildVersion));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", MetadataController.HostVersioningData.BuildVersion));
             }
-            if (!String.IsNullOrEmpty(configuration.VersionInfo.DisplayVersion))
+            if (!String.IsNullOrEmpty(MetadataController.HostVersioningData.DisplayVersion))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", configuration.VersionInfo.DisplayVersion));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", MetadataController.HostVersioningData.DisplayVersion));
             }
-            if (!String.IsNullOrEmpty(configuration.VersionInfo.OSVersion))
+            if (!String.IsNullOrEmpty(MetadataController.HostVersioningData.HostOSVersion))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", configuration.VersionInfo.OSVersion));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", MetadataController.HostVersioningData.HostOSVersion));
             }
 
-            // TODO (richardross): I hate the idea of having this super tightly coupled static variable in here.
-            // Lets eventually get rid of it.
-            if (!String.IsNullOrEmpty(ParseClient.MasterKey))
+            if (!String.IsNullOrEmpty(configuration.MasterKey))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", ParseClient.MasterKey));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", configuration.MasterKey));
             }
             else
             {

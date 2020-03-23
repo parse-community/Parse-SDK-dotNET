@@ -1,3 +1,4 @@
+using Parse.Abstractions.Library;
 using Parse.Core.Internal;
 
 namespace Parse.Push.Internal
@@ -106,7 +107,7 @@ namespace Parse.Push.Internal
                 lock (mutex)
                 {
                     currentInstallationController = currentInstallationController ?? new ParseCurrentInstallationController(
-                      CorePlugins.InstallationIdController, CorePlugins.StorageController, ParseInstallationCoder.Instance
+                      CorePlugins.InstallationController, CorePlugins.StorageController, ParseInstallationCoder.Instance
                     );
                     return currentInstallationController;
                 }
