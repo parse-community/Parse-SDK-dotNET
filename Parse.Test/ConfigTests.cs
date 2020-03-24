@@ -7,6 +7,7 @@ using Moq;
 using Newtonsoft.Json;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
+using Parse.Management;
 
 namespace Parse.Test
 {

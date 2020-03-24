@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Parse.Abstractions.Library;
+using Parse.Abstractions.Management;
 using Parse.Abstractions.Storage;
 using Parse.Common.Internal;
-using Parse.Core.Internal;
 using Parse.Library;
+using Parse.Management;
 
 namespace Parse
 {
@@ -66,12 +67,10 @@ namespace Parse
 
                 bool keepRelativeStoragePath = plugins is { StorageController: { } }, keepVersion = plugins is { MetadataController: { } };
 
-                //plugins.SetDefaults();
-
-                //if (plugins is ParseCorePlugins corePlugins)
-                //{
-                //    corePlugins.Activate();
-                //}
+                if (plugins is ParseCorePlugins)
+                {
+                    ParseCorePlugins.Instance = plugins;
+                }
 
                 if (hostVersioning is { } && !keepVersion && plugins.MetadataController is MetadataController { } metadataController)
                 {

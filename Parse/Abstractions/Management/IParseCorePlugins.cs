@@ -1,9 +1,10 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 
-namespace Parse.Abstractions.Library
+namespace Parse.Abstractions.Management
 {
     /// <summary>
     /// The dependency injection container for the .NET Parse SDK.

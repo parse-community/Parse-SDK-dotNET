@@ -1,14 +1,16 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using Parse.Abstractions.Library;
+using Parse.Abstractions.Management;
 using Parse.Common.Internal;
+using Parse.Core.Internal;
 using Parse.Library;
 
 #if DEBUG
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Parse.Test")]
 #endif
 
-namespace Parse.Core.Internal
+namespace Parse.Management
 {
     public class ParseCorePlugins : IParseCorePlugins
     {
@@ -20,16 +22,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (Mutex)
-                {
                     return instance ??= new ParseCorePlugins();
-                }
             }
             set
             {
                 lock (Mutex)
-                {
                     instance = value;
-                }
             }
         }
 
@@ -87,16 +85,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return metadataController ??= new MetadataController { };
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     metadataController = value;
-                }
             }
         }
 
@@ -105,16 +99,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return httpClient ??= new UniversalWebClient { };
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     httpClient = value;
-                }
             }
         }
 
@@ -123,16 +113,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return commandRunner ??= new ParseCommandRunner(WebClient, InstallationController, MetadataController);
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     commandRunner = value;
-                }
             }
         }
 
@@ -141,16 +127,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return storageController ??= new StorageController();
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     storageController = value;
-                }
             }
         }
 
@@ -159,16 +141,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return cloudCodeController ??= new ParseCloudCodeController(CommandRunner);
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     cloudCodeController = value;
-                }
             }
         }
 
@@ -177,16 +155,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return fileController ??= new ParseFileController(CommandRunner);
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     fileController = value;
-                }
             }
         }
 
@@ -195,16 +169,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return configController ?? (configController = new ParseConfigController(CommandRunner, StorageController));
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     configController = value;
-                }
             }
         }
 
@@ -213,16 +183,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return objectController ??= new ParseObjectController(CommandRunner);
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     objectController = value;
-                }
             }
         }
 
@@ -231,16 +197,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return queryController ?? (queryController = new ParseQueryController(CommandRunner));
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     queryController = value;
-                }
             }
         }
 
@@ -249,16 +211,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return sessionController ??= new ParseSessionController(CommandRunner);
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     sessionController = value;
-                }
             }
         }
 
@@ -267,16 +225,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
-                    return (userController ??= new ParseUserController(CommandRunner));
-                }
+                    return userController ??= new ParseUserController(CommandRunner);
             }
             set
             {
                 lock (mutex)
-                {
                     userController = value;
-                }
             }
         }
 
@@ -285,16 +239,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return currentUserController ??= new ParseCurrentUserController(StorageController);
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     currentUserController = value;
-                }
             }
         }
 
@@ -315,9 +265,7 @@ namespace Parse.Core.Internal
             set
             {
                 lock (mutex)
-                {
                     subclassingController = value;
-                }
             }
         }
 
@@ -326,16 +274,12 @@ namespace Parse.Core.Internal
             get
             {
                 lock (mutex)
-                {
                     return installationController ??= new ParseInstallationController(StorageController);
-                }
             }
             set
             {
                 lock (mutex)
-                {
                     installationController = value;
-                }
             }
         }
     }

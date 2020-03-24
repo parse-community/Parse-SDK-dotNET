@@ -8,6 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
+using Parse.Management;
 
 namespace Parse
 {

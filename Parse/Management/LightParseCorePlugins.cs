@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Parse.Abstractions.Library;
+using Parse.Abstractions.Management;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 

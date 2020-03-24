@@ -1,5 +1,5 @@
-using Parse.Abstractions.Library;
-using Parse.Core.Internal;
+using Parse.Abstractions.Management;
+using Parse.Management;
 
 namespace Parse.Push.Internal
 {

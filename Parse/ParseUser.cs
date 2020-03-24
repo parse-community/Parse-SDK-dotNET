@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
+using Parse.Management;
 
 namespace Parse
 {

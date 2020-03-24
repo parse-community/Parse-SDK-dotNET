@@ -1,5 +1,5 @@
 using Parse.Common.Internal;
-using Parse.Core.Internal;
+using Parse.Management;
 
 namespace Parse.Push.Internal
 {

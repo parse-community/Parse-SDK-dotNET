@@ -1,4 +1,4 @@
-using Parse.Abstractions.Library;
+using Parse.Abstractions.Management;
 
 namespace Parse.Push.Internal
 {

@@ -11,6 +11,7 @@ using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 using Parse.Library;
+using Parse.Management;
 
 namespace Parse.Test
 {

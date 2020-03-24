@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Core.Internal;
+using Parse.Management;
 
 namespace Parse.Test
 {

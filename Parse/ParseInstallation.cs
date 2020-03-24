@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parse.Abstractions.Library;
 using Parse.Common.Internal;
-using Parse.Core.Internal;
 using Parse.Library;
+using Parse.Management;
 using Parse.Push.Internal;
 
 namespace Parse
