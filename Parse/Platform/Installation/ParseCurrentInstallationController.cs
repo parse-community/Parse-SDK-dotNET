@@ -73,7 +73,7 @@ namespace Parse.Push.Internal
 
             if (cachedCurrent != null)
             {
-                return Task<ParseInstallation>.FromResult(cachedCurrent);
+                return Task.FromResult(cachedCurrent);
             }
 
             return taskQueue.Enqueue(toAwait =>
@@ -113,7 +113,7 @@ namespace Parse.Push.Internal
         {
             if (CurrentInstallation != null)
             {
-                return Task<bool>.FromResult(true);
+                return Task.FromResult(true);
             }
 
             return taskQueue.Enqueue(toAwait =>

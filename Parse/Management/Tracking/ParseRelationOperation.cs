@@ -25,8 +25,8 @@ namespace Parse.Core.Internal
         public ParseRelationOperation(IEnumerable<ParseObject> adds,
             IEnumerable<ParseObject> removes)
         {
-            adds = adds ?? new ParseObject[0];
-            removes = removes ?? new ParseObject[0];
+            adds ??= new ParseObject[0];
+            removes ??= new ParseObject[0];
             targetClassName = adds.Concat(removes).Select(o => o.ClassName).FirstOrDefault();
             this.adds = new ReadOnlyCollection<string>(IdsFromObjects(adds).ToList());
             this.removes = new ReadOnlyCollection<string>(IdsFromObjects(removes).ToList());

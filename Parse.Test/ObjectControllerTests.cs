@@ -16,7 +16,7 @@ namespace Parse.Test
     public class ObjectControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "" });
+        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectControllerTests))]
@@ -89,10 +89,7 @@ namespace Parse.Test
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi"),
-                    It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                    It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
-                    It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = t.Result;
                 Assert.AreEqual("isShibaInu", newState["doge"]);
@@ -161,10 +158,7 @@ namespace Parse.Test
                     Assert.IsNotNull(serverState.UpdatedAt);
                 }
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-                    It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                    It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
-                    It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -179,7 +173,10 @@ namespace Parse.Test
                 {
                     ClassName = "Corgi",
                     ObjectId = "st4nl3yW" + i,
-                    ServerData = new Dictionary<string, object> { ["corgi"] = "isNotDoge" }
+                    ServerData = new Dictionary<string, object>
+                    {
+                        ["corgi"] = "isNotDoge"
+                    }
                 });
             }
             List<IDictionary<string, IParseFieldOperation>> operationsList = new List<IDictionary<string, IParseFieldOperation>>();

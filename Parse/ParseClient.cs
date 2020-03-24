@@ -61,17 +61,17 @@ namespace Parse
         {
             lock (Mutex)
             {
-                configuration.ServerURI ??= configuration.Testing ? "https://api.parse.com/1/" : throw new ArgumentException("Since the official parse server has shut down, you must specify a URI that points to a hosted instance.");
+                configuration.ServerURI ??= configuration.Test ? "https://api.parse.com/1/" : throw new ArgumentException("Since the official parse server has shut down, you must specify a URI that points to a hosted instance.");
                 plugins ??= new ParseCorePlugins { };
 
                 bool keepRelativeStoragePath = plugins is { StorageController: { } }, keepVersion = plugins is { MetadataController: { } };
 
-                plugins.SetDefaults();
+                //plugins.SetDefaults();
 
-                if (plugins is ParseCorePlugins corePlugins)
-                {
-                    corePlugins.Activate();
-                }
+                //if (plugins is ParseCorePlugins corePlugins)
+                //{
+                //    corePlugins.Activate();
+                //}
 
                 if (hostVersioning is { } && !keepVersion && plugins.MetadataController is MetadataController { } metadataController)
                 {

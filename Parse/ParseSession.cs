@@ -47,18 +47,18 @@ namespace Parse
                                                                                                                       ParseUser user = t1.Result;
                                                                                                                       if (user == null)
                                                                                                                       {
-                                                                                                                          return Task<ParseSession>.FromResult((ParseSession) null);
+                                                                                                                          return Task.FromResult((ParseSession) null);
                                                                                                                       }
 
                                                                                                                       string sessionToken = user.SessionToken;
                                                                                                                       if (sessionToken == null)
                                                                                                                       {
-                                                                                                                          return Task<ParseSession>.FromResult((ParseSession) null);
+                                                                                                                          return Task.FromResult((ParseSession) null);
                                                                                                                       }
 
                                                                                                                       return SessionController.GetSessionAsync(sessionToken, cancellationToken).OnSuccess(t =>
                                                                                                                       {
-                                                                                                                          ParseSession session = ParseObject.FromState<ParseSession>(t.Result, "_Session");
+                                                                                                                          ParseSession session = FromState<ParseSession>(t.Result, "_Session");
                                                                                                                           return session;
                                                                                                                       });
                                                                                                                   }).Unwrap();
@@ -76,12 +76,12 @@ namespace Parse
         {
             if (sessionToken == null || SessionController.IsRevocableSessionToken(sessionToken))
             {
-                return Task<string>.FromResult(sessionToken);
+                return Task.FromResult(sessionToken);
             }
 
             return SessionController.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken).OnSuccess(t =>
             {
-                ParseSession session = ParseObject.FromState<ParseSession>(t.Result, "_Session");
+                ParseSession session = FromState<ParseSession>(t.Result, "_Session");
                 return session.SessionToken;
             });
         }

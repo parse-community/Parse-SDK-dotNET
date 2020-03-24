@@ -87,7 +87,7 @@ namespace Parse.Core.Internal
 
             if (cachedCurrent != null)
             {
-                return Task<ParseUser>.FromResult(cachedCurrent);
+                return Task.FromResult(cachedCurrent);
             }
 
             return taskQueue.Enqueue(toAwait =>
@@ -117,7 +117,7 @@ namespace Parse.Core.Internal
         {
             if (CurrentUser != null)
             {
-                return Task<bool>.FromResult(true);
+                return Task.FromResult(true);
             }
 
             return taskQueue.Enqueue(toAwait =>

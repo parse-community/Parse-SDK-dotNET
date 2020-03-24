@@ -11,7 +11,7 @@ namespace Parse.Push.Internal
         {
             get
             {
-                instance = instance ?? new ParsePushPlugins();
+                instance ??= new ParsePushPlugins();
                 return instance;
             }
             set
@@ -49,7 +49,7 @@ namespace Parse.Push.Internal
             {
                 lock (mutex)
                 {
-                    corePlugins = corePlugins ?? ParseCorePlugins.Instance;
+                    corePlugins ??= ParseCorePlugins.Instance;
                     return corePlugins;
                 }
             }
@@ -68,7 +68,7 @@ namespace Parse.Push.Internal
             {
                 lock (mutex)
                 {
-                    pushChannelsController = pushChannelsController ?? new ParsePushChannelsController();
+                    pushChannelsController ??= new ParsePushChannelsController();
                     return pushChannelsController;
                 }
             }
@@ -87,7 +87,7 @@ namespace Parse.Push.Internal
             {
                 lock (mutex)
                 {
-                    pushController = pushController ?? new ParsePushController(CorePlugins.CommandRunner, CorePlugins.CurrentUserController);
+                    pushController ??= new ParsePushController(CorePlugins.CommandRunner, CorePlugins.CurrentUserController);
                     return pushController;
                 }
             }
@@ -106,7 +106,7 @@ namespace Parse.Push.Internal
             {
                 lock (mutex)
                 {
-                    currentInstallationController = currentInstallationController ?? new ParseCurrentInstallationController(
+                    currentInstallationController ??= new ParseCurrentInstallationController(
                       CorePlugins.InstallationController, CorePlugins.StorageController, ParseInstallationCoder.Instance
                     );
                     return currentInstallationController;
@@ -127,7 +127,7 @@ namespace Parse.Push.Internal
             {
                 lock (mutex)
                 {
-                    deviceInfoController = deviceInfoController ?? new DeviceInfoController();
+                    deviceInfoController ??= new DeviceInfoController();
                     return deviceInfoController;
                 }
             }

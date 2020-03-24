@@ -40,8 +40,8 @@ namespace Parse.Common.Internal
 
         public Task<Tuple<HttpStatusCode, string>> ExecuteAsync(HttpRequest httpRequest, IProgress<ParseUploadProgressEventArgs> uploadProgress, IProgress<ParseDownloadProgressEventArgs> downloadProgress, CancellationToken cancellationToken)
         {
-            uploadProgress = uploadProgress ?? new Progress<ParseUploadProgressEventArgs> { };
-            downloadProgress = downloadProgress ?? new Progress<ParseDownloadProgressEventArgs> { };
+            uploadProgress ??= new Progress<ParseUploadProgressEventArgs> { };
+            downloadProgress ??= new Progress<ParseDownloadProgressEventArgs> { };
 
             HttpRequestMessage message = new HttpRequestMessage(new HttpMethod(httpRequest.Method), httpRequest.Uri);
 

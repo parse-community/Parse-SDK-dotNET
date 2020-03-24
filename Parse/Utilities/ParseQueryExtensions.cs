@@ -51,14 +51,14 @@ namespace Parse.Core.Internal
         },
       };
             containsMethod = GetMethod<object>(
-                o => ParseQueryExtensions.ContainsStub<object>(null, null)).GetGenericMethodDefinition();
+                o => ContainsStub<object>(null, null)).GetGenericMethodDefinition();
             notContainsMethod = GetMethod<object>(
-                o => ParseQueryExtensions.NotContainsStub<object>(null, null))
+                o => NotContainsStub<object>(null, null))
                     .GetGenericMethodDefinition();
 
-            containsKeyMethod = GetMethod<object>(o => ParseQueryExtensions.ContainsKeyStub(null, null));
+            containsKeyMethod = GetMethod<object>(o => ContainsKeyStub(null, null));
             notContainsKeyMethod = GetMethod<object>(
-              o => ParseQueryExtensions.NotContainsKeyStub(null, null));
+              o => NotContainsKeyStub(null, null));
         }
 
         /// <summary>

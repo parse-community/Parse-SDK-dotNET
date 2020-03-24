@@ -530,7 +530,7 @@ namespace Parse
                     }
 
                     // Save all of the objects in current.
-                    return ParseObject.EnqueueForAll<object>(current, toAwait =>
+                    return EnqueueForAll(current, toAwait =>
                     {
                         return toAwait.OnSuccess(__ =>
                         {
@@ -627,7 +627,7 @@ namespace Parse
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The list passed in for convenience.</returns>
         public static Task<IEnumerable<T>> FetchAllIfNeededAsync<T>(
-            IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => ParseObject.EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) =>
+            IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) =>
                                                                                                             {
                                                                                                                 return FetchAllInternalAsync(objects, false, toAwait, cancellationToken);
                                                                                                             }, cancellationToken);
@@ -647,7 +647,7 @@ namespace Parse
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The list passed in for convenience.</returns>
         public static Task<IEnumerable<T>> FetchAllAsync<T>(
-            IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => ParseObject.EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) =>
+            IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) =>
                                                                                                             {
                                                                                                                 return FetchAllInternalAsync(objects, true, toAwait, cancellationToken);
                                                                                                             }, cancellationToken);
@@ -761,7 +761,7 @@ namespace Parse
             HashSet<ParseObject> uniqueObjects = new HashSet<ParseObject>(objects.OfType<ParseObject>().ToList(),
               new IdentityEqualityComparer<ParseObject>());
 
-            return ParseObject.EnqueueForAll<object>(uniqueObjects, toAwait =>
+            return EnqueueForAll(uniqueObjects, toAwait =>
             {
                 List<IObjectState> states = uniqueObjects.Select(t => t.state).ToList();
                 return toAwait.OnSuccess(_ =>

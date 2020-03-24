@@ -104,6 +104,6 @@ namespace Parse.Core.Internal
         public static DateTime ParseDate(string input) =>
             // TODO(hallucinogen): Figure out if we should be more flexible with the date formats
             // we accept.
-            System.DateTime.ParseExact(input, ParseClient.DateFormatStrings, CultureInfo.InvariantCulture, DateTimeStyles.None);
+            DateTime.ParseExact(input, ParseClient.DateFormatStrings, CultureInfo.InvariantCulture, DateTimeStyles.None);
     }
 }

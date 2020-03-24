@@ -30,8 +30,8 @@ namespace Parse
 
         internal void EnsureParentAndKey(ParseObject parent, string key)
         {
-            this.parent = this.parent ?? parent;
-            this.key = this.key ?? key;
+            this.parent ??= parent;
+            this.key ??= key;
             Debug.Assert(this.parent == parent, "Relation retrieved from two different objects");
             Debug.Assert(this.key == key, "Relation retrieved from two different keys");
         }
@@ -125,6 +125,6 @@ namespace Parse
         /// <summary>
         /// Gets a query that can be used to query the objects in this relation.
         /// </summary>
-        public ParseQuery<T> Query => base.GetQuery<T>();
+        public ParseQuery<T> Query => GetQuery<T>();
     }
 }

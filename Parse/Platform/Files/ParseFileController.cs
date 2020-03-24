@@ -23,7 +23,7 @@ namespace Parse.Core.Internal
             if (state.Url != null)
             {
                 // !isDirty
-                return Task<FileState>.FromResult(state);
+                return Task.FromResult(state);
             }
 
             if (cancellationToken.IsCancellationRequested)

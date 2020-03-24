@@ -41,7 +41,7 @@ namespace Parse.Common.Internal
             return defaultValue;
         }
 
-        public static bool CollectionsEqual<T>(this IEnumerable<T> a, IEnumerable<T> b) => Object.Equals(a, b) ||
+        public static bool CollectionsEqual<T>(this IEnumerable<T> a, IEnumerable<T> b) => Equals(a, b) ||
                    (a != null && b != null &&
                    a.SequenceEqual(b));
 

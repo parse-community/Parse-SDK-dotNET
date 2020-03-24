@@ -22,7 +22,7 @@ namespace Parse.Test
         [TestInitialize]
         public void SetUp()
         {
-            ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "" });
+            ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
             MockMetadataController.Setup(metadata => metadata.HostVersioningData).Returns(new HostApplicationVersioningData { BuildVersion = "1", DisplayVersion = "1", HostOSVersion = "1" });
         }
 

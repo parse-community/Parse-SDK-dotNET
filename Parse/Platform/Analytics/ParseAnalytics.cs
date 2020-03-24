@@ -26,7 +26,7 @@ namespace Parse
         /// Tracks this application being launched.
         /// </summary>
         /// <returns>An Async Task that can be waited on or ignored.</returns>
-        public static Task TrackAppOpenedAsync() => ParseAnalytics.TrackAppOpenedWithPushHashAsync();
+        public static Task TrackAppOpenedAsync() => TrackAppOpenedWithPushHashAsync();
 
         /// <summary>
         /// Tracks the occurrence of a custom event with additional dimensions.

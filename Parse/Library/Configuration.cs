@@ -9,7 +9,7 @@ namespace Parse.Library
     /// </summary>
     public struct Configuration
     {
-        internal bool Testing { get; set; }
+        internal bool Test { get; set; }
 
         /// <summary>
         /// The App ID of your app.

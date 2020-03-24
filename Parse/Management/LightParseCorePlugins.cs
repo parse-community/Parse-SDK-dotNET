@@ -43,6 +43,8 @@ namespace Parse.Management
 
         public IParseCurrentConfigController CurrentConfigController { get; set; }
 
+        public void Reset() => throw new NotImplementedException { };
+
         /// <summary>
         /// Will <see langword="throw"/> a <see cref="NotSupportedException"/>.
         /// </summary>

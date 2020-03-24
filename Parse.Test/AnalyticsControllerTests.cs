@@ -16,7 +16,7 @@ namespace Parse.Test
     public class AnalyticsControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "" });
+        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(AnalyticsControllerTests))]

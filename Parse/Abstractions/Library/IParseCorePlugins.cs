@@ -27,11 +27,13 @@ namespace Parse.Abstractions.Library
         IParseSessionController SessionController { get; }
         IParseUserController UserController { get; }
         IParseCurrentUserController CurrentUserController { get; }
-        IParseCurrentConfigController CurrentConfigController { get; }
+        //IParseCurrentConfigController CurrentConfigController { get; }
+
+        public void Reset();
 
         /// <summary>
         /// Sets the default controller instances if not explicitly overridden. This method should effectively perform a <see langword="null"/>-coalescing assign on all of the properties of the <see cref="IParseCorePlugins"/> implementation instance.
         /// </summary>
-        public void SetDefaults();
+        //public void SetDefaults();
     }
 }

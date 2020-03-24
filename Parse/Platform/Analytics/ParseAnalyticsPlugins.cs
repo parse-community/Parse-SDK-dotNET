@@ -15,7 +15,7 @@ namespace Parse.Analytics.Internal
             {
                 lock (instanceMutex)
                 {
-                    instance = instance ?? new ParseAnalyticsPlugins();
+                    instance ??= new ParseAnalyticsPlugins();
                     return instance;
                 }
             }
@@ -48,7 +48,7 @@ namespace Parse.Analytics.Internal
             {
                 lock (mutex)
                 {
-                    corePlugins = corePlugins ?? ParseCorePlugins.Instance;
+                    corePlugins ??= ParseCorePlugins.Instance;
                     return corePlugins;
                 }
             }
@@ -67,7 +67,7 @@ namespace Parse.Analytics.Internal
             {
                 lock (mutex)
                 {
-                    analyticsController = analyticsController ?? new ParseAnalyticsController(CorePlugins.CommandRunner);
+                    analyticsController ??= new ParseAnalyticsController(CorePlugins.CommandRunner);
                     return analyticsController;
                 }
             }

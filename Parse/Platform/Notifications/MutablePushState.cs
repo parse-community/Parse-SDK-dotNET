@@ -42,13 +42,13 @@ namespace Parse.Push.Internal
             }
 
             MutablePushState other = obj as MutablePushState;
-            return Object.Equals(Query, other.Query) &&
+            return Equals(Query, other.Query) &&
                    Channels.CollectionsEqual(other.Channels) &&
-                   Object.Equals(Expiration, other.Expiration) &&
-                   Object.Equals(ExpirationInterval, other.ExpirationInterval) &&
-                   Object.Equals(PushTime, other.PushTime) &&
+                   Equals(Expiration, other.Expiration) &&
+                   Equals(ExpirationInterval, other.ExpirationInterval) &&
+                   Equals(PushTime, other.PushTime) &&
                    Data.CollectionsEqual(other.Data) &&
-                   Object.Equals(Alert, other.Alert);
+                   Equals(Alert, other.Alert);
         }
 
         public override int GetHashCode() =>

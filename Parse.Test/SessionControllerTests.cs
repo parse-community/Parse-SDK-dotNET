@@ -16,37 +16,34 @@ namespace Parse.Test
     public class SessionControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "" });
+        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(SessionControllerTests))]
         public Task TestGetSessionWithEmptyResult() => new ParseSessionController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null)).Object).GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
-                                                                 {
-                                                                     Assert.IsTrue(t.IsFaulted);
-                                                                     Assert.IsFalse(t.IsCanceled);
-                                                                 });
+        {
+            Assert.IsTrue(t.IsFaulted);
+            Assert.IsFalse(t.IsCanceled);
+        });
 
         [TestMethod]
         [AsyncStateMachine(typeof(SessionControllerTests))]
         public Task TestGetSession()
         {
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted,
-                new Dictionary<string, object>() {
-            { "__type", "Object" },
-            { "className", "Session" },
-            { "sessionToken", "S0m3Se551on" },
-            { "restricted", true }
-                });
+            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>
+            {
+                ["__type"] = "Object",
+                ["className"] = "Session",
+                ["sessionToken"] = "S0m3Se551on",
+                ["restricted"] = true
+            });
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
 
             return new ParseSessionController(mockRunner.Object).GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/sessions/me"),
-                  It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                  It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/sessions/me"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState session = t.Result;
                 Assert.AreEqual(2, session.Count());

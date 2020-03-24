@@ -25,7 +25,7 @@ namespace AssemblyLister
 
         private static IEnumerable<Assembly> DeepWalkReferences(this Assembly assembly, HashSet<string> seen = null)
         {
-            seen = seen ?? new HashSet<string>();
+            seen ??= new HashSet<string>();
 
             if (!seen.Add(assembly.FullName))
             {
