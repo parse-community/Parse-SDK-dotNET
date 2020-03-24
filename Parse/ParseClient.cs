@@ -99,6 +99,8 @@ namespace Parse
                 ParseObject.RegisterDerivative<ParseRole>();
                 ParseObject.RegisterDerivative<ParseSession>();
                 ParseObject.RegisterDerivative<ParseInstallation>();
+
+                AppDomain.CurrentDomain.ProcessExit += (_, __) => plugins.StorageController.Clean();
             }
         }
 
