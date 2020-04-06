@@ -8,21 +8,17 @@ namespace Parse.Core.Internal
 {
     internal class ObjectSubclassInfo
     {
-        public ObjectSubclassInfo(Type type, ConstructorInfo constructor)
-        {
-            TypeInfo = type.GetTypeInfo();
-            ClassName = GetClassName(TypeInfo);
-            Constructor = constructor;
-            PropertyMappings = ReflectionHelpers.GetProperties(type).Select(prop => Tuple.Create(prop, prop.GetCustomAttribute<ParseFieldNameAttribute>(true))).Where(t => t.Item2 != null).Select(t => Tuple.Create(t.Item1, t.Item2.FieldName)).ToDictionary(t => t.Item1.Name, t => t.Item2);
-        }
+        public ObjectSubclassInfo(Type type, ConstructorInfo constructor) => (TypeInfo, DeclaredName, Constructor, PropertyMappings) = (type.GetTypeInfo(), TypeInfo.GetParseClassName(), Constructor = constructor, PropertyMappings = type.GetProperties().Select(property => (Property: property, FieldNameAttribute: property.GetCustomAttribute<ParseFieldNameAttribute>(true))).Where(set => set.FieldNameAttribute is { }).ToDictionary(set => set.Property.Name, set => set.FieldNameAttribute.FieldName));
 
-        public TypeInfo TypeInfo { get; private set; }
-        public string ClassName { get; private set; }
-        public IDictionary<string, string> PropertyMappings { get; private set; }
-        private ConstructorInfo Constructor { get; set; }
+        public TypeInfo TypeInfo { get; }
 
-        public ParseObject Instantiate() => (ParseObject) Constructor.Invoke(null);
+        public string DeclaredName { get; }
 
-        internal static string GetClassName(TypeInfo type) => type.GetCustomAttribute<ParseClassNameAttribute>()?.ClassName;
+        public IDictionary<string, string> PropertyMappings { get; }
+
+        public ParseObject Instantiate() => Constructor.Invoke(default) as ParseObject;
+
+        ConstructorInfo Constructor { get; }
+
     }
 }

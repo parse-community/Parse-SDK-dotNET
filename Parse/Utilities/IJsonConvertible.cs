@@ -13,6 +13,6 @@ namespace Parse.Common.Internal
         /// Converts the object to a data structure that can be converted to JSON.
         /// </summary>
         /// <returns>An object to be JSONified.</returns>
-        IDictionary<string, object> ToJSON();
+        IDictionary<string, object> ConvertToJSON();
     }
 }

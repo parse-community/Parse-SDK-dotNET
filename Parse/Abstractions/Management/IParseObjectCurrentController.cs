@@ -18,20 +18,20 @@ namespace Parse.Core.Internal
         /// </summary>
         /// <param name="obj"><see cref="ParseObject"/> to be persisted.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        Task SetAsync(T obj, CancellationToken cancellationToken);
+        Task SetAsync(T obj, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Gets the persisted current <see cref="ParseObject"/>.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        Task<T> GetAsync(CancellationToken cancellationToken);
+        Task<T> GetAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a <see cref="Task"/> that resolves to <code>true</code> if current
         /// <see cref="ParseObject"/> exists.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        Task<bool> ExistsAsync(CancellationToken cancellationToken);
+        Task<bool> ExistsAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns <code>true</code> if the given <see cref="ParseObject"/> is the persisted current

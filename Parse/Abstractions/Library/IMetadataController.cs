@@ -10,8 +10,13 @@ namespace Parse.Abstractions.Library
     public interface IMetadataController
     {
         /// <summary>
-        /// The version information of your application environment.
+        /// Information about the application using the Parse SDK.
         /// </summary>
-        public IHostApplicationVersioningData HostVersioningData { get; }
+        public IHostManifestData HostManifestData { get; }
+
+        /// <summary>
+        /// Environment data specific to the application hosting the Parse SDK.
+        /// </summary>
+        public IEnvironmentData EnvironmentData { get; }
     }
 }

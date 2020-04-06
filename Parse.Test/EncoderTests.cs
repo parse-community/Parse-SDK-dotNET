@@ -12,41 +12,40 @@ namespace Parse.Test
     public class EncoderTests
     {
         /// <summary>
-        /// A <see cref="ParseEncoder"/> that's used only for testing. This class is used to test
-        /// <see cref="ParseEncoder"/>'s base methods.
+        /// A <see cref="ParseDataEncoder"/> that's used only for testing. This class is used to test
+        /// <see cref="ParseDataEncoder"/>'s base methods.
         /// </summary>
-        private class ParseEncoderTestClass : ParseEncoder
+        private class ParseEncoderTestClass : ParseDataEncoder
         {
-            private static readonly ParseEncoderTestClass instance = new ParseEncoderTestClass();
-            public static ParseEncoderTestClass Instance => instance;
+            public static ParseEncoderTestClass Instance { get; } = new ParseEncoderTestClass();
 
-            protected override IDictionary<string, object> EncodeParseObject(ParseObject value) => null;
+            protected override IDictionary<string, object> EncodeObject(ParseObject value) => null;
         }
 
         [TestMethod]
         public void TestIsValidType()
         {
             ParseObject corgi = new ParseObject("Corgi");
-            ParseRelation<ParseObject> corgiRelation = corgi.GetRelation<ParseObject>("corgi");
+            ParseRelation<ParseObject> corgiRelation = corgi.GetRelation<ParseObject>(nameof(corgi));
 
-            Assert.IsTrue(ParseEncoder.IsValidType(322));
-            Assert.IsTrue(ParseEncoder.IsValidType(0.3f));
-            Assert.IsTrue(ParseEncoder.IsValidType(new byte[] { 1, 2, 3, 4 }));
-            Assert.IsTrue(ParseEncoder.IsValidType("corgi"));
-            Assert.IsTrue(ParseEncoder.IsValidType(corgi));
-            Assert.IsTrue(ParseEncoder.IsValidType(new ParseACL()));
-            Assert.IsTrue(ParseEncoder.IsValidType(new ParseFile("Corgi", new byte[0])));
-            Assert.IsTrue(ParseEncoder.IsValidType(new ParseGeoPoint(1, 2)));
-            Assert.IsTrue(ParseEncoder.IsValidType(corgiRelation));
-            Assert.IsTrue(ParseEncoder.IsValidType(new DateTime()));
-            Assert.IsTrue(ParseEncoder.IsValidType(new List<object>()));
-            Assert.IsTrue(ParseEncoder.IsValidType(new Dictionary<string, string>()));
-            Assert.IsTrue(ParseEncoder.IsValidType(new Dictionary<string, object>()));
+            Assert.IsTrue(ParseDataEncoder.Validate(322));
+            Assert.IsTrue(ParseDataEncoder.Validate(0.3f));
+            Assert.IsTrue(ParseDataEncoder.Validate(new byte[] { 1, 2, 3, 4 }));
+            Assert.IsTrue(ParseDataEncoder.Validate(nameof(corgi)));
+            Assert.IsTrue(ParseDataEncoder.Validate(corgi));
+            Assert.IsTrue(ParseDataEncoder.Validate(new ParseACL()));
+            Assert.IsTrue(ParseDataEncoder.Validate(new ParseFile("Corgi", new byte[0])));
+            Assert.IsTrue(ParseDataEncoder.Validate(new ParseGeoPoint(1, 2)));
+            Assert.IsTrue(ParseDataEncoder.Validate(corgiRelation));
+            Assert.IsTrue(ParseDataEncoder.Validate(new DateTime()));
+            Assert.IsTrue(ParseDataEncoder.Validate(new List<object>()));
+            Assert.IsTrue(ParseDataEncoder.Validate(new Dictionary<string, string>()));
+            Assert.IsTrue(ParseDataEncoder.Validate(new Dictionary<string, object>()));
 
-            Assert.IsFalse(ParseEncoder.IsValidType(new ParseAddOperation(new List<object>())));
-            Assert.IsFalse(ParseEncoder.IsValidType(Task.FromResult(new ParseObject("Corgi"))));
-            Assert.ThrowsException<MissingMethodException>(() => ParseEncoder.IsValidType(new Dictionary<object, object>()));
-            Assert.ThrowsException<MissingMethodException>(() => ParseEncoder.IsValidType(new Dictionary<object, string>()));
+            Assert.IsFalse(ParseDataEncoder.Validate(new ParseAddOperation(new List<object>())));
+            Assert.IsFalse(ParseDataEncoder.Validate(Task.FromResult(new ParseObject("Corgi"))));
+            Assert.ThrowsException<MissingMethodException>(() => ParseDataEncoder.Validate(new Dictionary<object, object>()));
+            Assert.ThrowsException<MissingMethodException>(() => ParseDataEncoder.Validate(new Dictionary<object, string>()));
         }
 
         [TestMethod]

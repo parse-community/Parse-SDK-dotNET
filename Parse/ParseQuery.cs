@@ -1,16 +1,15 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
-using Parse.Management;
 
 namespace Parse
 {
@@ -48,106 +47,145 @@ namespace Parse
     /// </example>
     public class ParseQuery<T> where T : ParseObject
     {
-        private readonly string className;
-        private readonly Dictionary<string, object> where;
-        private readonly ReadOnlyCollection<string> orderBy;
-        private readonly ReadOnlyCollection<string> includes;
-        private readonly ReadOnlyCollection<string> selectedKeys;
-        private readonly String redirectClassNameForKey;
-        private readonly int? skip;
-        private readonly int? limit;
+        /// <summary>
+        /// Serialized <see langword="where"/> clauses.
+        /// </summary>
+        Dictionary<string, object> Filters { get; }
 
-        internal string ClassName => className;
+        /// <summary>
+        /// Serialized <see langword="orderby"/> clauses.
+        /// </summary>
+        ReadOnlyCollection<string> Orderings { get; }
 
-        internal static IParseQueryController QueryController => ParseCorePlugins.Instance.QueryController;
+        /// <summary>
+        /// Serialized related data query merging request (data inclusion) clauses.
+        /// </summary>
+        ReadOnlyCollection<string> Includes { get; }
 
-        internal static IObjectSubclassingController SubclassingController => ParseCorePlugins.Instance.SubclassingController;
+        /// <summary>
+        /// Serialized key selections.
+        /// </summary>
+        ReadOnlyCollection<string> KeySelections { get; }
+
+        string RedirectClassNameForKey { get; }
+
+        int? SkipAmount { get; }
+
+        int? LimitAmount { get; }
+
+        internal string ClassName { get; }
+
+        internal IServiceHub Services { get; }
 
         /// <summary>
         /// Private constructor for composition of queries. A source query is required,
         /// but the remaining values can be null if they won't be changed in this
         /// composition.
         /// </summary>
-        private ParseQuery(ParseQuery<T> source, IDictionary<string, object> where = null, IEnumerable<string> replacementOrderBy = null, IEnumerable<string> thenBy = null, int? skip = null, int? limit = null, IEnumerable<string> includes = null, IEnumerable<string> selectedKeys = null, String redirectClassNameForKey = null)
+        internal ParseQuery(ParseQuery<T> source, IDictionary<string, object> where = null, IEnumerable<string> replacementOrderBy = null, IEnumerable<string> thenBy = null, int? skip = null, int? limit = null, IEnumerable<string> includes = null, IEnumerable<string> selectedKeys = null, string redirectClassNameForKey = null)
         {
             if (source == null)
-                throw new ArgumentNullException("source");
-
-            className = source.className;
-            this.where = source.where;
-            orderBy = replacementOrderBy is null ? source.orderBy : new ReadOnlyCollection<string>(replacementOrderBy.ToList());
-            this.skip = skip is null ? source.skip : (source.skip ?? 0) + skip; // 0 could be handled differently from null
-            this.limit = limit ?? source.limit;
-            this.includes = source.includes;
-            this.selectedKeys = source.selectedKeys;
-            this.redirectClassNameForKey = redirectClassNameForKey ?? source.redirectClassNameForKey;
-
-            if (thenBy != null)
             {
-                List<string> newOrderBy = new List<string>(orderBy ?? throw new ArgumentException("You must call OrderBy before calling ThenBy."));
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            Services = source.Services;
+            ClassName = source.ClassName;
+            Filters = source.Filters;
+            Orderings = replacementOrderBy is null ? source.Orderings : new ReadOnlyCollection<string>(replacementOrderBy.ToList());
+
+            // 0 could be handled differently from null.
+
+            SkipAmount = skip is null ? source.SkipAmount : (source.SkipAmount ?? 0) + skip;
+            LimitAmount = limit ?? source.LimitAmount;
+            Includes = source.Includes;
+            KeySelections = source.KeySelections;
+            RedirectClassNameForKey = redirectClassNameForKey ?? source.RedirectClassNameForKey;
+
+            if (thenBy is { })
+            {
+                List<string> newOrderBy = new List<string>(Orderings ?? throw new ArgumentException("You must call OrderBy before calling ThenBy."));
 
                 newOrderBy.AddRange(thenBy);
-                orderBy = new ReadOnlyCollection<string>(newOrderBy);
+                Orderings = new ReadOnlyCollection<string>(newOrderBy);
             }
 
             // Remove duplicates.
-            if (orderBy != null)
-                orderBy = new ReadOnlyCollection<string>(new HashSet<string>(orderBy).ToList());
 
-            if (where != null)
-                this.where = new Dictionary<string, object>(MergeWhereClauses(where));
+            if (Orderings is { })
+            {
+                Orderings = new ReadOnlyCollection<string>(new HashSet<string>(Orderings).ToList());
+            }
 
-            if (includes != null)
-                this.includes = new ReadOnlyCollection<string>(MergeIncludes(includes).ToList());
+            if (where is { })
+            {
+                Filters = new Dictionary<string, object>(MergeWhereClauses(where));
+            }
 
-            if (selectedKeys != null)
-                this.selectedKeys = new ReadOnlyCollection<string>(MergeSelectedKeys(selectedKeys).ToList());
+            if (includes is { })
+            {
+                Includes = new ReadOnlyCollection<string>(MergeIncludes(includes).ToList());
+            }
+
+            if (selectedKeys is { })
+            {
+                KeySelections = new ReadOnlyCollection<string>(MergeSelectedKeys(selectedKeys).ToList());
+            }
         }
 
-        private HashSet<string> MergeIncludes(IEnumerable<string> includes)
+        HashSet<string> MergeIncludes(IEnumerable<string> includes)
         {
-            if (this.includes == null)
+            if (Includes is null)
+            {
                 return new HashSet<string>(includes);
-            HashSet<string> newIncludes = new HashSet<string>(this.includes);
+            }
+
+            HashSet<string> newIncludes = new HashSet<string>(Includes);
+
             foreach (string item in includes)
+            {
                 newIncludes.Add(item);
+            }
+
             return newIncludes;
         }
 
-        private HashSet<string> MergeSelectedKeys(IEnumerable<string> selectedKeys)
-        {
-            if (this.selectedKeys == null)
-                return new HashSet<string>(selectedKeys);
-            HashSet<string> newSelectedKeys = new HashSet<string>(this.selectedKeys);
-            foreach (string item in selectedKeys)
-                newSelectedKeys.Add(item);
-            return newSelectedKeys;
-        }
+        HashSet<string> MergeSelectedKeys(IEnumerable<string> selectedKeys) => new HashSet<string>((KeySelections ?? Enumerable.Empty<string>()).Concat(selectedKeys));
 
-        private IDictionary<string, object> MergeWhereClauses(IDictionary<string, object> where)
+        IDictionary<string, object> MergeWhereClauses(IDictionary<string, object> where)
         {
-            if (this.where == null)
+            if (Filters is null)
+            {
                 return where;
-            Dictionary<string, object> newWhere = new Dictionary<string, object>(this.where);
+            }
+
+            Dictionary<string, object> newWhere = new Dictionary<string, object>(Filters);
             foreach (KeyValuePair<string, object> pair in where)
             {
-                IDictionary<string, object> condition = pair.Value as IDictionary<string, object>;
                 if (newWhere.ContainsKey(pair.Key))
                 {
-                    IDictionary<string, object> oldCondition = newWhere[pair.Key] as IDictionary<string, object>;
-                    if (oldCondition == null || condition == null)
+                    if (!(newWhere[pair.Key] is IDictionary<string, object> oldCondition) || !(pair.Value is IDictionary<string, object> condition))
+                    {
                         throw new ArgumentException("More than one where clause for the given key provided.");
+                    }
+
                     Dictionary<string, object> newCondition = new Dictionary<string, object>(oldCondition);
                     foreach (KeyValuePair<string, object> conditionPair in condition)
                     {
                         if (newCondition.ContainsKey(conditionPair.Key))
+                        {
                             throw new ArgumentException("More than one condition for the given key provided.");
+                        }
+
                         newCondition[conditionPair.Key] = conditionPair.Value;
                     }
+
                     newWhere[pair.Key] = newCondition;
                 }
                 else
+                {
                     newWhere[pair.Key] = pair.Value;
+                }
             }
             return newWhere;
         }
@@ -155,41 +193,14 @@ namespace Parse
         /// <summary>
         /// Constructs a query based upon the ParseObject subclass used as the generic parameter for the ParseQuery.
         /// </summary>
-        public ParseQuery() : this(SubclassingController.GetClassName(typeof(T))) { }
+        public ParseQuery(IServiceHub serviceHub) : this(serviceHub, serviceHub.ClassController.GetClassName(typeof(T))) { }
 
         /// <summary>
         /// Constructs a query. A default query with no further parameters will retrieve
         /// all <see cref="ParseObject"/>s of the provided class.
         /// </summary>
         /// <param name="className">The name of the class to retrieve ParseObjects for.</param>
-        public ParseQuery(string className) => this.className = className ?? throw new ArgumentNullException("className", "Must specify a ParseObject class name when creating a ParseQuery.");
-
-        /// <summary>
-        /// Constructs a query that is the or of the given queries.
-        /// </summary>
-        /// <param name="queries">The list of ParseQueries to 'or' together.</param>
-        /// <returns>A ParseQquery that is the 'or' of the passed in queries.</returns>
-        public static ParseQuery<T> Or(IEnumerable<ParseQuery<T>> queries)
-        {
-            string className = null;
-            List<IDictionary<string, object>> orValue = new List<IDictionary<string, object>>();
-            // We need to cast it to non-generic IEnumerable because of AOT-limitation
-            IEnumerable nonGenericQueries = queries;
-            foreach (object obj in nonGenericQueries)
-            {
-                ParseQuery<T> q = obj as ParseQuery<T>;
-                if (className != null && q.className != className)
-                    throw new ArgumentException("All of the queries in an or query must be on the same class.");
-                className = q.className;
-                IDictionary<string, object> parameters = q.BuildParameters();
-                if (parameters.Count == 0)
-                    continue;
-                if (!parameters.TryGetValue("where", out object where) || parameters.Count > 1)
-                    throw new ArgumentException("None of the queries in an or query can have non-filtering clauses");
-                orValue.Add(where as IDictionary<string, object>);
-            }
-            return new ParseQuery<T>(new ParseQuery<T>(className), where: new Dictionary<string, object> { { "$or", orValue } });
-        }
+        public ParseQuery(IServiceHub serviceHub, string className) => (ClassName, Services) = (className ?? throw new ArgumentNullException(nameof(className), "Must specify a ParseObject class name when creating a ParseQuery."), serviceHub);
 
         #region Order By
 
@@ -270,7 +281,7 @@ namespace Parse
         /// <returns>A new query with the additional constraint.</returns>
         public ParseQuery<T> Limit(int count) => new ParseQuery<T>(this, limit: count);
 
-        internal ParseQuery<T> RedirectClassName(String key) => new ParseQuery<T>(this, redirectClassNameForKey: key);
+        internal ParseQuery<T> RedirectClassName(string key) => new ParseQuery<T>(this, redirectClassNameForKey: key);
 
         #region Where
 
@@ -431,7 +442,7 @@ namespace Parse
         /// <param name="keyInQuery">The key in the objects from the subquery to look in.</param>
         /// <param name="query">The subquery to run</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$select", new Dictionary<string, object> { { "query", query.BuildParameters(true) }, { "key", keyInQuery } } } } } });
+        public ParseQuery<T> WhereMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$select", new Dictionary<string, object> { { nameof(query), query.BuildParameters(true) }, { nameof(key), keyInQuery } } } } } });
 
         /// <summary>
         /// Adds a constraint to the query that requires a particular key's value
@@ -441,7 +452,7 @@ namespace Parse
         /// <param name="keyInQuery">The key in the objects from the subquery to look in.</param>
         /// <param name="query">The subquery to run</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereDoesNotMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$dontSelect", new Dictionary<string, object> { { "query", query.BuildParameters(true) }, { "key", keyInQuery } } } } } });
+        public ParseQuery<T> WhereDoesNotMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$dontSelect", new Dictionary<string, object> { { nameof(query), query.BuildParameters(true) }, { nameof(key), keyInQuery } } } } } });
 
         /// <summary>
         /// Adds a constraint to the query that requires that a particular key's value
@@ -509,7 +520,7 @@ namespace Parse
         /// <returns>A new query with the additional constraint.</returns>
         public ParseQuery<T> WhereWithinDistance(string key, ParseGeoPoint point, ParseGeoDistance maxDistance) => new ParseQuery<T>(WhereNear(key, point), where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$maxDistance", maxDistance.Radians } } } });
 
-        internal ParseQuery<T> WhereRelatedTo(ParseObject parent, string key) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { "$relatedTo", new Dictionary<string, object> { { "object", parent }, { "key", key } } } });
+        internal ParseQuery<T> WhereRelatedTo(ParseObject parent, string key) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { "$relatedTo", new Dictionary<string, object> { { "object", parent }, { nameof(key), key } } } });
 
         #endregion
 
@@ -527,7 +538,7 @@ namespace Parse
         public Task<IEnumerable<T>> FindAsync(CancellationToken cancellationToken)
         {
             EnsureNotInstallationQuery();
-            return QueryController.FindAsync(this, ParseUser.CurrentUser, cancellationToken).OnSuccess(t => from state in t.Result select ParseObject.FromState<T>(state, ClassName));
+            return Services.QueryController.FindAsync(this, Services.GetCurrentUser(), cancellationToken).OnSuccess(task => from state in task.Result select Services.GenerateObjectFromState<T>(state, ClassName));
         }
 
         /// <summary>
@@ -544,14 +555,14 @@ namespace Parse
         public Task<T> FirstOrDefaultAsync(CancellationToken cancellationToken)
         {
             EnsureNotInstallationQuery();
-            return QueryController.FirstAsync(this, ParseUser.CurrentUser, cancellationToken).OnSuccess(t => t.Result is IObjectState state && state != null ? ParseObject.FromState<T>(state, ClassName) : default(T));
+            return Services.QueryController.FirstAsync(this, Services.GetCurrentUser(), cancellationToken).OnSuccess(task => task.Result is IObjectState state && state is { } ? Services.GenerateObjectFromState<T>(state, ClassName) : default);
         }
 
         /// <summary>
         /// Retrieves at most one ParseObject that satisfies this query.
         /// </summary>
         /// <returns>A single ParseObject that satisfies this query.</returns>
-        /// <exception cref="ParseException">If no results match the query.</exception>
+        /// <exception cref="ParseFailureException">If no results match the query.</exception>
         public Task<T> FirstAsync() => FirstAsync(CancellationToken.None);
 
         /// <summary>
@@ -559,8 +570,8 @@ namespace Parse
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A single ParseObject that satisfies this query.</returns>
-        /// <exception cref="ParseException">If no results match the query.</exception>
-        public Task<T> FirstAsync(CancellationToken cancellationToken) => FirstOrDefaultAsync(cancellationToken).OnSuccess(t => t.Result ?? throw new ParseException(ParseException.ErrorCode.ObjectNotFound, "No results matched the query."));
+        /// <exception cref="ParseFailureException">If no results match the query.</exception>
+        public Task<T> FirstAsync(CancellationToken cancellationToken) => FirstOrDefaultAsync(cancellationToken).OnSuccess(task => task.Result ?? throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, "No results matched the query."));
 
         /// <summary>
         /// Counts the number of objects that match this query.
@@ -576,7 +587,7 @@ namespace Parse
         public Task<int> CountAsync(CancellationToken cancellationToken)
         {
             EnsureNotInstallationQuery();
-            return QueryController.CountAsync(this, ParseUser.CurrentUser, cancellationToken);
+            return Services.QueryController.CountAsync(this, Services.GetCurrentUser(), cancellationToken);
         }
 
         /// <summary>
@@ -596,38 +607,38 @@ namespace Parse
         /// <returns>The ParseObject for the given objectId.</returns>
         public Task<T> GetAsync(string objectId, CancellationToken cancellationToken)
         {
-            ParseQuery<T> singleItemQuery = new ParseQuery<T>(className).WhereEqualTo("objectId", objectId);
-            singleItemQuery = new ParseQuery<T>(singleItemQuery, includes: includes, selectedKeys: selectedKeys, limit: 1);
-            return singleItemQuery.FindAsync(cancellationToken).OnSuccess(t => t.Result.FirstOrDefault() ?? throw new ParseException(ParseException.ErrorCode.ObjectNotFound, "Object with the given objectId not found."));
+            ParseQuery<T> singleItemQuery = new ParseQuery<T>(Services, ClassName).WhereEqualTo(nameof(objectId), objectId);
+            singleItemQuery = new ParseQuery<T>(singleItemQuery, includes: Includes, selectedKeys: KeySelections, limit: 1);
+            return singleItemQuery.FindAsync(cancellationToken).OnSuccess(t => t.Result.FirstOrDefault() ?? throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, "Object with the given objectId not found."));
         }
 
-        internal object GetConstraint(string key) => where?.GetOrDefault(key, null);
+        internal object GetConstraint(string key) => Filters?.GetOrDefault(key, null);
 
         internal IDictionary<string, object> BuildParameters(bool includeClassName = false)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
-            if (where != null)
-                result["where"] = PointerOrLocalIdEncoder.Instance.Encode(where);
-            if (orderBy != null)
-                result["order"] = String.Join(",", orderBy.ToArray());
-            if (skip != null)
-                result["skip"] = skip.Value;
-            if (limit != null)
-                result["limit"] = limit.Value;
-            if (includes != null)
-                result["include"] = String.Join(",", includes.ToArray());
-            if (selectedKeys != null)
-                result["keys"] = String.Join(",", selectedKeys.ToArray());
+            if (Filters != null)
+                result[nameof(Filters)] = PointerOrLocalIdEncoder.Instance.Encode(Filters);
+            if (Orderings != null)
+                result["order"] = String.Join(",", Orderings.ToArray());
+            if (SkipAmount != null)
+                result[nameof(SkipAmount)] = SkipAmount.Value;
+            if (LimitAmount != null)
+                result[nameof(LimitAmount)] = LimitAmount.Value;
+            if (Includes != null)
+                result["include"] = String.Join(",", Includes.ToArray());
+            if (KeySelections != null)
+                result["keys"] = String.Join(",", KeySelections.ToArray());
             if (includeClassName)
-                result["className"] = className;
-            if (redirectClassNameForKey != null)
-                result["redirectClassNameForKey"] = redirectClassNameForKey;
+                result[nameof(ClassName)] = ClassName;
+            if (RedirectClassNameForKey != null)
+                result[nameof(RedirectClassNameForKey)] = RedirectClassNameForKey;
             return result;
         }
 
-        private string RegexQuote(string input) => "\\Q" + input.Replace("\\E", "\\E\\\\E\\Q") + "\\E";
+        string RegexQuote(string input) => "\\Q" + input.Replace("\\E", "\\E\\\\E\\Q") + "\\E";
 
-        private string GetRegexOptions(Regex regex, string modifiers)
+        string GetRegexOptions(Regex regex, string modifiers)
         {
             string result = modifiers ?? "";
             if (regex.Options.HasFlag(RegexOptions.IgnoreCase) && !modifiers.Contains("i"))
@@ -637,7 +648,7 @@ namespace Parse
             return result;
         }
 
-        private IDictionary<string, object> EncodeRegex(Regex regex, string modifiers)
+        IDictionary<string, object> EncodeRegex(Regex regex, string modifiers)
         {
             string options = GetRegexOptions(regex, modifiers);
             Dictionary<string, object> dict = new Dictionary<string, object> { ["$regex"] = regex.ToString() };
@@ -646,10 +657,10 @@ namespace Parse
             return dict;
         }
 
-        private void EnsureNotInstallationQuery()
+        void EnsureNotInstallationQuery()
         {
             // The ParseInstallation class is not accessible from this project; using string literal.
-            if (className.Equals("_Installation"))
+            if (ClassName.Equals("_Installation"))
                 throw new InvalidOperationException("Cannot directly query the Installation class.");
         }
 
@@ -658,7 +669,7 @@ namespace Parse
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c></returns>
-        public override bool Equals(object obj) => obj == null || !(obj is ParseQuery<T> other) ? false : Equals(className, other.ClassName) && where.CollectionsEqual(other.where) && orderBy.CollectionsEqual(other.orderBy) && includes.CollectionsEqual(other.includes) && selectedKeys.CollectionsEqual(other.selectedKeys) && Equals(skip, other.skip) && Equals(limit, other.limit);
+        public override bool Equals(object obj) => obj == null || !(obj is ParseQuery<T> other) ? false : Equals(ClassName, other.ClassName) && Filters.CollectionsEqual(other.Filters) && Orderings.CollectionsEqual(other.Orderings) && Includes.CollectionsEqual(other.Includes) && KeySelections.CollectionsEqual(other.KeySelections) && Equals(SkipAmount, other.SkipAmount) && Equals(LimitAmount, other.LimitAmount);
 
         /// <summary>
         /// Serves as the default hash function.

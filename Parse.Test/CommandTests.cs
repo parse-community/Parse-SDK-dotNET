@@ -23,8 +23,8 @@ namespace Parse.Test
         [TestInitialize]
         public void SetUp()
         {
-            ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
-            MockMetadataController.Setup(metadata => metadata.HostVersioningData).Returns(new HostApplicationVersioningData { BuildVersion = "1", DisplayVersion = "1", HostOSVersion = "1" });
+            ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
+            MockMetadataController.Setup(metadata => metadata.HostManifestData).Returns(new HostManifestData { Version = "1", ShortVersion = "1", HostOSVersion = "1" });
         }
 
         [TestCleanup]
@@ -35,7 +35,7 @@ namespace Parse.Test
         {
             ParseCommand command = new ParseCommand("endpoint", method: "GET", sessionToken: "abcd", headers: null, data: null);
 
-            Assert.AreEqual("/1/endpoint", command.Uri.AbsolutePath);
+            Assert.AreEqual("/1/endpoint", command.Target.AbsolutePath);
             Assert.AreEqual("GET", command.Method);
             Assert.IsTrue(command.Headers.Any(pair => pair.Key == "X-Parse-Session-Token" && pair.Value == "abcd"));
         }
@@ -47,7 +47,7 @@ namespace Parse.Test
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
             Task<Tuple<HttpStatusCode, string>> fakeResponse = Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "{}"));
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(fakeResponse);
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
             mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
@@ -66,7 +66,7 @@ namespace Parse.Test
         {
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "[]")));
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "[]")));
 
             mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
@@ -87,7 +87,7 @@ namespace Parse.Test
         {
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "invalid")));
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "invalid")));
 
             mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
@@ -95,8 +95,8 @@ namespace Parse.Test
             {
                 Assert.IsTrue(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseException));
-                Assert.AreEqual(ParseException.ErrorCode.OtherCause, (t.Exception.InnerException as ParseException).Code);
+                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseFailureException));
+                Assert.AreEqual(ParseFailureException.ErrorCode.OtherCause, (t.Exception.InnerException as ParseFailureException).Code);
             });
         }
 
@@ -106,7 +106,7 @@ namespace Parse.Test
         {
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<HttpRequest>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.NotFound, "{ \"code\": 101, \"error\": \"Object not found.\" }")));
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.NotFound, "{ \"code\": 101, \"error\": \"Object not found.\" }")));
 
             mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
@@ -114,9 +114,9 @@ namespace Parse.Test
             {
                 Assert.IsTrue(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseException));
-                ParseException parseException = t.Exception.InnerException as ParseException;
-                Assert.AreEqual(ParseException.ErrorCode.ObjectNotFound, parseException.Code);
+                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseFailureException));
+                ParseFailureException parseException = t.Exception.InnerException as ParseFailureException;
+                Assert.AreEqual(ParseFailureException.ErrorCode.ObjectNotFound, parseException.Code);
                 Assert.AreEqual("Object not found.", parseException.Message);
             });
         }
@@ -128,15 +128,15 @@ namespace Parse.Test
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
             
-            mockHttpClient.Setup(client => client.ExecuteAsync(It.IsAny<HttpRequest>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.InternalServerError, null)));
+            mockHttpClient.Setup(client => client.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.InternalServerError, null)));
             mockInstallationIdController.Setup(installationController => installationController.GetAsync()).Returns(Task.FromResult<Guid?>(null));
 
             return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, MockMetadataController.Object).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null)).ContinueWith(t =>
             {
                 Assert.IsTrue(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseException));
-                Assert.AreEqual(ParseException.ErrorCode.InternalServerError, (t.Exception.InnerException as ParseException).Code);
+                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseFailureException));
+                Assert.AreEqual(ParseFailureException.ErrorCode.InternalServerError, (t.Exception.InnerException as ParseFailureException).Code);
             });
         }
     }

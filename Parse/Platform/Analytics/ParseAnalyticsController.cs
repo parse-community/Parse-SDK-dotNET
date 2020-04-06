@@ -34,12 +34,12 @@ namespace Parse.Analytics.Internal
             IDictionary<string, object> data = new Dictionary<string, object>
             {
                 ["at"] = DateTime.Now,
-                ["name"] = name,
+                [nameof(name)] = name,
             };
 
             if (dimensions != null)
             {
-                data["dimensions"] = dimensions;
+                data[nameof(dimensions)] = dimensions;
             }
 
             return Runner.RunCommandAsync(new ParseCommand("events/" + name, "POST", sessionToken, data: PointerOrLocalIdEncoder.Instance.Encode(data) as IDictionary<string, object>), cancellationToken: cancellationToken);

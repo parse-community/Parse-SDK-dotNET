@@ -9,17 +9,16 @@ namespace Parse.Core.Internal
     /// </summary>
     public class ParseDeleteOperation : IParseFieldOperation
     {
-        internal static readonly object DeleteToken = new object();
-        private static ParseDeleteOperation _Instance = new ParseDeleteOperation();
-        public static ParseDeleteOperation Instance => _Instance;
+        internal static object Token { get; } = new object { };
+
+        public static ParseDeleteOperation Instance { get; } = new ParseDeleteOperation { };
 
         private ParseDeleteOperation() { }
-        public object Encode() => new Dictionary<string, object> {
-        {"__op", "Delete"}
-      };
+
+        public object Encode() => new Dictionary<string, object> { ["__op"] = "Delete" };
 
         public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => this;
 
-        public object Apply(object oldValue, string key) => DeleteToken;
+        public object Apply(object oldValue, string key) => Token;
     }
 }

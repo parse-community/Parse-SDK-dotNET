@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 using Parse.Management;
@@ -18,84 +19,59 @@ namespace Parse
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class ParseRelationBase : IJsonConvertible
     {
-        private ParseObject parent;
-        private string key;
-        private string targetClassName;
+        ParseObject Parent { get; set; }
+
+        string Key { get; set; }
 
         internal ParseRelationBase(ParseObject parent, string key) => EnsureParentAndKey(parent, key);
 
-        internal ParseRelationBase(ParseObject parent, string key, string targetClassName)
-          : this(parent, key) => this.targetClassName = targetClassName;
-
-        internal static IObjectSubclassingController SubclassingController => ParseCorePlugins.Instance.SubclassingController;
+        internal ParseRelationBase(ParseObject parent, string key, string targetClassName) : this(parent, key) => TargetClassName = targetClassName;
 
         internal void EnsureParentAndKey(ParseObject parent, string key)
         {
-            this.parent ??= parent;
-            this.key ??= key;
-            Debug.Assert(this.parent == parent, "Relation retrieved from two different objects");
-            Debug.Assert(this.key == key, "Relation retrieved from two different keys");
+            Parent ??= parent;
+            Key ??= key;
+
+            Debug.Assert(Parent == parent, "Relation retrieved from two different objects");
+            Debug.Assert(Key == key, "Relation retrieved from two different keys");
         }
 
-        internal void Add(ParseObject obj)
+        internal void Add(ParseObject entity)
         {
-            ParseRelationOperation change = new ParseRelationOperation(new[] { obj }, null);
-            parent.PerformOperation(key, change);
-            targetClassName = change.TargetClassName;
+            ParseRelationOperation change = new ParseRelationOperation(Parent.Client.ClassController, new[] { entity }, default);
+
+            Parent.PerformOperation(Key, change);
+            TargetClassName = change.TargetClassName;
         }
 
-        internal void Remove(ParseObject obj)
+        internal void Remove(ParseObject entity)
         {
-            ParseRelationOperation change = new ParseRelationOperation(null, new[] { obj });
-            parent.PerformOperation(key, change);
-            targetClassName = change.TargetClassName;
+            ParseRelationOperation change = new ParseRelationOperation(Parent.Client.ClassController, default, new[] { entity });
+
+            Parent.PerformOperation(Key, change);
+            TargetClassName = change.TargetClassName;
         }
 
-        IDictionary<string, object> IJsonConvertible.ToJSON() => new Dictionary<string, object> {
-        {"__type", "Relation"},
-        {"className", targetClassName}
-      };
-
-        internal ParseQuery<T> GetQuery<T>() where T : ParseObject
+        IDictionary<string, object> IJsonConvertible.ConvertToJSON() => new Dictionary<string, object>
         {
-            if (targetClassName != null)
-            {
-                return new ParseQuery<T>(targetClassName)
-                  .WhereRelatedTo(parent, key);
-            }
+            ["__type"] = "Relation",
+            ["className"] = TargetClassName
+        };
 
-            return new ParseQuery<T>(parent.ClassName)
-              .RedirectClassName(key)
-              .WhereRelatedTo(parent, key);
-        }
+        internal ParseQuery<T> GetQuery<T>() where T : ParseObject => TargetClassName is { } ? new ParseQuery<T>(Parent.Client, TargetClassName).WhereRelatedTo(Parent, Key) : new ParseQuery<T>(Parent.Client, Parent.ClassName).RedirectClassName(Key).WhereRelatedTo(Parent, Key);
 
-        internal string TargetClassName
-        {
-            get => targetClassName;
-            set => targetClassName = value;
-        }
+        internal string TargetClassName { get; set; }
 
         /// <summary>
         /// Produces the proper ParseRelation&lt;T&gt; instance for the given classname.
         /// </summary>
-        internal static ParseRelationBase CreateRelation(ParseObject parent,
-            string key,
-            string targetClassName)
+        internal static ParseRelationBase CreateRelation(ParseObject parent, string key, string targetClassName)
         {
-            Type targetType = SubclassingController.GetType(targetClassName) ?? typeof(ParseObject);
-
-            Expression<Func<ParseRelation<ParseObject>>> createRelationExpr =
-                () => CreateRelation<ParseObject>(parent, key, targetClassName);
-            MethodInfo createRelationMethod =
-                ((MethodCallExpression) createRelationExpr.Body)
-                .Method
-                .GetGenericMethodDefinition()
-                .MakeGenericMethod(targetType);
-            return (ParseRelationBase) createRelationMethod.Invoke(null, new object[] { parent, key, targetClassName });
+            Expression<Func<ParseRelation<ParseObject>>> createRelationExpr = () => CreateRelation<ParseObject>(parent, key, targetClassName);
+            return (createRelationExpr.Body as MethodCallExpression).Method.GetGenericMethodDefinition().MakeGenericMethod(parent.Client.ClassController.GetType(targetClassName) ?? typeof(ParseObject)).Invoke(default, new object[] { parent, key, targetClassName }) as ParseRelationBase;
         }
 
-        private static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName)
-            where T : ParseObject => new ParseRelation<T>(parent, key, targetClassName);
+        static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName) where T : ParseObject => new ParseRelation<T>(parent, key, targetClassName);
     }
 
     /// <summary>
@@ -105,11 +81,9 @@ namespace Parse
     /// <typeparam name="T">The type of the child objects.</typeparam>
     public sealed class ParseRelation<T> : ParseRelationBase where T : ParseObject
     {
-
         internal ParseRelation(ParseObject parent, string key) : base(parent, key) { }
 
-        internal ParseRelation(ParseObject parent, string key, string targetClassName)
-          : base(parent, key, targetClassName) { }
+        internal ParseRelation(ParseObject parent, string key, string targetClassName) : base(parent, key, targetClassName) { }
 
         /// <summary>
         /// Adds an object to this relation. The object must already have been saved.

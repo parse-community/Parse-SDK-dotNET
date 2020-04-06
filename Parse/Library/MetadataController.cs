@@ -8,8 +8,13 @@ namespace Parse.Library
     public class MetadataController : IMetadataController
     {
         /// <summary>
-        /// The version information of your application environment.
+        /// Information about your app.
         /// </summary>
-        public IHostApplicationVersioningData HostVersioningData { get; set; }
+        public IHostManifestData HostManifestData { get; set; }
+
+        /// <summary>
+        /// Information about the environment the library is operating in.
+        /// </summary>
+        public IEnvironmentData EnvironmentData { get; set; }
     }
 }

@@ -10,47 +10,24 @@ using Parse.Common.Internal;
 namespace Parse.Core.Internal
 {
     /// <summary>
-    /// ParseCommand is an <see cref="HttpRequest"/> with pre-populated
+    /// ParseCommand is an <see cref="WebRequest"/> with pre-populated
     /// headers.
     /// </summary>
-    public class ParseCommand : HttpRequest
+    public class ParseCommand : WebRequest
     {
         public IDictionary<string, object> DataObject { get; private set; }
+
         public override Stream Data
         {
-            get
-            {
-                if (base.Data != null)
-                {
-                    return base.Data;
-                }
-
-                return base.Data = (DataObject != null
-                  ? new MemoryStream(Encoding.UTF8.GetBytes(Json.Encode(DataObject)))
-                  : null);
-            }
+            get => base.Data ??= DataObject is { } ? new MemoryStream(Encoding.UTF8.GetBytes(Json.Encode(DataObject))) : default;
             set => base.Data = value;
         }
 
-        public ParseCommand(string relativeUri,
-            string method,
-            string sessionToken = null,
-            IList<KeyValuePair<string, string>> headers = null,
-            IDictionary<string, object> data = null) : this(relativeUri: relativeUri,
-                method: method,
-                sessionToken: sessionToken,
-                headers: headers,
-                stream: null,
-                contentType: data != null ? "application/json" : null) => DataObject = data;
+        public ParseCommand(string relativeUri, string method, string sessionToken = null, IList<KeyValuePair<string, string>> headers = null, IDictionary<string, object> data = null) : this(relativeUri: relativeUri, method: method, sessionToken: sessionToken, headers: headers, stream: null, contentType: data != null ? "application/json" : null) => DataObject = data;
 
-        public ParseCommand(string relativeUri,
-            string method,
-            string sessionToken = null,
-            IList<KeyValuePair<string, string>> headers = null,
-            Stream stream = null,
-            string contentType = null)
+        public ParseCommand(string relativeUri, string method, string sessionToken = null, IList<KeyValuePair<string, string>> headers = null, Stream stream = null, string contentType = null)
         {
-            Uri = new Uri(new Uri(ParseClient.Configuration.ServerURI), relativeUri);
+            Path = relativeUri;
             Method = method;
             Data = stream;
             Headers = new List<KeyValuePair<string, string>>(headers ?? Enumerable.Empty<KeyValuePair<string, string>>());
@@ -59,6 +36,7 @@ namespace Parse.Core.Internal
             {
                 Headers.Add(new KeyValuePair<string, string>("X-Parse-Session-Token", sessionToken));
             }
+
             if (!String.IsNullOrEmpty(contentType))
             {
                 Headers.Add(new KeyValuePair<string, string>("Content-Type", contentType));
@@ -67,7 +45,8 @@ namespace Parse.Core.Internal
 
         public ParseCommand(ParseCommand other)
         {
-            Uri = other.Uri;
+            Resource = other.Resource;
+            Path = other.Path;
             Method = other.Method;
             DataObject = other.DataObject;
             Headers = new List<KeyValuePair<string, string>>(other.Headers);

@@ -10,6 +10,6 @@ namespace Parse.Push.Internal
         IParsePushChannelsController PushChannelsController { get; }
         IParsePushController PushController { get; }
         IParseCurrentInstallationController CurrentInstallationController { get; }
-        IDeviceInfoController DeviceInfoController { get; }
+        IParseInstallationDataFinalizer DeviceInfoController { get; }
     }
 }

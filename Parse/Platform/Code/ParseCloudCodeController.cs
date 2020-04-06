@@ -11,28 +11,20 @@ namespace Parse.Core.Internal
 {
     public class ParseCloudCodeController : IParseCloudCodeController
     {
-        private readonly IParseCommandRunner commandRunner;
+        IParseCommandRunner CommandRunner { get; }
 
-        public ParseCloudCodeController(IParseCommandRunner commandRunner) => this.commandRunner = commandRunner;
+        IParseDataDecoder Decoder { get; }
 
-        public Task<T> CallFunctionAsync<T>(string name,
-            IDictionary<string, object> parameters,
-            string sessionToken,
-            CancellationToken cancellationToken)
+        public ParseCloudCodeController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
+
+        public Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, CancellationToken cancellationToken)
         {
-            ParseCommand command = new ParseCommand(String.Format("functions/{0}", Uri.EscapeUriString(name)),
-                method: "POST",
-                sessionToken: sessionToken,
-                data: NoObjectsEncoder.Instance.Encode(parameters) as IDictionary<string, object>);
+            ParseCommand command = new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken, data: NoObjectsEncoder.Instance.Encode(parameters) as IDictionary<string, object>);
 
-            return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t =>
+            return CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(task =>
             {
-                IDictionary<string, object> decoded = ParseDecoder.Instance.Decode(t.Result.Item2) as IDictionary<string, object>;
-                if (!decoded.ContainsKey("result"))
-                {
-                    return default(T);
-                }
-                return Conversion.To<T>(decoded["result"]);
+                IDictionary<string, object> decoded = Decoder.Decode(task.Result.Item2) as IDictionary<string, object>;
+                return !decoded.ContainsKey("result") ? default : Conversion.To<T>(decoded["result"]);
             });
         }
     }

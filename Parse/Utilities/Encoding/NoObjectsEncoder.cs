@@ -5,17 +5,16 @@ using System.Collections.Generic;
 
 namespace Parse.Core.Internal
 {
+    // This class isn't really a Singleton, but since it has no state, it's more efficient to get the default instance.
+
     /// <summary>
-    /// A <see cref="ParseEncoder"/> that throws an exception if it attempts to encode
+    /// A <see cref="ParseDataEncoder"/> that throws an exception if it attempts to encode
     /// a <see cref="ParseObject"/>
     /// </summary>
-    public class NoObjectsEncoder : ParseEncoder
+    public class NoObjectsEncoder : ParseDataEncoder
     {
-        // This class isn't really a Singleton, but since it has no state, it's more efficient to get
-        // the default instance.
-        private static readonly NoObjectsEncoder instance = new NoObjectsEncoder();
-        public static NoObjectsEncoder Instance => instance;
+        public static NoObjectsEncoder Instance { get; } = new NoObjectsEncoder();
 
-        protected override IDictionary<string, object> EncodeParseObject(ParseObject value) => throw new ArgumentException("ParseObjects not allowed here.");
+        protected override IDictionary<string, object> EncodeObject(ParseObject value) => throw new ArgumentException("ParseObjects not allowed here.");
     }
 }

@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
@@ -19,17 +20,21 @@ namespace Parse.Core.Internal
         IWebClient WebClient { get; }
         IParseInstallationController InstallationController { get; }
         IMetadataController MetadataController { get; }
+        IServerConnectionData ServerConnectionData { get; }
+        Lazy<IParseUserController> UserController { get; }
 
         /// <summary>
         /// Creates a new Parse SDK command runner.
         /// </summary>
         /// <param name="webClient">The <see cref="IWebClient"/> implementation instance to use.</param>
-        /// <param name="installationIdController">The <see cref="IParseInstallationController"/> implementation instance to use.</param>
-        public ParseCommandRunner(IWebClient webClient, IParseInstallationController installationIdController, IMetadataController metadataController)
+        /// <param name="installationController">The <see cref="IParseInstallationController"/> implementation instance to use.</param>
+        public ParseCommandRunner(IWebClient webClient, IParseInstallationController installationController, IMetadataController metadataController, IServerConnectionData serverConnectionData, Lazy<IParseUserController> userController)
         {
             WebClient = webClient;
-            InstallationController = installationIdController;
+            InstallationController = installationController;
             MetadataController = metadataController;
+            ServerConnectionData = serverConnectionData;
+            UserController = userController;
         }
 
         /// <summary>
@@ -40,101 +45,100 @@ namespace Parse.Core.Internal
         /// <param name="downloadProgress">An <see cref="IProgress{ParseDownloadProgressEventArgs}"/> instance to push download progress data to.</param>
         /// <param name="cancellationToken">An asynchronous operation cancellation token that dictates if and when the operation should be cancelled.</param>
         /// <returns></returns>
-        public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command, IProgress<ParseUploadProgressEventArgs> uploadProgress = null, IProgress<ParseDownloadProgressEventArgs> downloadProgress = null, CancellationToken cancellationToken = default) => PrepareCommand(command).ContinueWith(commandTask =>
+        public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command, IProgress<IDataTransferLevel> uploadProgress = null, IProgress<IDataTransferLevel> downloadProgress = null, CancellationToken cancellationToken = default) => PrepareCommand(command).ContinueWith(commandTask => WebClient.ExecuteAsync(commandTask.Result, uploadProgress, downloadProgress, cancellationToken).OnSuccess(task =>
         {
-            return WebClient.ExecuteAsync(commandTask.Result, uploadProgress, downloadProgress, cancellationToken).OnSuccess(t =>
+            cancellationToken.ThrowIfCancellationRequested();
+
+            Tuple<HttpStatusCode, string> response = task.Result;
+            string content = response.Item2;
+            int responseCode = (int) response.Item1;
+
+            if (responseCode >= 500)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                // Server error, return InternalServerError.
 
-                Tuple<HttpStatusCode, string> response = t.Result;
-                string contentString = response.Item2;
-                int responseCode = (int) response.Item1;
-                if (responseCode >= 500)
-                {
-                    // Server error, return InternalServerError.
-                    throw new ParseException(ParseException.ErrorCode.InternalServerError, response.Item2);
-                }
-                else if (contentString != null)
-                {
-                    IDictionary<string, object> contentJson = null;
-                    try
-                    {
-                        // TODO: Newer versions of Parse Server send the failure results back as HTML.
-                        contentJson = contentString.StartsWith("[")
-                                                                                                                                                                                                                                                                                                                            ? new Dictionary<string, object> { ["results"] = Json.Parse(contentString) }
-                                                                                                                                                                                                                                                                                                                            : Json.Parse(contentString) as IDictionary<string, object>;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ParseException(ParseException.ErrorCode.OtherCause, "Invalid or alternatively-formatted response recieved from server.", e);
-                    }
-                    if (responseCode < 200 || responseCode > 299)
-                    {
-                        int code = (int) (contentJson.ContainsKey("code") ? (long) contentJson["code"] : (int) ParseException.ErrorCode.OtherCause);
-                        string error = contentJson.ContainsKey("error") ?
-                            contentJson["error"] as string :
-                            contentString;
-                        throw new ParseException((ParseException.ErrorCode) code, error);
-                    }
-                    return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, contentJson);
-                }
-                return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, null);
-            });
-        }).Unwrap();
+                throw new ParseFailureException(ParseFailureException.ErrorCode.InternalServerError, response.Item2);
+            }
+            else if (content is { })
+            {
+                IDictionary<string, object> contentJson = default;
 
-        private const string revocableSessionTokentrueValue = "1";
-        private Task<ParseCommand> PrepareCommand(ParseCommand command)
+                try
+                {
+                    // TODO: Newer versions of Parse Server send the failure results back as HTML.
+
+                    contentJson = content.StartsWith("[") ? new Dictionary<string, object> { ["results"] = Json.Parse(content) } : Json.Parse(content) as IDictionary<string, object>;
+                }
+                catch (Exception e)
+                {
+                    throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Invalid or alternatively-formatted response recieved from server.", e);
+                }
+
+                if (responseCode < 200 || responseCode > 299)
+                {
+                    throw new ParseFailureException(contentJson.ContainsKey("code") ? (ParseFailureException.ErrorCode) contentJson["code"] : ParseFailureException.ErrorCode.OtherCause, contentJson.ContainsKey("error") ? contentJson["error"] as string : content);
+                }
+
+                return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, contentJson);
+            }
+            return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, null);
+        })).Unwrap();
+
+        Task<ParseCommand> PrepareCommand(ParseCommand command)
         {
-            ParseCommand newCommand = new ParseCommand(command);
-
-            Task<ParseCommand> installationIdTask = InstallationController.GetAsync().ContinueWith(t =>
+            ParseCommand newCommand = new ParseCommand(command)
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Installation-Id", t.Result.ToString()));
+                Resource = ServerConnectionData.ServerURI
+            };
+
+            Task<ParseCommand> installationIdFetchTask = InstallationController.GetAsync().ContinueWith(task =>
+            {
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Installation-Id", task.Result.ToString()));
+
                 return newCommand;
             });
 
-            // TODO (richardross): Inject configuration instead of using shared static here.
-            Configuration configuration = ParseClient.Configuration;
-            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", configuration.ApplicationID));
+            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", ServerConnectionData.ApplicationID));
             newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.Version.ToString()));
 
-            if (configuration.AuxiliaryHeaders != null)
+            if (ServerConnectionData.Headers != null)
             {
-                foreach (KeyValuePair<string, string> header in configuration.AuxiliaryHeaders)
+                foreach (KeyValuePair<string, string> header in ServerConnectionData.Headers)
                 {
                     newCommand.Headers.Add(header);
                 }
             }
 
-            if (!String.IsNullOrEmpty(MetadataController.HostVersioningData.BuildVersion))
+            if (!String.IsNullOrEmpty(MetadataController.HostManifestData.Version))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", MetadataController.HostVersioningData.BuildVersion));
-            }
-            if (!String.IsNullOrEmpty(MetadataController.HostVersioningData.DisplayVersion))
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", MetadataController.HostVersioningData.DisplayVersion));
-            }
-            if (!String.IsNullOrEmpty(MetadataController.HostVersioningData.HostOSVersion))
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", MetadataController.HostVersioningData.HostOSVersion));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", MetadataController.HostManifestData.Version));
             }
 
-            if (!String.IsNullOrEmpty(configuration.MasterKey))
+            if (!String.IsNullOrEmpty(MetadataController.HostManifestData.ShortVersion))
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", configuration.MasterKey));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", MetadataController.HostManifestData.ShortVersion));
+            }
+
+            if (!String.IsNullOrEmpty(MetadataController.EnvironmentData.OSVersion))
+            {
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", MetadataController.EnvironmentData.OSVersion));
+            }
+
+            if (!String.IsNullOrEmpty(ServerConnectionData.MasterKey))
+            {
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", ServerConnectionData.MasterKey));
             }
             else
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Windows-Key", configuration.Key));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Windows-Key", ServerConnectionData.Key));
             }
 
-            // TODO (richardross): Inject this instead of using static here.
-            if (ParseUser.IsRevocableSessionEnabled)
+            if (UserController.Value.RevocableSessionEnabled)
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Revocable-Session", revocableSessionTokentrueValue));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Revocable-Session", "1"));
             }
 
-            return installationIdTask;
+            return installationIdFetchTask;
         }
     }
 }

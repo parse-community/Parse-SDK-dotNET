@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Common.Internal;
+using Parse.Abstractions.Library;
 using Parse.Push.Internal;
 
 namespace Parse
@@ -14,20 +14,21 @@ namespace Parse
     /// </summary>
     public partial class ParsePush
     {
-        private object mutex;
-        private IPushState state;
+        object Mutex { get; } = new object { };
+
+        IPushState State { get; set; }
+
+        IServiceHub Services { get; }
+
+#warning Make default(IServiceHub) the default value of serviceHub once all dependents properly inject it.
 
         /// <summary>
         /// Creates a push which will target every device. The Data field must be set before calling SendAsync.
         /// </summary>
-        public ParsePush()
+        public ParsePush(IServiceHub serviceHub)
         {
-            mutex = new object();
-            // Default to everyone.
-            state = new MutablePushState
-            {
-                Query = ParseInstallation.Query
-            };
+            Services = serviceHub ?? ParseClient.Instance;
+            State = new MutablePushState { Query = Services.GetInstallationQuery() };
         }
 
         #region Properties
@@ -39,15 +40,16 @@ namespace Parse
         /// </summary>
         public ParseQuery<ParseInstallation> Query
         {
-            get => state.Query;
-            set => MutateState(s =>
-                 {
-                     if (s.Channels != null && value != null && value.GetConstraint("channels") != null)
-                     {
-                         throw new InvalidOperationException("A push may not have both Channels and a Query with a channels constraint");
-                     }
-                     s.Query = value;
-                 });
+            get => State.Query;
+            set => MutateState(state =>
+            {
+                if (state.Channels is { } && value is { } && value.GetConstraint("channels") is { })
+                {
+                    throw new InvalidOperationException("A push may not have both Channels and a Query with a channels constraint.");
+                }
+
+                state.Query = value;
+            });
         }
 
         /// <summary>
@@ -63,15 +65,16 @@ namespace Parse
         /// </summary>
         public IEnumerable<string> Channels
         {
-            get => state.Channels;
-            set => MutateState(s =>
-                 {
-                     if (value != null && s.Query != null && s.Query.GetConstraint("channels") != null)
-                     {
-                         throw new InvalidOperationException("A push may not have both Channels and a Query with a channels constraint");
-                     }
-                     s.Channels = value;
-                 });
+            get => State.Channels;
+            set => MutateState(state =>
+            {
+                if (value is { } && state.Query is { } && state.Query.GetConstraint("channels") is { })
+                {
+                    throw new InvalidOperationException("A push may not have both Channels and a Query with a channels constraint.");
+                }
+
+                state.Channels = value;
+            });
         }
 
         /// <summary>
@@ -79,15 +82,16 @@ namespace Parse
         /// </summary>
         public DateTime? Expiration
         {
-            get => state.Expiration;
-            set => MutateState(s =>
-                 {
-                     if (s.ExpirationInterval != null)
-                     {
-                         throw new InvalidOperationException("Cannot set Expiration after setting ExpirationInterval");
-                     }
-                     s.Expiration = value;
-                 });
+            get => State.Expiration;
+            set => MutateState(state =>
+            {
+                if (state.ExpirationInterval is { })
+                {
+                    throw new InvalidOperationException("Cannot set Expiration after setting ExpirationInterval.");
+                }
+
+                state.Expiration = value;
+            });
         }
 
         /// <summary>
@@ -95,16 +99,18 @@ namespace Parse
         /// </summary>
         public DateTime? PushTime
         {
-            get => state.PushTime;
-            set => MutateState(s =>
-                 {
-                     DateTime now = DateTime.Now;
-                     if (value < now || value > now.AddDays(14))
-                     {
-                         throw new InvalidOperationException("Cannot set PushTime in the past or more than two weeks later than now");
-                     }
-                     s.PushTime = value;
-                 });
+            get => State.PushTime;
+            set => MutateState(state =>
+            {
+                DateTime now = DateTime.Now;
+
+                if (value < now || value > now.AddDays(14))
+                {
+                    throw new InvalidOperationException("Cannot set PushTime in the past or more than two weeks later than now.");
+                }
+
+                state.PushTime = value;
+            });
         }
 
         /// <summary>
@@ -112,15 +118,16 @@ namespace Parse
         /// </summary>
         public TimeSpan? ExpirationInterval
         {
-            get => state.ExpirationInterval;
-            set => MutateState(s =>
-                 {
-                     if (s.Expiration != null)
-                     {
-                         throw new InvalidOperationException("Cannot set ExpirationInterval after setting Expiration");
-                     }
-                     s.ExpirationInterval = value;
-                 });
+            get => State.ExpirationInterval;
+            set => MutateState(state =>
+            {
+                if (state.Expiration is { })
+                {
+                    throw new InvalidOperationException("Cannot set ExpirationInterval after setting Expiration.");
+                }
+
+                state.ExpirationInterval = value;
+            });
         }
 
         /// <summary>
@@ -136,15 +143,16 @@ namespace Parse
         /// </summary>
         public IDictionary<string, object> Data
         {
-            get => state.Data;
-            set => MutateState(s =>
-                 {
-                     if (s.Alert != null && value != null)
-                     {
-                         throw new InvalidOperationException("A push may not have both an Alert and Data");
-                     }
-                     s.Data = value;
-                 });
+            get => State.Data;
+            set => MutateState(state =>
+            {
+                if (state.Alert is { } && value is { })
+                {
+                    throw new InvalidOperationException("A push may not have both an Alert and Data.");
+                }
+
+                state.Data = value;
+            });
         }
 
         /// <summary>
@@ -158,32 +166,29 @@ namespace Parse
         /// </summary>
         public string Alert
         {
-            get => state.Alert;
-            set => MutateState(s =>
-                 {
-                     if (s.Data != null && value != null)
-                     {
-                         throw new InvalidOperationException("A push may not have both an Alert and Data");
-                     }
-                     s.Alert = value;
-                 });
+            get => State.Alert;
+            set => MutateState(state =>
+            {
+                if (state.Data is { } && value is { })
+                {
+                    throw new InvalidOperationException("A push may not have both an Alert and Data.");
+                }
+
+                state.Alert = value;
+            });
         }
 
         #endregion
 
-        internal IDictionary<string, object> Encode() => ParsePushEncoder.Instance.Encode(state);
+        internal IDictionary<string, object> Encode() => ParsePushEncoder.Instance.Encode(State);
 
-        private void MutateState(Action<MutablePushState> func)
+        void MutateState(Action<MutablePushState> func)
         {
-            lock (mutex)
+            lock (Mutex)
             {
-                state = state.MutatedClone(func);
+                State = State.MutatedClone(func);
             }
         }
-
-        private static IParsePushController PushController => ParsePushPlugins.Instance.PushController;
-
-        private static IParsePushChannelsController PushChannelsController => ParsePushPlugins.Instance.PushChannelsController;
 
         #region Sending Push
 
@@ -203,302 +208,7 @@ namespace Parse
         /// console on http://parse.com
         /// </summary>
         /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public Task SendAsync(CancellationToken cancellationToken) => PushController.SendPushNotificationAsync(state, cancellationToken);
-
-        /// <summary>
-        /// Pushes a simple message to every device. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="alert">The alert message to send.</param>
-        public static Task SendAlertAsync(string alert)
-        {
-            ParsePush push = new ParsePush
-            {
-                Alert = alert
-            };
-            return push.SendAsync();
-        }
-
-        /// <summary>
-        /// Pushes a simple message to every device subscribed to channel. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Channels = new List&lt;string&gt; { channel };
-        /// push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="alert">The alert message to send.</param>
-        /// <param name="channel">An Installation must be subscribed to channel to receive this Push Notification.</param>
-        public static Task SendAlertAsync(string alert, string channel)
-        {
-            ParsePush push = new ParsePush
-            {
-                Channels = new List<string> { channel },
-                Alert = alert
-            };
-            return push.SendAsync();
-        }
-
-        /// <summary>
-        /// Pushes a simple message to every device subscribed to any of channels. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Channels = channels;
-        /// push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="alert">The alert message to send.</param>
-        /// <param name="channels">An Installation must be subscribed to any of channels to receive this Push Notification.</param>
-        public static Task SendAlertAsync(string alert, IEnumerable<string> channels)
-        {
-            ParsePush push = new ParsePush
-            {
-                Channels = channels,
-                Alert = alert
-            };
-            return push.SendAsync();
-        }
-
-        /// <summary>
-        /// Pushes a simple message to every device matching the target query. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Query = query;
-        /// push.Data = new Dictionary&lt;string, object&gt;{{"alert", alert}};
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="alert">The alert message to send.</param>
-        /// <param name="query">A query filtering the devices which should receive this Push Notification.</param>
-        public static Task SendAlertAsync(string alert, ParseQuery<ParseInstallation> query)
-        {
-            ParsePush push = new ParsePush
-            {
-                Query = query,
-                Alert = alert
-            };
-            return push.SendAsync();
-        }
-
-        /// <summary>
-        /// Pushes an arbitrary payload to every device. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Data = data;
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
-        public static Task SendDataAsync(IDictionary<string, object> data)
-        {
-            ParsePush push = new ParsePush
-            {
-                Data = data
-            };
-            return push.SendAsync();
-        }
-
-        /// <summary>
-        /// Pushes an arbitrary payload to every device subscribed to channel. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Channels = new List&lt;string&gt; { channel };
-        /// push.Data = data;
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
-        /// <param name="channel">An Installation must be subscribed to channel to receive this Push Notification.</param>
-        public static Task SendDataAsync(IDictionary<string, object> data, string channel)
-        {
-            ParsePush push = new ParsePush
-            {
-                Channels = new List<string> { channel },
-                Data = data
-            };
-            return push.SendAsync();
-        }
-
-        /// <summary>
-        /// Pushes an arbitrary payload to every device subscribed to any of channels. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Channels = channels;
-        /// push.Data = data;
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
-        /// <param name="channels">An Installation must be subscribed to any of channels to receive this Push Notification.</param>
-        public static Task SendDataAsync(IDictionary<string, object> data, IEnumerable<string> channels)
-        {
-            ParsePush push = new ParsePush
-            {
-                Channels = channels,
-                Data = data
-            };
-            return push.SendAsync();
-        }
-
-        /// <summary>
-        /// Pushes an arbitrary payload to every device matching target. This is shorthand for:
-        ///
-        /// <code>
-        /// var push = new ParsePush();
-        /// push.Query = query
-        /// push.Data = data;
-        /// return push.SendAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="data">A push payload. See the ParsePush.Data property for more information.</param>
-        /// <param name="query">A query filtering the devices which should receive this Push Notification.</param>
-        public static Task SendDataAsync(IDictionary<string, object> data, ParseQuery<ParseInstallation> query)
-        {
-            ParsePush push = new ParsePush
-            {
-                Query = query,
-                Data = data
-            };
-            return push.SendAsync();
-        }
-
-        #endregion
-
-        #region Receiving Push
-
-        /// <summary>
-        /// An event fired when a push notification is received.
-        /// </summary>
-        public static event EventHandler<ParsePushNotificationEventArgs> ParsePushNotificationReceived
-        {
-            add
-            {
-                parsePushNotificationReceived.Add(value);
-            }
-            remove
-            {
-                parsePushNotificationReceived.Remove(value);
-            }
-        }
-
-        internal static readonly SynchronizedEventHandler<ParsePushNotificationEventArgs> parsePushNotificationReceived = new SynchronizedEventHandler<ParsePushNotificationEventArgs>();
-
-        #endregion
-
-        #region Push Subscription
-
-        /// <summary>
-        /// Subscribe the current installation to this channel. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.AddUniqueToList("channels", channel);
-        /// installation.SaveAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="channel">The channel to which this installation should subscribe.</param>
-        public static Task SubscribeAsync(string channel) => SubscribeAsync(new List<string> { channel }, CancellationToken.None);
-
-        /// <summary>
-        /// Subscribe the current installation to this channel. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.AddUniqueToList("channels", channel);
-        /// installation.SaveAsync(cancellationToken);
-        /// </code>
-        /// </summary>
-        /// <param name="channel">The channel to which this installation should subscribe.</param>
-        /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public static Task SubscribeAsync(string channel, CancellationToken cancellationToken) => SubscribeAsync(new List<string> { channel }, cancellationToken);
-
-        /// <summary>
-        /// Subscribe the current installation to these channels. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.AddRangeUniqueToList("channels", channels);
-        /// installation.SaveAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="channels">The channels to which this installation should subscribe.</param>
-        public static Task SubscribeAsync(IEnumerable<string> channels) => SubscribeAsync(channels, CancellationToken.None);
-
-        /// <summary>
-        /// Subscribe the current installation to these channels. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.AddRangeUniqueToList("channels", channels);
-        /// installation.SaveAsync(cancellationToken);
-        /// </code>
-        /// </summary>
-        /// <param name="channels">The channels to which this installation should subscribe.</param>
-        /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public static Task SubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken) => PushChannelsController.SubscribeAsync(channels, cancellationToken);
-
-        /// <summary>
-        /// Unsubscribe the current installation from this channel. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.Remove("channels", channel);
-        /// installation.SaveAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="channel">The channel from which this installation should unsubscribe.</param>
-        public static Task UnsubscribeAsync(string channel) => UnsubscribeAsync(new List<string> { channel }, CancellationToken.None);
-
-        /// <summary>
-        /// Unsubscribe the current installation from this channel. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.Remove("channels", channel);
-        /// installation.SaveAsync(cancellationToken);
-        /// </code>
-        /// </summary>
-        /// <param name="channel">The channel from which this installation should unsubscribe.</param>
-        /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public static Task UnsubscribeAsync(string channel, CancellationToken cancellationToken) => UnsubscribeAsync(new List<string> { channel }, cancellationToken);
-
-        /// <summary>
-        /// Unsubscribe the current installation from these channels. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.RemoveAllFromList("channels", channels);
-        /// installation.SaveAsync();
-        /// </code>
-        /// </summary>
-        /// <param name="channels">The channels from which this installation should unsubscribe.</param>
-        public static Task UnsubscribeAsync(IEnumerable<string> channels) => UnsubscribeAsync(channels, CancellationToken.None);
-
-        /// <summary>
-        /// Unsubscribe the current installation from these channels. This is shorthand for:
-        ///
-        /// <code>
-        /// var installation = ParseInstallation.CurrentInstallation;
-        /// installation.RemoveAllFromList("channels", channels);
-        /// installation.SaveAsync(cancellationToken);
-        /// </code>
-        /// </summary>
-        /// <param name="channels">The channels from which this installation should unsubscribe.</param>
-        /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public static Task UnsubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken) => PushChannelsController.UnsubscribeAsync(channels, cancellationToken);
+        public Task SendAsync(CancellationToken cancellationToken) => Services.PushController.SendPushNotificationAsync(State, cancellationToken);
 
         #endregion
     }

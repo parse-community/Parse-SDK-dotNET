@@ -34,7 +34,7 @@ namespace Parse.Core.Internal
             {
                 ServerData.TryGetValue(pair.Key, out object oldValue);
                 object newValue = pair.Value.Apply(oldValue, pair.Key);
-                if (newValue != ParseDeleteOperation.DeleteToken)
+                if (newValue != ParseDeleteOperation.Token)
                 {
                     ServerData[pair.Key] = newValue;
                 }

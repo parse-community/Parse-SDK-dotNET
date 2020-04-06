@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
+using Parse.Library;
 
 namespace Parse
 {
@@ -15,73 +17,6 @@ namespace Parse
     public static class ParseExtensions
     {
         /// <summary>
-        /// Saves all of the ParseObjects in the enumeration. Equivalent to
-        /// calling <see cref="ParseObject.SaveAllAsync{T}(IEnumerable{T})"/>.
-        /// </summary>
-        /// <param name="objects">The objects to save.</param>
-        public static Task SaveAllAsync<T>(this IEnumerable<T> objects) where T : ParseObject => ParseObject.SaveAllAsync(objects);
-
-        /// <summary>
-        /// Saves all of the ParseObjects in the enumeration. Equivalent to
-        /// calling
-        /// <see cref="ParseObject.SaveAllAsync{T}(IEnumerable{T}, CancellationToken)"/>.
-        /// </summary>
-        /// <param name="objects">The objects to save.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SaveAllAsync<T>(
-            this IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => ParseObject.SaveAllAsync(objects, cancellationToken);
-
-        /// <summary>
-        /// Fetches all of the objects in the enumeration. Equivalent to
-        /// calling <see cref="ParseObject.FetchAllAsync{T}(IEnumerable{T})"/>.
-        /// </summary>
-        /// <param name="objects">The objects to save.</param>
-        public static Task<IEnumerable<T>> FetchAllAsync<T>(this IEnumerable<T> objects)
-          where T : ParseObject => ParseObject.FetchAllAsync(objects);
-
-        /// <summary>
-        /// Fetches all of the objects in the enumeration. Equivalent to
-        /// calling
-        /// <see cref="ParseObject.FetchAllAsync{T}(IEnumerable{T}, CancellationToken)"/>.
-        /// </summary>
-        /// <param name="objects">The objects to fetch.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task<IEnumerable<T>> FetchAllAsync<T>(
-            this IEnumerable<T> objects, CancellationToken cancellationToken)
-          where T : ParseObject => ParseObject.FetchAllAsync(objects, cancellationToken);
-
-        /// <summary>
-        /// Fetches all of the objects in the enumeration that don't already have
-        /// data. Equivalent to calling
-        /// <see cref="ParseObject.FetchAllIfNeededAsync{T}(IEnumerable{T})"/>.
-        /// </summary>
-        /// <param name="objects">The objects to fetch.</param>
-        public static Task<IEnumerable<T>> FetchAllIfNeededAsync<T>(
-            this IEnumerable<T> objects)
-          where T : ParseObject => ParseObject.FetchAllIfNeededAsync(objects);
-
-        /// <summary>
-        /// Fetches all of the objects in the enumeration that don't already have
-        /// data. Equivalent to calling
-        /// <see cref="ParseObject.FetchAllIfNeededAsync{T}(IEnumerable{T}, CancellationToken)"/>.
-        /// </summary>
-        /// <param name="objects">The objects to fetch.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task<IEnumerable<T>> FetchAllIfNeededAsync<T>(
-            this IEnumerable<T> objects, CancellationToken cancellationToken)
-          where T : ParseObject => ParseObject.FetchAllIfNeededAsync(objects, cancellationToken);
-
-        /// <summary>
-        /// Constructs a query that is the or of the given queries.
-        /// </summary>
-        /// <typeparam name="T">The type of ParseObject being queried.</typeparam>
-        /// <param name="source">An initial query to 'or' with additional queries.</param>
-        /// <param name="queries">The list of ParseQueries to 'or' together.</param>
-        /// <returns>A query that is the or of the given queries.</returns>
-        public static ParseQuery<T> Or<T>(this ParseQuery<T> source, params ParseQuery<T>[] queries)
-            where T : ParseObject => ParseQuery<T>.Or(queries.Concat(new[] { source }));
-
-        /// <summary>
         /// Fetches this object with the data from the server.
         /// </summary>
         public static Task<T> FetchAsync<T>(this T obj) where T : ParseObject => obj.FetchAsyncInternal(CancellationToken.None).OnSuccess(t => (T) t.Result);
@@ -89,10 +24,9 @@ namespace Parse
         /// <summary>
         /// Fetches this object with the data from the server.
         /// </summary>
-        /// <param name="obj">The ParseObject to fetch.</param>
+        /// <param name="target">The ParseObject to fetch.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task<T> FetchAsync<T>(this T obj, CancellationToken cancellationToken)
-            where T : ParseObject => obj.FetchAsyncInternal(cancellationToken).OnSuccess(t => (T) t.Result);
+        public static Task<T> FetchAsync<T>(this T target, CancellationToken cancellationToken) where T : ParseObject => target.FetchAsyncInternal(cancellationToken).OnSuccess(task => (T) task.Result);
 
         /// <summary>
         /// If this ParseObject has not been fetched (i.e. <see cref="ParseObject.IsDataAvailable"/> returns
@@ -107,7 +41,6 @@ namespace Parse
         /// </summary>
         /// <param name="obj">The ParseObject to fetch.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task<T> FetchIfNeededAsync<T>(this T obj, CancellationToken cancellationToken)
-            where T : ParseObject => obj.FetchIfNeededAsyncInternal(cancellationToken).OnSuccess(t => (T) t.Result);
+        public static Task<T> FetchIfNeededAsync<T>(this T obj, CancellationToken cancellationToken) where T : ParseObject => obj.FetchIfNeededAsyncInternal(cancellationToken).OnSuccess(t => (T) t.Result);
     }
 }

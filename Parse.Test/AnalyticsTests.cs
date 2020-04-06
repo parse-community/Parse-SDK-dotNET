@@ -34,7 +34,7 @@ namespace Parse.Test
                 CorePlugins = mockCorePlugins.Object
             };
 
-            return ParseAnalytics.TrackEventAsync("SomeEvent").ContinueWith(t =>
+            return AnalyticsServiceExtensions.TrackEventAsync("SomeEvent").ContinueWith(t =>
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
@@ -60,7 +60,7 @@ namespace Parse.Test
                 CorePlugins = mockCorePlugins.Object
             };
 
-            return ParseAnalytics.TrackEventAsync("SomeEvent", new Dictionary<string, string> { ["facebook"] = "hq" }).ContinueWith(t =>
+            return AnalyticsServiceExtensions.TrackEventAsync("SomeEvent", new Dictionary<string, string> { ["facebook"] = "hq" }).ContinueWith(t =>
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
@@ -86,7 +86,7 @@ namespace Parse.Test
                 CorePlugins = mockCorePlugins.Object
             };
 
-            return ParseAnalytics.TrackAppOpenedAsync().ContinueWith(t =>
+            return AnalyticsServiceExtensions.TrackAppOpenedAsync().ContinueWith(t =>
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);

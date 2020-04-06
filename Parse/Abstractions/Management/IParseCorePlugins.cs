@@ -15,26 +15,28 @@ namespace Parse.Abstractions.Management
 
         IWebClient WebClient { get; }
         IStorageController StorageController { get; }
-        IObjectSubclassingController SubclassingController { get; }
+        IParseObjectClassController SubclassingController { get; }
 
         IParseInstallationController InstallationController { get; }
         IParseCommandRunner CommandRunner { get; }
 
         IParseCloudCodeController CloudCodeController { get; }
-        IParseConfigController ConfigController { get; }
+        IParseConfigurationController ConfigController { get; }
         IParseFileController FileController { get; }
         IParseObjectController ObjectController { get; }
         IParseQueryController QueryController { get; }
         IParseSessionController SessionController { get; }
         IParseUserController UserController { get; }
         IParseCurrentUserController CurrentUserController { get; }
-        //IParseCurrentConfigController CurrentConfigController { get; }
+
+        // IParseCurrentConfigController CurrentConfigController { get; }
 
         public void Reset();
 
-        /// <summary>
-        /// Sets the default controller instances if not explicitly overridden. This method should effectively perform a <see langword="null"/>-coalescing assign on all of the properties of the <see cref="IParseCorePlugins"/> implementation instance.
-        /// </summary>
-        //public void SetDefaults();
+        // /// <summary>
+        // /// Sets the default controller instances if not explicitly overridden. This method should effectively perform a <see langword="null"/>-coalescing assign on all of the properties of the <see cref="IParseCorePlugins"/> implementation instance.
+        // /// </summary>
+
+        // public void SetDefaults();
     }
 }

@@ -181,7 +181,7 @@ namespace Parse.Common.Internal
                 StringBuilder builder = new StringBuilder(contentCapture.Value);
                 foreach (Capture escape in m.Groups["escape"].Captures)
                 {
-                    int index = (escape.Index - contentCapture.Index) - offset;
+                    int index = escape.Index - contentCapture.Index - offset;
                     offset += escape.Length - 1;
                     builder.Remove(index + 1, escape.Length - 1);
                     switch (escape.Value[1])
@@ -279,7 +279,7 @@ namespace Parse.Common.Internal
                     ++currentStep;
                 }
 
-                bool match = (currentStep < strLen) && (InputAsArray[currentStep] == condition);
+                bool match = currentStep < strLen && InputAsArray[currentStep] == condition;
                 if (match)
                 {
                     ++step;
@@ -332,7 +332,7 @@ namespace Parse.Common.Internal
                     }
                 }
 
-                bool match = (currentStep < strLen) && strMatch;
+                bool match = currentStep < strLen && strMatch;
                 if (match)
                 {
                     Skip(step + condition.Length);

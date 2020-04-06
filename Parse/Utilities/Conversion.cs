@@ -6,6 +6,8 @@ using Parse.Common.Internal;
 
 namespace Parse.Utilities
 {
+#warning Possibly should be refactored.
+
     /// <summary>
     /// A set of utilities for converting generic types between each other.
     /// </summary>
@@ -52,38 +54,28 @@ namespace Parse.Utilities
                 return value;
             }
 
-            if (ReflectionHelpers.IsPrimitive(typeof(T)))
+            if (typeof(T).IsPrimitive)
             {
                 return (T) Convert.ChangeType(value, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
             }
 
-            if (ReflectionHelpers.IsConstructedGenericType(typeof(T)))
+            if (typeof(T).IsConstructedGenericType)
             {
                 // Add lifting for nullables. Only supports conversions between primitives.
-                if (ReflectionHelpers.IsNullable(typeof(T)))
+
+                if (ReflectionHelpers.CheckWrappedWithNullable(typeof(T)) && typeof(T).GenericTypeArguments[0] is { IsPrimitive: true } innerType)
                 {
-                    Type innerType = ReflectionHelpers.GetGenericTypeArguments(typeof(T))[0];
-                    if (ReflectionHelpers.IsPrimitive(innerType))
-                    {
-                        return (T) Convert.ChangeType(value, innerType, System.Globalization.CultureInfo.InvariantCulture);
-                    }
+                    return (T) Convert.ChangeType(value, innerType, System.Globalization.CultureInfo.InvariantCulture);
                 }
-                Type listType = GetInterfaceType(value.GetType(), typeof(IList<>));
-                if (listType != null &&
-                    typeof(T).GetGenericTypeDefinition() == typeof(IList<>))
+
+                if (GetInterfaceType(value.GetType(), typeof(IList<>)) is { } listType && typeof(T).GetGenericTypeDefinition() == typeof(IList<>))
                 {
-                    Type wrapperType = typeof(FlexibleListWrapper<,>)
-                      .MakeGenericType(ReflectionHelpers.GetGenericTypeArguments(typeof(T))[0],
-                                       ReflectionHelpers.GetGenericTypeArguments(listType)[0]);
-                    return Activator.CreateInstance(wrapperType, value);
+                    return Activator.CreateInstance(typeof(FlexibleListWrapper<,>).MakeGenericType(typeof(T).GenericTypeArguments[0], listType.GenericTypeArguments[0]), value);
                 }
-                Type dictType = GetInterfaceType(value.GetType(), typeof(IDictionary<,>));
-                if (dictType != null && typeof(T).GetGenericTypeDefinition() == typeof(IDictionary<,>))
+
+                if (GetInterfaceType(value.GetType(), typeof(IDictionary<,>)) is { } dictType && typeof(T).GetGenericTypeDefinition() == typeof(IDictionary<,>))
                 {
-                    Type wrapperType = typeof(FlexibleDictionaryWrapper<,>)
-                      .MakeGenericType(ReflectionHelpers.GetGenericTypeArguments(typeof(T))[1],
-                                       ReflectionHelpers.GetGenericTypeArguments(dictType)[1]);
-                    return Activator.CreateInstance(wrapperType, value);
+                    return Activator.CreateInstance(typeof(FlexibleDictionaryWrapper<,>).MakeGenericType(typeof(T).GenericTypeArguments[1], dictType.GenericTypeArguments[1]), value);
                 }
             }
 
@@ -98,23 +90,26 @@ namespace Parse.Utilities
         /// The map is:
         ///    (object type, generic interface type) => constructed generic type
         /// </summary>
-        private static readonly Dictionary<Tuple<Type, Type>, Type> interfaceLookupCache = new Dictionary<Tuple<Type, Type>, Type>();
+        static Dictionary<Tuple<Type, Type>, Type> InterfaceLookupCache { get; } = new Dictionary<Tuple<Type, Type>, Type>();
 
-        private static Type GetInterfaceType(Type objType, Type genericInterfaceType)
+        static Type GetInterfaceType(Type objType, Type genericInterfaceType)
         {
             Tuple<Type, Type> cacheKey = new Tuple<Type, Type>(objType, genericInterfaceType);
-            if (interfaceLookupCache.ContainsKey(cacheKey))
+
+            if (InterfaceLookupCache.ContainsKey(cacheKey))
             {
-                return interfaceLookupCache[cacheKey];
+                return InterfaceLookupCache[cacheKey];
             }
-            foreach (Type type in ReflectionHelpers.GetInterfaces(objType))
+
+            foreach (Type type in objType.GetInterfaces())
             {
-                if (ReflectionHelpers.IsConstructedGenericType(type) && type.GetGenericTypeDefinition() == genericInterfaceType)
+                if (type.IsConstructedGenericType && type.GetGenericTypeDefinition() == genericInterfaceType)
                 {
-                    return interfaceLookupCache[cacheKey] = type;
+                    return InterfaceLookupCache[cacheKey] = type;
                 }
             }
-            return null;
+
+            return default;
         }
     }
 }

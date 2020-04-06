@@ -16,7 +16,7 @@ namespace Parse.Test
     public class FileControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(FileControllerTests))]
@@ -27,7 +27,7 @@ namespace Parse.Test
             FileState state = new FileState
             {
                 Name = "bekti.png",
-                MimeType = "image/png"
+                MediaType = "image/png"
             };
 
             ParseFileController controller = new ParseFileController(mockRunner.Object);
@@ -43,7 +43,7 @@ namespace Parse.Test
             FileState state = new FileState
             {
                 Name = "bekti.png",
-                MimeType = "image/png"
+                MediaType = "image/png"
             };
 
             ParseFileController controller = new ParseFileController(mockRunner.Object);
@@ -59,7 +59,7 @@ namespace Parse.Test
             FileState state = new FileState
             {
                 Name = "bekti.png",
-                MimeType = "image/png"
+                MediaType = "image/png"
             };
 
             ParseFileController controller = new ParseFileController(mockRunner.Object);
@@ -73,7 +73,7 @@ namespace Parse.Test
             FileState state = new FileState
             {
                 Name = "bekti.png",
-                MimeType = "image/png"
+                MediaType = "image/png"
             };
 
             return new ParseFileController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { ["name"] = "newBekti.png", ["url"] = "https://www.parse.com/newBekti.png" })).Object).SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t =>
@@ -81,16 +81,16 @@ namespace Parse.Test
                 Assert.IsFalse(t.IsFaulted);
                 FileState newState = t.Result;
 
-                Assert.AreEqual(state.MimeType, newState.MimeType);
+                Assert.AreEqual(state.MediaType, newState.MediaType);
                 Assert.AreEqual("newBekti.png", newState.Name);
-                Assert.AreEqual("https://www.parse.com/newBekti.png", newState.Url.AbsoluteUri);
+                Assert.AreEqual("https://www.parse.com/newBekti.png", newState.Location.AbsoluteUri);
             });
         }
 
         private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
         {
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
-            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
+            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
 
             return mockRunner;
         }

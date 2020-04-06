@@ -11,12 +11,13 @@ namespace Parse.Common.Internal
     /// </summary>
     public class ParseModuleController
     {
-        public static ParseModuleController Instance { get; } = new ParseModuleController();
+        public static ParseModuleController Instance { get; } = new ParseModuleController { };
 
-        private readonly object mutex = new object();
-        private readonly List<IParseModule> modules = new List<IParseModule>();
+        object Mutex { get; } = new object { };
 
-        private bool isParseInitialized = false;
+        List<IParseModule> Modules { get; } = new List<IParseModule> { };
+
+        bool Initialized { get; set; } = false;
 
         public void RegisterModule(IParseModule module)
         {
@@ -25,36 +26,31 @@ namespace Parse.Common.Internal
                 return;
             }
 
-            lock (mutex)
+            lock (Mutex)
             {
-                modules.Add(module);
-                module.OnModuleRegistered();
+                Modules.Add(module);
+                module.ExecuteModuleRegistrationHook();
 
-                if (isParseInitialized)
+                if (Initialized)
                 {
-                    module.OnParseInitialized();
+                    module.ExecuteLibraryInitializationHook();
                 }
             }
         }
 
         public void ScanForModules()
         {
-            IEnumerable<Type> moduleTypes = Lister.AllAssemblies
-              .SelectMany(asm => asm.GetCustomAttributes<ParseModuleAttribute>())
-              .Select(attr => attr.ModuleType)
-              .Where(type => type != null && type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IParseModule)));
+            IEnumerable<Type> moduleTypes = Lister.AllAssemblies.SelectMany(asm => asm.GetCustomAttributes<ParseModuleAttribute>()).Select(attr => attr.ModuleType).Where(type => type != null && type.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IParseModule)));
 
-            lock (mutex)
+            lock (Mutex)
             {
                 foreach (Type moduleType in moduleTypes)
                 {
                     try
                     {
-                        ConstructorInfo constructor = moduleType.FindConstructor();
-                        if (constructor != null)
+                        if (moduleType.FindConstructor() is { } constructor)
                         {
-                            IParseModule module = constructor.Invoke(new object[] { }) as IParseModule;
-                            RegisterModule(module);
+                            RegisterModule(constructor.Invoke(new object[] { }) as IParseModule);
                         }
                     }
                     catch (Exception)
@@ -67,22 +63,23 @@ namespace Parse.Common.Internal
 
         public void Reset()
         {
-            lock (mutex)
+            lock (Mutex)
             {
-                modules.Clear();
-                isParseInitialized = false;
+                Modules.Clear();
+                Initialized = false;
             }
         }
 
-        public void ParseDidInitialize()
+        public void BroadcastParseInitialization()
         {
-            lock (mutex)
+            lock (Mutex)
             {
-                foreach (IParseModule module in modules)
+                foreach (IParseModule module in Modules)
                 {
-                    module.OnParseInitialized();
+                    module.ExecuteLibraryInitializationHook();
                 }
-                isParseInitialized = true;
+
+                Initialized = true;
             }
         }
     }

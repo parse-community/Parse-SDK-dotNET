@@ -15,7 +15,7 @@ namespace Parse.Test
     public class CloudControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(CloudControllerTests))]
@@ -64,7 +64,7 @@ namespace Parse.Test
         private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
         {
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner> { };
-            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
+            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
 
             return mockRunner;
         }

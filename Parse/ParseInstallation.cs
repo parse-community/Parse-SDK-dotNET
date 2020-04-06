@@ -14,7 +14,6 @@ using Parse.Push.Internal;
 
 namespace Parse
 {
-
     /// <summary>
     ///  Represents this app installed on this device. Use this class to track information you want
     ///  to sample from (i.e. if you update a field on app launch, you can issue a query to see
@@ -23,52 +22,13 @@ namespace Parse
     [ParseClassName("_Installation")]
     public partial class ParseInstallation : ParseObject
     {
-        static readonly HashSet<string> readOnlyKeys = new HashSet<string> { "deviceType", "deviceUris", "installationId", "timeZone", "localeIdentifier", "parseVersion", "appName", "appIdentifier", "appVersion", "pushType" };
-
-        internal static IParseCurrentInstallationController CurrentInstallationController => ParsePushPlugins.Instance.CurrentInstallationController;
-
-        internal static IDeviceInfoController DeviceInfoController => ParsePushPlugins.Instance.DeviceInfoController;
-
-        internal static IMetadataController MetadataController => ParseCorePlugins.Instance.MetadataController;
+        static HashSet<string> ImmutableKeys { get; } = new HashSet<string> { "deviceType", "deviceUris", "installationId", "timeZone", "localeIdentifier", "parseVersion", "appName", "appIdentifier", "appVersion", "pushType" };
 
         /// <summary>
         /// Constructs a new ParseInstallation. Generally, you should not need to construct
         /// ParseInstallations yourself. Instead use <see cref="CurrentInstallation"/>.
         /// </summary>
         public ParseInstallation() : base() { }
-
-        /// <summary>
-        /// Gets the ParseInstallation representing this app on this device.
-        /// </summary>
-        public static ParseInstallation CurrentInstallation
-        {
-            get
-            {
-                Task<ParseInstallation> task = CurrentInstallationController.GetAsync(CancellationToken.None);
-                // TODO (hallucinogen): this will absolutely break on Unity, but how should we resolve this?
-                task.Wait();
-                return task.Result;
-            }
-        }
-
-        internal static void ClearInMemoryInstallation() => CurrentInstallationController.ClearFromMemory();
-
-        /// <summary>
-        /// Constructs a <see cref="ParseQuery{ParseInstallation}"/> for ParseInstallations.
-        /// </summary>
-        /// <remarks>
-        /// Only the following types of queries are allowed for installations:
-        ///
-        /// <code>
-        /// query.GetAsync(objectId)
-        /// query.WhereEqualTo(key, value)
-        /// query.WhereMatchesKeyInQuery&lt;TOther&gt;(key, keyInQuery, otherQuery)
-        /// </code>
-        ///
-        /// You can add additional query conditions, but one of the above must appear as a top-level <c>AND</c>
-        /// clause in the query.
-        /// </remarks>
-        public static ParseQuery<ParseInstallation> Query => new ParseQuery<ParseInstallation>();
 
         /// <summary>
         /// A GUID that uniquely names this app installed on this device.
@@ -78,8 +38,9 @@ namespace Parse
         {
             get
             {
-                string installationIdString = GetProperty<string>("InstallationId");
+                string installationIdString = GetProperty<string>(nameof(InstallationId));
                 Guid? installationId = null;
+
                 try
                 {
                     installationId = new Guid(installationIdString);
@@ -94,7 +55,7 @@ namespace Parse
             internal set
             {
                 Guid installationId = value;
-                SetProperty(installationId.ToString(), "InstallationId");
+                SetProperty(installationId.ToString(), nameof(InstallationId));
             }
         }
 
@@ -104,8 +65,8 @@ namespace Parse
         [ParseFieldName("deviceType")]
         public string DeviceType
         {
-            get => GetProperty<string>("DeviceType");
-            internal set => SetProperty(value, "DeviceType");
+            get => GetProperty<string>(nameof(DeviceType));
+            internal set => SetProperty(value, nameof(DeviceType));
         }
 
         /// <summary>
@@ -114,8 +75,8 @@ namespace Parse
         [ParseFieldName("appName")]
         public string AppName
         {
-            get => GetProperty<string>("AppName");
-            internal set => SetProperty(value, "AppName");
+            get => GetProperty<string>(nameof(AppName));
+            internal set => SetProperty(value, nameof(AppName));
         }
 
         /// <summary>
@@ -124,8 +85,8 @@ namespace Parse
         [ParseFieldName("appVersion")]
         public string AppVersion
         {
-            get => GetProperty<string>("AppVersion");
-            internal set => SetProperty(value, "AppVersion");
+            get => GetProperty<string>(nameof(AppVersion));
+            internal set => SetProperty(value, nameof(AppVersion));
         }
 
         /// <summary>
@@ -136,8 +97,8 @@ namespace Parse
         [ParseFieldName("appIdentifier")]
         public string AppIdentifier
         {
-            get => GetProperty<string>("AppIdentifier");
-            internal set => SetProperty(value, "AppIdentifier");
+            get => GetProperty<string>(nameof(AppIdentifier));
+            internal set => SetProperty(value, nameof(AppIdentifier));
         }
 
         /// <summary>
@@ -150,8 +111,8 @@ namespace Parse
         [ParseFieldName("timeZone")]
         public string TimeZone
         {
-            get => GetProperty<string>("TimeZone");
-            private set => SetProperty(value, "TimeZone");
+            get => GetProperty<string>(nameof(TimeZone));
+            private set => SetProperty(value, nameof(TimeZone));
         }
 
         /// <summary>
@@ -161,8 +122,8 @@ namespace Parse
         [ParseFieldName("localeIdentifier")]
         public string LocaleIdentifier
         {
-            get => GetProperty<string>("LocaleIdentifier");
-            private set => SetProperty(value, "LocaleIdentifier");
+            get => GetProperty<string>(nameof(LocaleIdentifier));
+            private set => SetProperty(value, nameof(LocaleIdentifier));
         }
 
         /// <summary>
@@ -173,6 +134,7 @@ namespace Parse
         {
             string languageCode = null;
             string countryCode = null;
+
             if (CultureInfo.CurrentCulture != null)
             {
                 languageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
@@ -199,7 +161,7 @@ namespace Parse
         {
             get
             {
-                string versionString = GetProperty<string>("ParseVersion");
+                string versionString = GetProperty<string>(nameof(ParseVersion));
                 Version version = null;
                 try
                 {
@@ -215,7 +177,7 @@ namespace Parse
             private set
             {
                 Version version = value;
-                SetProperty(version.ToString(), "ParseVersion");
+                SetProperty(version.ToString(), nameof(ParseVersion));
             }
         }
 
@@ -226,45 +188,33 @@ namespace Parse
         [ParseFieldName("channels")]
         public IList<string> Channels
         {
-            get => GetProperty<IList<string>>("Channels");
-            set => SetProperty(value, "Channels");
+            get => GetProperty<IList<string>>(nameof(Channels));
+            set => SetProperty(value, nameof(Channels));
         }
 
-        protected override bool IsKeyMutable(string key) => !readOnlyKeys.Contains(key);
+        protected override bool CheckKeyMutable(string key) => !ImmutableKeys.Contains(key);
 
         protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
         {
             Task platformHookTask = null;
-            if (CurrentInstallationController.IsCurrent(this))
+
+            if (Client.CurrentInstallationController.IsCurrent(this))
             {
-                Configuration configuration = ParseClient.Configuration;
-
-                // 'this' is required in order for the extension method to be used.
-                SetIfDifferent("deviceType", DeviceInfoController.DeviceType);
-                SetIfDifferent("timeZone", DeviceInfoController.DeviceTimeZone);
+                SetIfDifferent("deviceType", Client.MetadataController.EnvironmentData.Platform);
+                SetIfDifferent("timeZone", Client.MetadataController.EnvironmentData.TimeZone);
                 SetIfDifferent("localeIdentifier", GetLocaleIdentifier());
-                SetIfDifferent("parseVersion", GetParseVersion().ToString());
-                SetIfDifferent("appVersion", MetadataController.HostVersioningData.BuildVersion ?? DeviceInfoController.AppBuildVersion);
-                SetIfDifferent("appIdentifier", DeviceInfoController.AppIdentifier);
-                SetIfDifferent("appName", DeviceInfoController.AppName);
+                SetIfDifferent("parseVersion", ParseClient.Version);
+                SetIfDifferent("appVersion", Client.MetadataController.HostManifestData.Version);
+                SetIfDifferent("appIdentifier", Client.MetadataController.HostManifestData.Identifier);
+                SetIfDifferent("appName", Client.MetadataController.HostManifestData.Name);
 
-                platformHookTask = DeviceInfoController.ExecuteParseInstallationSaveHookAsync(this);
+#warning InstallationDataFinalizer needs to be injected here somehow or removed.
+
+                //platformHookTask = Client.InstallationDataFinalizer.FinalizeAsync(this);
             }
 
-            return platformHookTask.Safe().OnSuccess(_ =>
-            {
-                return base.SaveAsync(toAwait, cancellationToken);
-            }).Unwrap().OnSuccess(_ =>
-            {
-                if (CurrentInstallationController.IsCurrent(this))
-                {
-                    return Task.FromResult(0);
-                }
-                return CurrentInstallationController.SetAsync(this, cancellationToken);
-            }).Unwrap();
+            return platformHookTask.Safe().OnSuccess(_ => base.SaveAsync(toAwait, cancellationToken)).Unwrap().OnSuccess(_ => Client.CurrentInstallationController.IsCurrent(this) ? Task.CompletedTask : Client.CurrentInstallationController.SetAsync(this, cancellationToken)).Unwrap();
         }
-
-        private Version GetParseVersion() => new AssemblyName(typeof(ParseInstallation).GetTypeInfo().Assembly.FullName).Version;
 
         /// <summary>
         /// This mapping of Windows names to a standard everyone else uses is maintained

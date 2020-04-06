@@ -6,27 +6,27 @@ namespace Parse.Core.Internal
 {
     public class FileState
     {
-        private const string ParseFileSecureScheme = "https";
-        private const string ParseFileSecureDomain = "files.parsetfss.com";
+        static string SecureHyperTextTransferScheme { get; } = "https";
 
         public string Name { get; set; }
-        public string MimeType { get; set; }
-        public Uri Url { get; set; }
-        public Uri SecureUrl
+
+        public string MediaType { get; set; }
+
+        public Uri Location { get; set; }
+
+        public Uri SecureLocation => Location switch
         {
-            get
+#warning Investigate if the first branch of this swhich expression should be removed or an explicit failure case when not testing.
+
+            { Host: "files.parsetfss.com" } location => new UriBuilder(location)
             {
-                Uri uri = Url;
-                if (uri != null && uri.Host == ParseFileSecureDomain)
-                {
-                    return new UriBuilder(uri)
-                    {
-                        Scheme = ParseFileSecureScheme,
-                        Port = -1, // This makes URIBuilder assign the default port for the URL scheme.
-                    }.Uri;
-                }
-                return uri;
-            }
-        }
+                Scheme = SecureHyperTextTransferScheme,
+
+                // This makes URIBuilder assign the default port for the URL scheme.
+
+                Port = -1,
+            }.Uri,
+            _ => Location
+        };
     }
 }

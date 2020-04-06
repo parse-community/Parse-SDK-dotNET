@@ -9,163 +9,119 @@ using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
 {
+#warning This class needs to be rewritten (PCuUsC).
+
     public class ParseCurrentUserController : IParseCurrentUserController
     {
-        private readonly object mutex = new object();
-        private readonly TaskQueue taskQueue = new TaskQueue();
+        object Mutex { get; } = new object { };
 
-        private IStorageController storageController;
+        TaskQueue TaskQueue { get; } = new TaskQueue { };
 
-        public ParseCurrentUserController(IStorageController storageController) => this.storageController = storageController;
+        IStorageController StorageController { get; }
 
-        private ParseUser currentUser;
+        IParseObjectClassController ClassController { get; }
+
+        IParseDataDecoder Decoder { get; }
+
+        public ParseCurrentUserController(IStorageController storageController, IParseObjectClassController classController, IParseDataDecoder decoder) => (StorageController, ClassController, Decoder) = (storageController, classController, decoder);
+
+        ParseUser currentUser;
         public ParseUser CurrentUser
         {
             get
             {
-                lock (mutex)
+                lock (Mutex)
                 {
                     return currentUser;
                 }
             }
             set
             {
-                lock (mutex)
+                lock (Mutex)
                 {
                     currentUser = value;
                 }
             }
         }
 
-        public Task SetAsync(ParseUser user, CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait =>
-                                                                                               {
-                                                                                                   return toAwait.ContinueWith(_ =>
-                                                                                                   {
-                                                                                                       Task saveTask = null;
-                                                                                                       if (user == null)
-                                                                                                       {
-                                                                                                           saveTask = storageController
-                                                                                                             .LoadAsync()
-                                                                                                             .OnSuccess(t => t.Result.RemoveAsync("CurrentUser"))
-                                                                                                             .Unwrap();
-                                                                                                       }
-                                                                                                       else
-                                                                                                       {
-                                                                                                           // TODO (hallucinogen): we need to use ParseCurrentCoder instead of this janky encoding
-                                                                                                           IDictionary<string, object> data = user.ServerDataToJSONObjectForSerialization();
-                                                                                                           data["objectId"] = user.ObjectId;
-                                                                                                           if (user.CreatedAt != null)
-                                                                                                           {
-                                                                                                               data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First(),
-                                                                                                                 CultureInfo.InvariantCulture);
-                                                                                                           }
-                                                                                                           if (user.UpdatedAt != null)
-                                                                                                           {
-                                                                                                               data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First(),
-                                                                                                                 CultureInfo.InvariantCulture);
-                                                                                                           }
+        public Task SetAsync(ParseUser user, CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
+        {
+            Task saveTask = default;
 
-                                                                                                           saveTask = storageController
-                                                                                                             .LoadAsync()
-                                                                                                             .OnSuccess(t => t.Result.AddAsync("CurrentUser", Json.Encode(data)))
-                                                                                                             .Unwrap();
-                                                                                                       }
-                                                                                                       CurrentUser = user;
+            if (user is null)
+            {
+                saveTask = StorageController.LoadAsync().OnSuccess(task => task.Result.RemoveAsync(nameof(CurrentUser))).Unwrap();
+            }
+            else
+            {
+                // TODO (hallucinogen): we need to use ParseCurrentCoder instead of this janky encoding
 
-                                                                                                       return saveTask;
-                                                                                                   }).Unwrap();
-                                                                                               }, cancellationToken);
+                IDictionary<string, object> data = user.ServerDataToJSONObjectForSerialization();
+                data["objectId"] = user.ObjectId;
+
+                if (user.CreatedAt != null)
+                {
+                    data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture);
+                }
+                if (user.UpdatedAt != null)
+                {
+                    data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture);
+                }
+
+                saveTask = StorageController.LoadAsync().OnSuccess(task => task.Result.AddAsync(nameof(CurrentUser), Json.Encode(data))).Unwrap();
+            }
+
+            CurrentUser = user;
+            return saveTask;
+        }).Unwrap(), cancellationToken);
 
         public Task<ParseUser> GetAsync(CancellationToken cancellationToken)
         {
             ParseUser cachedCurrent;
 
-            lock (mutex)
+            lock (Mutex)
             {
                 cachedCurrent = CurrentUser;
             }
 
-            if (cachedCurrent != null)
+            return cachedCurrent is { } ? Task.FromResult(cachedCurrent) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(task =>
             {
-                return Task.FromResult(cachedCurrent);
-            }
+                task.Result.TryGetValue(nameof(CurrentUser), out object data);
+                ParseUser user = default;
 
-            return taskQueue.Enqueue(toAwait =>
-            {
-                return toAwait.ContinueWith(_ =>
+                if (data is string { } serialization)
                 {
-                    return storageController.LoadAsync().OnSuccess(t =>
-                    {
-                        t.Result.TryGetValue("CurrentUser", out object temp);
-                        string userDataString = temp as string;
-                        ParseUser user = null;
-                        if (userDataString != null)
-                        {
-                            IDictionary<string, object> userData = Json.Parse(userDataString) as IDictionary<string, object>;
-                            IObjectState state = ParseObjectCoder.Instance.Decode(userData, ParseDecoder.Instance);
-                            user = ParseObject.FromState<ParseUser>(state, "_User");
-                        }
+                    user = ClassController.GenerateObjectFromState<ParseUser>(ParseObjectCoder.Instance.Decode(Json.Parse(serialization) as IDictionary<string, object>, Decoder), "_User");
+                }
 
-                        CurrentUser = user;
-                        return user;
-                    });
-                }).Unwrap();
-            }, cancellationToken);
+                return CurrentUser = user;
+            })).Unwrap(), cancellationToken);
         }
 
-        public Task<bool> ExistsAsync(CancellationToken cancellationToken)
-        {
-            if (CurrentUser != null)
-            {
-                return Task.FromResult(true);
-            }
-
-            return taskQueue.Enqueue(toAwait =>
-            {
-                return toAwait.ContinueWith(_ =>
-                  storageController.LoadAsync().OnSuccess(t => t.Result.ContainsKey("CurrentUser"))
-                ).Unwrap();
-            }, cancellationToken);
-        }
+        public Task<bool> ExistsAsync(CancellationToken cancellationToken) => CurrentUser is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(t => t.Result.ContainsKey(nameof(CurrentUser)))).Unwrap(), cancellationToken);
 
         public bool IsCurrent(ParseUser user)
         {
-            lock (mutex)
+            lock (Mutex)
             {
                 return CurrentUser == user;
             }
         }
 
-        public void ClearFromMemory() => CurrentUser = null;
+        public void ClearFromMemory() => CurrentUser = default;
 
         public void ClearFromDisk()
         {
-            lock (mutex)
+            lock (Mutex)
             {
                 ClearFromMemory();
 
-                taskQueue.Enqueue(toAwait =>
-                {
-                    return toAwait.ContinueWith(_ =>
-                    {
-                        return storageController.LoadAsync().OnSuccess(t => t.Result.RemoveAsync("CurrentUser"));
-                    }).Unwrap().Unwrap();
-                }, CancellationToken.None);
+                TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(t => t.Result.RemoveAsync(nameof(CurrentUser)))).Unwrap().Unwrap(), CancellationToken.None);
             }
         }
 
-        public Task<string> GetCurrentSessionTokenAsync(CancellationToken cancellationToken) => GetAsync(cancellationToken).OnSuccess(t =>
-                                                                                                          {
-                                                                                                              ParseUser user = t.Result;
-                                                                                                              return user == null ? null : user.SessionToken;
-                                                                                                          });
+        public Task<string> GetCurrentSessionTokenAsync(CancellationToken cancellationToken) => GetAsync(cancellationToken).OnSuccess(task => task.Result?.SessionToken);
 
-        public Task LogOutAsync(CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait =>
-                                                                                  {
-                                                                                      return toAwait.ContinueWith(_ => GetAsync(cancellationToken)).Unwrap().OnSuccess(t =>
-                                                                                      {
-                                                                                          ClearFromDisk();
-                                                                                      });
-                                                                                  }, cancellationToken);
+        public Task LogOutAsync(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(cancellationToken)).Unwrap().OnSuccess(t => ClearFromDisk()), cancellationToken);
     }
 }

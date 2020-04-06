@@ -12,10 +12,10 @@ namespace Parse.Test
     [TestClass]
     public class ObjectTests
     {
-        [ParseClassName("SubClass")]
+        [ParseClassName(nameof(SubClass))]
         private class SubClass : ParseObject { }
 
-        [ParseClassName("UnregisteredSubClass")]
+        [ParseClassName(nameof(UnregisteredSubClass))]
         private class UnregisteredSubClass : ParseObject { }
 
         [TestCleanup]
@@ -54,13 +54,13 @@ namespace Parse.Test
             ParseObject.RegisterDerivative<SubClass>();
 
             ParseObject obj = ParseObject.Create<SubClass>();
-            Assert.AreEqual("SubClass", obj.ClassName);
+            Assert.AreEqual(nameof(SubClass), obj.ClassName);
             Assert.IsNull(obj.CreatedAt);
             Assert.IsTrue(obj.IsDataAvailable);
             Assert.IsTrue(obj.IsDirty);
 
             ParseObject obj2 = ParseObject.CreateWithoutData<SubClass>("waGiManPutr4Pet1r");
-            Assert.AreEqual("SubClass", obj2.ClassName);
+            Assert.AreEqual(nameof(SubClass), obj2.ClassName);
             Assert.AreEqual("waGiManPutr4Pet1r", obj2.ObjectId);
             Assert.IsNull(obj2.CreatedAt);
             Assert.IsFalse(obj2.IsDataAvailable);
@@ -103,12 +103,12 @@ namespace Parse.Test
                 ParseObject.RegisterDerivative<SubClass>();
                 ParseObject.Create<SubClass>();
 
-                ParseCorePlugins.Instance.SubclassingController.UnregisterSubclass(typeof(UnregisteredSubClass));
+                ParseCorePlugins.Instance.SubclassingController.RemoveClass(typeof(UnregisteredSubClass));
                 ParseObject.Create<SubClass>();
             }
             catch { Assert.Fail(); }
 
-            ParseCorePlugins.Instance.SubclassingController.UnregisterSubclass(typeof(SubClass));
+            ParseCorePlugins.Instance.SubclassingController.RemoveClass(typeof(SubClass));
             Assert.ThrowsException<InvalidCastException>(() => ParseObject.Create<SubClass>());
         }
 
@@ -136,7 +136,7 @@ namespace Parse.Test
             IDictionary<string, object> someDict = new Dictionary<string, object>() {
         { "someList", new List<object>() }
       };
-            obj["obj"] = ParseObject.Create("Pug");
+            obj[nameof(obj)] = ParseObject.Create("Pug");
             obj["obj2"] = ParseObject.Create("Pug");
             obj["list"] = new List<object>();
             obj["dict"] = someDict;
@@ -197,7 +197,7 @@ namespace Parse.Test
             obj["list"] = new List<string>();
             obj["dict"] = new Dictionary<string, object>();
             obj["fakeACL"] = new ParseACL();
-            obj["obj"] = new ParseObject("Corgi");
+            obj[nameof(obj)] = new ParseObject("Corgi");
 
             Assert.IsTrue(obj.ContainsKey("gogo"));
             Assert.IsInstanceOfType(obj["gogo"], typeof(bool));
@@ -211,8 +211,8 @@ namespace Parse.Test
             Assert.IsTrue(obj.ContainsKey("fakeACL"));
             Assert.IsInstanceOfType(obj["fakeACL"], typeof(ParseACL));
 
-            Assert.IsTrue(obj.ContainsKey("obj"));
-            Assert.IsInstanceOfType(obj["obj"], typeof(ParseObject));
+            Assert.IsTrue(obj.ContainsKey(nameof(obj)));
+            Assert.IsInstanceOfType(obj[nameof(obj)], typeof(ParseObject));
 
             Assert.ThrowsException<KeyNotFoundException>(() => { object gogo = obj["missingItem"]; });
         }
@@ -433,12 +433,12 @@ namespace Parse.Test
         {
             ParseObject.RegisterDerivative<SubClass>();
 
-            ParseQuery<ParseObject> query = ParseObject.GetQuery("UnregisteredSubClass");
-            Assert.AreEqual("UnregisteredSubClass", query.GetClassName());
+            ParseQuery<ParseObject> query = ParseObject.GetQuery(nameof(UnregisteredSubClass));
+            Assert.AreEqual(nameof(UnregisteredSubClass), query.GetClassName());
 
-            Assert.ThrowsException<ArgumentException>(() => ParseObject.GetQuery("SubClass"));
+            Assert.ThrowsException<ArgumentException>(() => ParseObject.GetQuery(nameof(SubClass)));
 
-            ParseCorePlugins.Instance.SubclassingController.UnregisterSubclass(typeof(SubClass));
+            ParseCorePlugins.Instance.SubclassingController.RemoveClass(typeof(SubClass));
         }
 
         [TestMethod]

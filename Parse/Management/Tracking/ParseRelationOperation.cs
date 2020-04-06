@@ -9,130 +9,94 @@ namespace Parse.Core.Internal
 {
     public class ParseRelationOperation : IParseFieldOperation
     {
-        private readonly IList<string> adds;
-        private readonly IList<string> removes;
-        private readonly string targetClassName;
+        IList<string> Additions { get; }
 
-        private ParseRelationOperation(IEnumerable<string> adds,
-            IEnumerable<string> removes,
-            string targetClassName)
+        IList<string> Removals { get; }
+
+        IParseObjectClassController ClassController { get; }
+
+        ParseRelationOperation(IParseObjectClassController classController) => ClassController = classController;
+
+        ParseRelationOperation(IParseObjectClassController classController, IEnumerable<string> adds, IEnumerable<string> removes, string targetClassName) : this(classController)
         {
-            this.targetClassName = targetClassName;
-            this.adds = new ReadOnlyCollection<string>(adds.ToList());
-            this.removes = new ReadOnlyCollection<string>(removes.ToList());
+            TargetClassName = targetClassName;
+            Additions = new ReadOnlyCollection<string>(adds.ToList());
+            Removals = new ReadOnlyCollection<string>(removes.ToList());
         }
 
-        public ParseRelationOperation(IEnumerable<ParseObject> adds,
-            IEnumerable<ParseObject> removes)
+        public ParseRelationOperation(IParseObjectClassController classController, IEnumerable<ParseObject> adds, IEnumerable<ParseObject> removes) : this(classController)
         {
             adds ??= new ParseObject[0];
             removes ??= new ParseObject[0];
-            targetClassName = adds.Concat(removes).Select(o => o.ClassName).FirstOrDefault();
-            this.adds = new ReadOnlyCollection<string>(IdsFromObjects(adds).ToList());
-            this.removes = new ReadOnlyCollection<string>(IdsFromObjects(removes).ToList());
+
+            TargetClassName = adds.Concat(removes).Select(entity => entity.ClassName).FirstOrDefault();
+            Additions = new ReadOnlyCollection<string>(GetIdsFromObjects(adds).ToList());
+            Removals = new ReadOnlyCollection<string>(GetIdsFromObjects(removes).ToList());
         }
 
         public object Encode()
         {
-            List<object> adds = this.adds
-                .Select(id => PointerOrLocalIdEncoder.Instance.Encode(
-                    ParseObject.CreateWithoutData(targetClassName, id)))
-                .ToList();
-            List<object> removes = this.removes
-                .Select(id => PointerOrLocalIdEncoder.Instance.Encode(
-                    ParseObject.CreateWithoutData(targetClassName, id)))
-                .ToList();
-            Dictionary<string, object> addDict = adds.Count == 0 ? null : new Dictionary<string, object> {
-        {"__op", "AddRelation"},
-        {"objects", adds}
-      };
-            Dictionary<string, object> removeDict = removes.Count == 0 ? null : new Dictionary<string, object> {
-        {"__op", "RemoveRelation"},
-        {"objects", removes}
-      };
+            List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id))).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id))).ToList();
 
-            if (addDict != null && removeDict != null)
+            Dictionary<string, object> addition = additions.Count == 0 ? default : new Dictionary<string, object>
             {
-                return new Dictionary<string, object> {
-          {"__op", "Batch"},
-          {"ops", new[] {addDict, removeDict}}
+                ["__op"] = "AddRelation",
+                ["objects"] = additions
+            };
+
+            Dictionary<string, object> removal = removals.Count == 0 ? default : new Dictionary<string, object>
+            {
+                ["__op"] = "RemoveRelation",
+                ["objects"] = removals
+            };
+
+            if (addition is { } && removal is { })
+            {
+                return new Dictionary<string, object>
+                {
+                    ["__op"] = "Batch",
+                    ["ops"] = new[] { addition, removal }
+                };
+            }
+            return addition ?? removal;
+        }
+
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
+        {
+            null => this,
+            ParseDeleteOperation { } => throw new InvalidOperationException("You can't modify a relation after deleting it."),
+            ParseRelationOperation { } other when other.TargetClassName != TargetClassName => throw new InvalidOperationException($"Related object must be of class {other.TargetClassName}, but {TargetClassName} was passed in."),
+            ParseRelationOperation { ClassController: var classController } other => new ParseRelationOperation(classController, Additions.Union(other.Additions.Except(Removals)).ToList(), Removals.Union(other.Removals.Except(Additions)).ToList(), TargetClassName),
+            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
         };
-            }
-            return addDict ?? removeDict;
-        }
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+        public object Apply(object oldValue, string key) => oldValue switch
         {
-            if (previous == null)
-            {
-                return this;
-            }
-            if (previous is ParseDeleteOperation)
-            {
-                throw new InvalidOperationException("You can't modify a relation after deleting it.");
-            }
-            ParseRelationOperation other = previous as ParseRelationOperation;
-            if (other != null)
-            {
-                if (other.TargetClassName != TargetClassName)
-                {
-                    throw new InvalidOperationException(
-                        String.Format("Related object must be of class {0}, but {1} was passed in.",
-                            other.TargetClassName,
-                            TargetClassName));
-                }
-                List<string> newAdd = adds.Union(other.adds.Except(removes)).ToList();
-                List<string> newRemove = removes.Union(other.removes.Except(adds)).ToList();
-                return new ParseRelationOperation(newAdd, newRemove, TargetClassName);
-            }
-            throw new InvalidOperationException("Operation is invalid after previous operation.");
-        }
+            _ when Additions.Count == 0 && Removals.Count == 0 => default,
+            null => ParseRelationBase.CreateRelation(null, key, TargetClassName),
+            ParseRelationBase { TargetClassName: { } oldClassname } when oldClassname != TargetClassName => throw new InvalidOperationException($"Related object must be a {oldClassname}, but a {TargetClassName} was passed in."),
+            ParseRelationBase { } oldRelation => (Relation: oldRelation, oldRelation.TargetClassName = TargetClassName).Relation,
+            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+        };
 
-        public object Apply(object oldValue, string key)
+        public string TargetClassName { get; }
+
+        IEnumerable<string> GetIdsFromObjects(IEnumerable<ParseObject> objects)
         {
-            if (adds.Count == 0 && removes.Count == 0)
+            foreach (ParseObject entity in objects)
             {
-                return null;
-            }
-            if (oldValue == null)
-            {
-                return ParseRelationBase.CreateRelation(null, key, targetClassName);
-            }
-            if (oldValue is ParseRelationBase)
-            {
-                ParseRelationBase oldRelation = (ParseRelationBase) oldValue;
-                string oldClassName = oldRelation.TargetClassName;
-                if (oldClassName != null && oldClassName != targetClassName)
+                if (entity.ObjectId is null)
                 {
-                    throw new InvalidOperationException("Related object must be a " + oldClassName
-                        + ", but a " + targetClassName + " was passed in.");
+                    throw new ArgumentException("You can't add an unsaved ParseObject to a relation.");
                 }
-                oldRelation.TargetClassName = targetClassName;
-                return oldRelation;
-            }
-            throw new InvalidOperationException("Operation is invalid after previous operation.");
-        }
 
-        public string TargetClassName => targetClassName;
-
-        private IEnumerable<string> IdsFromObjects(IEnumerable<ParseObject> objects)
-        {
-            foreach (ParseObject obj in objects)
-            {
-                if (obj.ObjectId == null)
+                if (entity.ClassName != TargetClassName)
                 {
-                    throw new ArgumentException(
-                      "You can't add an unsaved ParseObject to a relation.");
-                }
-                if (obj.ClassName != targetClassName)
-                {
-                    throw new ArgumentException(String.Format(
-                        "Tried to create a ParseRelation with 2 different types: {0} and {1}",
-                            targetClassName,
-                            obj.ClassName));
+                    throw new ArgumentException($"Tried to create a ParseRelation with 2 different types: {TargetClassName} and {entity.ClassName}");
                 }
             }
-            return objects.Select(o => o.ObjectId).Distinct();
+
+            return objects.Select(entity => entity.ObjectId).Distinct();
         }
     }
 }

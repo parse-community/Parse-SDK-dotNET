@@ -15,7 +15,7 @@ namespace Parse.Core.Internal
 
         public object Encode() => new Dictionary<string, object> {
         {"__op", "Add"},
-        {"objects", PointerOrLocalIdEncoder.Instance.Encode(objects)}
+        {nameof(objects), PointerOrLocalIdEncoder.Instance.Encode(objects)}
       };
 
         public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)

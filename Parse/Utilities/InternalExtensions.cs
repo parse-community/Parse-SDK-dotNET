@@ -42,8 +42,8 @@ namespace Parse.Common.Internal
         }
 
         public static bool CollectionsEqual<T>(this IEnumerable<T> a, IEnumerable<T> b) => Equals(a, b) ||
-                   (a != null && b != null &&
-                   a.SequenceEqual(b));
+                   a != null && b != null &&
+                   a.SequenceEqual(b);
 
         public static Task<TResult> OnSuccess<TIn, TResult>(this Task<TIn> task,
             Func<Task<TIn>, TResult> continuation) => ((Task) task).OnSuccess(t => continuation((Task<TIn>) t));
@@ -92,9 +92,7 @@ namespace Parse.Common.Internal
         public static Task WhileAsync(Func<Task<bool>> predicate, Func<Task> body)
         {
             Func<Task> iterate = null;
-            iterate = () =>
-            {
-                return predicate().OnSuccess(t =>
+            iterate = () => predicate().OnSuccess(t =>
                 {
                     if (!t.Result)
                     {
@@ -102,7 +100,6 @@ namespace Parse.Common.Internal
                     }
                     return body().OnSuccess(_ => iterate()).Unwrap();
                 }).Unwrap();
-            };
             return iterate();
         }
     }

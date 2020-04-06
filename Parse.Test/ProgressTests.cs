@@ -10,36 +10,36 @@ namespace Parse.Test
         [TestMethod]
         public void TestDownloadProgressEventGetterSetter()
         {
-            ParseDownloadProgressEventArgs downloadProgressEvent = new ParseDownloadProgressEventArgs { Progress = 0.5f };
-            Assert.AreEqual(0.5f, downloadProgressEvent.Progress);
+            DataRecievalPresenter downloadProgressEvent = new DataRecievalPresenter { Amount = 0.5f };
+            Assert.AreEqual(0.5f, downloadProgressEvent.Amount);
 
-            downloadProgressEvent.Progress = 1.0f;
-            Assert.AreEqual(1.0f, downloadProgressEvent.Progress);
+            downloadProgressEvent.Amount = 1.0f;
+            Assert.AreEqual(1.0f, downloadProgressEvent.Amount);
         }
 
         [TestMethod]
         public void TestUploadProgressEventGetterSetter()
         {
-            ParseDownloadProgressEventArgs uploadProgressEvent = new ParseDownloadProgressEventArgs { Progress = 0.5f };
-            Assert.AreEqual(0.5f, uploadProgressEvent.Progress);
+            DataRecievalPresenter uploadProgressEvent = new DataRecievalPresenter { Amount = 0.5f };
+            Assert.AreEqual(0.5f, uploadProgressEvent.Amount);
 
-            uploadProgressEvent.Progress = 1.0f;
-            Assert.AreEqual(1.0f, uploadProgressEvent.Progress);
+            uploadProgressEvent.Amount = 1.0f;
+            Assert.AreEqual(1.0f, uploadProgressEvent.Amount);
         }
 
         [TestMethod]
         public void TestObservingDownloadProgress()
         {
             int called = 0;
-            Mock<IProgress<ParseDownloadProgressEventArgs>> mockProgress = new Mock<IProgress<ParseDownloadProgressEventArgs>>();
-            mockProgress.Setup(obj => obj.Report(It.IsAny<ParseDownloadProgressEventArgs>())).Callback(() => called++);
-            IProgress<ParseDownloadProgressEventArgs> progress = mockProgress.Object;
+            Mock<IProgress<DataRecievalPresenter>> mockProgress = new Mock<IProgress<DataRecievalPresenter>>();
+            mockProgress.Setup(obj => obj.Report(It.IsAny<DataRecievalPresenter>())).Callback(() => called++);
+            IProgress<DataRecievalPresenter> progress = mockProgress.Object;
 
-            progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.2f });
-            progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.42f });
-            progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.53f });
-            progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.68f });
-            progress.Report(new ParseDownloadProgressEventArgs { Progress = 0.88f });
+            progress.Report(new DataRecievalPresenter { Amount = 0.2f });
+            progress.Report(new DataRecievalPresenter { Amount = 0.42f });
+            progress.Report(new DataRecievalPresenter { Amount = 0.53f });
+            progress.Report(new DataRecievalPresenter { Amount = 0.68f });
+            progress.Report(new DataRecievalPresenter { Amount = 0.88f });
 
             Assert.AreEqual(5, called);
         }
@@ -48,15 +48,15 @@ namespace Parse.Test
         public void TestObservingUploadProgress()
         {
             int called = 0;
-            Mock<IProgress<ParseUploadProgressEventArgs>> mockProgress = new Mock<IProgress<ParseUploadProgressEventArgs>>();
-            mockProgress.Setup(obj => obj.Report(It.IsAny<ParseUploadProgressEventArgs>())).Callback(() => called++);
-            IProgress<ParseUploadProgressEventArgs> progress = mockProgress.Object;
+            Mock<IProgress<DataTransmissionAdvancementLevel>> mockProgress = new Mock<IProgress<DataTransmissionAdvancementLevel>>();
+            mockProgress.Setup(obj => obj.Report(It.IsAny<DataTransmissionAdvancementLevel>())).Callback(() => called++);
+            IProgress<DataTransmissionAdvancementLevel> progress = mockProgress.Object;
 
-            progress.Report(new ParseUploadProgressEventArgs { Progress = 0.2f });
-            progress.Report(new ParseUploadProgressEventArgs { Progress = 0.42f });
-            progress.Report(new ParseUploadProgressEventArgs { Progress = 0.53f });
-            progress.Report(new ParseUploadProgressEventArgs { Progress = 0.68f });
-            progress.Report(new ParseUploadProgressEventArgs { Progress = 0.88f });
+            progress.Report(new DataTransmissionAdvancementLevel { Amount = 0.2f });
+            progress.Report(new DataTransmissionAdvancementLevel { Amount = 0.42f });
+            progress.Report(new DataTransmissionAdvancementLevel { Amount = 0.53f });
+            progress.Report(new DataTransmissionAdvancementLevel { Amount = 0.68f });
+            progress.Report(new DataTransmissionAdvancementLevel { Amount = 0.88f });
 
             Assert.AreEqual(5, called);
         }

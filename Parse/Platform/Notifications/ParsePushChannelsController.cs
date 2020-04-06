@@ -3,23 +3,26 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Library;
 
 namespace Parse.Push.Internal
 {
     internal class ParsePushChannelsController : IParsePushChannelsController
     {
-        public Task SubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken)
-        {
-            ParseInstallation installation = ParseInstallation.CurrentInstallation;
-            installation.AddRangeUniqueToList("channels", channels);
-            return installation.SaveAsync(cancellationToken);
-        }
+        IParseCurrentInstallationController CurrentInstallationController { get; }
 
-        public Task UnsubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken)
+        public ParsePushChannelsController(IParseCurrentInstallationController currentInstallationController) => CurrentInstallationController = currentInstallationController;
+
+        public Task SubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken) => CurrentInstallationController.GetAsync(cancellationToken).ContinueWith(task =>
         {
-            ParseInstallation installation = ParseInstallation.CurrentInstallation;
-            installation.RemoveAllFromList("channels", channels);
-            return installation.SaveAsync(cancellationToken);
-        }
+            task.Result.AddRangeUniqueToList(nameof(channels), channels);
+            return task.Result.SaveAsync(cancellationToken);
+        });
+
+        public Task UnsubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken) => CurrentInstallationController.GetAsync().ContinueWith(task =>
+        {
+            task.Result.RemoveAllFromList(nameof(channels), channels);
+            return task.Result.SaveAsync(cancellationToken);
+        });
     }
 }

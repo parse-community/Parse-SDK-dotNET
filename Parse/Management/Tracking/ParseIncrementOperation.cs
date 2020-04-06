@@ -97,7 +97,7 @@ namespace Parse.Core.Internal
 
         public object Encode() => new Dictionary<string, object> {
         {"__op", "Increment"},
-        {"amount", amount}
+        {nameof(amount), amount}
       };
 
         private static object Add(object obj1, object obj2)

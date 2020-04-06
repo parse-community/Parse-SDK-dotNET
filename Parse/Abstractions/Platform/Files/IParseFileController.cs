@@ -9,10 +9,6 @@ namespace Parse.Core.Internal
 {
     public interface IParseFileController
     {
-        Task<FileState> SaveAsync(FileState state,
-            Stream dataStream,
-            string sessionToken,
-            IProgress<ParseUploadProgressEventArgs> progress,
-            CancellationToken cancellationToken);
+        Task<FileState> SaveAsync(FileState state, Stream dataStream, string sessionToken, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken);
     }
 }

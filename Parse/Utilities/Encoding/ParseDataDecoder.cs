@@ -1,0 +1,47 @@
+// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Parse.Abstractions.Library;
+using Parse.Utilities;
+
+namespace Parse.Core.Internal
+{
+    public class ParseDataDecoder : IParseDataDecoder
+    {
+        // Prevent default constructor.
+
+        IParseObjectClassController ClassController { get; }
+
+        public ParseDataDecoder(IParseObjectClassController classController) => ClassController = classController;
+
+        static string[] Types { get; } = { "Date", "Bytes", "Pointer", "File", "GeoPoint", "Object", "Relation" };
+
+        public object Decode(object data) => data switch
+        {
+            null => default,
+            IDictionary<string, object> { } dictionary when dictionary.ContainsKey("__op") => ParseFieldOperations.Decode(dictionary),
+            IDictionary<string, object> { } dictionary when dictionary.TryGetValue("__type", out object type) && Types.Contains(type) => type switch
+            {
+                "Date" => ParseDate(dictionary["iso"] as string),
+                "Bytes" => Convert.FromBase64String(dictionary["base64"] as string),
+                "Pointer" => DecodePointer(dictionary["className"] as string, dictionary["objectId"] as string),
+                "File" => new ParseFile(dictionary["name"] as string, new Uri(dictionary["url"] as string)),
+                "GeoPoint" => new ParseGeoPoint(Conversion.To<double>(dictionary["latitude"]), Conversion.To<double>(dictionary["longitude"])),
+                "Object" => ClassController.GenerateObjectFromState<ParseObject>(ParseObjectCoder.Instance.Decode(dictionary, this), dictionary["className"] as string),
+                "Relation" => ParseRelationBase.CreateRelation(null, null, dictionary["className"] as string)
+            },
+            IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value)),
+            IList<object> { } list => list.Select(Decode),
+            _ => data
+        };
+
+        protected virtual object DecodePointer(string className, string objectId) => ClassController.CreateObjectWithoutData(className, objectId);
+
+        // TODO(hallucinogen): Figure out if we should be more flexible with the date formats we accept.
+
+        public static DateTime ParseDate(string input) => DateTime.ParseExact(input, ParseClient.DateFormatStrings, CultureInfo.InvariantCulture, DateTimeStyles.None);
+    }
+}

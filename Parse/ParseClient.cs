@@ -11,13 +11,17 @@ using Parse.Common.Internal;
 using Parse.Library;
 using Parse.Management;
 
+#if DEBUG
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Parse.Test")]
+#endif
+
 namespace Parse
 {
     /// <summary>
     /// ParseClient contains static functions that handle global
     /// configuration for the Parse library.
     /// </summary>
-    public static partial class ParseClient
+    public class ParseClient : CustomServiceHub, IServiceHubComposer
     {
         /// <summary>
         /// Contains, in order, the official ISO date and time format strings, and two modified versions that account for the possibility that the server-side string processing mechanism removed trailing zeroes.
@@ -29,14 +33,29 @@ namespace Parse
             "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'f'Z'",
         };
 
-        static object Mutex { get; } = new object { };
+        /// <summary>
+        /// Gets whether or not the assembly using the Parse SDK was compiled by IL2CPP.
+        /// </summary>
+        public static bool IL2CPPCompiled { get; set; } = AppDomain.CurrentDomain?.FriendlyName?.Equals("IL2CPP Root Domain") == true;
+
+        /// <summary>
+        /// The configured default instance of <see cref="ParseClient"/> to use.
+        /// </summary>
+        public static ParseClient Instance { get; private set; }
 
         /// <summary>
         /// The current configuration that parse has been initialized with.
         /// </summary>
-        public static Configuration Configuration { get; internal set; }
+        public IServerConnectionData Configuration => Services.ServerConnectionData;
 
-        internal static Version Version => new AssemblyName(typeof(ParseClient).GetTypeInfo().Assembly.FullName).Version;
+        internal static string Version => typeof(ParseClient)?.Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? typeof(ParseClient)?.Assembly?.GetName()?.Version?.ToString();
+
+        /// <summary>
+        /// Services that provide essential functionality.
+        /// </summary>
+        public override IServiceHub Services { get; protected set; }
+
+        // TODO: Implement IServiceHubMutator in all IServiceHub-implementing classes in Parse.Library and possibly require all implementations to do so as an efficiency improvement over instantiating an OrchestrationServiceHub, only for another one to be possibly instantiated when configurators are specified.
 
         /// <summary>
         /// Authenticates this client as belonging to your application. This must be
@@ -48,7 +67,8 @@ namespace Parse
         /// </param>
         /// <param name="serverURI">The server URI provided in the Parse dashboard.
         /// </param>
-        public static void Initialize(string identifier, string serverURI, ICacheLocationConfiguration storageConfiguration = default, IHostApplicationVersioningData hostVersioning = default, IParseCorePlugins plugins = default) => Initialize(new Configuration { ApplicationID = identifier, ServerURI = serverURI }, storageConfiguration, hostVersioning, plugins);
+        /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
+        public ParseClient(string identifier, string serverURI, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators) : this(new ServerConnectionData { ApplicationID = identifier, ServerURI = serverURI }, serviceHub, configurators) { }
 
         /// <summary>
         /// Authenticates this client as belonging to your application. This must be
@@ -58,66 +78,75 @@ namespace Parse
         /// </summary>
         /// <param name="configuration">The configuration to initialize Parse with.
         /// </param>
-        public static void Initialize(Configuration configuration, ICacheLocationConfiguration cacheConfiguration = default, IHostApplicationVersioningData hostVersioning = default, IParseCorePlugins plugins = default)
+        /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
+        public ParseClient(IServerConnectionData configuration, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators)
+        {
+            Services = serviceHub is { } ? new OrchestrationServiceHub { Custom = serviceHub, Default = new ServiceHub { ServerConnectionData = GenerateServerConnectionData() } } : new ServiceHub { ServerConnectionData = GenerateServerConnectionData() } as IServiceHub;
+
+            IServerConnectionData GenerateServerConnectionData() => configuration switch
+            {
+                null => throw new ArgumentNullException(nameof(configuration)),
+                ServerConnectionData { Test: true } data => data,
+                { ServerURI: "https://api.parse.com/1/" } => throw new InvalidOperationException("Since the official parse server has shut down, you must specify a URI that points to a hosted instance."),
+                { ApplicationID: { }, ServerURI: { }, Key: { } } data => data,
+                _ => throw new InvalidOperationException("The IClientConfiguration implementation instance provided to the ParseClient constructor must be populated with configuration information.")
+            };
+
+            if (configurators is { Length: int length } && length > 0)
+            {
+                Services = BuildHub(default, Services, configurators);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a <see cref="ParseClient"/> instance using the <see cref="IServiceHub.Cloner"/> set on the <see cref="Instance"/>'s <see cref="Services"/> <see cref="IServiceHub"/> implementation instance.
+        /// </summary>
+        public ParseClient() => Services = (Instance ?? throw new InvalidOperationException("A ParseClient instance with an initializer service must first be publicized in order for the default constructor to be used.")).Services.Cloner.BuildHub(Instance.Services, this);
+
+        /// <summary>
+        /// Sets this <see cref="ParseClient"/> instance as the template to create new instances from.
+        /// </summary>
+        ///// <param name="publicize">Declares that the current <see cref="ParseClient"/> instance should be the publicly-accesible <see cref="Instance"/>.</param>
+        public void Publicize()
         {
             lock (Mutex)
             {
-                configuration.ServerURI ??= configuration.Test ? "https://api.parse.com/1/" : throw new ArgumentException("Since the official parse server has shut down, you must specify a URI that points to a hosted instance.");
-                plugins ??= new ParseCorePlugins { };
-
-                bool keepRelativeStoragePath = plugins is { StorageController: { } }, keepVersion = plugins is { MetadataController: { } };
-
-                if (plugins is ParseCorePlugins)
-                {
-                    ParseCorePlugins.Instance = plugins;
-                }
-
-                if (hostVersioning is { } && !keepVersion && plugins.MetadataController is MetadataController { } metadataController)
-                {
-                    metadataController.HostVersioningData = hostVersioning switch
-                    {
-                        { CanBeUsedForInference: true } data => data,
-                        { IsDefault: false } data => new HostApplicationVersioningData
-                        {
-                            BuildVersion = data.BuildVersion,
-                            HostOSVersion = data.HostOSVersion,
-                            DisplayVersion = HostApplicationVersioningData.Inferred.DisplayVersion
-                        },
-                        _ => HostApplicationVersioningData.Inferred
-                    };
-                }
-
-                if (cacheConfiguration is { } && !keepRelativeStoragePath && plugins.StorageController is StorageController { } storageController)
-                {
-                    storageController.RelativeStorageFilePath = cacheConfiguration.GetRelativeStorageFilePath(plugins);
-                }
-
-                Configuration = configuration;
-
-                ParseObject.RegisterDerivative<ParseUser>();
-                ParseObject.RegisterDerivative<ParseRole>();
-                ParseObject.RegisterDerivative<ParseSession>();
-                ParseObject.RegisterDerivative<ParseInstallation>();
-
-                AppDomain.CurrentDomain.ProcessExit += (_, __) => plugins.StorageController.Clean();
+                Instance = this;
             }
         }
+
+        static object Mutex { get; } = new object { };
 
         internal static string BuildQueryString(IDictionary<string, object> parameters) => String.Join("&", (from pair in parameters let valueString = pair.Value as string select $"{Uri.EscapeDataString(pair.Key)}={Uri.EscapeDataString(String.IsNullOrEmpty(valueString) ? Json.Encode(pair.Value) : valueString)}").ToArray());
 
         internal static IDictionary<string, string> DecodeQueryString(string queryString)
         {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
+            Dictionary<string, string> query = new Dictionary<string, string> { };
+
             foreach (string pair in queryString.Split('&'))
             {
                 string[] parts = pair.Split(new char[] { '=' }, 2);
-                dict[parts[0]] = parts.Length == 2 ? Uri.UnescapeDataString(parts[1].Replace("+", " ")) : null;
+                query[parts[0]] = parts.Length == 2 ? Uri.UnescapeDataString(parts[1].Replace("+", " ")) : null;
             }
-            return dict;
+
+            return query;
         }
 
         internal static IDictionary<string, object> DeserializeJsonString(string jsonData) => Json.Parse(jsonData) as IDictionary<string, object>;
 
         internal static string SerializeJsonString(IDictionary<string, object> jsonData) => Json.Encode(jsonData);
+
+        public IServiceHub BuildHub(IMutableServiceHub target = default, IServiceHub extension = default, params IServiceHubMutator[] configurators)
+        {
+            OrchestrationServiceHub orchestrationServiceHub = new OrchestrationServiceHub { Custom = target ??= new MutableServiceHub { }, Default = extension ?? new ServiceHub { } };
+
+            foreach (IServiceHubMutator mutator in configurators.Where(configurator => configurator.Valid))
+            {
+                mutator.Mutate(ref target, orchestrationServiceHub);
+                orchestrationServiceHub.Custom = target;
+            }
+
+            return orchestrationServiceHub;
+        }
     }
 }

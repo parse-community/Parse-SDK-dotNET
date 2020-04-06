@@ -6,30 +6,34 @@ namespace Parse.Push.Internal
 {
     public class ParseInstallationCoder : IParseInstallationCoder
     {
-        private static readonly ParseInstallationCoder instance = new ParseInstallationCoder();
-        public static ParseInstallationCoder Instance => instance;
-        private const string ISO8601Format = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'";
+        IParseDataDecoder Decoder { get; }
+
+        IParseObjectClassController ClassController { get; }
+
+        public ParseInstallationCoder(IParseDataDecoder decoder, IParseObjectClassController classController) => Decoder = decoder;
 
         public IDictionary<string, object> Encode(ParseInstallation installation)
         {
-            IObjectState state = installation.GetState();
+            IObjectState state = installation.State;
             IDictionary<string, object> data = PointerOrLocalIdEncoder.Instance.Encode(state.ToDictionary(x => x.Key, x => x.Value)) as IDictionary<string, object>;
+
             data["objectId"] = state.ObjectId;
-            if (state.CreatedAt != null)
+
+            // The following operations use the date and time serialization format defined by ISO standard 8601.
+
+            if (state.CreatedAt is { })
             {
-                data["createdAt"] = state.CreatedAt.Value.ToString(ISO8601Format);
+                data["createdAt"] = state.CreatedAt.Value.ToString(ParseClient.DateFormatStrings[0]);
             }
-            if (state.UpdatedAt != null)
+
+            if (state.UpdatedAt is { })
             {
-                data["updatedAt"] = state.UpdatedAt.Value.ToString(ISO8601Format);
+                data["updatedAt"] = state.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings[0]);
             }
+
             return data;
         }
 
-        public ParseInstallation Decode(IDictionary<string, object> data)
-        {
-            IObjectState state = ParseObjectCoder.Instance.Decode(data, ParseDecoder.Instance);
-            return ParseObjectExtensions.FromState<ParseInstallation>(state, "_Installation");
-        }
+        public ParseInstallation Decode(IDictionary<string, object> data) => ClassController.GenerateObjectFromState<ParseInstallation>(ParseObjectCoder.Instance.Decode(data, Decoder), "_Installation");
     }
 }

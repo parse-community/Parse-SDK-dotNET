@@ -16,7 +16,7 @@ namespace Parse.Test
     public class ObjectControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(ObjectControllerTests))]
@@ -29,7 +29,7 @@ namespace Parse.Test
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi/st4nl3yW"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/classes/Corgi/st4nl3yW"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = t.Result;
                 Assert.AreEqual("isShibaInu", newState["doge"]);
@@ -50,7 +50,7 @@ namespace Parse.Test
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi/st4nl3yW"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/classes/Corgi/st4nl3yW"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = t.Result;
                 Assert.AreEqual("isShibaInu", newState["doge"]);
@@ -89,7 +89,7 @@ namespace Parse.Test
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/classes/Corgi"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = t.Result;
                 Assert.AreEqual("isShibaInu", newState["doge"]);
@@ -112,7 +112,7 @@ namespace Parse.Test
                 states.Add(new MutableObjectState
                 {
                     ClassName = "Corgi",
-                    ObjectId = ((i % 2 == 0) ? null : "st4nl3yW" + i),
+                    ObjectId = (i % 2 == 0) ? null : "st4nl3yW" + i,
                     ServerData = new Dictionary<string, object> { ["corgi"] = "isNotDoge" }
                 });
             }
@@ -135,7 +135,7 @@ namespace Parse.Test
                     }
                 });
             }
-            Dictionary<string, object> responseDict = new Dictionary<string, object> { ["results"] = results };
+            Dictionary<string, object> responseDict = new Dictionary<string, object> { [nameof(results)] = results };
 
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict);
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
@@ -158,7 +158,7 @@ namespace Parse.Test
                     Assert.IsNotNull(serverState.UpdatedAt);
                 }
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/batch"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -200,7 +200,7 @@ namespace Parse.Test
                     }
                 });
             }
-            Dictionary<string, object> responseDict = new Dictionary<string, object> { ["results"] = results };
+            Dictionary<string, object> responseDict = new Dictionary<string, object> { [nameof(results)] = results };
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict);
 
             List<IDictionary<string, object>> results2 = new List<IDictionary<string, object>>();
@@ -218,11 +218,11 @@ namespace Parse.Test
                     }
                 });
             }
-            Dictionary<string, object> responseDict2 = new Dictionary<string, object> { ["results"] = results2 };
+            Dictionary<string, object> responseDict2 = new Dictionary<string, object> { [nameof(results)] = results2 };
             Tuple<HttpStatusCode, IDictionary<string, object>> response2 = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict2);
 
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner> { };
-            mockRunner.SetupSequence(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response)).Returns(Task.FromResult(response)).Returns(Task.FromResult(response2));
+            mockRunner.SetupSequence(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response)).Returns(Task.FromResult(response)).Returns(Task.FromResult(response2));
 
             ParseObjectController controller = new ParseObjectController(mockRunner.Object);
             IList<Task<IObjectState>> tasks = controller.SaveAllAsync(states, operationsList, null, CancellationToken.None);
@@ -234,7 +234,7 @@ namespace Parse.Test
                 for (int i = 0; i < 102; ++i)
                 {
                     IObjectState serverState = tasks[i].Result;
-                    Assert.AreEqual("st4nl3yW" + (i % 50), serverState.ObjectId);
+                    Assert.AreEqual("st4nl3yW" + i % 50, serverState.ObjectId);
                     Assert.IsFalse(serverState.ContainsKey("gogo"));
                     Assert.IsFalse(serverState.ContainsKey("corgi"));
                     Assert.AreEqual("isShibaInu", serverState["doge"]);
@@ -242,7 +242,7 @@ namespace Parse.Test
                     Assert.IsNotNull(serverState.UpdatedAt);
                 }
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/batch"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
             });
         }
 
@@ -266,9 +266,9 @@ namespace Parse.Test
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/classes/Corgi/st4nl3yW"),
-                    It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                    It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/classes/Corgi/st4nl3yW"),
+                    It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
+                    It.IsAny<IProgress<DataRecievalPresenter>>(),
                     It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
@@ -293,7 +293,7 @@ namespace Parse.Test
             for (int i = 0; i < 30; ++i)
                 results.Add(new Dictionary<string, object> { ["success"] = null });
 
-            Dictionary<string, object> responseDict = new Dictionary<string, object> { ["results"] = results };
+            Dictionary<string, object> responseDict = new Dictionary<string, object> { [nameof(results)] = results };
 
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict);
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
@@ -305,7 +305,7 @@ namespace Parse.Test
             {
                 Assert.IsTrue(tasks.All(task => task.IsCompleted && !task.IsCanceled && !task.IsFaulted));
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/batch"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -330,7 +330,7 @@ namespace Parse.Test
             for (int i = 0; i < 50; ++i)
                 results.Add(new Dictionary<string, object> { ["success"] = null });
 
-            Dictionary<string, object> responseDict = new Dictionary<string, object> { ["results"] = results };
+            Dictionary<string, object> responseDict = new Dictionary<string, object> { [nameof(results)] = results };
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict);
 
             List<IDictionary<string, object>> results2 = new List<IDictionary<string, object>>();
@@ -338,11 +338,11 @@ namespace Parse.Test
             for (int i = 0; i < 2; ++i)
                 results2.Add(new Dictionary<string, object> { ["success"] = null });
 
-            Dictionary<string, object> responseDict2 = new Dictionary<string, object> { ["results"] = results2 };
+            Dictionary<string, object> responseDict2 = new Dictionary<string, object> { [nameof(results)] = results2 };
             Tuple<HttpStatusCode, IDictionary<string, object>> response2 = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict2);
 
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
-            mockRunner.SetupSequence(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response)).Returns(Task.FromResult(response)).Returns(Task.FromResult(response2));
+            mockRunner.SetupSequence(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response)).Returns(Task.FromResult(response)).Returns(Task.FromResult(response2));
 
             ParseObjectController controller = new ParseObjectController(mockRunner.Object);
             IList<Task> tasks = controller.DeleteAllAsync(states, null, CancellationToken.None);
@@ -351,7 +351,7 @@ namespace Parse.Test
             {
                 Assert.IsTrue(tasks.All(task => task.IsCompleted && !task.IsCanceled && !task.IsFaulted));
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/batch"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(3));
             });
         }
 
@@ -365,7 +365,7 @@ namespace Parse.Test
                 states.Add(new MutableObjectState
                 {
                     ClassName = "Corgi",
-                    ObjectId = ((i % 2 == 0) ? null : "st4nl3yW" + i),
+                    ObjectId = (i % 2 == 0) ? null : "st4nl3yW" + i,
                     ServerData = new Dictionary<string, object> { ["corgi"] = "isNotDoge" }
                 });
             }
@@ -380,7 +380,7 @@ namespace Parse.Test
                     {
                         ["error"] = new Dictionary<string, object>
                         {
-                            ["code"] = (long) ParseException.ErrorCode.ObjectNotFound,
+                            ["code"] = (long) ParseFailureException.ErrorCode.ObjectNotFound,
                             ["error"] = "Object not found."
                         }
                     });
@@ -389,7 +389,7 @@ namespace Parse.Test
                     results.Add(new Dictionary<string, object> { ["success"] = null });
             }
 
-            Dictionary<string, object> responseDict = new Dictionary<string, object> { ["results"] = results };
+            Dictionary<string, object> responseDict = new Dictionary<string, object> { [nameof(results)] = results };
 
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict);
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
@@ -404,9 +404,9 @@ namespace Parse.Test
                     if (i % 2 == 0)
                     {
                         Assert.IsTrue(tasks[i].IsFaulted);
-                        Assert.IsInstanceOfType(tasks[i].Exception.InnerException, typeof(ParseException));
-                        ParseException exception = tasks[i].Exception.InnerException as ParseException;
-                        Assert.AreEqual(ParseException.ErrorCode.ObjectNotFound, exception.Code);
+                        Assert.IsInstanceOfType(tasks[i].Exception.InnerException, typeof(ParseFailureException));
+                        ParseFailureException exception = tasks[i].Exception.InnerException as ParseFailureException;
+                        Assert.AreEqual(ParseFailureException.ErrorCode.ObjectNotFound, exception.Code);
                     }
                     else
                     {
@@ -415,9 +415,9 @@ namespace Parse.Test
                     }
                 }
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-                    It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                    It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/batch"),
+                    It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
+                    It.IsAny<IProgress<DataRecievalPresenter>>(),
                     It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
@@ -447,7 +447,7 @@ namespace Parse.Test
         });
             }
             Dictionary<string, object> responseDict = new Dictionary<string, object>() {
-        { "results", results }
+        { nameof(results), results }
       };
 
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.OK, responseDict);
@@ -461,9 +461,9 @@ namespace Parse.Test
                 Assert.IsTrue(tasks.All(task => task.IsFaulted));
                 Assert.IsInstanceOfType(tasks[0].Exception.InnerException, typeof(InvalidOperationException));
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/batch"),
-                    It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                    It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/batch"),
+                    It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
+                    It.IsAny<IProgress<DataRecievalPresenter>>(),
                     It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
@@ -472,8 +472,8 @@ namespace Parse.Test
         {
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
             mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(),
-                It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+                It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
+                It.IsAny<IProgress<DataRecievalPresenter>>(),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(response));
 

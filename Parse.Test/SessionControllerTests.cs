@@ -16,7 +16,7 @@ namespace Parse.Test
     public class SessionControllerTests
     {
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new Configuration { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(SessionControllerTests))]
@@ -43,7 +43,7 @@ namespace Parse.Test
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/sessions/me"), It.IsAny<IProgress<ParseUploadProgressEventArgs>>(), It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/sessions/me"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState session = t.Result;
                 Assert.AreEqual(2, session.Count());
@@ -64,9 +64,9 @@ namespace Parse.Test
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/logout"),
-                  It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                  It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/logout"),
+                  It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
+                  It.IsAny<IProgress<DataRecievalPresenter>>(),
                   It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
@@ -89,9 +89,9 @@ namespace Parse.Test
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Uri.AbsolutePath == "/1/upgradeToRevocableSession"),
-                  It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                  It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/upgradeToRevocableSession"),
+                  It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
+                  It.IsAny<IProgress<DataRecievalPresenter>>(),
                   It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState session = t.Result;
@@ -118,8 +118,8 @@ namespace Parse.Test
         {
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
             mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(),
-                It.IsAny<IProgress<ParseUploadProgressEventArgs>>(),
-                It.IsAny<IProgress<ParseDownloadProgressEventArgs>>(),
+                It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
+                It.IsAny<IProgress<DataRecievalPresenter>>(),
                 It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(response));
 

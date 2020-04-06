@@ -11,10 +11,7 @@ namespace Parse.Test
         {
             MutablePushState state = new MutablePushState();
 
-            IPushState mutated = state.MutatedClone(s =>
-            {
-                s.Alert = "test";
-            });
+            IPushState mutated = state.MutatedClone(s => s.Alert = "test");
 
             Assert.AreEqual(null, state.Alert);
             Assert.AreEqual("test", mutated.Alert);

@@ -9,45 +9,17 @@ namespace Parse.Core.Internal
 {
     public class ParseSessionController : IParseSessionController
     {
-        private readonly IParseCommandRunner commandRunner;
+        IParseCommandRunner CommandRunner { get; }
 
-        public ParseSessionController(IParseCommandRunner commandRunner) => this.commandRunner = commandRunner;
+        IParseDataDecoder Decoder { get; }
 
-        public Task<IObjectState> GetSessionAsync(string sessionToken, CancellationToken cancellationToken)
-        {
-            ParseCommand command = new ParseCommand("sessions/me",
-                method: "GET",
-                sessionToken: sessionToken,
-                data: null);
+        public ParseSessionController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
 
-            return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t =>
-            {
-                return ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
-            });
-        }
+        public Task<IObjectState> GetSessionAsync(string sessionToken, CancellationToken cancellationToken) => CommandRunner.RunCommandAsync(new ParseCommand("sessions/me", method: "GET", sessionToken: sessionToken, data: null), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder));
 
-        public Task RevokeAsync(string sessionToken, CancellationToken cancellationToken)
-        {
-            ParseCommand command = new ParseCommand("logout",
-                method: "POST",
-                sessionToken: sessionToken,
-                data: new Dictionary<string, object>());
+        public Task RevokeAsync(string sessionToken, CancellationToken cancellationToken) => CommandRunner.RunCommandAsync(new ParseCommand("logout", method: "POST", sessionToken: sessionToken, data: new Dictionary<string, object> { }), cancellationToken: cancellationToken);
 
-            return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
-        }
-
-        public Task<IObjectState> UpgradeToRevocableSessionAsync(string sessionToken, CancellationToken cancellationToken)
-        {
-            ParseCommand command = new ParseCommand("upgradeToRevocableSession",
-                method: "POST",
-                sessionToken: sessionToken,
-                data: new Dictionary<string, object>());
-
-            return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(t =>
-            {
-                return ParseObjectCoder.Instance.Decode(t.Result.Item2, ParseDecoder.Instance);
-            });
-        }
+        public Task<IObjectState> UpgradeToRevocableSessionAsync(string sessionToken, CancellationToken cancellationToken) => CommandRunner.RunCommandAsync(new ParseCommand("upgradeToRevocableSession", method: "POST", sessionToken: sessionToken, data: new Dictionary<string, object>()), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder));
 
         public bool IsRevocableSessionToken(string sessionToken) => sessionToken.Contains("r:");
     }

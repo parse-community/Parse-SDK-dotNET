@@ -38,4 +38,9 @@
       </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Abstractions\Management\Managers\" />
+      <Folder Include="Library\Controllers\" />
+    </ItemGroup>
+
 </Project>

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parse.Core.Internal;
 using Parse.Internal.Utilities;
+using Parse.Library;
 using Parse.Management;
 using Parse.Storage;
 
@@ -190,7 +191,7 @@ namespace Parse.Common.Internal
         /// <summary>
         /// Gets the calculated persistent storage file fallback path for this app execution.
         /// </summary>
-        public string FallbackPersistentStorageFilePath => StoredFallbackPersistentStorageFilePath ??= IdentifierBasedCacheLocationConfiguration.Fallback.GetRelativeStorageFilePath(new LightParseCorePlugins { StorageController = this });
+        public string FallbackPersistentStorageFilePath => StoredFallbackPersistentStorageFilePath ??= IdentifierBasedCacheLocationConfiguration.Fallback.GetRelativeStorageFilePath(new MutableServiceHub { StorageController = this });
 
         string StoredFallbackPersistentStorageFilePath { get; set; }
 

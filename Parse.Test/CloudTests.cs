@@ -28,7 +28,7 @@ namespace Parse.Test
                 CurrentUserController = new Mock<IParseCurrentUserController>().Object
             };
 
-            return ParseCloud.CallFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None).ContinueWith(t =>
+            return CloudCodeServiceExtensions.CallFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None).ContinueWith(t =>
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);

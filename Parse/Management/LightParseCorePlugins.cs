@@ -20,7 +20,7 @@ namespace Parse.Management
 
         public IStorageController StorageController { get; set; }
 
-        public IObjectSubclassingController SubclassingController { get; set; }
+        public IParseObjectClassController SubclassingController { get; set; }
 
         public IParseInstallationController InstallationController { get; set; }
 
@@ -28,7 +28,7 @@ namespace Parse.Management
 
         public IParseCloudCodeController CloudCodeController { get; set; }
 
-        public IParseConfigController ConfigController { get; set; }
+        public IParseConfigurationController ConfigController { get; set; }
 
         public IParseFileController FileController { get; set; }
 
@@ -42,7 +42,7 @@ namespace Parse.Management
 
         public IParseCurrentUserController CurrentUserController { get; set; }
 
-        public IParseCurrentConfigController CurrentConfigController { get; set; }
+        public IParseCurrentConfigurationController CurrentConfigController { get; set; }
 
         public void Reset() => throw new NotImplementedException { };
 

@@ -1,7 +1,9 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Common.Internal;
@@ -10,59 +12,49 @@ namespace Parse.Core.Internal
 {
     public class ParseFileController : IParseFileController
     {
-        private readonly IParseCommandRunner commandRunner;
+        IParseCommandRunner CommandRunner { get; }
 
-        public ParseFileController(IParseCommandRunner commandRunner) => this.commandRunner = commandRunner;
+        public ParseFileController(IParseCommandRunner commandRunner) => CommandRunner = commandRunner;
 
-        public Task<FileState> SaveAsync(FileState state,
-            Stream dataStream,
-            string sessionToken,
-            IProgress<ParseUploadProgressEventArgs> progress,
-            CancellationToken cancellationToken = default(CancellationToken))
+        public Task<FileState> SaveAsync(FileState state, Stream dataStream, string sessionToken, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default)
         {
-            if (state.Url != null)
+            if (state.Location != null)
             {
                 // !isDirty
+
                 return Task.FromResult(state);
             }
 
             if (cancellationToken.IsCancellationRequested)
             {
-                TaskCompletionSource<FileState> tcs = new TaskCompletionSource<FileState>();
-                tcs.TrySetCanceled();
-                return tcs.Task;
+                return Task.FromCanceled<FileState>(cancellationToken);
             }
 
             long oldPosition = dataStream.Position;
-            ParseCommand command = new ParseCommand("files/" + state.Name,
-                method: "POST",
-                sessionToken: sessionToken,
-                contentType: state.MimeType,
-                stream: dataStream);
 
-            return commandRunner.RunCommandAsync(command,
-                uploadProgress: progress,
-                cancellationToken: cancellationToken).OnSuccess(uploadTask =>
-                {
-                    Tuple<System.Net.HttpStatusCode, System.Collections.Generic.IDictionary<string, object>> result = uploadTask.Result;
-                    System.Collections.Generic.IDictionary<string, object> jsonData = result.Item2;
-                    cancellationToken.ThrowIfCancellationRequested();
+            return CommandRunner.RunCommandAsync(new ParseCommand($"files/{state.Name}", method: "POST", sessionToken: sessionToken, contentType: state.MediaType, stream: dataStream), uploadProgress: progress, cancellationToken: cancellationToken).OnSuccess(uploadTask =>
+            {
+                Tuple<HttpStatusCode, IDictionary<string, object>> result = uploadTask.Result;
+                IDictionary<string, object> jsonData = result.Item2;
+                cancellationToken.ThrowIfCancellationRequested();
 
-                    return new FileState
-                    {
-                        Name = jsonData["name"] as string,
-                        Url = new Uri(jsonData["url"] as string, UriKind.Absolute),
-                        MimeType = state.MimeType
-                    };
-                }).ContinueWith(t =>
+                return new FileState
                 {
-                    // Rewind the stream on failure or cancellation (if possible)
-                    if ((t.IsFaulted || t.IsCanceled) && dataStream.CanSeek)
-                    {
-                        dataStream.Seek(oldPosition, SeekOrigin.Begin);
-                    }
-                    return t;
-                }).Unwrap();
+                    Name = jsonData["name"] as string,
+                    Location = new Uri(jsonData["url"] as string, UriKind.Absolute),
+                    MediaType = state.MediaType
+                };
+            }).ContinueWith(task =>
+            {
+                // Rewind the stream on failure or cancellation (if possible).
+
+                if ((task.IsFaulted || task.IsCanceled) && dataStream.CanSeek)
+                {
+                    dataStream.Seek(oldPosition, SeekOrigin.Begin);
+                }
+
+                return task;
+            }).Unwrap();
         }
     }
 }

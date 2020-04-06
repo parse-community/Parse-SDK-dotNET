@@ -91,10 +91,7 @@ namespace Parse.Test
             Assert.AreEqual(2, state["exist"]);
             Assert.AreEqual("teletubies", state["change"]);
 
-            state = state.MutatedClone(mutableClone =>
-            {
-                mutableClone.Apply(operations);
-            });
+            state = state.MutatedClone(mutableClone => mutableClone.Apply(operations));
 
             Assert.AreEqual(3, state.Count());
             Assert.AreEqual(9, state["exist"]);
@@ -127,10 +124,7 @@ namespace Parse.Test
         }
             };
 
-            state = state.MutatedClone(mutableClone =>
-            {
-                mutableClone.Apply(appliedState);
-            });
+            state = state.MutatedClone(mutableClone => mutableClone.Apply(appliedState));
 
             Assert.AreEqual("Corgi", state.ClassName);
             Assert.AreEqual("1234", state.ObjectId);

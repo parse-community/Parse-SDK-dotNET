@@ -18,9 +18,6 @@ namespace Parse.Core.Internal
         /// <param name="downloadProgress">Download progress callback.</param>
         /// <param name="cancellationToken">The cancellation token for the request.</param>
         /// <returns></returns>
-        Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command,
-            IProgress<ParseUploadProgressEventArgs> uploadProgress = null,
-            IProgress<ParseDownloadProgressEventArgs> downloadProgress = null,
-            CancellationToken cancellationToken = default(CancellationToken));
+        Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command, IProgress<IDataTransferLevel> uploadProgress = null, IProgress<IDataTransferLevel> downloadProgress = null, CancellationToken cancellationToken = default);
     }
 }

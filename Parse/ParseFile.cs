@@ -5,12 +5,44 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 using Parse.Management;
 
 namespace Parse
 {
+    public static class FileServiceExtensions
+    {
+        /// <summary>
+        /// Saves the file to the Parse cloud.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public static Task SaveFileAsync(this IServiceHub serviceHub, ParseFile file, CancellationToken cancellationToken = default) => serviceHub.SaveFileAsync(file, default, cancellationToken);
+
+        /// <summary>
+        /// Saves the file to the Parse cloud.
+        /// </summary>
+        /// <param name="progress">The progress callback.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public static Task SaveFileAsync(this IServiceHub serviceHub, ParseFile file, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default) => file.TaskQueue.Enqueue(toAwait => serviceHub.FileController.SaveAsync(file.State, file.DataStream, serviceHub.GetCurrentSessionToken(), progress, cancellationToken), cancellationToken).OnSuccess(task => file.State = task.Result);
+
+#warning Make serviceHub null by default once dependents properly inject it when needed.
+
+        /// <summary>
+        /// Saves the file to the Parse cloud.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public static Task SaveAsync(this ParseFile file, IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.SaveFileAsync(file, cancellationToken);
+
+        /// <summary>
+        /// Saves the file to the Parse cloud.
+        /// </summary>
+        /// <param name="progress">The progress callback.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public static Task SaveAsync(this ParseFile file, IServiceHub serviceHub, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default) => serviceHub.SaveFileAsync(file, progress, cancellationToken);
+    }
+
     /// <summary>
     /// ParseFile is a local representation of a file that is saved to the Parse cloud.
     /// </summary>
@@ -29,17 +61,21 @@ namespace Parse
     /// </example>
     public class ParseFile : IJsonConvertible
     {
-        private FileState state;
-        private readonly Stream dataStream;
-        private readonly TaskQueue taskQueue = new TaskQueue();
+        internal FileState State { get; set; }
+
+        internal Stream DataStream { get; }
+
+        internal TaskQueue TaskQueue { get; } = new TaskQueue { };
 
         #region Constructor
 
-        internal ParseFile(string name, Uri uri, string mimeType = null) => state = new FileState
+#warning Make IServiceHub optionally null once all dependents are injecting it if necessary.
+
+        internal ParseFile(string name, Uri uri, string mimeType = null) => State = new FileState
         {
             Name = name,
-            Url = uri,
-            MimeType = mimeType
+            Location = uri,
+            MediaType = mimeType
         };
 
         /// <summary>
@@ -51,8 +87,7 @@ namespace Parse
         /// <param name="data">The file's data.</param>
         /// <param name="mimeType">To specify the content-type used when uploading the
         /// file, provide this parameter.</param>
-        public ParseFile(string name, byte[] data, string mimeType = null)
-          : this(name, new MemoryStream(data), mimeType) { }
+        public ParseFile(string name, byte[] data, string mimeType = null) : this(name, new MemoryStream(data), mimeType) { }
 
         /// <summary>
         /// Creates a new file from a stream and a name.
@@ -65,12 +100,13 @@ namespace Parse
         /// file, provide this parameter.</param>
         public ParseFile(string name, Stream data, string mimeType = null)
         {
-            state = new FileState
+            State = new FileState
             {
                 Name = name,
-                MimeType = mimeType
+                MediaType = mimeType
             };
-            dataStream = data;
+
+            DataStream = data;
         }
 
         #endregion
@@ -80,79 +116,44 @@ namespace Parse
         /// <summary>
         /// Gets whether the file still needs to be saved.
         /// </summary>
-        public bool IsDirty => state.Url == null;
+        public bool IsDirty => State.Location == null;
 
         /// <summary>
         /// Gets the name of the file. Before save is called, this is the filename given by
         /// the user. After save is called, that name gets prefixed with a unique identifier.
         /// </summary>
         [ParseFieldName("name")]
-        public string Name => state.Name;
+        public string Name => State.Name;
 
         /// <summary>
         /// Gets the MIME type of the file. This is either passed in to the constructor or
         /// inferred from the file extension. "unknown/unknown" will be used if neither is
         /// available.
         /// </summary>
-        public string MimeType => state.MimeType;
+        public string MimeType => State.MediaType;
 
         /// <summary>
         /// Gets the url of the file. It is only available after you save the file or after
         /// you get the file from a <see cref="ParseObject"/>.
         /// </summary>
         [ParseFieldName("url")]
-        public Uri Url => state.SecureUrl;
-
-        internal static IParseFileController FileController => ParseCorePlugins.Instance.FileController;
+        public Uri Url => State.SecureLocation;
 
         #endregion
 
-        IDictionary<string, object> IJsonConvertible.ToJSON()
+        IDictionary<string, object> IJsonConvertible.ConvertToJSON()
         {
             if (IsDirty)
             {
-                throw new InvalidOperationException(
-                  "ParseFile must be saved before it can be serialized.");
+                throw new InvalidOperationException("ParseFile must be saved before it can be serialized.");
             }
-            return new Dictionary<string, object> {
-        {"__type", "File"},
-        {"name", Name},
-        {"url", Url.AbsoluteUri}
-      };
-        }
 
-        #region Save
-
-        /// <summary>
-        /// Saves the file to the Parse cloud.
-        /// </summary>
-        public Task SaveAsync() => SaveAsync(null, CancellationToken.None);
-
-        /// <summary>
-        /// Saves the file to the Parse cloud.
-        /// </summary>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public Task SaveAsync(CancellationToken cancellationToken) => SaveAsync(null, cancellationToken);
-
-        /// <summary>
-        /// Saves the file to the Parse cloud.
-        /// </summary>
-        /// <param name="progress">The progress callback.</param>
-        public Task SaveAsync(IProgress<ParseUploadProgressEventArgs> progress) => SaveAsync(progress, CancellationToken.None);
-
-        /// <summary>
-        /// Saves the file to the Parse cloud.
-        /// </summary>
-        /// <param name="progress">The progress callback.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public Task SaveAsync(IProgress<ParseUploadProgressEventArgs> progress,
-            CancellationToken cancellationToken) => taskQueue.Enqueue(
-                toAwait => FileController.SaveAsync(state, dataStream, ParseUser.CurrentSessionToken, progress, cancellationToken), cancellationToken)
-            .OnSuccess(t =>
+            return new Dictionary<string, object>
             {
-                state = t.Result;
-            });
-
-        #endregion
+                ["__type"] = "File",
+                ["name"] = Name,
+                ["url"] = Url.AbsoluteUri
+            };
+        }
     }
 }

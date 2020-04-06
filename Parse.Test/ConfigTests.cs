@@ -14,20 +14,20 @@ namespace Parse.Test
     [TestClass]
     public class ConfigTests
     {
-        private IParseConfigController MockedConfigController
+        private IParseConfigurationController MockedConfigController
         {
             get
             {
-                Mock<IParseConfigController> mockedConfigController = new Mock<IParseConfigController>();
-                Mock<IParseCurrentConfigController> mockedCurrentConfigController = new Mock<IParseCurrentConfigController>();
+                Mock<IParseConfigurationController> mockedConfigController = new Mock<IParseConfigurationController>();
+                Mock<IParseCurrentConfigurationController> mockedCurrentConfigController = new Mock<IParseCurrentConfigurationController>();
 
-                ParseConfig theConfig = ParseConfigExtensions.Create(new Dictionary<string, object> { ["params"] = new Dictionary<string, object> { ["testKey"] = "testValue" } });
+                ParseConfiguration theConfig = ParseConfigExtensions.Create(new Dictionary<string, object> { ["params"] = new Dictionary<string, object> { ["testKey"] = "testValue" } });
 
                 mockedCurrentConfigController.Setup(obj => obj.GetCurrentConfigAsync()).Returns(Task.FromResult(theConfig));
 
-                mockedConfigController.Setup(obj => obj.CurrentConfigController).Returns(mockedCurrentConfigController.Object);
+                mockedConfigController.Setup(obj => obj.CurrentConfigurationController).Returns(mockedCurrentConfigController.Object);
 
-                TaskCompletionSource<ParseConfig> tcs = new TaskCompletionSource<ParseConfig>();
+                TaskCompletionSource<ParseConfiguration> tcs = new TaskCompletionSource<ParseConfiguration>();
                 tcs.TrySetCanceled();
 
                 mockedConfigController.Setup(obj => obj.FetchConfigAsync(It.IsAny<string>(), It.Is<CancellationToken>(ct => ct.IsCancellationRequested))).Returns(tcs.Task);
@@ -47,7 +47,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestCurrentConfig()
         {
-            ParseConfig config = ParseConfig.CurrentConfig;
+            ParseConfiguration config = ParseConfiguration.CurrentConfig;
 
             Assert.AreEqual("testValue", config["testKey"]);
             Assert.AreEqual("testValue", config.Get<string>("testKey"));
@@ -57,12 +57,12 @@ namespace Parse.Test
         public void TestToJSON()
         {
             IDictionary<string, object> expectedJson = new Dictionary<string, object> { { "params", new Dictionary<string, object> { { "testKey", "testValue" } } } };
-            Assert.AreEqual(JsonConvert.SerializeObject((ParseConfig.CurrentConfig as IJsonConvertible).ToJSON()), JsonConvert.SerializeObject(expectedJson));
+            Assert.AreEqual(JsonConvert.SerializeObject((ParseConfiguration.CurrentConfig as IJsonConvertible).ConvertToJSON()), JsonConvert.SerializeObject(expectedJson));
         }
 
         [TestMethod]
         [AsyncStateMachine(typeof(ConfigTests))]
-        public Task TestGetConfig() => ParseConfig.GetAsync().ContinueWith(t =>
+        public Task TestGetConfig() => ParseConfiguration.GetAsync().ContinueWith(t =>
         {
             Assert.AreEqual("testValue", t.Result["testKey"]);
             Assert.AreEqual("testValue", t.Result.Get<string>("testKey"));
@@ -74,7 +74,7 @@ namespace Parse.Test
         {
             CancellationTokenSource tokenSource = new CancellationTokenSource();
             tokenSource.Cancel();
-            return ParseConfig.GetAsync(tokenSource.Token).ContinueWith(t => Assert.IsTrue(t.IsCanceled));
+            return ParseConfiguration.GetAsync(tokenSource.Token).ContinueWith(t => Assert.IsTrue(t.IsCanceled));
         }
     }
 }

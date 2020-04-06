@@ -17,25 +17,25 @@ namespace Parse.Test
             FileState state = new FileState
             {
                 Name = "A",
-                Url = unsecureUri,
-                MimeType = null
+                Location = unsecureUri,
+                MediaType = null
             };
 
-            Assert.AreEqual(unsecureUri, state.Url);
-            Assert.AreEqual(secureUri, state.SecureUrl);
+            Assert.AreEqual(unsecureUri, state.Location);
+            Assert.AreEqual(secureUri, state.SecureLocation);
 
             // Make sure the proper port was given back.
-            Assert.AreEqual(443, state.SecureUrl.Port);
+            Assert.AreEqual(443, state.SecureLocation.Port);
 
             state = new FileState
             {
                 Name = "B",
-                Url = randomUri,
-                MimeType = null
+                Location = randomUri,
+                MediaType = null
             };
 
-            Assert.AreEqual(randomUri, state.Url);
-            Assert.AreEqual(randomUri, state.Url);
+            Assert.AreEqual(randomUri, state.Location);
+            Assert.AreEqual(randomUri, state.Location);
         }
     }
 }

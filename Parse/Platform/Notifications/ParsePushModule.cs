@@ -3,22 +3,21 @@ using Parse.Management;
 
 namespace Parse.Push.Internal
 {
-    public class ParsePushModule : IParseModule
-    {
-        public void OnModuleRegistered()
-        {
-        }
+#warning Check if the logic in this class is necessary to run.
 
-        public void OnParseInitialized()
-        {
-            ParseObject.RegisterDerivative<ParseInstallation>();
+    //public class ParsePushModule : IParseModule
+    //{
+    //    public void ExecuteModuleRegistrationHook()
+    //    {
+    //    }
 
-            ParseCorePlugins.Instance.SubclassingController.AddRegisterHook(typeof(ParseInstallation), () =>
-            {
-                ParsePushPlugins.Instance.CurrentInstallationController.ClearFromMemory();
-            });
+    //    public void ExecuteLibraryInitializationHook()
+    //    {
+    //        ParseObject.RegisterDerivative<ParseInstallation>();
 
-            ParsePushPlugins.Instance.DeviceInfoController.Initialize();
-        }
-    }
+    //        ParseCorePlugins.Instance.SubclassingController.AddRegisterHook(typeof(ParseInstallation), () => ParsePushPlugins.Instance.CurrentInstallationController.ClearFromMemory());
+
+    //        ParsePushPlugins.Instance.DeviceInfoController.Initialize();
+    //    }
+    //}
 }

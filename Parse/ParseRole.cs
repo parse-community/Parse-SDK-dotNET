@@ -30,8 +30,7 @@ namespace Parse
         /// </summary>
         /// <param name="name">The name of the role to create.</param>
         /// <param name="acl">The ACL for this role. Roles must have an ACL.</param>
-        public ParseRole(string name, ParseACL acl)
-          : this()
+        public ParseRole(string name, ParseACL acl) : this()
         {
             Name = name;
             ACL = acl;
@@ -43,8 +42,8 @@ namespace Parse
         [ParseFieldName("name")]
         public string Name
         {
-            get => GetProperty<string>("Name");
-            set => SetProperty(value, "Name");
+            get => GetProperty<string>(nameof(Name));
+            set => SetProperty(value, nameof(Name));
         }
 
         /// <summary>
@@ -77,20 +76,13 @@ namespace Parse
                 }
                 if (!(value is string))
                 {
-                    throw new ArgumentException("A role's name must be a string.", "value");
+                    throw new ArgumentException("A role's name must be a string.", nameof(value));
                 }
                 if (!namePattern.IsMatch((string) value))
                 {
-                    throw new ArgumentException(
-                        "A role's name can only contain alphanumeric characters, _, -, and spaces.",
-                        "value");
+                    throw new ArgumentException("A role's name can only contain alphanumeric characters, _, -, and spaces.", nameof(value));
                 }
             }
         }
-
-        /// <summary>
-        /// Gets a <see cref="ParseQuery{ParseRole}"/> over the Role collection.
-        /// </summary>
-        public static ParseQuery<ParseRole> Query => new ParseQuery<ParseRole>();
     }
 }

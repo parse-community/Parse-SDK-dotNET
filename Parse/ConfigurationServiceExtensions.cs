@@ -1,0 +1,42 @@
+// Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
+
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Parse.Abstractions.Library;
+using Parse.Core.Internal;
+
+namespace Parse
+{
+    public static class ConfigurationServiceExtensions
+    {
+        public static ParseConfiguration BuildConfiguration(this IServiceHub serviceHub, IDictionary<string, object> configurationData) => ParseConfiguration.Create(configurationData, serviceHub.Decoder);
+
+        public static ParseConfiguration BuildConfiguration(this IParseDataDecoder dataDecoder, IDictionary<string, object> configurationData) => ParseConfiguration.Create(configurationData, dataDecoder);
+
+#warning Investigate if these methods which simply block a thread waiting for an asynchronous process to complete should be eliminated.
+
+        /// <summary>
+        /// Gets the latest fetched ParseConfig.
+        /// </summary>
+        /// <returns>ParseConfig object</returns>
+        public static ParseConfiguration GetCurrentConfig(this IServiceHub serviceHub)
+        {
+            Task<ParseConfiguration> task = serviceHub.ConfigurationController.CurrentConfigurationController.GetCurrentConfigAsync();
+
+            task.Wait();
+            return task.Result;
+        }
+
+        internal static void ClearCurrentConfig(this IServiceHub serviceHub) => serviceHub.ConfigurationController.CurrentConfigurationController.ClearCurrentConfigAsync().Wait();
+
+        internal static void ClearCurrentConfigInMemory(this IServiceHub serviceHub) => serviceHub.ConfigurationController.CurrentConfigurationController.ClearCurrentConfigInMemoryAsync().Wait();
+
+        /// <summary>
+        /// Retrieves the ParseConfig asynchronously from the server.
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>ParseConfig object that was fetched</returns>
+        public static Task<ParseConfiguration> GetAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.ConfigurationController.FetchConfigAsync(serviceHub.GetCurrentSessionToken(), cancellationToken);
+    }
+}

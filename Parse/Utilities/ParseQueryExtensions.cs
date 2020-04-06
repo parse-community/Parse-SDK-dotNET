@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -9,6 +10,8 @@ using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
 {
+#warning Fully refactor at some point.
+
     /// <summary>
     /// So here's the deal. We have a lot of internal APIs for ParseObject, ParseUser, etc.
     ///
@@ -21,89 +24,83 @@ namespace Parse.Core.Internal
     /// </summary>
     public static class ParseQueryExtensions
     {
-        private static readonly MethodInfo getMethod;
-        private static readonly MethodInfo stringContains;
-        private static readonly MethodInfo stringStartsWith;
-        private static readonly MethodInfo stringEndsWith;
-        private static readonly MethodInfo containsMethod;
-        private static readonly MethodInfo notContainsMethod;
-        private static readonly MethodInfo containsKeyMethod;
-        private static readonly MethodInfo notContainsKeyMethod;
-        private static readonly Dictionary<MethodInfo, MethodInfo> functionMappings;
+        static MethodInfo ParseObjectGetMethod { get; }
+
+        static MethodInfo StringContainsMethod { get; }
+
+        static MethodInfo StringStartsWithMethod { get; }
+
+        static MethodInfo StringEndsWithMethod { get; }
+
+        static MethodInfo ContainsMethod { get; }
+
+        static MethodInfo NotContainsMethod { get; }
+
+        static MethodInfo ContainsKeyMethod { get; }
+
+        static MethodInfo NotContainsKeyMethod { get; }
+
+        static Dictionary<MethodInfo, MethodInfo> Mappings { get; }
+
         static ParseQueryExtensions()
         {
-            getMethod = GetMethod<ParseObject>(obj => obj.Get<int>(null)).GetGenericMethodDefinition();
-            stringContains = GetMethod<string>(str => str.Contains(null));
-            stringStartsWith = GetMethod<string>(str => str.StartsWith(null));
-            stringEndsWith = GetMethod<string>(str => str.EndsWith(null));
-            functionMappings = new Dictionary<MethodInfo, MethodInfo> {
-        {
-          stringContains,
-          GetMethod<ParseQuery<ParseObject>>(q => q.WhereContains(null, null))
-        },
-        {
-          stringStartsWith,
-          GetMethod<ParseQuery<ParseObject>>(q => q.WhereStartsWith(null, null))
-        },
-        {
-          stringEndsWith,
-          GetMethod<ParseQuery<ParseObject>>(q => q.WhereEndsWith(null,null))
-        },
-      };
-            containsMethod = GetMethod<object>(
-                o => ContainsStub<object>(null, null)).GetGenericMethodDefinition();
-            notContainsMethod = GetMethod<object>(
-                o => NotContainsStub<object>(null, null))
-                    .GetGenericMethodDefinition();
+            ParseObjectGetMethod = GetMethod<ParseObject>(target => target.Get<int>(null)).GetGenericMethodDefinition();
+            StringContainsMethod = GetMethod<string>(text => text.Contains(null));
+            StringStartsWithMethod = GetMethod<string>(text => text.StartsWith(null));
+            StringEndsWithMethod = GetMethod<string>(text => text.EndsWith(null));
 
-            containsKeyMethod = GetMethod<object>(o => ContainsKeyStub(null, null));
-            notContainsKeyMethod = GetMethod<object>(
-              o => NotContainsKeyStub(null, null));
+            Mappings = new Dictionary<MethodInfo, MethodInfo>
+            {
+                [StringContainsMethod] = GetMethod<ParseQuery<ParseObject>>(query => query.WhereContains(null, null)),
+                [StringStartsWithMethod] = GetMethod<ParseQuery<ParseObject>>(query => query.WhereStartsWith(null, null)),
+                [StringEndsWithMethod] = GetMethod<ParseQuery<ParseObject>>(query => query.WhereEndsWith(null, null)),
+            };
+
+            ContainsMethod = GetMethod<object>(o => ContainsStub<object>(null, null)).GetGenericMethodDefinition();
+            NotContainsMethod = GetMethod<object>(o => NotContainsStub<object>(null, null)).GetGenericMethodDefinition();
+
+            ContainsKeyMethod = GetMethod<object>(o => ContainsKeyStub(null, null));
+            NotContainsKeyMethod = GetMethod<object>(o => NotContainsKeyStub(null, null));
         }
 
         /// <summary>
         /// Gets a MethodInfo for a top-level method call.
         /// </summary>
-        private static MethodInfo GetMethod<T>(Expression<Action<T>> expression) => (expression.Body as MethodCallExpression).Method;
+        static MethodInfo GetMethod<T>(Expression<Action<T>> expression) => (expression.Body as MethodCallExpression).Method;
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate we should
         /// add a WhereContainedIn() clause.
         /// </summary>
-        private static bool ContainsStub<T>(object collection, T value) => throw new NotImplementedException(
-                "Exists only for expression translation as a placeholder.");
+        static bool ContainsStub<T>(object collection, T value) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate we should
         /// add a WhereNotContainedIn() clause.
         /// </summary>
-        private static bool NotContainsStub<T>(object collection, T value) => throw new NotImplementedException(
-                "Exists only for expression translation as a placeholder.");
+        static bool NotContainsStub<T>(object collection, T value) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate that we should
         /// add a WhereExists() clause.
         /// </summary>
-        private static bool ContainsKeyStub(ParseObject obj, string key) => throw new NotImplementedException(
-                "Exists only for expression translation as a placeholder.");
+        static bool ContainsKeyStub(ParseObject obj, string key) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate that we should
         /// add a WhereDoesNotExist() clause.
         /// </summary>
-        private static bool NotContainsKeyStub(ParseObject obj, string key) => throw new NotImplementedException(
-                "Exists only for expression translation as a placeholder.");
+        static bool NotContainsKeyStub(ParseObject obj, string key) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
 
         /// <summary>
         /// Evaluates an expression and throws if the expression has components that can't be
         /// evaluated (e.g. uses the parameter that's only represented by an object on the server).
         /// </summary>
-        private static object GetValue(Expression exp)
+        static object GetValue(Expression exp)
         {
             try
             {
-                return Expression.Lambda(
-                    typeof(Func<>).MakeGenericType(exp.Type), exp).Compile().DynamicInvoke();
+                return Expression.Lambda(typeof(Func<>).MakeGenericType(exp.Type), exp).Compile().DynamicInvoke();
             }
             catch (Exception e)
             {
@@ -115,43 +112,30 @@ namespace Parse.Core.Internal
         /// Checks whether the MethodCallExpression is a call to ParseObject.Get(),
         /// which is the call we normalize all indexing into the ParseObject to.
         /// </summary>
-        private static bool IsParseObjectGet(MethodCallExpression node)
-        {
-            if (node == null || node.Object == null)
-            {
-                return false;
-            }
-            if (!typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Object.Type.GetTypeInfo()))
-            {
-                return false;
-            }
-            return node.Method.IsGenericMethod && node.Method.GetGenericMethodDefinition() == getMethod;
-        }
-
+        static bool IsParseObjectGet(MethodCallExpression node) => node is { Object: { } } && typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Object.Type.GetTypeInfo()) && node.Method.IsGenericMethod && node.Method.GetGenericMethodDefinition() == ParseObjectGetMethod;
 
         /// <summary>
         /// Visits an Expression, converting ParseObject.Get/ParseObject[]/ParseObject.Property,
         /// and nested indices into a single call to ParseObject.Get() with a "field path" like
         /// "foo.bar.baz"
         /// </summary>
-        private class ObjectNormalizer : ExpressionVisitor
+        class ObjectNormalizer : ExpressionVisitor
         {
             protected override Expression VisitIndex(IndexExpression node)
             {
                 Expression visitedObject = Visit(node.Object);
                 MethodCallExpression indexer = visitedObject as MethodCallExpression;
+
                 if (IsParseObjectGet(indexer))
                 {
-                    string indexValue = GetValue(node.Arguments[0]) as string;
-                    if (indexValue == null)
+                    if (!(GetValue(node.Arguments[0]) is string indexValue))
                     {
                         throw new InvalidOperationException("Index must be a string");
                     }
-                    string newPath = GetValue(indexer.Arguments[0]) + "." + indexValue;
-                    return Expression.Call(indexer.Object,
-                        getMethod.MakeGenericMethod(node.Type),
-                        Expression.Constant(newPath, typeof(string)));
+
+                    return Expression.Call(indexer.Object, ParseObjectGetMethod.MakeGenericMethod(node.Type), Expression.Constant($"{GetValue(indexer.Arguments[0])}.{indexValue}", typeof(string)));
                 }
+
                 return base.VisitIndex(node);
             }
 
@@ -159,19 +143,7 @@ namespace Parse.Core.Internal
             /// Check for a ParseFieldName attribute and use that as the path component, turning
             /// properties like foo.ObjectId into foo.Get("objectId")
             /// </summary>
-            protected override Expression VisitMember(MemberExpression node)
-            {
-                ParseFieldNameAttribute fieldName = node.Member.GetCustomAttribute<ParseFieldNameAttribute>();
-                if (fieldName != null &&
-                    typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Expression.Type.GetTypeInfo()))
-                {
-                    string newPath = fieldName.FieldName;
-                    return Expression.Call(node.Expression,
-                        getMethod.MakeGenericMethod(node.Type),
-                        Expression.Constant(newPath, typeof(string)));
-                }
-                return base.VisitMember(node);
-            }
+            protected override Expression VisitMember(MemberExpression node) => node.Member.GetCustomAttribute<ParseFieldNameAttribute>() is { } fieldName && typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Expression.Type.GetTypeInfo()) ? Expression.Call(node.Expression, ParseObjectGetMethod.MakeGenericMethod(node.Type), Expression.Constant(fieldName.FieldName, typeof(string))) : base.VisitMember(node);
 
             /// <summary>
             /// If a ParseObject.Get() call has been cast, just change the generic parameter.
@@ -179,46 +151,36 @@ namespace Parse.Core.Internal
             protected override Expression VisitUnary(UnaryExpression node)
             {
                 MethodCallExpression methodCall = Visit(node.Operand) as MethodCallExpression;
-                if ((node.NodeType == ExpressionType.Convert ||
-                    node.NodeType == ExpressionType.ConvertChecked) &&
-                    IsParseObjectGet(methodCall))
-                {
-                    return Expression.Call(methodCall.Object,
-                        getMethod.MakeGenericMethod(node.Type),
-                        methodCall.Arguments);
-                }
-                return base.VisitUnary(node);
+                return (node.NodeType == ExpressionType.Convert || node.NodeType == ExpressionType.ConvertChecked) && IsParseObjectGet(methodCall) ? Expression.Call(methodCall.Object, ParseObjectGetMethod.MakeGenericMethod(node.Type), methodCall.Arguments) : base.VisitUnary(node);
             }
 
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
                 // Turn parseObject["foo"] into parseObject.Get<object>("foo")
+
                 if (node.Method.Name == "get_Item" && node.Object is ParameterExpression)
                 {
-                    string indexPath = GetValue(node.Arguments[0]) as string;
-                    return Expression.Call(node.Object,
-                        getMethod.MakeGenericMethod(typeof(object)),
-                        Expression.Constant(indexPath, typeof(string)));
+                    return Expression.Call(node.Object, ParseObjectGetMethod.MakeGenericMethod(typeof(object)), Expression.Constant(GetValue(node.Arguments[0]) as string, typeof(string)));
                 }
 
                 // Turn parseObject.Get<object>("foo")["bar"] into parseObject.Get<object>("foo.bar")
+
                 if (node.Method.Name == "get_Item" || IsParseObjectGet(node))
                 {
                     Expression visitedObject = Visit(node.Object);
                     MethodCallExpression indexer = visitedObject as MethodCallExpression;
+
                     if (IsParseObjectGet(indexer))
                     {
-                        string indexValue = GetValue(node.Arguments[0]) as string;
-                        if (indexValue == null)
+                        if (!(GetValue(node.Arguments[0]) is string indexValue))
                         {
                             throw new InvalidOperationException("Index must be a string");
                         }
-                        string newPath = GetValue(indexer.Arguments[0]) + "." + indexValue;
-                        return Expression.Call(indexer.Object,
-                            getMethod.MakeGenericMethod(node.Type),
-                            Expression.Constant(newPath, typeof(string)));
+
+                        return Expression.Call(indexer.Object, ParseObjectGetMethod.MakeGenericMethod(node.Type), Expression.Constant($"{GetValue(indexer.Arguments[0])}.{indexValue}", typeof(string)));
                     }
                 }
+
                 return base.VisitMethodCall(node);
             }
         }
@@ -226,7 +188,7 @@ namespace Parse.Core.Internal
         /// <summary>
         /// Normalizes Where expressions.
         /// </summary>
-        private class WhereNormalizer : ExpressionVisitor
+        class WhereNormalizer : ExpressionVisitor
         {
 
             /// <summary>
@@ -236,13 +198,11 @@ namespace Parse.Core.Internal
             /// </summary>
             protected override Expression VisitBinary(BinaryExpression node)
             {
-                MethodCallExpression leftTransformed = new ObjectNormalizer().Visit(node.Left) as MethodCallExpression;
-                MethodCallExpression rightTransformed = new ObjectNormalizer().Visit(node.Right) as MethodCallExpression;
-
-                MethodCallExpression objectExpression;
+                MethodCallExpression rightTransformed = new ObjectNormalizer().Visit(node.Right) as MethodCallExpression, objectExpression;
                 Expression filterExpression;
                 bool inverted;
-                if (leftTransformed != null)
+
+                if (new ObjectNormalizer().Visit(node.Left) is MethodCallExpression leftTransformed)
                 {
                     objectExpression = leftTransformed;
                     filterExpression = node.Right;
@@ -260,41 +220,13 @@ namespace Parse.Core.Internal
                     switch (node.NodeType)
                     {
                         case ExpressionType.GreaterThan:
-                            if (inverted)
-                            {
-                                return Expression.LessThan(objectExpression, filterExpression);
-                            }
-                            else
-                            {
-                                return Expression.GreaterThan(objectExpression, filterExpression);
-                            }
+                            return inverted ? Expression.LessThan(objectExpression, filterExpression) : Expression.GreaterThan(objectExpression, filterExpression);
                         case ExpressionType.GreaterThanOrEqual:
-                            if (inverted)
-                            {
-                                return Expression.LessThanOrEqual(objectExpression, filterExpression);
-                            }
-                            else
-                            {
-                                return Expression.GreaterThanOrEqual(objectExpression, filterExpression);
-                            }
+                            return inverted ? Expression.LessThanOrEqual(objectExpression, filterExpression) : Expression.GreaterThanOrEqual(objectExpression, filterExpression);
                         case ExpressionType.LessThan:
-                            if (inverted)
-                            {
-                                return Expression.GreaterThan(objectExpression, filterExpression);
-                            }
-                            else
-                            {
-                                return Expression.LessThan(objectExpression, filterExpression);
-                            }
+                            return inverted ? Expression.GreaterThan(objectExpression, filterExpression) : Expression.LessThan(objectExpression, filterExpression);
                         case ExpressionType.LessThanOrEqual:
-                            if (inverted)
-                            {
-                                return Expression.GreaterThanOrEqual(objectExpression, filterExpression);
-                            }
-                            else
-                            {
-                                return Expression.LessThanOrEqual(objectExpression, filterExpression);
-                            }
+                            return inverted ? Expression.GreaterThanOrEqual(objectExpression, filterExpression) : Expression.LessThanOrEqual(objectExpression, filterExpression);
                         case ExpressionType.Equal:
                             return Expression.Equal(objectExpression, filterExpression);
                         case ExpressionType.NotEqual:
@@ -305,6 +237,7 @@ namespace Parse.Core.Internal
                 {
                     throw new InvalidOperationException("Operation not supported: " + node);
                 }
+
                 return base.VisitBinary(node);
             }
 
@@ -314,12 +247,32 @@ namespace Parse.Core.Internal
             /// </summary>
             protected override Expression VisitUnary(UnaryExpression node)
             {
+                // This is incorrect because control is supposed to be able to flow out of the binaryOperand case if the value of NodeType is not matched against an ExpressionType value, which it will not do.
+                //
+                // return node switch
+                // {
+                //     { NodeType: ExpressionType.Not, Operand: var operand } => Visit(operand) switch
+                //     {
+                //         BinaryExpression { Left: var left, Right: var right, NodeType: var type } binaryOperand => type switch
+                //         {
+                //             ExpressionType.GreaterThan => Expression.LessThanOrEqual(left, right),
+                //             ExpressionType.GreaterThanOrEqual => Expression.LessThan(left, right),
+                //             ExpressionType.LessThan => Expression.GreaterThanOrEqual(left, right),
+                //             ExpressionType.LessThanOrEqual => Expression.GreaterThan(left, right),
+                //             ExpressionType.Equal => Expression.NotEqual(left, right),
+                //             ExpressionType.NotEqual => Expression.Equal(left, right),
+                //         },
+                //         _ => base.VisitUnary(node)
+                //     },
+                //     _ => base.VisitUnary(node)
+                // };
+
                 // Normalizes inversion
+
                 if (node.NodeType == ExpressionType.Not)
                 {
                     Expression visitedOperand = Visit(node.Operand);
-                    BinaryExpression binaryOperand = visitedOperand as BinaryExpression;
-                    if (binaryOperand != null)
+                    if (visitedOperand is BinaryExpression binaryOperand)
                     {
                         switch (binaryOperand.NodeType)
                         {
@@ -338,31 +291,26 @@ namespace Parse.Core.Internal
                         }
                     }
 
-                    MethodCallExpression methodCallOperand = visitedOperand as MethodCallExpression;
-                    if (methodCallOperand != null)
+                    if (visitedOperand is MethodCallExpression methodCallOperand)
                     {
                         if (methodCallOperand.Method.IsGenericMethod)
                         {
-                            if (methodCallOperand.Method.GetGenericMethodDefinition() == containsMethod)
+                            if (methodCallOperand.Method.GetGenericMethodDefinition() == ContainsMethod)
                             {
-                                MethodInfo genericNotContains = notContainsMethod.MakeGenericMethod(
-                                    methodCallOperand.Method.GetGenericArguments());
-                                return Expression.Call(genericNotContains, methodCallOperand.Arguments.ToArray());
+                                return Expression.Call(NotContainsMethod.MakeGenericMethod(methodCallOperand.Method.GetGenericArguments()), methodCallOperand.Arguments.ToArray());
                             }
-                            if (methodCallOperand.Method.GetGenericMethodDefinition() == notContainsMethod)
+                            if (methodCallOperand.Method.GetGenericMethodDefinition() == NotContainsMethod)
                             {
-                                MethodInfo genericContains = containsMethod.MakeGenericMethod(
-                                    methodCallOperand.Method.GetGenericArguments());
-                                return Expression.Call(genericContains, methodCallOperand.Arguments.ToArray());
+                                return Expression.Call(ContainsMethod.MakeGenericMethod(methodCallOperand.Method.GetGenericArguments()), methodCallOperand.Arguments.ToArray());
                             }
                         }
-                        if (methodCallOperand.Method == containsKeyMethod)
+                        if (methodCallOperand.Method == ContainsKeyMethod)
                         {
-                            return Expression.Call(notContainsKeyMethod, methodCallOperand.Arguments.ToArray());
+                            return Expression.Call(NotContainsKeyMethod, methodCallOperand.Arguments.ToArray());
                         }
-                        if (methodCallOperand.Method == notContainsKeyMethod)
+                        if (methodCallOperand.Method == NotContainsKeyMethod)
                         {
-                            return Expression.Call(containsKeyMethod, methodCallOperand.Arguments.ToArray());
+                            return Expression.Call(ContainsKeyMethod, methodCallOperand.Arguments.ToArray());
                         }
                     }
                 }
@@ -375,67 +323,56 @@ namespace Parse.Core.Internal
             protected override Expression VisitMethodCall(MethodCallExpression node)
             {
                 // Convert .Equals() into ==
-                if (node.Method.Name == "Equals" &&
-                    node.Method.ReturnType == typeof(bool) &&
-                    node.Method.GetParameters().Length == 1)
+
+                if (node.Method.Name == "Equals" && node.Method.ReturnType == typeof(bool) && node.Method.GetParameters().Length == 1)
                 {
-                    MethodCallExpression obj = new ObjectNormalizer().Visit(node.Object) as MethodCallExpression;
-                    MethodCallExpression parameter = new ObjectNormalizer().Visit(node.Arguments[0]) as MethodCallExpression;
-                    if ((IsParseObjectGet(obj) && (obj.Object is ParameterExpression)) ||
-                        (IsParseObjectGet(parameter) && (parameter.Object is ParameterExpression)))
+                    MethodCallExpression obj = new ObjectNormalizer().Visit(node.Object) as MethodCallExpression,  parameter = new ObjectNormalizer().Visit(node.Arguments[0]) as MethodCallExpression;
+
+                    if (IsParseObjectGet(obj) && obj.Object is ParameterExpression || IsParseObjectGet(parameter) && parameter.Object is ParameterExpression)
                     {
                         return Expression.Equal(node.Object, node.Arguments[0]);
                     }
                 }
 
                 // Convert the .Contains() into a ContainsStub
-                if (node.Method != stringContains &&
-                    node.Method.Name == "Contains" &&
-                    node.Method.ReturnType == typeof(bool) &&
-                    node.Method.GetParameters().Length <= 2)
+
+                if (node.Method != StringContainsMethod && node.Method.Name == "Contains" && node.Method.ReturnType == typeof(bool) && node.Method.GetParameters().Length <= 2)
                 {
-                    Expression collection = node.Method.GetParameters().Length == 1 ?
-                        node.Object :
-                        node.Arguments[0];
+                    Expression collection = node.Method.GetParameters().Length == 1 ? node.Object : node.Arguments[0];
                     int parameterIndex = node.Method.GetParameters().Length - 1;
-                    MethodCallExpression parameter = new ObjectNormalizer().Visit(node.Arguments[parameterIndex])
-                        as MethodCallExpression;
-                    if (IsParseObjectGet(parameter) && (parameter.Object is ParameterExpression))
+
+                    if (new ObjectNormalizer().Visit(node.Arguments[parameterIndex]) is MethodCallExpression { } parameter && IsParseObjectGet(parameter) && parameter.Object is ParameterExpression)
                     {
-                        MethodInfo genericContains = containsMethod.MakeGenericMethod(parameter.Type);
-                        return Expression.Call(genericContains, collection, parameter);
+                        return Expression.Call(ContainsMethod.MakeGenericMethod(parameter.Type), collection, parameter);
                     }
-                    MethodCallExpression target = new ObjectNormalizer().Visit(collection) as MethodCallExpression;
-                    Expression element = node.Arguments[parameterIndex];
-                    if (IsParseObjectGet(target) && (target.Object is ParameterExpression))
+
+                    if (new ObjectNormalizer().Visit(collection) is MethodCallExpression { } target && IsParseObjectGet(target) && target.Object is ParameterExpression)
                     {
-                        MethodInfo genericContains = containsMethod.MakeGenericMethod(element.Type);
-                        return Expression.Call(genericContains, target, element);
+                        Expression element = node.Arguments[parameterIndex];
+                        return Expression.Call(ContainsMethod.MakeGenericMethod(element.Type), target, element);
                     }
                 }
 
-                // Convert obj["foo.bar"].ContainsKey("baz") into obj.ContainsKey("foo.bar.baz")
-                if (node.Method.Name == "ContainsKey" &&
-                    node.Method.ReturnType == typeof(bool) &&
-                    node.Method.GetParameters().Length == 1)
+                // Convert obj["foo.bar"].ContainsKey("baz") into obj.ContainsKey("foo.bar.baz").
+
+                if (node.Method.Name == "ContainsKey" && node.Method.ReturnType == typeof(bool) && node.Method.GetParameters().Length == 1)
                 {
-                    MethodCallExpression getter = new ObjectNormalizer().Visit(node.Object) as MethodCallExpression;
                     Expression target = null;
                     string path = null;
-                    if (IsParseObjectGet(getter) && getter.Object is ParameterExpression)
+
+                    if (new ObjectNormalizer().Visit(node.Object) is MethodCallExpression { } getter && IsParseObjectGet(getter) && getter.Object is ParameterExpression)
                     {
-                        target = getter.Object;
-                        path = GetValue(getter.Arguments[0]) + "." + GetValue(node.Arguments[0]);
-                        return Expression.Call(containsKeyMethod, target, Expression.Constant(path));
+                        return Expression.Call(ContainsKeyMethod, getter.Object, Expression.Constant($"{GetValue(getter.Arguments[0])}.{GetValue(node.Arguments[0])}"));
                     }
                     else if (node.Object is ParameterExpression)
                     {
                         target = node.Object;
                         path = GetValue(node.Arguments[0]) as string;
                     }
-                    if (target != null && path != null)
+
+                    if (target is { } && path is { })
                     {
-                        return Expression.Call(containsKeyMethod, target, Expression.Constant(path));
+                        return Expression.Call(ContainsKeyMethod, target, Expression.Constant(path));
                     }
                 }
                 return base.VisitMethodCall(node);
@@ -445,44 +382,39 @@ namespace Parse.Core.Internal
         /// <summary>
         /// Converts a normalized method call expression into the appropriate ParseQuery clause.
         /// </summary>
-        private static ParseQuery<T> WhereMethodCall<T>(
-            this ParseQuery<T> source, Expression<Func<T, bool>> expression, MethodCallExpression node)
-            where T : ParseObject
+        static ParseQuery<T> WhereMethodCall<T>(this ParseQuery<T> source, Expression<Func<T, bool>> expression, MethodCallExpression node) where T : ParseObject
         {
             if (IsParseObjectGet(node) && (node.Type == typeof(bool) || node.Type == typeof(bool?)))
             {
-                // This is a raw boolean field access like 'where obj.Get<bool>("foo")'
+                // This is a raw boolean field access like 'where obj.Get<bool>("foo")'.
+
                 return source.WhereEqualTo(GetValue(node.Arguments[0]) as string, true);
             }
 
-            if (functionMappings.TryGetValue(node.Method, out MethodInfo translatedMethod))
+            if (Mappings.TryGetValue(node.Method, out MethodInfo translatedMethod))
             {
                 MethodCallExpression objTransformed = new ObjectNormalizer().Visit(node.Object) as MethodCallExpression;
-                if (!(IsParseObjectGet(objTransformed) &&
-                    objTransformed.Object == expression.Parameters[0]))
+
+                if (!(IsParseObjectGet(objTransformed) && objTransformed.Object == expression.Parameters[0]))
                 {
-                    throw new InvalidOperationException(
-                      "The left-hand side of a supported function call must be a ParseObject field access.");
+                    throw new InvalidOperationException("The left-hand side of a supported function call must be a ParseObject field access.");
                 }
-                object fieldPath = GetValue(objTransformed.Arguments[0]);
-                object containedIn = GetValue(node.Arguments[0]);
-                Type queryType = translatedMethod.DeclaringType.GetGenericTypeDefinition()
-                    .MakeGenericType(typeof(T));
-                translatedMethod = ReflectionHelpers.GetMethod(queryType,
-                    translatedMethod.Name,
-                    translatedMethod.GetParameters().Select(p => p.ParameterType).ToArray());
-                return translatedMethod.Invoke(source, new[] { fieldPath, containedIn }) as ParseQuery<T>;
+
+                return translatedMethod.DeclaringType.GetGenericTypeDefinition().MakeGenericType(typeof(T)).GetRuntimeMethod(translatedMethod.Name, translatedMethod.GetParameters().Select(parameter => parameter.ParameterType).ToArray()).Invoke(source, new[] { GetValue(objTransformed.Arguments[0]), GetValue(node.Arguments[0]) }) as ParseQuery<T>;
             }
 
             if (node.Arguments[0] == expression.Parameters[0])
             {
                 // obj.ContainsKey("foo") --> query.WhereExists("foo")
-                if (node.Method == containsKeyMethod)
+
+                if (node.Method == ContainsKeyMethod)
                 {
                     return source.WhereExists(GetValue(node.Arguments[1]) as string);
                 }
+
                 // !obj.ContainsKey("foo") --> query.WhereDoesNotExist("foo")
-                if (node.Method == notContainsKeyMethod)
+
+                if (node.Method == NotContainsKeyMethod)
                 {
                     return source.WhereDoesNotExist(GetValue(node.Arguments[1]) as string);
                 }
@@ -490,41 +422,37 @@ namespace Parse.Core.Internal
 
             if (node.Method.IsGenericMethod)
             {
-                if (node.Method.GetGenericMethodDefinition() == containsMethod)
+                if (node.Method.GetGenericMethodDefinition() == ContainsMethod)
                 {
                     // obj.Get<IList<T>>("path").Contains(someValue)
+
                     if (IsParseObjectGet(node.Arguments[0] as MethodCallExpression))
                     {
-                        return source.WhereEqualTo(
-                            GetValue(((MethodCallExpression) node.Arguments[0]).Arguments[0]) as string,
-                            GetValue(node.Arguments[1]));
+                        return source.WhereEqualTo(GetValue(((MethodCallExpression) node.Arguments[0]).Arguments[0]) as string, GetValue(node.Arguments[1]));
                     }
+
                     // someList.Contains(obj.Get<T>("path"))
+
                     if (IsParseObjectGet(node.Arguments[1] as MethodCallExpression))
                     {
-                        System.Collections.IEnumerable collection = GetValue(node.Arguments[0]) as System.Collections.IEnumerable;
-                        return source.WhereContainedIn(
-                            GetValue(((MethodCallExpression) node.Arguments[1]).Arguments[0]) as string,
-                            collection.Cast<object>());
+                        return source.WhereContainedIn(GetValue(((MethodCallExpression) node.Arguments[1]).Arguments[0]) as string, (GetValue(node.Arguments[0]) as IEnumerable).Cast<object>());
                     }
                 }
 
-                if (node.Method.GetGenericMethodDefinition() == notContainsMethod)
+                if (node.Method.GetGenericMethodDefinition() == NotContainsMethod)
                 {
                     // !obj.Get<IList<T>>("path").Contains(someValue)
+
                     if (IsParseObjectGet(node.Arguments[0] as MethodCallExpression))
                     {
-                        return source.WhereNotEqualTo(
-                            GetValue(((MethodCallExpression) node.Arguments[0]).Arguments[0]) as string,
-                            GetValue(node.Arguments[1]));
+                        return source.WhereNotEqualTo(GetValue(((MethodCallExpression) node.Arguments[0]).Arguments[0]) as string, GetValue(node.Arguments[1]));
                     }
+
                     // !someList.Contains(obj.Get<T>("path"))
+
                     if (IsParseObjectGet(node.Arguments[1] as MethodCallExpression))
                     {
-                        System.Collections.IEnumerable collection = GetValue(node.Arguments[0]) as System.Collections.IEnumerable;
-                        return source.WhereNotContainedIn(
-                            GetValue(((MethodCallExpression) node.Arguments[1]).Arguments[0]) as string,
-                            collection.Cast<object>());
+                        return source.WhereNotContainedIn(GetValue(((MethodCallExpression) node.Arguments[1]).Arguments[0]) as string, (GetValue(node.Arguments[0]) as IEnumerable).Cast<object>());
                     }
                 }
             }
@@ -534,46 +462,33 @@ namespace Parse.Core.Internal
         /// <summary>
         /// Converts a normalized binary expression into the appropriate ParseQuery clause.
         /// </summary>
-        private static ParseQuery<T> WhereBinaryExpression<T>(
-            this ParseQuery<T> source, Expression<Func<T, bool>> expression, BinaryExpression node)
-            where T : ParseObject
+        static ParseQuery<T> WhereBinaryExpression<T>(this ParseQuery<T> source, Expression<Func<T, bool>> expression, BinaryExpression node) where T : ParseObject
         {
             MethodCallExpression leftTransformed = new ObjectNormalizer().Visit(node.Left) as MethodCallExpression;
 
-            if (!(IsParseObjectGet(leftTransformed) &&
-                leftTransformed.Object == expression.Parameters[0]))
+            if (!(IsParseObjectGet(leftTransformed) && leftTransformed.Object == expression.Parameters[0]))
             {
-                throw new InvalidOperationException(
-                  "Where expressions must have one side be a field operation on a ParseObject.");
+                throw new InvalidOperationException("Where expressions must have one side be a field operation on a ParseObject.");
             }
 
             string fieldPath = GetValue(leftTransformed.Arguments[0]) as string;
             object filterValue = GetValue(node.Right);
 
-            if (filterValue != null && !ParseEncoder.IsValidType(filterValue))
+            if (filterValue != null && !ParseDataEncoder.Validate(filterValue))
             {
-                throw new InvalidOperationException(
-                  "Where clauses must use types compatible with ParseObjects.");
+                throw new InvalidOperationException("Where clauses must use types compatible with ParseObjects.");
             }
 
-            switch (node.NodeType)
+            return node.NodeType switch
             {
-                case ExpressionType.GreaterThan:
-                    return source.WhereGreaterThan(fieldPath, filterValue);
-                case ExpressionType.GreaterThanOrEqual:
-                    return source.WhereGreaterThanOrEqualTo(fieldPath, filterValue);
-                case ExpressionType.LessThan:
-                    return source.WhereLessThan(fieldPath, filterValue);
-                case ExpressionType.LessThanOrEqual:
-                    return source.WhereLessThanOrEqualTo(fieldPath, filterValue);
-                case ExpressionType.Equal:
-                    return source.WhereEqualTo(fieldPath, filterValue);
-                case ExpressionType.NotEqual:
-                    return source.WhereNotEqualTo(fieldPath, filterValue);
-                default:
-                    throw new InvalidOperationException(
-                      "Where expressions do not support this operator.");
-            }
+                ExpressionType.GreaterThan => source.WhereGreaterThan(fieldPath, filterValue),
+                ExpressionType.GreaterThanOrEqual => source.WhereGreaterThanOrEqualTo(fieldPath, filterValue),
+                ExpressionType.LessThan => source.WhereLessThan(fieldPath, filterValue),
+                ExpressionType.LessThanOrEqual => source.WhereLessThanOrEqualTo(fieldPath, filterValue),
+                ExpressionType.Equal => source.WhereEqualTo(fieldPath, filterValue),
+                ExpressionType.NotEqual => source.WhereNotEqualTo(fieldPath, filterValue),
+                _ => throw new InvalidOperationException("Where expressions do not support this operator."),
+            };
         }
 
         /// <summary>
@@ -587,81 +502,67 @@ namespace Parse.Core.Internal
         /// functions on ParseQuery</param>
         /// <returns>A new ParseQuery whose results will match the given predicate as
         /// well as the source's filters.</returns>
-        public static ParseQuery<TSource> Where<TSource>(
-            this ParseQuery<TSource> source, Expression<Func<TSource, bool>> predicate)
-            where TSource : ParseObject
+        public static ParseQuery<TSource> Where<TSource>(this ParseQuery<TSource> source, Expression<Func<TSource, bool>> predicate) where TSource : ParseObject
         {
             // Handle top-level logic operators && and ||
-            BinaryExpression binaryExpression = predicate.Body as BinaryExpression;
-            if (binaryExpression != null)
+
+            if (predicate.Body is BinaryExpression binaryExpression)
             {
                 if (binaryExpression.NodeType == ExpressionType.AndAlso)
                 {
-                    return source
-                        .Where(Expression.Lambda<Func<TSource, bool>>(
-                            binaryExpression.Left, predicate.Parameters))
-                        .Where(Expression.Lambda<Func<TSource, bool>>(
-                            binaryExpression.Right, predicate.Parameters));
+                    return source.Where(Expression.Lambda<Func<TSource, bool>>(binaryExpression.Left, predicate.Parameters)).Where(Expression.Lambda<Func<TSource, bool>>(binaryExpression.Right, predicate.Parameters));
                 }
+
                 if (binaryExpression.NodeType == ExpressionType.OrElse)
                 {
-                    ParseQuery<TSource> left = source.Where(Expression.Lambda<Func<TSource, bool>>(
-                            binaryExpression.Left, predicate.Parameters));
-                    ParseQuery<TSource> right = source.Where(Expression.Lambda<Func<TSource, bool>>(
-                            binaryExpression.Right, predicate.Parameters));
-                    return left.Or(right);
+                    return source.Services.ConstructOrQuery(source.Where(Expression.Lambda<Func<TSource, bool>>(binaryExpression.Left, predicate.Parameters)), (ParseQuery<TSource>) source.Where(Expression.Lambda<Func<TSource, bool>>(binaryExpression.Right, predicate.Parameters)));
                 }
             }
 
             Expression normalized = new WhereNormalizer().Visit(predicate.Body);
 
-            MethodCallExpression methodCallExpr = normalized as MethodCallExpression;
-            if (methodCallExpr != null)
+            if (normalized is MethodCallExpression methodCallExpr)
             {
                 return source.WhereMethodCall(predicate, methodCallExpr);
             }
 
-            BinaryExpression binaryExpr = normalized as BinaryExpression;
-            if (binaryExpr != null)
+            if (normalized is BinaryExpression binaryExpr)
             {
                 return source.WhereBinaryExpression(predicate, binaryExpr);
             }
 
-            UnaryExpression unaryExpr = normalized as UnaryExpression;
-            if (unaryExpr != null && unaryExpr.NodeType == ExpressionType.Not)
+            if (normalized is UnaryExpression { NodeType: ExpressionType.Not, Operand: MethodCallExpression { } node, Type: var type } unaryExpr && IsParseObjectGet(node) && (type == typeof(bool) || type == typeof(bool?)))
             {
-                MethodCallExpression node = unaryExpr.Operand as MethodCallExpression;
-                if (IsParseObjectGet(node) && (node.Type == typeof(bool) || node.Type == typeof(bool?)))
-                {
-                    // This is a raw boolean field access like 'where !obj.Get<bool>("foo")'
-                    return source.WhereNotEqualTo(GetValue(node.Arguments[0]) as string, true);
-                }
+                // This is a raw boolean field access like 'where !obj.Get<bool>("foo")'.
+
+                return source.WhereNotEqualTo(GetValue(node.Arguments[0]) as string, true);
             }
 
-            throw new InvalidOperationException(
-              "Encountered an unsupported expression for ParseQueries.");
+            throw new InvalidOperationException("Encountered an unsupported expression for ParseQueries.");
         }
 
         /// <summary>
         /// Normalizes an OrderBy's keySelector expression and then extracts the path
         /// from the ParseObject.Get() call.
         /// </summary>
-        private static string GetOrderByPath<TSource, TSelector>(
-              Expression<Func<TSource, TSelector>> keySelector)
+        static string GetOrderByPath<TSource, TSelector>(Expression<Func<TSource, TSelector>> keySelector)
         {
             string result = null;
             Expression normalized = new ObjectNormalizer().Visit(keySelector.Body);
             MethodCallExpression callExpr = normalized as MethodCallExpression;
+
             if (IsParseObjectGet(callExpr) && callExpr.Object == keySelector.Parameters[0])
             {
                 // We're operating on the parameter
+
                 result = GetValue(callExpr.Arguments[0]) as string;
             }
+
             if (result == null)
             {
-                throw new InvalidOperationException(
-                  "OrderBy expression must be a field access on a ParseObject.");
+                throw new InvalidOperationException("OrderBy expression must be a field access on a ParseObject.");
             }
+
             return result;
         }
 
@@ -674,9 +575,7 @@ namespace Parse.Core.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> OrderBy<TSource, TSelector>(
-            this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-            where TSource : ParseObject => source.OrderBy(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> OrderBy<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.OrderBy(GetOrderByPath(keySelector));
 
         /// <summary>
         /// Orders a query based upon the key selector provided.
@@ -687,9 +586,7 @@ namespace Parse.Core.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> OrderByDescending<TSource, TSelector>(
-            this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-            where TSource : ParseObject => source.OrderByDescending(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> OrderByDescending<TSource, TSelector>( this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.OrderByDescending(GetOrderByPath(keySelector));
 
         /// <summary>
         /// Performs a subsequent ordering of a query based upon the key selector provided.
@@ -700,9 +597,7 @@ namespace Parse.Core.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> ThenBy<TSource, TSelector>(
-            this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-            where TSource : ParseObject => source.ThenBy(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> ThenBy<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.ThenBy(GetOrderByPath(keySelector));
 
         /// <summary>
         /// Performs a subsequent ordering of a query based upon the key selector provided.
@@ -713,9 +608,7 @@ namespace Parse.Core.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> ThenByDescending<TSource, TSelector>(
-            this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector)
-            where TSource : ParseObject => source.ThenByDescending(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> ThenByDescending<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.ThenByDescending(GetOrderByPath(keySelector));
 
         /// <summary>
         /// Correlates the elements of two queries based on matching keys.
@@ -736,65 +629,52 @@ namespace Parse.Core.Internal
         /// result to determine which query is the base query.</param>
         /// <returns>A new ParseQuery with a WhereMatchesQuery or WhereMatchesKeyInQuery
         /// clause based upon the query indicated in the <paramref name="resultSelector"/>.</returns>
-        public static ParseQuery<TResult> Join<TOuter, TInner, TKey, TResult>(
-            this ParseQuery<TOuter> outer,
-            ParseQuery<TInner> inner,
-            Expression<Func<TOuter, TKey>> outerKeySelector,
-            Expression<Func<TInner, TKey>> innerKeySelector,
-            Expression<Func<TOuter, TInner, TResult>> resultSelector)
-          where TOuter : ParseObject
-          where TInner : ParseObject
-          where TResult : ParseObject
+        public static ParseQuery<TResult> Join<TOuter, TInner, TKey, TResult>(this ParseQuery<TOuter> outer, ParseQuery<TInner> inner, Expression<Func<TOuter, TKey>> outerKeySelector, Expression<Func<TInner, TKey>> innerKeySelector, Expression<Func<TOuter, TInner, TResult>> resultSelector) where TOuter : ParseObject where TInner : ParseObject where TResult : ParseObject
         {
-            // resultSelector must select either the inner object or the outer object. If it's the inner
-            // object, reverse the query.
+            // resultSelector must select either the inner object or the outer object. If it's the inner object, reverse the query.
+
             if (resultSelector.Body == resultSelector.Parameters[1])
             {
                 // The inner object was selected.
-                return inner.Join(
-                    outer,
-                    innerKeySelector,
-                    outerKeySelector,
-                    (i, o) => i) as ParseQuery<TResult>;
+
+                return inner.Join(outer, innerKeySelector, outerKeySelector, (i, o) => i) as ParseQuery<TResult>;
             }
+
             if (resultSelector.Body != resultSelector.Parameters[0])
             {
                 throw new InvalidOperationException("Joins must select either the outer or inner object.");
             }
 
             // Normalize both selectors
-            Expression outerNormalized = new ObjectNormalizer().Visit(outerKeySelector.Body);
-            Expression innerNormalized = new ObjectNormalizer().Visit(innerKeySelector.Body);
-            MethodCallExpression outerAsGet = outerNormalized as MethodCallExpression;
-            MethodCallExpression innerAsGet = innerNormalized as MethodCallExpression;
+            Expression outerNormalized = new ObjectNormalizer().Visit(outerKeySelector.Body), innerNormalized = new ObjectNormalizer().Visit(innerKeySelector.Body);
+            MethodCallExpression outerAsGet = outerNormalized as MethodCallExpression, innerAsGet = innerNormalized as MethodCallExpression;
+
             if (IsParseObjectGet(outerAsGet) && outerAsGet.Object == outerKeySelector.Parameters[0])
             {
                 string outerKey = GetValue(outerAsGet.Arguments[0]) as string;
 
                 if (IsParseObjectGet(innerAsGet) && innerAsGet.Object == innerKeySelector.Parameters[0])
                 {
-                    // Both are key accesses, so treat this as a WhereMatchesKeyInQuery
-                    string innerKey = GetValue(innerAsGet.Arguments[0]) as string;
-                    return outer.WhereMatchesKeyInQuery(outerKey, innerKey, inner) as ParseQuery<TResult>;
+                    // Both are key accesses, so treat this as a WhereMatchesKeyInQuery.
+
+                    return outer.WhereMatchesKeyInQuery(outerKey, GetValue(innerAsGet.Arguments[0]) as string, inner) as ParseQuery<TResult>;
                 }
 
                 if (innerKeySelector.Body == innerKeySelector.Parameters[0])
                 {
-                    // The inner selector is on the result of the query itself, so treat this as a
-                    // WhereMatchesQuery
+                    // The inner selector is on the result of the query itself, so treat this as a WhereMatchesQuery.
+
                     return outer.WhereMatchesQuery(outerKey, inner) as ParseQuery<TResult>;
                 }
-                throw new InvalidOperationException(
-                    "The key for the joined object must be a ParseObject or a field access " +
-                    "on the ParseObject.");
+
+                throw new InvalidOperationException("The key for the joined object must be a ParseObject or a field access on the ParseObject.");
             }
 
             // TODO (hallucinogen): If we ever support "and" queries fully and/or support a "where this object
             // matches some key in some other query" (as opposed to requiring a key on this query), we
             // can add support for even more types of joins.
 
-            throw new InvalidOperationException(
-              "The key for the selected object must be a field access on the ParseObject.");
+            throw new InvalidOperationException("The key for the selected object must be a field access on the ParseObject.");
         }
 
         public static string GetClassName<T>(this ParseQuery<T> query) where T : ParseObject => query.ClassName;
