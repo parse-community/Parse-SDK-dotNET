@@ -618,7 +618,7 @@ namespace Parse
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             if (Filters != null)
-                result[nameof(Filters)] = PointerOrLocalIdEncoder.Instance.Encode(Filters);
+                result[nameof(Filters)] = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services);
             if (Orderings != null)
                 result["order"] = String.Join(",", Orderings.ToArray());
             if (SkipAmount != null)

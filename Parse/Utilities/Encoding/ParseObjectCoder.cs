@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Parse.Abstractions.Library;
 
 namespace Parse.Core.Internal
 {
@@ -15,7 +16,7 @@ namespace Parse.Core.Internal
 
         ParseObjectCoder() { }
 
-        public IDictionary<string, object> Encode<T>(T state, IDictionary<string, IParseFieldOperation> operations, ParseDataEncoder encoder) where T : IObjectState
+        public IDictionary<string, object> Encode<T>(T state, IDictionary<string, IParseFieldOperation> operations, ParseDataEncoder encoder, IServiceHub serviceHub) where T : IObjectState
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             foreach (KeyValuePair<string, IParseFieldOperation> pair in operations)
@@ -23,13 +24,13 @@ namespace Parse.Core.Internal
                 // Serialize the data
                 IParseFieldOperation operation = pair.Value;
 
-                result[pair.Key] = encoder.Encode(operation);
+                result[pair.Key] = encoder.Encode(operation, serviceHub);
             }
 
             return result;
         }
 
-        public IObjectState Decode(IDictionary<string, object> data, IParseDataDecoder decoder)
+        public IObjectState Decode(IDictionary<string, object> data, IParseDataDecoder decoder, IServiceHub serviceHub)
         {
             IDictionary<string, object> serverData = new Dictionary<string, object> { }, mutableData = new Dictionary<string, object>(data);
 
@@ -55,7 +56,7 @@ namespace Parse.Core.Internal
                     continue;
                 }
 
-                serverData[pair.Key] = decoder.Decode(pair.Value);
+                serverData[pair.Key] = decoder.Decode(pair.Value, serviceHub);
             }
 
             return new MutableObjectState

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Parse.Library.Utilities
 {
@@ -8,7 +9,7 @@ namespace Parse.Library.Utilities
     /// </summary>
     public class LateInitializer
     {
-        Lazy<Dictionary<Func<object>, object>> Storage { get; } = new Lazy<Dictionary<Func<object>, object>> { };
+        Lazy<Dictionary<Func<object>, object>> Storage { get; set; } = new Lazy<Dictionary<Func<object>, object>> { };
 
         public TData GetValue<TData>(Func<TData> generator)
         {
@@ -27,5 +28,38 @@ namespace Parse.Library.Utilities
                 }
             }
         }
+
+        public bool ClearValue<TData>()
+        {
+            lock (Storage)
+            {
+                if (Storage.IsValueCreated && Storage.Value.Keys.OfType<Func<TData>>().FirstOrDefault() is { } key)
+                {
+                    lock (key)
+                    {
+                        Storage.Value.Remove(key as Func<object>);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool Reset()
+        {
+            lock (Storage)
+            {
+                if (Storage.IsValueCreated)
+                {
+                    Storage.Value.Clear();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool Used => Storage.IsValueCreated;
     }
 }

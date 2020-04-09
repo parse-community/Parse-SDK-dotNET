@@ -2,13 +2,14 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 
 namespace Parse.Core.Internal
 {
     public interface IParseCurrentUserController : IParseObjectCurrentController<ParseUser>
     {
-        Task<string> GetCurrentSessionTokenAsync(CancellationToken cancellationToken);
+        Task<string> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default);
 
-        Task LogOutAsync(CancellationToken cancellationToken);
+        Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default);
     }
 }

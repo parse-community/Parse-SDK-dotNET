@@ -28,11 +28,11 @@ namespace Parse
         {
             null => Task.FromResult<ParseSession>(default),
             { SessionToken: null } => Task.FromResult<ParseSession>(default),
-            { SessionToken: { } sessionToken } => serviceHub.SessionController.GetSessionAsync(sessionToken, cancellationToken).OnSuccess(successTask => serviceHub.GenerateObjectFromState<ParseSession>(successTask.Result, "_Session"))
+            { SessionToken: { } sessionToken } => serviceHub.SessionController.GetSessionAsync(sessionToken, serviceHub, cancellationToken).OnSuccess(successTask => serviceHub.GenerateObjectFromState<ParseSession>(successTask.Result, "_Session"))
         }).Unwrap();
 
         public static Task RevokeSessionAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken) => sessionToken is null || !serviceHub.SessionController.IsRevocableSessionToken(sessionToken) ? Task.CompletedTask : serviceHub.SessionController.RevokeAsync(sessionToken, cancellationToken);
 
-        public static Task<string> UpgradeToRevocableSessionAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken) => sessionToken is null || serviceHub.SessionController.IsRevocableSessionToken(sessionToken) ? Task.FromResult(sessionToken) : serviceHub.SessionController.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken).OnSuccess(task => serviceHub.GenerateObjectFromState<ParseSession>(task.Result, "_Session").SessionToken);
+        public static Task<string> UpgradeToRevocableSessionAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken) => sessionToken is null || serviceHub.SessionController.IsRevocableSessionToken(sessionToken) ? Task.FromResult(sessionToken) : serviceHub.SessionController.UpgradeToRevocableSessionAsync(sessionToken, serviceHub, cancellationToken).OnSuccess(task => serviceHub.GenerateObjectFromState<ParseSession>(task.Result, "_Session").SessionToken);
     }
 }

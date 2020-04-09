@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
@@ -75,7 +76,7 @@ namespace Parse.Core.Internal
             return saveTask;
         }).Unwrap(), cancellationToken);
 
-        public Task<ParseUser> GetAsync(CancellationToken cancellationToken)
+        public Task<ParseUser> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
         {
             ParseUser cachedCurrent;
 
@@ -91,7 +92,7 @@ namespace Parse.Core.Internal
 
                 if (data is string { } serialization)
                 {
-                    user = ClassController.GenerateObjectFromState<ParseUser>(ParseObjectCoder.Instance.Decode(Json.Parse(serialization) as IDictionary<string, object>, Decoder), "_User");
+                    user = ClassController.GenerateObjectFromState<ParseUser>(ParseObjectCoder.Instance.Decode(Json.Parse(serialization) as IDictionary<string, object>, Decoder, serviceHub), "_User", serviceHub);
                 }
 
                 return CurrentUser = user;
@@ -120,8 +121,8 @@ namespace Parse.Core.Internal
             }
         }
 
-        public Task<string> GetCurrentSessionTokenAsync(CancellationToken cancellationToken) => GetAsync(cancellationToken).OnSuccess(task => task.Result?.SessionToken);
+        public Task<string> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default) => GetAsync(serviceHub, cancellationToken).OnSuccess(task => task.Result?.SessionToken);
 
-        public Task LogOutAsync(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(cancellationToken)).Unwrap().OnSuccess(t => ClearFromDisk()), cancellationToken);
+        public Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(serviceHub, cancellationToken)).Unwrap().OnSuccess(t => ClearFromDisk()), cancellationToken);
     }
 }

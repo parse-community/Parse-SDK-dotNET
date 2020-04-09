@@ -2,6 +2,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 
 namespace Parse.Core.Internal
 {
@@ -24,7 +25,7 @@ namespace Parse.Core.Internal
         /// Gets the persisted current <see cref="ParseObject"/>.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        Task<T> GetAsync(CancellationToken cancellationToken = default);
+        Task<T> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Returns a <see cref="Task"/> that resolves to <code>true</code> if current

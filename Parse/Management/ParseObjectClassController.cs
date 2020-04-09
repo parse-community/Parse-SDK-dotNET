@@ -2,29 +2,30 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
 {
-    internal class ObjectSubclassingController : IParseObjectClassController
+    internal class ParseObjectClassController : IParseObjectClassController
     {
         // Class names starting with _ are documented to be reserved. Use this one here to allow us to "inherit" certain properties.
         static string ReservedParseObjectClassName { get; } = "_ParseObject";
 
         ReaderWriterLockSlim Mutex { get; } = new ReaderWriterLockSlim { };
 
-        IDictionary<string, ObjectSubclassInfo> RegisteredSubclasses { get; } = new Dictionary<string, ObjectSubclassInfo> { };
+        IDictionary<string, ParseObjectClass> Classes { get; } = new Dictionary<string, ParseObjectClass> { };
 
         Dictionary<string, Action> RegisterActions { get; set; } = new Dictionary<string, Action> { };
 
-        public ObjectSubclassingController() => AddValid(typeof(ParseObject));
+        public ParseObjectClassController() => AddValid(typeof(ParseObject));
 
         public string GetClassName(Type type) => type == typeof(ParseObject) ? ReservedParseObjectClassName : type.GetParseClassName();
 
         public Type GetType(string className)
         {
             Mutex.EnterReadLock();
-            RegisteredSubclasses.TryGetValue(className, out ObjectSubclassInfo info);
+            Classes.TryGetValue(className, out ParseObjectClass info);
             Mutex.ExitReadLock();
 
             return info?.TypeInfo.AsType();
@@ -33,10 +34,10 @@ namespace Parse.Core.Internal
         public bool GetClassMatch(string className, Type type)
         {
             Mutex.EnterReadLock();
-            RegisteredSubclasses.TryGetValue(className, out ObjectSubclassInfo subclassInfo);
+            Classes.TryGetValue(className, out ParseObjectClass subclassInfo);
             Mutex.ExitReadLock();
 
-            return subclassInfo == null ? type == typeof(ParseObject) : subclassInfo.TypeInfo == type.GetTypeInfo();
+            return subclassInfo is { } ? subclassInfo.TypeInfo == type.GetTypeInfo() : type == typeof(ParseObject);
         }
 
         public void AddValid(Type type)
@@ -58,17 +59,17 @@ namespace Parse.Core.Internal
 
                 Mutex.EnterWriteLock();
 
-                if (RegisteredSubclasses.TryGetValue(className, out ObjectSubclassInfo previousInfo))
+                if (Classes.TryGetValue(className, out ParseObjectClass previousInfo))
                 {
                     if (typeInfo.IsAssignableFrom(previousInfo.TypeInfo))
                     {
                         // Previous subclass is more specific or equal to the current type, do nothing.
+
                         return;
                     }
                     else if (previousInfo.TypeInfo.IsAssignableFrom(typeInfo))
                     {
-                        // Previous subclass is parent of new child, fallthrough and actually register
-                        // this class.
+                        // Previous subclass is parent of new child, fallthrough and actually register this class.
                         /* Do nothing */
                     }
                     else
@@ -79,12 +80,12 @@ namespace Parse.Core.Internal
 
                 ConstructorInfo constructor = type.FindConstructor();
 
-                if (constructor == null)
+                if (constructor is null)
                 {
                     throw new ArgumentException("Cannot register a type that does not implement the default constructor!");
                 }
 
-                RegisteredSubclasses[className] = new ObjectSubclassInfo(type, constructor);
+                Classes[className] = new ParseObjectClass(type, constructor);
             }
             finally
             {
@@ -101,48 +102,53 @@ namespace Parse.Core.Internal
         public void RemoveClass(Type type)
         {
             Mutex.EnterWriteLock();
-            RegisteredSubclasses.Remove(GetClassName(type));
+            Classes.Remove(GetClassName(type));
             Mutex.ExitWriteLock();
         }
 
-        public void AddRegisterHook(Type t, Action action)
+        public void AddRegisterHook(Type type, Action action)
         {
             Mutex.EnterWriteLock();
-            RegisterActions.Add(GetClassName(t), action);
+            RegisterActions.Add(GetClassName(type), action);
             Mutex.ExitWriteLock();
         }
 
-        public ParseObject Instantiate(string className)
+        public ParseObject Instantiate(string className, IServiceHub serviceHub)
         {
             Mutex.EnterReadLock();
-            RegisteredSubclasses.TryGetValue(className, out ObjectSubclassInfo info);
+            Classes.TryGetValue(className, out ParseObjectClass info);
             Mutex.ExitReadLock();
 
-            return info is { } ? info.Instantiate() : new ParseObject(className);
+            return info is { } ? info.Instantiate().Bind(serviceHub) : new ParseObject(className, serviceHub);
         }
 
         public IDictionary<string, string> GetPropertyMappings(string className)
         {
             Mutex.EnterReadLock();
-            RegisteredSubclasses.TryGetValue(className, out ObjectSubclassInfo info);
+            Classes.TryGetValue(className, out ParseObjectClass info);
 
             if (info is null)
             {
-                RegisteredSubclasses.TryGetValue(ReservedParseObjectClassName, out info);
+                Classes.TryGetValue(ReservedParseObjectClassName, out info);
             }
 
             Mutex.ExitReadLock();
             return info.PropertyMappings;
         }
 
+        bool SDKClassesAdded { get; set; }
+
         // ALTERNATE NAME: AddObject, AddType, AcknowledgeType, CatalogType
 
         public void AddIntrinsic()
         {
-            AddValid(typeof(ParseUser));
-            AddValid(typeof(ParseRole));
-            AddValid(typeof(ParseSession));
-            AddValid(typeof(ParseInstallation));
+            if (!(SDKClassesAdded, SDKClassesAdded = true).SDKClassesAdded)
+            {
+                AddValid(typeof(ParseUser));
+                AddValid(typeof(ParseRole));
+                AddValid(typeof(ParseSession));
+                AddValid(typeof(ParseInstallation));
+            }
         }
     }
 }

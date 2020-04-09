@@ -168,7 +168,7 @@ namespace Parse
         /// </summary>
         /// <param name="channels">The channels to which this installation should subscribe.</param>
         /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public static Task SubscribeToPushChannelsAsync(this IServiceHub serviceHub, IEnumerable<string> channels, CancellationToken cancellationToken = default) => serviceHub.PushChannelsController.SubscribeAsync(channels, cancellationToken);
+        public static Task SubscribeToPushChannelsAsync(this IServiceHub serviceHub, IEnumerable<string> channels, CancellationToken cancellationToken = default) => serviceHub.PushChannelsController.SubscribeAsync(channels, serviceHub, cancellationToken);
 
         /// <summary>
         /// Unsubscribe the current installation from this channel. This is shorthand for:
@@ -194,7 +194,7 @@ namespace Parse
         /// </summary>
         /// <param name="channels">The channels from which this installation should unsubscribe.</param>
         /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public static Task UnsubscribeToPushChannelsAsync(this IServiceHub serviceHub, IEnumerable<string> channels, CancellationToken cancellationToken = default) => serviceHub.PushChannelsController.UnsubscribeAsync(channels, cancellationToken);
+        public static Task UnsubscribeToPushChannelsAsync(this IServiceHub serviceHub, IEnumerable<string> channels, CancellationToken cancellationToken = default) => serviceHub.PushChannelsController.UnsubscribeAsync(channels, serviceHub, cancellationToken);
 
         #endregion
     }

@@ -1,6 +1,7 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parse.Core.Internal;
+using Parse.Library;
 using Parse.Management;
 
 namespace Parse.Test
@@ -8,15 +9,17 @@ namespace Parse.Test
     [TestClass]
     public class ACLTests
     {
+        ParseClient Client { get; set; } = new ParseClient(new ServerConnectionData { Test = true });
+
         [TestInitialize]
-        public void SetUp()
+        public void Initialize()
         {
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+            Client.AddValidClass<ParseUser>();
+            Client.AddValidClass<ParseSession>();
         }
 
         [TestCleanup]
-        public void TearDown() => ParseCorePlugins.Instance = null;
+        public void Clean() => (Client.Services as ServiceHub).Reset();
 
         [TestMethod]
         public void TestCheckPermissionsWithParseUserConstructor()
@@ -49,8 +52,8 @@ namespace Parse.Test
         }
 
         [TestMethod]
-        public void TestParseACLCreationWithNullObjectIdParseUser() => Assert.ThrowsException<ArgumentException>(() => new ParseACL(GenerateUser(null)));
+        public void TestParseACLCreationWithNullObjectIdParseUser() => Assert.ThrowsException<ArgumentException>(() => new ParseACL(GenerateUser(default)));
 
-        ParseUser GenerateUser(string objectID) => ParseObjectExtensions.FromState<ParseUser>(new MutableObjectState { ObjectId = objectID }, "_User");
+        ParseUser GenerateUser(string objectID) => Client.GenerateObjectFromState<ParseUser>(new MutableObjectState { ObjectId = objectID }, "_User");
     }
 }

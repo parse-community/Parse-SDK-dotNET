@@ -4,55 +4,34 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-
+using Parse.Abstractions.Library;
 using Parse.Utilities;
 
 namespace Parse.Core.Internal
 {
     public class ParseRemoveOperation : IParseFieldOperation
     {
-        private ReadOnlyCollection<object> objects;
-        public ParseRemoveOperation(IEnumerable<object> objects) => this.objects = new ReadOnlyCollection<object>(objects.Distinct().ToList());
+        ReadOnlyCollection<object> Data { get; }
 
-        public object Encode() => new Dictionary<string, object> {
-        {"__op", "Remove"},
-        {nameof(objects), PointerOrLocalIdEncoder.Instance.Encode(objects)}
-      };
+        public ParseRemoveOperation(IEnumerable<object> objects) => Data = new ReadOnlyCollection<object>(objects.Distinct().ToList());
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+        public object Encode(IServiceHub serviceHub) => new Dictionary<string, object>
         {
-            if (previous == null)
-            {
-                return this;
-            }
-            if (previous is ParseDeleteOperation)
-            {
-                return previous;
-            }
-            if (previous is ParseSetOperation)
-            {
-                ParseSetOperation setOp = (ParseSetOperation) previous;
-                IList<object> oldList = Conversion.As<IList<object>>(setOp.Value);
-                return new ParseSetOperation(Apply(oldList, null));
-            }
-            if (previous is ParseRemoveOperation)
-            {
-                ParseRemoveOperation oldOp = (ParseRemoveOperation) previous;
-                return new ParseRemoveOperation(oldOp.Objects.Concat(objects));
-            }
-            throw new InvalidOperationException("Operation is invalid after previous operation.");
-        }
+            ["__op"] = "Remove",
+            ["objects"] = PointerOrLocalIdEncoder.Instance.Encode(Data, serviceHub)
+        };
 
-        public object Apply(object oldValue, string key)
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
         {
-            if (oldValue == null)
-            {
-                return new List<object>();
-            }
-            IList<object> oldList = Conversion.As<IList<object>>(oldValue);
-            return oldList.Except(objects, ParseFieldOperations.ParseObjectComparer).ToList();
-        }
+            null => this,
+            ParseDeleteOperation _ => previous,
+            ParseSetOperation setOp => new ParseSetOperation(Apply(Conversion.As<IList<object>>(setOp.Value), default)),
+            ParseRemoveOperation oldOp => new ParseRemoveOperation(oldOp.Objects.Concat(Data)),
+            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+        };
 
-        public IEnumerable<object> Objects => objects;
+        public object Apply(object oldValue, string key) => oldValue is { } ? Conversion.As<IList<object>>(oldValue).Except(Data, ParseFieldOperations.ParseObjectComparer).ToList() : new List<object> { };
+
+        public IEnumerable<object> Objects => Data;
     }
 }

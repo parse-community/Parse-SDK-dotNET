@@ -3,6 +3,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
+using Parse.Common.Internal;
 using Parse.Library;
 
 namespace Parse.Push.Internal
@@ -13,16 +15,16 @@ namespace Parse.Push.Internal
 
         public ParsePushChannelsController(IParseCurrentInstallationController currentInstallationController) => CurrentInstallationController = currentInstallationController;
 
-        public Task SubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken) => CurrentInstallationController.GetAsync(cancellationToken).ContinueWith(task =>
+        public Task SubscribeAsync(IEnumerable<string> channels, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CurrentInstallationController.GetAsync(serviceHub, cancellationToken).OnSuccess(task =>
         {
             task.Result.AddRangeUniqueToList(nameof(channels), channels);
             return task.Result.SaveAsync(cancellationToken);
-        });
+        }).Unwrap();
 
-        public Task UnsubscribeAsync(IEnumerable<string> channels, CancellationToken cancellationToken) => CurrentInstallationController.GetAsync().ContinueWith(task =>
+        public Task UnsubscribeAsync(IEnumerable<string> channels, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CurrentInstallationController.GetAsync(serviceHub, cancellationToken).OnSuccess(task =>
         {
             task.Result.RemoveAllFromList(nameof(channels), channels);
             return task.Result.SaveAsync(cancellationToken);
-        });
+        }).Unwrap();
     }
 }

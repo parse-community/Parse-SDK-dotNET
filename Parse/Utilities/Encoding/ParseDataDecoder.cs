@@ -19,7 +19,7 @@ namespace Parse.Core.Internal
 
         static string[] Types { get; } = { "Date", "Bytes", "Pointer", "File", "GeoPoint", "Object", "Relation" };
 
-        public object Decode(object data) => data switch
+        public object Decode(object data, IServiceHub serviceHub) => data switch
         {
             null => default,
             IDictionary<string, object> { } dictionary when dictionary.ContainsKey("__op") => ParseFieldOperations.Decode(dictionary),
@@ -27,18 +27,18 @@ namespace Parse.Core.Internal
             {
                 "Date" => ParseDate(dictionary["iso"] as string),
                 "Bytes" => Convert.FromBase64String(dictionary["base64"] as string),
-                "Pointer" => DecodePointer(dictionary["className"] as string, dictionary["objectId"] as string),
+                "Pointer" => DecodePointer(dictionary["className"] as string, dictionary["objectId"] as string, serviceHub),
                 "File" => new ParseFile(dictionary["name"] as string, new Uri(dictionary["url"] as string)),
                 "GeoPoint" => new ParseGeoPoint(Conversion.To<double>(dictionary["latitude"]), Conversion.To<double>(dictionary["longitude"])),
-                "Object" => ClassController.GenerateObjectFromState<ParseObject>(ParseObjectCoder.Instance.Decode(dictionary, this), dictionary["className"] as string),
+                "Object" => ClassController.GenerateObjectFromState<ParseObject>(ParseObjectCoder.Instance.Decode(dictionary, this, serviceHub), dictionary["className"] as string, serviceHub),
                 "Relation" => ParseRelationBase.CreateRelation(null, null, dictionary["className"] as string)
             },
-            IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value)),
-            IList<object> { } list => list.Select(Decode),
+            IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value, serviceHub)),
+            IList<object> { } list => list.Select(item => Decode(item, serviceHub)),
             _ => data
         };
 
-        protected virtual object DecodePointer(string className, string objectId) => ClassController.CreateObjectWithoutData(className, objectId);
+        protected virtual object DecodePointer(string className, string objectId, IServiceHub serviceHub) => ClassController.CreateObjectWithoutData(className, objectId, serviceHub);
 
         // TODO(hallucinogen): Figure out if we should be more flexible with the date formats we accept.
 

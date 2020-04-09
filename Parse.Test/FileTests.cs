@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Core.Internal;
+using Parse.Library;
 using Parse.Management;
 
 namespace Parse.Test
@@ -13,26 +14,25 @@ namespace Parse.Test
     [TestClass]
     public class FileTests
     {
-        [TestCleanup]
-        public void TearDown() => ParseCorePlugins.Instance = null;
-
         [TestMethod]
         [AsyncStateMachine(typeof(FileTests))]
         public Task TestFileSave()
         {
             Mock<IParseFileController> mockController = new Mock<IParseFileController>();
-            mockController.Setup(obj => obj.SaveAsync(It.IsAny<FileState>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new FileState { Name = "newBekti.png", Location = new Uri("https://www.parse.com/newBekti.png"), MediaType = "image/png" }));
+            mockController.Setup(obj => obj.SaveAsync(It.IsAny<FileState>(), It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new FileState { Name = "newBekti.png", Location = new Uri("https://www.parse.com/newBekti.png"), MediaType = "image/png" }));
             Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            ParseCorePlugins.Instance = new ParseCorePlugins { FileController = mockController.Object, CurrentUserController = mockCurrentUserController.Object };
 
-            ParseFile file = new ParseFile("bekti.jpeg", new MemoryStream(), "image/jpeg");
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, new MutableServiceHub { FileController = mockController.Object, CurrentUserController = mockCurrentUserController.Object });
+
+            ParseFile file = new ParseFile("bekti.jpeg", new MemoryStream { }, "image/jpeg");
+
             Assert.AreEqual("bekti.jpeg", file.Name);
             Assert.AreEqual("image/jpeg", file.MimeType);
             Assert.IsTrue(file.IsDirty);
 
-            return file.SaveAsync().ContinueWith(t =>
+            return file.SaveAsync(client).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
+                Assert.IsFalse(task.IsFaulted);
                 Assert.AreEqual("newBekti.png", file.Name);
                 Assert.AreEqual("image/png", file.MimeType);
                 Assert.AreEqual("https://www.parse.com/newBekti.png", file.Url.AbsoluteUri);

@@ -45,7 +45,7 @@ namespace Parse.Library
         public IParseCurrentInstallationController CurrentInstallationController { get; set; }
         public IParseInstallationDataFinalizer InstallationDataFinalizer { get; set; }
 
-        public void SetDefaults(IServerConnectionData connectionData)
+        public MutableServiceHub SetDefaults(IServerConnectionData connectionData = default)
         {
             ServerConnectionData ??= connectionData;
             MetadataController ??= new MetadataController
@@ -58,7 +58,7 @@ namespace Parse.Library
 
             WebClient ??= new UniversalWebClient { };
             StorageController ??= new StorageController { };
-            ClassController ??= new ObjectSubclassingController { };
+            ClassController ??= new ParseObjectClassController { };
 
             Decoder ??= new ParseDataDecoder(ClassController);
 
@@ -82,6 +82,8 @@ namespace Parse.Library
             CurrentInstallationController ??= new ParseCurrentInstallationController(InstallationController, StorageController, InstallationCoder, ClassController);
             PushChannelsController ??= new ParsePushChannelsController(CurrentInstallationController);
             InstallationDataFinalizer ??= new ParseInstallationDataFinalizer { };
+
+            return this;
         }
     }
 }

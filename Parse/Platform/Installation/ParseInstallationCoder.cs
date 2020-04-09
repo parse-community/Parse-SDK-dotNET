@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Parse.Abstractions.Library;
 using Parse.Core.Internal;
 
 namespace Parse.Push.Internal
@@ -10,12 +11,12 @@ namespace Parse.Push.Internal
 
         IParseObjectClassController ClassController { get; }
 
-        public ParseInstallationCoder(IParseDataDecoder decoder, IParseObjectClassController classController) => Decoder = decoder;
+        public ParseInstallationCoder(IParseDataDecoder decoder, IParseObjectClassController classController) => (Decoder, ClassController) = (decoder, classController);
 
         public IDictionary<string, object> Encode(ParseInstallation installation)
         {
             IObjectState state = installation.State;
-            IDictionary<string, object> data = PointerOrLocalIdEncoder.Instance.Encode(state.ToDictionary(x => x.Key, x => x.Value)) as IDictionary<string, object>;
+            IDictionary<string, object> data = PointerOrLocalIdEncoder.Instance.Encode(state.ToDictionary(pair => pair.Key, pair => pair.Value), installation.Services) as IDictionary<string, object>;
 
             data["objectId"] = state.ObjectId;
 
@@ -34,6 +35,6 @@ namespace Parse.Push.Internal
             return data;
         }
 
-        public ParseInstallation Decode(IDictionary<string, object> data) => ClassController.GenerateObjectFromState<ParseInstallation>(ParseObjectCoder.Instance.Decode(data, Decoder), "_Installation");
+        public ParseInstallation Decode(IDictionary<string, object> data, IServiceHub serviceHub) => ClassController.GenerateObjectFromState<ParseInstallation>(ParseObjectCoder.Instance.Decode(data, Decoder, serviceHub), "_Installation", serviceHub);
     }
 }

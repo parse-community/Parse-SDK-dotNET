@@ -2,6 +2,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 
 namespace Parse.Core.Internal
 {
@@ -15,6 +16,6 @@ namespace Parse.Core.Internal
         /// <returns>The config async.</returns>
         /// <param name="sessionToken">Session token.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        Task<ParseConfiguration> FetchConfigAsync(string sessionToken, CancellationToken cancellationToken);
+        Task<ParseConfiguration> FetchConfigAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default);
     }
 }

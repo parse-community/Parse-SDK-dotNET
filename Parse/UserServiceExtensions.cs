@@ -18,16 +18,7 @@ namespace Parse
             return sessionTokenTask.Result;
         }
 
-        internal static Task<string> GetCurrentSessionTokenAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(cancellationToken);
-
-        /// <summary>
-        /// Logs in a user with a username and password. On success, this saves the session to disk so you
-        /// can retrieve the currently logged in user using <see cref="GetCurrentUser()"/>.
-        /// </summary>
-        /// <param name="username">The username to log in with.</param>
-        /// <param name="password">The password to log in with.</param>
-        /// <returns>The newly logged-in user.</returns>
-        public static Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password) => LogInAsync(serviceHub, username, password, CancellationToken.None);
+        internal static Task<string> GetCurrentSessionTokenAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken);
 
         /// <summary>
         /// Logs in a user with a username and password. On success, this saves the session to disk so you
@@ -37,7 +28,7 @@ namespace Parse
         /// <param name="password">The password to log in with.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The newly logged-in user.</returns>
-        public static Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken) => serviceHub.UserController.LogInAsync(username, password, cancellationToken).OnSuccess(task =>
+        public static Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default) => serviceHub.UserController.LogInAsync(username, password, serviceHub, cancellationToken).OnSuccess(task =>
         {
             ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(task.Result, "_User");
             return SaveCurrentUserAsync(serviceHub, user).OnSuccess(_ => user);
@@ -48,17 +39,9 @@ namespace Parse
         /// can retrieve the currently logged in user using <see cref="GetCurrentUser()"/>.
         /// </summary>
         /// <param name="sessionToken">The session token to authorize with</param>
-        /// <returns>The user if authorization was successful</returns>
-        public static Task<ParseUser> BecomeAsync(this IServiceHub serviceHub, string sessionToken) => BecomeAsync(serviceHub, sessionToken, CancellationToken.None);
-
-        /// <summary>
-        /// Logs in a user with a username and password. On success, this saves the session to disk so you
-        /// can retrieve the currently logged in user using <see cref="GetCurrentUser()"/>.
-        /// </summary>
-        /// <param name="sessionToken">The session token to authorize with</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The user if authorization was successful</returns>
-        public static Task<ParseUser> BecomeAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken) => serviceHub.UserController.GetUserAsync(sessionToken, cancellationToken).OnSuccess(t =>
+        public static Task<ParseUser> BecomeAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken = default) => serviceHub.UserController.GetUserAsync(sessionToken, serviceHub, cancellationToken).OnSuccess(t =>
         {
             ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(t.Result, "_User");
             return SaveCurrentUserAsync(serviceHub, user).OnSuccess(_ => user);
@@ -93,7 +76,7 @@ namespace Parse
         public static Task LogOutAsync(this IServiceHub serviceHub, CancellationToken cancellationToken) => GetCurrentUserAsync(serviceHub).OnSuccess(task =>
         {
             LogOutWithProviders();
-            return task.Result is { } user ? user.taskQueue.Enqueue(toAwait => user.LogOutAsync(toAwait, cancellationToken), cancellationToken) : Task.CompletedTask;
+            return task.Result is { } user ? user.TaskQueue.Enqueue(toAwait => user.LogOutAsync(toAwait, cancellationToken), cancellationToken) : Task.CompletedTask;
         }).Unwrap();
 
         static void LogOutWithProviders()
@@ -122,7 +105,7 @@ namespace Parse
         /// Gets the currently logged in ParseUser with a valid session, either from memory or disk
         /// if necessary, asynchronously.
         /// </summary>
-        internal static Task<ParseUser> GetCurrentUserAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.GetAsync(cancellationToken);
+        internal static Task<ParseUser> GetCurrentUserAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.GetAsync(serviceHub, cancellationToken);
 
         internal static Task SaveCurrentUserAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.SetAsync(user, cancellationToken);
 
@@ -188,7 +171,7 @@ namespace Parse
         {
             ParseUser user = null;
 
-            return serviceHub.UserController.LogInAsync(authType, data, cancellationToken).OnSuccess(task =>
+            return serviceHub.UserController.LogInAsync(authType, data, serviceHub, cancellationToken).OnSuccess(task =>
             {
                 user = serviceHub.GenerateObjectFromState<ParseUser>(task.Result, "_User");
 

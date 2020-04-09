@@ -208,7 +208,7 @@ namespace Parse
         /// console on http://parse.com
         /// </summary>
         /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public Task SendAsync(CancellationToken cancellationToken) => Services.PushController.SendPushNotificationAsync(State, cancellationToken);
+        public Task SendAsync(CancellationToken cancellationToken) => Services.PushController.SendPushNotificationAsync(State, Services, cancellationToken);
 
         #endregion
     }

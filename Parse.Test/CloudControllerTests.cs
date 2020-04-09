@@ -11,18 +11,22 @@ using Parse.Library;
 
 namespace Parse.Test
 {
+#warning Class refactoring requires completion.
+
     [TestClass]
     public class CloudControllerTests
     {
+        ParseClient Client { get; set; }
+
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => Client = new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(CloudControllerTests))]
-        public Task TestEmptyCallFunction() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null)).Object).CallFunctionAsync<string>("someFunction", null, null, CancellationToken.None).ContinueWith(t =>
+        public Task TestEmptyCallFunction() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, default)).Object, Client.Decoder).CallFunctionAsync<string>("someFunction", default, default, Client, CancellationToken.None).ContinueWith(task =>
         {
-            Assert.IsTrue(t.IsFaulted);
-            Assert.IsFalse(t.IsCanceled);
+            Assert.IsTrue(task.IsFaulted);
+            Assert.IsFalse(task.IsCanceled);
         });
 
         [TestMethod]
@@ -33,38 +37,37 @@ namespace Parse.Test
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict);
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
 
-            ParseCloudCodeController controller = new ParseCloudCodeController(mockRunner.Object);
-            return controller.CallFunctionAsync<string>("someFunction", null, null, CancellationToken.None).ContinueWith(t =>
+            return new ParseCloudCodeController(mockRunner.Object, Client.Decoder).CallFunctionAsync<string>("someFunction", default, default, Client, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                Assert.AreEqual("gogo", t.Result);
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+                Assert.AreEqual("gogo", task.Result);
             });
         }
 
         [TestMethod]
         [AsyncStateMachine(typeof(CloudControllerTests))]
-        public Task TestCallFunctionWithComplexType() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>() { { "result", new Dictionary<string, object> { { "fosco", "ben" }, { "list", new List<object> { 1, 2, 3 } } } } })).Object).CallFunctionAsync<IDictionary<string, object>>("someFunction", null, null, CancellationToken.None).ContinueWith(t =>
+        public Task TestCallFunctionWithComplexType() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>() { { "result", new Dictionary<string, object> { { "fosco", "ben" }, { "list", new List<object> { 1, 2, 3 } } } } })).Object, Client.Decoder).CallFunctionAsync<IDictionary<string, object>>("someFunction", default, default, Client, CancellationToken.None).ContinueWith(task =>
         {
-            Assert.IsFalse(t.IsFaulted);
-            Assert.IsFalse(t.IsCanceled);
-            Assert.IsInstanceOfType(t.Result, typeof(IDictionary<string, object>));
-            Assert.AreEqual("ben", t.Result["fosco"]);
-            Assert.IsInstanceOfType(t.Result["list"], typeof(IList<object>));
+            Assert.IsFalse(task.IsFaulted);
+            Assert.IsFalse(task.IsCanceled);
+            Assert.IsInstanceOfType(task.Result, typeof(IDictionary<string, object>));
+            Assert.AreEqual("ben", task.Result["fosco"]);
+            Assert.IsInstanceOfType(task.Result["list"], typeof(IList<object>));
         });
 
         [TestMethod]
         [AsyncStateMachine(typeof(CloudControllerTests))]
-        public Task TestCallFunctionWithWrongType() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>() { { "result", "gogo" } })).Object).CallFunctionAsync<int>("someFunction", null, null, CancellationToken.None).ContinueWith(t =>
+        public Task TestCallFunctionWithWrongType() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>() { { "result", "gogo" } })).Object, Client.Decoder).CallFunctionAsync<int>("someFunction", default, default, Client, CancellationToken.None).ContinueWith(task =>
         {
-            Assert.IsTrue(t.IsFaulted);
-            Assert.IsFalse(t.IsCanceled);
+            Assert.IsTrue(task.IsFaulted);
+            Assert.IsFalse(task.IsCanceled);
         });
 
         private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
         {
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner> { };
-            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
+            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
 
             return mockRunner;
         }

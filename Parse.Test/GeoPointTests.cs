@@ -5,12 +5,15 @@ using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
+using Parse.Library;
 
 namespace Parse.Test
 {
     [TestClass]
     public class GeoPointTests
     {
+        ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
+
         [TestMethod]
         public void TestGeoPointCultureInvariantParsing()
         {
@@ -19,8 +22,8 @@ namespace Parse.Test
             {
                 Thread.CurrentThread.CurrentCulture = c;
                 ParseGeoPoint point = new ParseGeoPoint(1.234, 1.234);
-                string serialized = Json.Encode(new Dictionary<string, object> { { nameof(point), NoObjectsEncoder.Instance.Encode(point) } });
-                IDictionary<string, object> deserialized = ParseDataDecoder.Instance.Decode(Json.Parse(serialized)) as IDictionary<string, object>;
+                string serialized = Json.Encode(new Dictionary<string, object> { { nameof(point), NoObjectsEncoder.Instance.Encode(point, Client) } });
+                IDictionary<string, object> deserialized = Client.Decoder.Decode(Json.Parse(serialized), Client) as IDictionary<string, object>;
                 ParseGeoPoint pointAgain = (ParseGeoPoint) deserialized[nameof(point)];
                 Assert.AreEqual(1.234, pointAgain.Latitude);
                 Assert.AreEqual(1.234, pointAgain.Longitude);

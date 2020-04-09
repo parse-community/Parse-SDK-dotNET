@@ -7,7 +7,7 @@ namespace Parse.Abstractions.Library
 {
     public abstract class CustomServiceHub : ICustomServiceHub
     {
-        public virtual IServiceHub Services { get; protected set; }
+        public virtual IServiceHub Services { get; internal set; }
 
         public virtual IServiceHubCloner Cloner => Services.Cloner;
 

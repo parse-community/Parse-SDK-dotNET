@@ -4,7 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Parse.Abstractions.Library;
 using Parse.Core.Internal;
+using Parse.Library;
 using Parse.Management;
 
 namespace Parse.Test
@@ -12,29 +14,31 @@ namespace Parse.Test
     [TestClass]
     public class CloudTests
     {
-        [TestCleanup]
-        public void TearDown() => ParseCorePlugins.Instance.Reset();
+#warning Skipped post-test-evaluation cleaning method may be needed.
+
+        // [TestCleanup]
+        // public void TearDown() => ParseCorePlugins.Instance.Reset();
 
         [TestMethod]
         [AsyncStateMachine(typeof(CloudTests))]
         public Task TestCloudFunctions()
         {
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
             Mock<IParseCloudCodeController> mockController = new Mock<IParseCloudCodeController>();
-            mockController.Setup(obj => obj.CallFunctionAsync<IDictionary<string, object>>(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult<IDictionary<string, object>>(new Dictionary<string, object> { ["fosco"] = "ben", ["list"] = new List<object> { 1, 2, 3 } }));
+            mockController.Setup(obj => obj.CallFunctionAsync<IDictionary<string, object>>(It.IsAny<string>(), It.IsAny<IDictionary<string, object>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult<IDictionary<string, object>>(new Dictionary<string, object> { ["fosco"] = "ben", ["list"] = new List<object> { 1, 2, 3 } }));
 
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                CloudCodeController = mockController.Object,
-                CurrentUserController = new Mock<IParseCurrentUserController>().Object
-            };
+            hub.CloudCodeController = mockController.Object;
+            hub.CurrentUserController = new Mock<IParseCurrentUserController> { }.Object;
 
-            return CloudCodeServiceExtensions.CallFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None).ContinueWith(t =>
+            return client.CallCloudCodeFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Result, typeof(IDictionary<string, object>));
-                Assert.AreEqual("ben", t.Result["fosco"]);
-                Assert.IsInstanceOfType(t.Result["list"], typeof(IList<object>));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+                Assert.IsInstanceOfType(task.Result, typeof(IDictionary<string, object>));
+                Assert.AreEqual("ben", task.Result["fosco"]);
+                Assert.IsInstanceOfType(task.Result["list"], typeof(IList<object>));
             });
         }
     }

@@ -15,25 +15,24 @@ using Parse.Management;
 
 namespace Parse.Test
 {
+#warning Initialization and cleaning steps may be redundant for each test method. It may be possible to simply reset the required services before each run.
+#warning Class refactoring requires completion.
+
     [TestClass]
     public class CommandTests
     {
-        Mock<IMetadataController> MockMetadataController { get; } = new Mock<IMetadataController> { };
+        ParseClient Client { get; set; }
 
         [TestInitialize]
-        public void SetUp()
-        {
-            ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
-            MockMetadataController.Setup(metadata => metadata.HostManifestData).Returns(new HostManifestData { Version = "1", ShortVersion = "1", HostOSVersion = "1" });
-        }
+        public void Initialize() => Client = new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestCleanup]
-        public void TearDown() => ParseCorePlugins.Instance.Reset();
+        public void Clean() => (Client.Services as ServiceHub).Reset();
 
         [TestMethod]
         public void TestMakeCommand()
         {
-            ParseCommand command = new ParseCommand("endpoint", method: "GET", sessionToken: "abcd", headers: null, data: null);
+            ParseCommand command = new ParseCommand("endpoint", method: "GET", sessionToken: "abcd", headers: default, data: default);
 
             Assert.AreEqual("/1/endpoint", command.Target.AbsolutePath);
             Assert.AreEqual("GET", command.Method);
@@ -47,16 +46,16 @@ namespace Parse.Test
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
             Task<Tuple<HttpStatusCode, string>> fakeResponse = Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "{}"));
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(fakeResponse);
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(fakeResponse);
 
-            mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
+            mockInstallationIdController.Setup(controller => controller.GetAsync()).Returns(Task.FromResult<Guid?>(default));
 
-            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, MockMetadataController.Object).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null)).ContinueWith(t =>
+            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, Client.MetadataController, Client.ServerConnectionData, new Lazy<IParseUserController>(() => Client.UserController)).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: default)).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Result.Item2, typeof(IDictionary<string, object>));
-                Assert.AreEqual(0, t.Result.Item2.Count);
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+                Assert.IsInstanceOfType(task.Result.Item2, typeof(IDictionary<string, object>));
+                Assert.AreEqual(0, task.Result.Item2.Count);
             });
         }
 
@@ -66,11 +65,11 @@ namespace Parse.Test
         {
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "[]")));
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "[]")));
 
-            mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
+            mockInstallationIdController.Setup(controller => controller.GetAsync()).Returns(Task.FromResult<Guid?>(default));
 
-            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, MockMetadataController.Object).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null)).ContinueWith(t =>
+            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, Client.MetadataController, Client.ServerConnectionData, new Lazy<IParseUserController>(() => Client.UserController)).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: default)).ContinueWith(t =>
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
@@ -87,16 +86,16 @@ namespace Parse.Test
         {
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
             Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "invalid")));
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "invalid")));
 
-            mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
+            mockInstallationIdController.Setup(controller => controller.GetAsync()).Returns(Task.FromResult<Guid?>(default));
 
-            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, MockMetadataController.Object).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null)).ContinueWith(t =>
+            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, Client.MetadataController, Client.ServerConnectionData, new Lazy<IParseUserController>(() => Client.UserController)).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: default)).ContinueWith(task =>
             {
-                Assert.IsTrue(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseFailureException));
-                Assert.AreEqual(ParseFailureException.ErrorCode.OtherCause, (t.Exception.InnerException as ParseFailureException).Code);
+                Assert.IsTrue(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+                Assert.IsInstanceOfType(task.Exception.InnerException, typeof(ParseFailureException));
+                Assert.AreEqual(ParseFailureException.ErrorCode.OtherCause, (task.Exception.InnerException as ParseFailureException).Code);
             });
         }
 
@@ -105,17 +104,17 @@ namespace Parse.Test
         public Task TestRunCommandWithErrorCode()
         {
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
-            Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
-            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.NotFound, "{ \"code\": 101, \"error\": \"Object not found.\" }")));
+            Mock<IParseInstallationController> mockInstallationController = new Mock<IParseInstallationController>();
+            mockHttpClient.Setup(obj => obj.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.NotFound, "{ \"code\": 101, \"error\": \"Object not found.\" }")));
 
-            mockInstallationIdController.Setup(i => i.GetAsync()).Returns(Task.FromResult<Guid?>(null));
+            mockInstallationController.Setup(controller => controller.GetAsync()).Returns(Task.FromResult<Guid?>(default));
 
-            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, MockMetadataController.Object).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null)).ContinueWith(t =>
+            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationController.Object, Client.MetadataController, Client.ServerConnectionData, new Lazy<IParseUserController>(() => Client.UserController)).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: default)).ContinueWith(task =>
             {
-                Assert.IsTrue(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseFailureException));
-                ParseFailureException parseException = t.Exception.InnerException as ParseFailureException;
+                Assert.IsTrue(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+                Assert.IsInstanceOfType(task.Exception.InnerException, typeof(ParseFailureException));
+                ParseFailureException parseException = task.Exception.InnerException as ParseFailureException;
                 Assert.AreEqual(ParseFailureException.ErrorCode.ObjectNotFound, parseException.Code);
                 Assert.AreEqual("Object not found.", parseException.Message);
             });
@@ -126,17 +125,17 @@ namespace Parse.Test
         public Task TestRunCommandWithInternalServerError()
         {
             Mock<IWebClient> mockHttpClient = new Mock<IWebClient>();
-            Mock<IParseInstallationController> mockInstallationIdController = new Mock<IParseInstallationController>();
+            Mock<IParseInstallationController> mockInstallationController = new Mock<IParseInstallationController>();
             
-            mockHttpClient.Setup(client => client.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.InternalServerError, null)));
-            mockInstallationIdController.Setup(installationController => installationController.GetAsync()).Returns(Task.FromResult<Guid?>(null));
+            mockHttpClient.Setup(client => client.ExecuteAsync(It.IsAny<Common.Internal.WebRequest>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(new Tuple<HttpStatusCode, string>(HttpStatusCode.InternalServerError, default)));
+            mockInstallationController.Setup(installationController => installationController.GetAsync()).Returns(Task.FromResult<Guid?>(default));
 
-            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationIdController.Object, MockMetadataController.Object).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null)).ContinueWith(t =>
+            return new ParseCommandRunner(mockHttpClient.Object, mockInstallationController.Object, Client.MetadataController, Client.ServerConnectionData, new Lazy<IParseUserController>(() => Client.UserController)).RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: default)).ContinueWith(task =>
             {
-                Assert.IsTrue(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(ParseFailureException));
-                Assert.AreEqual(ParseFailureException.ErrorCode.InternalServerError, (t.Exception.InnerException as ParseFailureException).Code);
+                Assert.IsTrue(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+                Assert.IsInstanceOfType(task.Exception.InnerException, typeof(ParseFailureException));
+                Assert.AreEqual(ParseFailureException.ErrorCode.InternalServerError, (task.Exception.InnerException as ParseFailureException).Code);
             });
         }
     }

@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Threading;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 using Parse.Management;
@@ -9,7 +10,6 @@ using Parse.Utilities;
 
 namespace Parse
 {
-
     /// <summary>
     /// The ParseConfig is a representation of the remote configuration object,
     /// that enables you to add things like feature gating, a/b testing or simple "Message of the day".
@@ -18,11 +18,13 @@ namespace Parse
     {
         IDictionary<string, object> Properties { get; } = new Dictionary<string, object> { };
 
-        internal ParseConfiguration() { }
+        IServiceHub Services { get; }
 
-        ParseConfiguration(IDictionary<string, object> properties) => Properties = properties;
+        internal ParseConfiguration(IServiceHub serviceHub) => Services = serviceHub;
 
-        internal static ParseConfiguration Create(IDictionary<string, object> configurationData, IParseDataDecoder decoder) => new ParseConfiguration(decoder.Decode(configurationData["params"]) as IDictionary<string, object>);
+        ParseConfiguration(IDictionary<string, object> properties, IServiceHub serviceHub) : this(serviceHub) => Properties = properties;
+
+        internal static ParseConfiguration Create(IDictionary<string, object> configurationData, IParseDataDecoder decoder, IServiceHub serviceHub) => new ParseConfiguration(decoder.Decode(configurationData["params"], serviceHub) as IDictionary<string, object>, serviceHub);
 
         /// <summary>
         /// Gets a value for the key of a particular type.
@@ -76,7 +78,7 @@ namespace Parse
 
         IDictionary<string, object> IJsonConvertible.ConvertToJSON() => new Dictionary<string, object>
         {
-            ["params"] = NoObjectsEncoder.Instance.Encode(Properties)
+            ["params"] = NoObjectsEncoder.Instance.Encode(Properties, Services)
         };
     }
 }

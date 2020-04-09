@@ -15,15 +15,19 @@ namespace Parse.Test
     [TestClass]
     public class SessionControllerTests
     {
+#warning Check if reinitializing the client for every test method is really necessary.
+
+        ParseClient Client { get; set; }
+
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => Client = new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(SessionControllerTests))]
-        public Task TestGetSessionWithEmptyResult() => new ParseSessionController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null)).Object).GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
+        public Task TestGetSessionWithEmptyResult() => new ParseSessionController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null)).Object, Client.Decoder).GetSessionAsync("S0m3Se551on", Client, CancellationToken.None).ContinueWith(task =>
         {
-            Assert.IsTrue(t.IsFaulted);
-            Assert.IsFalse(t.IsCanceled);
+            Assert.IsTrue(task.IsFaulted);
+            Assert.IsFalse(task.IsCanceled);
         });
 
         [TestMethod]
@@ -37,15 +41,17 @@ namespace Parse.Test
                 ["sessionToken"] = "S0m3Se551on",
                 ["restricted"] = true
             });
+
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
 
-            return new ParseSessionController(mockRunner.Object).GetSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
+            return new ParseSessionController(mockRunner.Object, Client.Decoder).GetSessionAsync("S0m3Se551on", Client, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/sessions/me"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
 
-                IObjectState session = t.Result;
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/sessions/me"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+                IObjectState session = task.Result;
                 Assert.AreEqual(2, session.Count());
                 Assert.IsTrue((bool) session["restricted"]);
                 Assert.AreEqual("S0m3Se551on", session["sessionToken"]);
@@ -56,18 +62,14 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(SessionControllerTests))]
         public Task TestRevoke()
         {
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null);
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, default));
 
-            ParseSessionController controller = new ParseSessionController(mockRunner.Object);
-            return controller.RevokeAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
+            return new ParseSessionController(mockRunner.Object, Client.Decoder).RevokeAsync("S0m3Se551on", CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/logout"),
-                  It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
-                  It.IsAny<IProgress<DataRecievalPresenter>>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/logout"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -76,25 +78,23 @@ namespace Parse.Test
         public Task TestUpgradeToRevocableSession()
         {
             Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted,
-                new Dictionary<string, object>() {
-            { "__type", "Object" },
-            { "className", "Session" },
-            { "sessionToken", "S0m3Se551on" },
-            { "restricted", true }
+                new Dictionary<string, object>
+                {
+                    ["__type"] = "Object",
+                    ["className"] = "Session",
+                    ["sessionToken"] = "S0m3Se551on",
+                    ["restricted"] = true
                 });
+
             Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
 
-            ParseSessionController controller = new ParseSessionController(mockRunner.Object);
-            return controller.UpgradeToRevocableSessionAsync("S0m3Se551on", CancellationToken.None).ContinueWith(t =>
+            return new ParseSessionController(mockRunner.Object, Client.Decoder).UpgradeToRevocableSessionAsync("S0m3Se551on", Client, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/upgradeToRevocableSession"),
-                  It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
-                  It.IsAny<IProgress<DataRecievalPresenter>>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/upgradeToRevocableSession"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-                IObjectState session = t.Result;
+                IObjectState session = task.Result;
                 Assert.AreEqual(2, session.Count());
                 Assert.IsTrue((bool) session["restricted"]);
                 Assert.AreEqual("S0m3Se551on", session["sessionToken"]);
@@ -104,7 +104,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestIsRevocableSessionToken()
         {
-            IParseSessionController sessionController = new ParseSessionController(Mock.Of<IParseCommandRunner>());
+            IParseSessionController sessionController = new ParseSessionController(Mock.Of<IParseCommandRunner>(), Client.Decoder);
             Assert.IsTrue(sessionController.IsRevocableSessionToken("r:session"));
             Assert.IsTrue(sessionController.IsRevocableSessionToken("r:session:r:"));
             Assert.IsTrue(sessionController.IsRevocableSessionToken("session:r:"));
@@ -117,11 +117,7 @@ namespace Parse.Test
         private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
         {
             Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
-            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(),
-                It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(),
-                It.IsAny<IProgress<DataRecievalPresenter>>(),
-                It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(response));
+            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
 
             return mockRunner;
         }

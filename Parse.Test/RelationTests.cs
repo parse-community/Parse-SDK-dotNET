@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parse.Core.Internal;
+using Parse.Library;
 
 namespace Parse.Test
 {
@@ -10,7 +11,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestRelationQuery()
         {
-            ParseObject parent = ParseObject.CreateWithoutData("Foo", "abcxyz");
+            ParseObject parent = new ServiceHub { }.CreateObjectWithoutData("Foo", "abcxyz");
 
             ParseRelation<ParseObject> relation = parent.GetRelation<ParseObject>("child");
             ParseQuery<ParseObject> query = relation.Query;

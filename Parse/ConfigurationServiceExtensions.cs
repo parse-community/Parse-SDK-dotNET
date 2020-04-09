@@ -10,9 +10,9 @@ namespace Parse
 {
     public static class ConfigurationServiceExtensions
     {
-        public static ParseConfiguration BuildConfiguration(this IServiceHub serviceHub, IDictionary<string, object> configurationData) => ParseConfiguration.Create(configurationData, serviceHub.Decoder);
+        public static ParseConfiguration BuildConfiguration(this IServiceHub serviceHub, IDictionary<string, object> configurationData) => ParseConfiguration.Create(configurationData, serviceHub.Decoder, serviceHub);
 
-        public static ParseConfiguration BuildConfiguration(this IParseDataDecoder dataDecoder, IDictionary<string, object> configurationData) => ParseConfiguration.Create(configurationData, dataDecoder);
+        public static ParseConfiguration BuildConfiguration(this IParseDataDecoder dataDecoder, IDictionary<string, object> configurationData, IServiceHub serviceHub) => ParseConfiguration.Create(configurationData, dataDecoder, serviceHub);
 
 #warning Investigate if these methods which simply block a thread waiting for an asynchronous process to complete should be eliminated.
 
@@ -20,9 +20,9 @@ namespace Parse
         /// Gets the latest fetched ParseConfig.
         /// </summary>
         /// <returns>ParseConfig object</returns>
-        public static ParseConfiguration GetCurrentConfig(this IServiceHub serviceHub)
+        public static ParseConfiguration GetCurrentConfiguration(this IServiceHub serviceHub)
         {
-            Task<ParseConfiguration> task = serviceHub.ConfigurationController.CurrentConfigurationController.GetCurrentConfigAsync();
+            Task<ParseConfiguration> task = serviceHub.ConfigurationController.CurrentConfigurationController.GetCurrentConfigAsync(serviceHub);
 
             task.Wait();
             return task.Result;
@@ -37,6 +37,6 @@ namespace Parse
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>ParseConfig object that was fetched</returns>
-        public static Task<ParseConfiguration> GetAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.ConfigurationController.FetchConfigAsync(serviceHub.GetCurrentSessionToken(), cancellationToken);
+        public static Task<ParseConfiguration> GetConfigurationAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.ConfigurationController.FetchConfigAsync(serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
     }
 }

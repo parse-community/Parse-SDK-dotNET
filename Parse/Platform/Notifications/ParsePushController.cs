@@ -2,6 +2,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 
@@ -9,23 +10,16 @@ namespace Parse.Push.Internal
 {
     internal class ParsePushController : IParsePushController
     {
-        private readonly IParseCommandRunner commandRunner;
-        private readonly IParseCurrentUserController currentUserController;
+        IParseCommandRunner CommandRunner { get; }
+
+        IParseCurrentUserController CurrentUserController { get; }
 
         public ParsePushController(IParseCommandRunner commandRunner, IParseCurrentUserController currentUserController)
         {
-            this.commandRunner = commandRunner;
-            this.currentUserController = currentUserController;
+            CommandRunner = commandRunner;
+            CurrentUserController = currentUserController;
         }
 
-        public Task SendPushNotificationAsync(IPushState state, CancellationToken cancellationToken) => currentUserController.GetCurrentSessionTokenAsync(cancellationToken).OnSuccess(sessionTokenTask =>
-                                                                                                                  {
-                                                                                                                      ParseCommand command = new ParseCommand("push",
-                                                                                                                          method: "POST",
-                                                                                                                          sessionToken: sessionTokenTask.Result,
-                                                                                                                          data: ParsePushEncoder.Instance.Encode(state));
-
-                                                                                                                      return commandRunner.RunCommandAsync(command, cancellationToken: cancellationToken);
-                                                                                                                  }).Unwrap();
+        public Task SendPushNotificationAsync(IPushState state, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken).OnSuccess(sessionTokenTask => CommandRunner.RunCommandAsync(new ParseCommand("push", method: "POST", sessionToken: sessionTokenTask.Result, data: ParsePushEncoder.Instance.Encode(state)), cancellationToken: cancellationToken)).Unwrap();
     }
 }

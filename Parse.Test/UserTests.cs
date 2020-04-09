@@ -5,39 +5,47 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Parse.Abstractions.Library;
 using Parse.Core.Internal;
+using Parse.Library;
 using Parse.Management;
 
 namespace Parse.Test
 {
+#warning Class refactoring requires completion.
+
     [TestClass]
     public class UserTests
     {
-        [TestInitialize]
-        public void SetUp()
-        {
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
-        }
+        ParseClient Client { get; set; } = new ParseClient(new ServerConnectionData { Test = true });
 
         [TestCleanup]
-        public void TearDown() => ParseCorePlugins.Instance = null;
+        public void TearDown() => (Client.Services as ServiceHub).Reset();
 
         [TestMethod]
         public void TestRemoveFields()
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "name", "andrew" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["username"] = "kevin",
+                    ["name"] = "andrew"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
+
+            ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
             Assert.ThrowsException<ArgumentException>(() => user.Remove("username"));
+
             try
-            { user.Remove("name"); }
-            catch { Assert.Fail(); }
+            {
+                user.Remove("name");
+            }
+            catch
+            {
+                Assert.Fail(@"Removing ""name"" field on ParseUser should not throw an exception because ""name"" is not an immutable field and was defined on the object.");
+            }
+
             Assert.IsFalse(user.ContainsKey("name"));
         }
 
@@ -46,12 +54,14 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
+
+            ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
             Assert.AreEqual("se551onT0k3n", user.SessionToken);
         }
 
@@ -60,11 +70,13 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["username"] = "kevin",
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
+
+            ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
             Assert.AreEqual("kevin", user.Username);
             user.Username = "ilya";
             Assert.AreEqual("ilya", user.Username);
@@ -75,15 +87,17 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "password", "hurrah" },
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["username"] = "kevin",
+                    ["password"] = "hurrah"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Assert.AreEqual("hurrah", user.GetState()["password"]);
+
+            ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
+            Assert.AreEqual("hurrah", user.State["password"]);
             user.Password = "david";
-            Assert.IsNotNull(user.GetCurrentOperations()["password"]);
+            Assert.IsNotNull(user.CurrentOperations["password"]);
         }
 
         [TestMethod]
@@ -91,13 +105,15 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "email", "james@parse.com" },
-          { "name", "andrew" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["email"] = "james@parse.com",
+                    ["name"] = "andrew",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
+
+            ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
             Assert.AreEqual("james@parse.com", user.Email);
             user.Email = "bryan@parse.com";
             Assert.AreEqual("bryan@parse.com", user.Email);
@@ -108,22 +124,26 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "email", "james@parse.com" },
-          { "authData", new Dictionary<string, object>() {
-            { "facebook", new Dictionary<string, object>() {
-              { "sessionToken", "none" }
-            }}
-          }}
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["email"] = "james@parse.com",
+                    ["authData"] = new Dictionary<string, object>
+                    {
+                        ["facebook"] = new Dictionary<string, object>
+                        {
+                            ["sessionToken"] = "none"
+                        }
+                    }
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Assert.AreEqual(1, user.GetAuthData().Count);
-            Assert.IsInstanceOfType(user.GetAuthData()["facebook"], typeof(IDictionary<string, object>));
+
+            ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
+            Assert.AreEqual(1, user.AuthData.Count);
+            Assert.IsInstanceOfType(user.AuthData["facebook"], typeof(IDictionary<string, object>));
         }
 
         [TestMethod]
-        public void TestGetUserQuery() => Assert.IsInstanceOfType(ParseUser.Query, typeof(ParseQuery<ParseUser>));
+        public void TestGetUserQuery() => Assert.IsInstanceOfType(Client.GetUserQuery(), typeof(ParseQuery<ParseUser>));
 
         [TestMethod]
         public void TestIsAuthenticated()
@@ -131,20 +151,21 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "wagimanPutraPetir",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(user));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                CurrentUserController = mockCurrentUserController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController> { };
+            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(user));
+
+            hub.CurrentUserController = mockCurrentUserController.Object;
 
             Assert.IsTrue(user.IsAuthenticated);
         }
@@ -155,28 +176,31 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "wagimanPutraPetir",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
+
             IObjectState state2 = new MutableObjectState
             {
                 ObjectId = "wagimanPutraPetir2",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            ParseUser user2 = ParseObjectExtensions.FromState<ParseUser>(state2, "_User");
-            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(user));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                CurrentUserController = mockCurrentUserController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+            ParseUser user2 = client.GenerateObjectFromState<ParseUser>(state2, "_User");
+
+            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController> { };
+            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(user));
+
+            hub.CurrentUserController = mockCurrentUserController.Object;
 
             Assert.IsFalse(user2.IsAuthenticated);
         }
@@ -187,16 +211,18 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
 
-            return user.SignUpAsync().ContinueWith(t =>
+            ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            return user.SignUpAsync().ContinueWith(task =>
             {
-                Assert.IsTrue(t.IsFaulted);
-                Assert.IsInstanceOfType(t.Exception.InnerException, typeof(InvalidOperationException));
+                Assert.IsTrue(task.IsFaulted);
+                Assert.IsInstanceOfType(task.Exception.InnerException, typeof(InvalidOperationException));
             });
         }
 
@@ -206,38 +232,39 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" },
-          { "username", "ihave" },
-          { "password", "adream" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu",
+                    ["username"] = "ihave",
+                    ["password"] = "adream"
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4"
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseUserController> mockController = new Mock<IParseUserController>();
-            mockController.Setup(obj => obj.SignUpAsync(It.IsAny<IObjectState>(),
-                It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                UserController = mockController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            return user.SignUpAsync().ContinueWith(t =>
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseUserController> mockController = new Mock<IParseUserController> { };
+            mockController.Setup(obj => obj.SignUpAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            hub.UserController = mockController.Object;
+
+            return user.SignUpAsync().ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockController.Verify(obj => obj.SignUpAsync(It.IsAny<IObjectState>(),
-                  It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockController.Verify(obj => obj.SignUpAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
                 Assert.IsFalse(user.IsDirty);
                 Assert.AreEqual("ihave", user.Username);
-                Assert.IsFalse(user.GetState().ContainsKey("password"));
+                Assert.IsFalse(user.State.ContainsKey("password"));
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
             });
         }
@@ -248,36 +275,35 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" },
-          { "username", "ihave" },
-          { "password", "adream" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu",
+                    ["username"] = "ihave",
+                    ["password"] = "adream"
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4"
             };
-            Mock<IParseUserController> mockController = new Mock<IParseUserController>();
-            mockController.Setup(obj => obj.LogInAsync("ihave",
-                "adream",
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                UserController = mockController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            return ParseUser.LogInAsync("ihave", "adream").ContinueWith(t =>
-            {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockController.Verify(obj => obj.LogInAsync("ihave",
-                  "adream",
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
 
-                ParseUser user = t.Result;
+            Mock<IParseUserController> mockController = new Mock<IParseUserController> { };
+            mockController.Setup(obj => obj.LogInAsync("ihave", "adream", It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            hub.UserController = mockController.Object;
+
+            return client.LogInAsync("ihave", "adream").ContinueWith(task =>
+            {
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockController.Verify(obj => obj.LogInAsync("ihave", "adream", It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+                ParseUser user = task.Result;
                 Assert.IsFalse(user.IsDirty);
                 Assert.IsNull(user.Username);
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
@@ -293,22 +319,23 @@ namespace Parse.Test
                 ObjectId = "some0neTol4v4",
                 ServerData = new Dictionary<string, object> { ["sessionToken"] = "llaKcolnu" }
             };
-            Mock<IParseUserController> mockController = new Mock<IParseUserController>();
-            mockController.Setup(obj => obj.GetUserAsync("llaKcolnu", It.IsAny<CancellationToken>())).Returns(Task.FromResult(state));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                UserController = mockController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            return ParseUser.BecomeAsync("llaKcolnu").ContinueWith(t =>
-            {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockController.Verify(obj => obj.GetUserAsync("llaKcolnu", It.IsAny<CancellationToken>()), Times.Exactly(1));
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
 
-                ParseUser user = t.Result;
+            Mock<IParseUserController> mockController = new Mock<IParseUserController> { };
+            mockController.Setup(obj => obj.GetUserAsync("llaKcolnu", It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(state));
+
+            hub.UserController = mockController.Object;
+
+            return client.BecomeAsync("llaKcolnu").ContinueWith(task =>
+            {
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockController.Verify(obj => obj.GetUserAsync("llaKcolnu", It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
+                ParseUser user = task.Result;
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
                 Assert.AreEqual("llaKcolnu", user.SessionToken);
             });
@@ -320,30 +347,32 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "r:llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "r:llaKcolnu"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(user));
+
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController> { };
+            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(user));
+
             Mock<IParseSessionController> mockSessionController = new Mock<IParseSessionController>();
             mockSessionController.Setup(c => c.IsRevocableSessionToken(It.IsAny<string>())).Returns(true);
 
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                CurrentUserController = mockCurrentUserController.Object,
-                SessionController = mockSessionController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+            hub.CurrentUserController = mockCurrentUserController.Object;
+            hub.SessionController = mockSessionController.Object;
 
-            return ParseUser.LogOutAsync().ContinueWith(t =>
+            return client.LogOutAsync().ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockCurrentUserController.Verify(obj => obj.LogOutAsync(It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockCurrentUserController.Verify(obj => obj.LogOutAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
                 mockSessionController.Verify(obj => obj.RevokeAsync("r:llaKcolnu", It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
@@ -353,37 +382,27 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(user));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                CurrentUserController = mockCurrentUserController.Object,
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            Assert.AreEqual(user, ParseUser.CurrentUser);
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController> { };
+            mockCurrentUserController.Setup(obj => obj.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(user));
+
+            hub.CurrentUserController = mockCurrentUserController.Object;
+
+            Assert.AreEqual(user, client.GetCurrentUser());
         }
 
         [TestMethod]
-        public void TestCurrentUserWithEmptyResult()
-        {
-            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                CurrentUserController = mockCurrentUserController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
-
-            Assert.IsNull(ParseUser.CurrentUser);
-        }
+        public void TestCurrentUserWithEmptyResult() => Assert.IsNull(new ParseClient(new ServerConnectionData { Test = true }, new MutableServiceHub { CurrentUserController = new Mock<IParseCurrentUserController> { }.Object }).GetCurrentUser());
 
         [TestMethod]
         [AsyncStateMachine(typeof(UserTests))]
@@ -391,33 +410,37 @@ namespace Parse.Test
         {
             IObjectState state = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "r:llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "r:llaKcolnu"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseSessionController> mockSessionController = new Mock<IParseSessionController>();
-            mockSessionController.Setup(obj => obj.UpgradeToRevocableSessionAsync("llaKcolnu",
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                SessionController = mockSessionController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            return user.UpgradeToRevocableSessionAsync(CancellationToken.None).ContinueWith(t =>
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseSessionController> mockSessionController = new Mock<IParseSessionController>();
+            mockSessionController.Setup(obj => obj.UpgradeToRevocableSessionAsync("llaKcolnu", It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            hub.SessionController = mockSessionController.Object;
+
+            return user.UpgradeToRevocableSessionAsync(CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockSessionController.Verify(obj => obj.UpgradeToRevocableSessionAsync("llaKcolnu",
-                    It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockSessionController.Verify(obj => obj.UpgradeToRevocableSessionAsync("llaKcolnu", It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
                 Assert.AreEqual("r:llaKcolnu", user.SessionToken);
             });
         }
@@ -426,20 +449,19 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(UserTests))]
         public Task TestRequestPasswordReset()
         {
-            Mock<IParseUserController> mockController = new Mock<IParseUserController>();
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                UserController = mockController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
 
-            return ParseUser.RequestPasswordResetAsync("gogo@parse.com").ContinueWith(t =>
+            Mock<IParseUserController> mockController = new Mock<IParseUserController> { };
+
+            hub.UserController = mockController.Object;
+
+            return client.RequestPasswordResetAsync("gogo@parse.com").ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockController.Verify(obj => obj.RequestPasswordResetAsync("gogo@parse.com",
-                    It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockController.Verify(obj => obj.RequestPasswordResetAsync("gogo@parse.com", It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -450,44 +472,45 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" },
-          { "username", "ihave" },
-          { "password", "adream" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu",
+                    ["username"] = "ihave",
+                    ["password"] = "adream"
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "Alliance", "rekt" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["Alliance"] = "rekt"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
+
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
             Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
-            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                ObjectController = mockObjectController.Object,
-                CurrentUserController = new Mock<IParseCurrentUserController>().Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+
+            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            hub.ObjectController = mockObjectController.Object;
+            hub.CurrentUserController = new Mock<IParseCurrentUserController> { }.Object;
+
             user["Alliance"] = "rekt";
 
-            return user.SaveAsync().ContinueWith(t =>
+            return user.SaveAsync().ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                  It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                  It.IsAny<string>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
                 Assert.IsFalse(user.IsDirty);
                 Assert.AreEqual("ihave", user.Username);
-                Assert.IsFalse(user.GetState().ContainsKey("password"));
+                Assert.IsFalse(user.State.ContainsKey("password"));
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
                 Assert.AreEqual("rekt", user["Alliance"]);
             });
@@ -500,42 +523,45 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" },
-          { "username", "ihave" },
-          { "password", "adream" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu",
+                    ["username"] = "ihave",
+                    ["password"] = "adream"
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "Alliance", "rekt" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["Alliance"] = "rekt"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
+
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
             Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
-            mockObjectController.Setup(obj => obj.FetchAsync(It.IsAny<IObjectState>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                ObjectController = mockObjectController.Object,
-                CurrentUserController = new Mock<IParseCurrentUserController>().Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+            mockObjectController.Setup(obj => obj.FetchAsync(It.IsAny<IObjectState>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            hub.ObjectController = mockObjectController.Object;
+            hub.CurrentUserController = new Mock<IParseCurrentUserController> { }.Object;
+
             user["Alliance"] = "rekt";
 
-            return user.FetchAsync().ContinueWith(t =>
+            return user.FetchAsync().ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockObjectController.Verify(obj => obj.FetchAsync(It.IsAny<IObjectState>(),
-                  It.IsAny<string>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockObjectController.Verify(obj => obj.FetchAsync(It.IsAny<IObjectState>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
                 Assert.IsTrue(user.IsDirty);
                 Assert.AreEqual("ihave", user.Username);
-                Assert.IsTrue(user.GetState().ContainsKey("password"));
+                Assert.IsTrue(user.State.ContainsKey("password"));
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
                 Assert.AreEqual("rekt", user["Alliance"]);
             });
@@ -548,41 +574,41 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "garden", "ofWords" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["garden"] = "ofWords"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
-            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                ObjectController = mockObjectController.Object,
-                CurrentUserController = new Mock<IParseCurrentUserController>().Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            return user.LinkWithAsync("parse", new Dictionary<string, object>(), CancellationToken.None).ContinueWith(t =>
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
+            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            hub.ObjectController = mockObjectController.Object;
+            hub.CurrentUserController = new Mock<IParseCurrentUserController> { }.Object;
+
+            return user.LinkWithAsync("parse", new Dictionary<string, object> { }, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                  It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                  It.IsAny<string>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
                 Assert.IsFalse(user.IsDirty);
-                Assert.IsNotNull(user.GetAuthData());
-                Assert.IsNotNull(user.GetAuthData()["parse"]);
+                Assert.IsNotNull(user.AuthData);
+                Assert.IsNotNull(user.AuthData["parse"]);
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
                 Assert.AreEqual("ofWords", user["garden"]);
             });
@@ -595,46 +621,48 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" },
-          { "authData", new Dictionary<string, object> {
-            { "parse", new Dictionary<string, object>() }
-          }}
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu",
+                    ["authData"] = new Dictionary<string, object>
+                    {
+                        ["parse"] = new Dictionary<string, object> { }
+                    }
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "garden", "ofWords" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["garden"] = "ofWords"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
-            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            mockCurrentUserController.Setup(obj => obj.IsCurrent(user)).Returns(true);
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                ObjectController = mockObjectController.Object,
-                CurrentUserController = mockCurrentUserController.Object,
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(t =>
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
+            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController> { };
+            mockCurrentUserController.Setup(obj => obj.IsCurrent(user)).Returns(true);
+
+            hub.ObjectController = mockObjectController.Object;
+            hub.CurrentUserController = mockCurrentUserController.Object;
+
+            return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                  It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                  It.IsAny<string>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
                 Assert.IsFalse(user.IsDirty);
-                Assert.IsNotNull(user.GetAuthData());
-                Assert.IsFalse(user.GetAuthData().ContainsKey("parse"));
+                Assert.IsNotNull(user.AuthData);
+                Assert.IsFalse(user.AuthData.ContainsKey("parse"));
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
                 Assert.AreEqual("ofWords", user["garden"]);
             });
@@ -647,47 +675,49 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" },
-          { "authData", new Dictionary<string, object> {
-            { "parse", new Dictionary<string, object>() }
-          }}
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu",
+                    ["authData"] = new Dictionary<string, object>
+                    {
+                        ["parse"] = new Dictionary<string, object> { }
+                    }
+                }
             };
+
             IObjectState newState = new MutableObjectState
             {
-                ServerData = new Dictionary<string, object>() {
-          { "garden", "ofWords" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["garden"] = "ofWords"
+                }
             };
-            ParseUser user = ParseObjectExtensions.FromState<ParseUser>(state, "_User");
-            Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
-            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
-            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController>();
-            mockCurrentUserController.Setup(obj => obj.IsCurrent(user)).Returns(false);
-            ParseCorePlugins.Instance = new ParseCorePlugins
-            {
-                ObjectController = mockObjectController.Object,
-                CurrentUserController = mockCurrentUserController.Object,
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
 
-            return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(t =>
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            ParseUser user = client.GenerateObjectFromState<ParseUser>(state, "_User");
+
+            Mock<IParseObjectController> mockObjectController = new Mock<IParseObjectController>();
+            mockObjectController.Setup(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(newState));
+
+            Mock<IParseCurrentUserController> mockCurrentUserController = new Mock<IParseCurrentUserController> { };
+            mockCurrentUserController.Setup(obj => obj.IsCurrent(user)).Returns(false);
+
+            hub.ObjectController = mockObjectController.Object;
+            hub.CurrentUserController = mockCurrentUserController.Object;
+
+            return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(),
-                  It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-                  It.IsAny<string>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
+
+                mockObjectController.Verify(obj => obj.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+
                 Assert.IsFalse(user.IsDirty);
-                Assert.IsNotNull(user.GetAuthData());
-                Assert.IsTrue(user.GetAuthData().ContainsKey("parse"));
-                Assert.IsNull(user.GetAuthData()["parse"]);
+                Assert.IsNotNull(user.AuthData);
+                Assert.IsTrue(user.AuthData.ContainsKey("parse"));
+                Assert.IsNull(user.AuthData["parse"]);
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
                 Assert.AreEqual("ofWords", user["garden"]);
             });
@@ -700,33 +730,31 @@ namespace Parse.Test
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "some0neTol4v4",
-                ServerData = new Dictionary<string, object>() {
-          { "sessionToken", "llaKcolnu" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["sessionToken"] = "llaKcolnu"
+                }
             };
-            Mock<IParseUserController> mockController = new Mock<IParseUserController>();
-            mockController.Setup(obj => obj.LogInAsync("parse",
-                It.IsAny<IDictionary<string, object>>(),
-                It.IsAny<CancellationToken>())).Returns(Task.FromResult(state));
 
-            ParseCorePlugins.Instance = new ParseCorePlugins
+            MutableServiceHub hub = new MutableServiceHub { };
+            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+            Mock<IParseUserController> mockController = new Mock<IParseUserController> { };
+            mockController.Setup(obj => obj.LogInAsync("parse", It.IsAny<IDictionary<string, object>>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(state));
+
+            hub.UserController = mockController.Object;
+
+            return client.LogInWithAsync("parse", new Dictionary<string, object> { }, CancellationToken.None).ContinueWith(task =>
             {
-                UserController = mockController.Object
-            };
-            ParseObject.RegisterDerivative<ParseUser>();
-            ParseObject.RegisterDerivative<ParseSession>();
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
 
-            return ParseUserExtensions.LogInWithAsync("parse", new Dictionary<string, object>(), CancellationToken.None).ContinueWith(t =>
-            {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
-                mockController.Verify(obj => obj.LogInAsync("parse",
-                  It.IsAny<IDictionary<string, object>>(),
-                  It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockController.Verify(obj => obj.LogInAsync("parse", It.IsAny<IDictionary<string, object>>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-                ParseUser user = t.Result;
-                Assert.IsNotNull(user.GetAuthData());
-                Assert.IsNotNull(user.GetAuthData()["parse"]);
+                ParseUser user = task.Result;
+
+                Assert.IsNotNull(user.AuthData);
+                Assert.IsNotNull(user.AuthData["parse"]);
                 Assert.AreEqual("some0neTol4v4", user.ObjectId);
             });
         }
@@ -735,34 +763,23 @@ namespace Parse.Test
         public void TestImmutableKeys()
         {
             ParseUser user = new ParseUser();
-            string[] immutableKeys = new string[] {
-        "sessionToken", "isNew"
-      };
+            string[] immutableKeys = new string[] { "sessionToken", "isNew" };
 
             foreach (string key in immutableKeys)
             {
-                Assert.ThrowsException<InvalidOperationException>(() =>
-                  user[key] = "1234567890"
-                );
+                Assert.ThrowsException<InvalidOperationException>(() => user[key] = "1234567890");
 
-                Assert.ThrowsException<InvalidOperationException>(() =>
-                  user.Add(key, "1234567890")
-                );
+                Assert.ThrowsException<InvalidOperationException>(() => user.Add(key, "1234567890"));
 
-                Assert.ThrowsException<InvalidOperationException>(() =>
-                  user.AddRangeUniqueToList(key, new string[] { "1234567890" })
-                );
+                Assert.ThrowsException<InvalidOperationException>(() => user.AddRangeUniqueToList(key, new string[] { "1234567890" }));
 
-                Assert.ThrowsException<InvalidOperationException>(() =>
-                  user.Remove(key)
-                );
+                Assert.ThrowsException<InvalidOperationException>(() => user.Remove(key));
 
-                Assert.ThrowsException<InvalidOperationException>(() =>
-                  user.RemoveAllFromList(key, new string[] { "1234567890" })
-                );
+                Assert.ThrowsException<InvalidOperationException>(() => user.RemoveAllFromList(key, new string[] { "1234567890" }));
             }
 
-            // Other special keys should be good
+            // Other special keys should be good.
+
             user["username"] = "username";
             user["password"] = "password";
         }

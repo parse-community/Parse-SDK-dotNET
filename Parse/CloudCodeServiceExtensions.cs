@@ -49,6 +49,6 @@ namespace Parse
         /// ParseObjects themselves.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result of the cloud call.</returns>
-        public static Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters, CancellationToken cancellationToken) => serviceHub.CloudCodeController.CallFunctionAsync<T>(name, parameters, serviceHub.GetCurrentSessionToken(), cancellationToken);
+        public static Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters, CancellationToken cancellationToken) => serviceHub.CloudCodeController.CallFunctionAsync<T>(name, parameters, serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Parse.Abstractions.Library;
 
 namespace Parse.Push.Internal
 {
@@ -7,6 +8,6 @@ namespace Parse.Push.Internal
     {
         IDictionary<string, object> Encode(ParseInstallation installation);
 
-        ParseInstallation Decode(IDictionary<string, object> data);
+        ParseInstallation Decode(IDictionary<string, object> data, IServiceHub serviceHub);
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Utilities;
 
@@ -20,7 +21,7 @@ namespace Parse.Core.Internal
 
         // If this object has a special encoding, encode it and return the encoded object. Otherwise, just return the original object.
 
-        public object Encode(object value) => value switch
+        public object Encode(object value, IServiceHub serviceHub) => value switch
         {
             DateTime { } date => new Dictionary<string, object>
             {
@@ -34,18 +35,18 @@ namespace Parse.Core.Internal
             },
             ParseObject { } entity => EncodeObject(entity),
             IJsonConvertible { } jsonConvertible => jsonConvertible.ConvertToJSON(),
-            { } when Conversion.As<IDictionary<string, object>>(value) is { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Encode(pair.Value)),
-            { } when Conversion.As<IList<object>>(value) is { } list => EncodeList(list),
+            { } when Conversion.As<IDictionary<string, object>>(value) is { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Encode(pair.Value, serviceHub)),
+            { } when Conversion.As<IList<object>>(value) is { } list => EncodeList(list, serviceHub),
 
             // TODO (hallucinogen): convert IParseFieldOperation to IJsonConvertible
 
-            IParseFieldOperation { } fieldOperation => fieldOperation.Encode(),
+            IParseFieldOperation { } fieldOperation => fieldOperation.Encode(serviceHub),
             _ => value
         };
 
         protected abstract IDictionary<string, object> EncodeObject(ParseObject value);
 
-        object EncodeList(IList<object> list)
+        object EncodeList(IList<object> list, IServiceHub serviceHub)
         {
             List<object> encoded = new List<object> { };
 
@@ -63,7 +64,7 @@ namespace Parse.Core.Internal
                     throw new ArgumentException("Invalid type for value in an array");
                 }
 
-                encoded.Add(Encode(item));
+                encoded.Add(Encode(item, serviceHub));
             }
 
             return encoded;

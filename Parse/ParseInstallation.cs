@@ -198,22 +198,22 @@ namespace Parse
         {
             Task platformHookTask = null;
 
-            if (Client.CurrentInstallationController.IsCurrent(this))
+            if (Services.CurrentInstallationController.IsCurrent(this))
             {
-                SetIfDifferent("deviceType", Client.MetadataController.EnvironmentData.Platform);
-                SetIfDifferent("timeZone", Client.MetadataController.EnvironmentData.TimeZone);
+                SetIfDifferent("deviceType", Services.MetadataController.EnvironmentData.Platform);
+                SetIfDifferent("timeZone", Services.MetadataController.EnvironmentData.TimeZone);
                 SetIfDifferent("localeIdentifier", GetLocaleIdentifier());
                 SetIfDifferent("parseVersion", ParseClient.Version);
-                SetIfDifferent("appVersion", Client.MetadataController.HostManifestData.Version);
-                SetIfDifferent("appIdentifier", Client.MetadataController.HostManifestData.Identifier);
-                SetIfDifferent("appName", Client.MetadataController.HostManifestData.Name);
+                SetIfDifferent("appVersion", Services.MetadataController.HostManifestData.Version);
+                SetIfDifferent("appIdentifier", Services.MetadataController.HostManifestData.Identifier);
+                SetIfDifferent("appName", Services.MetadataController.HostManifestData.Name);
 
 #warning InstallationDataFinalizer needs to be injected here somehow or removed.
 
                 //platformHookTask = Client.InstallationDataFinalizer.FinalizeAsync(this);
             }
 
-            return platformHookTask.Safe().OnSuccess(_ => base.SaveAsync(toAwait, cancellationToken)).Unwrap().OnSuccess(_ => Client.CurrentInstallationController.IsCurrent(this) ? Task.CompletedTask : Client.CurrentInstallationController.SetAsync(this, cancellationToken)).Unwrap();
+            return platformHookTask.Safe().OnSuccess(_ => base.SaveAsync(toAwait, cancellationToken)).Unwrap().OnSuccess(_ => Services.CurrentInstallationController.IsCurrent(this) ? Task.CompletedTask : Services.CurrentInstallationController.SetAsync(this, cancellationToken)).Unwrap();
         }
 
         /// <summary>

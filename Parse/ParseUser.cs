@@ -26,7 +26,7 @@ namespace Parse
             {
                 lock (Mutex)
                 {
-                    return SessionToken is { } && Client.GetCurrentUser() is { } user && user.ObjectId == ObjectId;
+                    return SessionToken is { } && Services.GetCurrentUser() is { } user && user.ObjectId == ObjectId;
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace Parse
         internal Task SetSessionTokenAsync(string newSessionToken, CancellationToken cancellationToken)
         {
             MutateState(mutableClone => mutableClone.ServerData["sessionToken"] = newSessionToken);
-            return Client.SaveCurrentUserAsync(this);
+            return Services.SaveCurrentUserAsync(this);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace Parse
 
             IDictionary<string, IParseFieldOperation> currentOperations = StartSave();
 
-            return toAwait.OnSuccess(_ => Client.UserController.SignUpAsync(State, currentOperations, cancellationToken)).Unwrap().ContinueWith(t =>
+            return toAwait.OnSuccess(_ => Services.UserController.SignUpAsync(State, currentOperations, Services, cancellationToken)).Unwrap().ContinueWith(t =>
             {
                 if (t.IsFaulted || t.IsCanceled)
                 {
@@ -136,7 +136,7 @@ namespace Parse
                     HandleSave(t.Result);
                 }
                 return t;
-            }).Unwrap().OnSuccess(_ => Client.SaveCurrentUserAsync(this)).Unwrap();
+            }).Unwrap().OnSuccess(_ => Services.SaveCurrentUserAsync(this)).Unwrap();
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace Parse
         /// password must be set before calling SignUpAsync.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public Task SignUpAsync(CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait => SignUpAsync(toAwait, cancellationToken), cancellationToken);
+        public Task SignUpAsync(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => SignUpAsync(toAwait, cancellationToken), cancellationToken);
 
         protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
         {
@@ -163,12 +163,12 @@ namespace Parse
                     throw new InvalidOperationException("You must call SignUpAsync before calling SaveAsync.");
                 }
 
-                return base.SaveAsync(toAwait, cancellationToken).OnSuccess(_ => Client.CurrentUserController.IsCurrent(this) ? Client.SaveCurrentUserAsync(this) : Task.CompletedTask).Unwrap();
+                return base.SaveAsync(toAwait, cancellationToken).OnSuccess(_ => Services.CurrentUserController.IsCurrent(this) ? Services.SaveCurrentUserAsync(this) : Task.CompletedTask).Unwrap();
             }
         }
 
         // If this is already the current user, refresh its state on disk.
-        internal override Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken) => base.FetchAsyncInternal(toAwait, cancellationToken).OnSuccess(t => !Client.CurrentUserController.IsCurrent(this) ? Task.FromResult(t.Result) : Client.SaveCurrentUserAsync(this).OnSuccess(_ => t.Result)).Unwrap();
+        internal override Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken) => base.FetchAsyncInternal(toAwait, cancellationToken).OnSuccess(t => !Services.CurrentUserController.IsCurrent(this) ? Task.FromResult(t.Result) : Services.SaveCurrentUserAsync(this).OnSuccess(_ => t.Result)).Unwrap();
 
         internal Task LogOutAsync(Task toAwait, CancellationToken cancellationToken)
         {
@@ -181,19 +181,19 @@ namespace Parse
             // Cleanup in-memory session.
 
             MutateState(mutableClone => mutableClone.ServerData.Remove("sessionToken"));
-            Task revokeSessionTask = Client.RevokeSessionAsync(oldSessionToken, cancellationToken);
-            return Task.WhenAll(revokeSessionTask, Client.CurrentUserController.LogOutAsync(cancellationToken));
+            Task revokeSessionTask = Services.RevokeSessionAsync(oldSessionToken, cancellationToken);
+            return Task.WhenAll(revokeSessionTask, Services.CurrentUserController.LogOutAsync(Services, cancellationToken));
         }
 
         internal Task UpgradeToRevocableSessionAsync() => UpgradeToRevocableSessionAsync(CancellationToken.None);
 
-        internal Task UpgradeToRevocableSessionAsync(CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait => UpgradeToRevocableSessionAsync(toAwait, cancellationToken), cancellationToken);
+        internal Task UpgradeToRevocableSessionAsync(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => UpgradeToRevocableSessionAsync(toAwait, cancellationToken), cancellationToken);
 
         internal Task UpgradeToRevocableSessionAsync(Task toAwait, CancellationToken cancellationToken)
         {
             string sessionToken = SessionToken;
 
-            return toAwait.OnSuccess(_ => Client.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken)).Unwrap().OnSuccess(task => SetSessionTokenAsync(task.Result)).Unwrap();
+            return toAwait.OnSuccess(_ => Services.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken)).Unwrap().OnSuccess(task => SetSessionTokenAsync(task.Result)).Unwrap();
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace Parse
         {
             lock (Mutex)
             {
-                if (!Client.CurrentUserController.IsCurrent(this))
+                if (!Services.CurrentUserController.IsCurrent(this))
                 {
                     return;
                 }
@@ -288,7 +288,7 @@ namespace Parse
             }
         }
 
-        internal Task LinkWithAsync(string authType, IDictionary<string, object> data, CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait =>
+        internal Task LinkWithAsync(string authType, IDictionary<string, object> data, CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait =>
         {
             IDictionary<string, IDictionary<string, object>> authData = AuthData;
 

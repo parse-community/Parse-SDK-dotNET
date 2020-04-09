@@ -32,7 +32,7 @@ namespace Parse
         /// </summary>
         public static ParseInstallation GetCurrentInstallation(this IServiceHub serviceHub)
         {
-            Task<ParseInstallation> task = serviceHub.CurrentInstallationController.GetAsync(CancellationToken.None);
+            Task<ParseInstallation> task = serviceHub.CurrentInstallationController.GetAsync(serviceHub);
 
             // TODO (hallucinogen): this will absolutely break on Unity, but how should we resolve this?
             task.Wait();

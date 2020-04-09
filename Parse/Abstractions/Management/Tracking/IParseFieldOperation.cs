@@ -1,5 +1,7 @@
 // Copyright (c) 2015-present, Parse, LLC.  All rights reserved.  This source code is licensed under the BSD-style license found in the LICENSE file in the root directory of this source tree.  An additional grant of patent rights can be found in the PATENTS file in the same directory.
 
+using Parse.Abstractions.Library;
+
 namespace Parse.Core.Internal
 {
     /// <summary>
@@ -15,7 +17,7 @@ namespace Parse.Core.Internal
         /// Parse as part of a save operation.
         /// </summary>
         /// <returns>An object to be JSONified.</returns>
-        object Encode();
+        object Encode(IServiceHub serviceHub);
 
         /// <summary>
         /// Returns a field operation that is composed of a previous operation followed by

@@ -9,7 +9,10 @@ namespace Parse.Library
     {
         public IServiceHub BuildHub(in IServiceHub reference, IServiceHubComposer composer)
         {
-            throw new NotImplementedException { };
+            return new MutableServiceHub
+            {
+
+            };
         }
     }
 }

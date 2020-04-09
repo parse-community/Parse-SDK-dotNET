@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
@@ -32,10 +33,10 @@ namespace Parse.Core.Internal
             TaskQueue = new TaskQueue { };
         }
 
-        public Task<ParseConfiguration> GetCurrentConfigAsync() => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration is { } ? Task.FromResult(CurrentConfiguration) : StorageController.LoadAsync().OnSuccess(task =>
+        public Task<ParseConfiguration> GetCurrentConfigAsync(IServiceHub serviceHub) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration is { } ? Task.FromResult(CurrentConfiguration) : StorageController.LoadAsync().OnSuccess(task =>
         {
             task.Result.TryGetValue(CurrentConfigurationKey, out object data);
-            return CurrentConfiguration = data is string { } configuration ? Decoder.BuildConfiguration(ParseClient.DeserializeJsonString(configuration)) : new ParseConfiguration { };
+            return CurrentConfiguration = data is string { } configuration ? Decoder.BuildConfiguration(ParseClient.DeserializeJsonString(configuration), serviceHub) : new ParseConfiguration(serviceHub);
         })), CancellationToken.None).Unwrap();
 
         public Task SetCurrentConfigAsync(ParseConfiguration target) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>

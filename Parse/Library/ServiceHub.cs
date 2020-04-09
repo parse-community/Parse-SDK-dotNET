@@ -25,7 +25,7 @@ namespace Parse.Library
 
         public IWebClient WebClient => LateInitializer.GetValue(() => new UniversalWebClient { });
         public IStorageController StorageController => LateInitializer.GetValue(() => new StorageController { });
-        public IParseObjectClassController ClassController => LateInitializer.GetValue(() => new ObjectSubclassingController { });
+        public IParseObjectClassController ClassController => LateInitializer.GetValue(() => new ParseObjectClassController { });
 
         public IParseDataDecoder Decoder => LateInitializer.GetValue(() => new ParseDataDecoder(ClassController));
 
@@ -49,5 +49,7 @@ namespace Parse.Library
         public IParsePushController PushController => LateInitializer.GetValue(() => new ParsePushController(CommandRunner, CurrentUserController));
         public IParseCurrentInstallationController CurrentInstallationController => LateInitializer.GetValue(() => new ParseCurrentInstallationController(InstallationController, StorageController, InstallationCoder, ClassController));
         public IParseInstallationDataFinalizer InstallationDataFinalizer => LateInitializer.GetValue(() => new ParseInstallationDataFinalizer { });
+
+        public bool Reset() => LateInitializer.Used && LateInitializer.Reset();
     }
 }

@@ -84,7 +84,7 @@ namespace Parse
                 throw new ArgumentException("A name for the custom event must be provided.");
             }
 
-            return serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(CancellationToken.None).OnSuccess(task => serviceHub.AnalyticsController.TrackEventAsync(name, dimensions, task.Result, CancellationToken.None)).Unwrap();
+            return serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub).OnSuccess(task => serviceHub.AnalyticsController.TrackEventAsync(name, dimensions, task.Result, serviceHub)).Unwrap();
         }
 
         /// <summary>
@@ -94,6 +94,6 @@ namespace Parse
         /// <param name="pushHash">An identifying hash for a given push notification,
         /// passed down from the server.</param>
         /// <returns>An Async Task that can be waited on or ignored.</returns>
-        static Task TrackLaunchWithPushHashAsync(this IServiceHub serviceHub, string pushHash = null) => serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(CancellationToken.None).OnSuccess(task => serviceHub.AnalyticsController.TrackAppOpenedAsync(pushHash, task.Result, CancellationToken.None)).Unwrap();
+        static Task TrackLaunchWithPushHashAsync(this IServiceHub serviceHub, string pushHash = null) => serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub).OnSuccess(task => serviceHub.AnalyticsController.TrackAppOpenedAsync(pushHash, task.Result, serviceHub)).Unwrap();
     }
 }

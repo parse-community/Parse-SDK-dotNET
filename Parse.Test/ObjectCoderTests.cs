@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parse.Core.Internal;
+using Parse.Library;
 
 namespace Parse.Test
 {
@@ -21,9 +22,10 @@ namespace Parse.Test
                     },
                     ["*"] = new Dictionary<string, object> { ["read"] = true }
                 }
-            }, null);
+            }, default, new ServiceHub { });
 
-            ParseACL resultACL = null;
+            ParseACL resultACL = default;
+
             Assert.IsTrue(state.ContainsKey("ACL"));
             Assert.IsTrue((resultACL = state.ServerData["ACL"] as ParseACL) is ParseACL);
             Assert.IsTrue(resultACL.PublicReadAccess);

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Utilities;
 
@@ -17,15 +18,10 @@ namespace Parse.Core.Internal
 
         public ParseCloudCodeController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
 
-        public Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, CancellationToken cancellationToken)
+        public Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken, data: NoObjectsEncoder.Instance.Encode(parameters, serviceHub) as IDictionary<string, object>), cancellationToken: cancellationToken).OnSuccess(task =>
         {
-            ParseCommand command = new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken, data: NoObjectsEncoder.Instance.Encode(parameters) as IDictionary<string, object>);
-
-            return CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(task =>
-            {
-                IDictionary<string, object> decoded = Decoder.Decode(task.Result.Item2) as IDictionary<string, object>;
-                return !decoded.ContainsKey("result") ? default : Conversion.To<T>(decoded["result"]);
-            });
-        }
+            IDictionary<string, object> decoded = Decoder.Decode(task.Result.Item2, serviceHub) as IDictionary<string, object>;
+            return !decoded.ContainsKey("result") ? default : Conversion.To<T>(decoded["result"]);
+        });
     }
 }

@@ -53,7 +53,7 @@ namespace Parse
         /// <summary>
         /// Services that provide essential functionality.
         /// </summary>
-        public override IServiceHub Services { get; protected set; }
+        public override IServiceHub Services { get; internal set; }
 
         // TODO: Implement IServiceHubMutator in all IServiceHub-implementing classes in Parse.Library and possibly require all implementations to do so as an efficiency improvement over instantiating an OrchestrationServiceHub, only for another one to be possibly instantiated when configurators are specified.
 
@@ -63,12 +63,12 @@ namespace Parse
         /// way is to put a call to <c>ParseClient.Initialize</c> in your
         /// Application startup.
         /// </summary>
-        /// <param name="identifier">The Application ID provided in the Parse dashboard.
+        /// <param name="application">The Application ID provided in the Parse dashboard.
         /// </param>
         /// <param name="serverURI">The server URI provided in the Parse dashboard.
         /// </param>
         /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
-        public ParseClient(string identifier, string serverURI, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators) : this(new ServerConnectionData { ApplicationID = identifier, ServerURI = serverURI }, serviceHub, configurators) { }
+        public ParseClient(string application, string serverURI, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators) : this(new ServerConnectionData { ApplicationID = application, ServerURI = serverURI }, serviceHub, configurators) { }
 
         /// <summary>
         /// Authenticates this client as belonging to your application. This must be
@@ -96,6 +96,8 @@ namespace Parse
             {
                 Services = BuildHub(default, Services, configurators);
             }
+
+            Services.ClassController.AddIntrinsic();
         }
 
         /// <summary>

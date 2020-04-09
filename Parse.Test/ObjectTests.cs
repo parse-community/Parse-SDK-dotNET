@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parse.Core.Internal;
+using Parse.Library;
 using Parse.Management;
 
 namespace Parse.Test
@@ -13,13 +14,15 @@ namespace Parse.Test
     public class ObjectTests
     {
         [ParseClassName(nameof(SubClass))]
-        private class SubClass : ParseObject { }
+        class SubClass : ParseObject { }
 
         [ParseClassName(nameof(UnregisteredSubClass))]
-        private class UnregisteredSubClass : ParseObject { }
+        class UnregisteredSubClass : ParseObject { }
+
+        ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
 
         [TestCleanup]
-        public void TearDown() => ParseCorePlugins.Instance.Reset();
+        public void TearDown() => (Client.Services as ServiceHub).Reset();
 
         [TestMethod]
         public void TestParseObjectConstructor()
@@ -34,13 +37,13 @@ namespace Parse.Test
         [TestMethod]
         public void TestParseObjectCreate()
         {
-            ParseObject obj = ParseObject.Create("Corgi");
+            ParseObject obj = Client.CreateObject("Corgi");
             Assert.AreEqual("Corgi", obj.ClassName);
             Assert.IsNull(obj.CreatedAt);
             Assert.IsTrue(obj.IsDataAvailable);
             Assert.IsTrue(obj.IsDirty);
 
-            ParseObject obj2 = ParseObject.CreateWithoutData("Corgi", "waGiManPutr4Pet1r");
+            ParseObject obj2 = Client.CreateObjectWithoutData("Corgi", "waGiManPutr4Pet1r");
             Assert.AreEqual("Corgi", obj2.ClassName);
             Assert.AreEqual("waGiManPutr4Pet1r", obj2.ObjectId);
             Assert.IsNull(obj2.CreatedAt);
@@ -51,15 +54,15 @@ namespace Parse.Test
         [TestMethod]
         public void TestParseObjectCreateWithGeneric()
         {
-            ParseObject.RegisterDerivative<SubClass>();
+            Client.AddValidClass<SubClass>();
 
-            ParseObject obj = ParseObject.Create<SubClass>();
+            ParseObject obj = Client.CreateObject<SubClass>();
             Assert.AreEqual(nameof(SubClass), obj.ClassName);
             Assert.IsNull(obj.CreatedAt);
             Assert.IsTrue(obj.IsDataAvailable);
             Assert.IsTrue(obj.IsDirty);
 
-            ParseObject obj2 = ParseObject.CreateWithoutData<SubClass>("waGiManPutr4Pet1r");
+            ParseObject obj2 = Client.CreateObjectWithoutData<SubClass>("waGiManPutr4Pet1r");
             Assert.AreEqual(nameof(SubClass), obj2.ClassName);
             Assert.AreEqual("waGiManPutr4Pet1r", obj2.ObjectId);
             Assert.IsNull(obj2.CreatedAt);
@@ -68,7 +71,7 @@ namespace Parse.Test
         }
 
         [TestMethod]
-        public void TestParseObjectCreateWithGenericFailWithoutSubclass() => Assert.ThrowsException<InvalidCastException>(() => ParseObject.Create<SubClass>());
+        public void TestParseObjectCreateWithGenericFailWithoutSubclass() => Assert.ThrowsException<InvalidCastException>(() => Client.CreateObject<SubClass>());
 
         [TestMethod]
         public void TestFromState()
@@ -77,13 +80,15 @@ namespace Parse.Test
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
-                CreatedAt = new DateTime(),
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                CreatedAt = new DateTime { },
+                ServerData = new Dictionary<string, object>
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+
+            ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
 
             Assert.AreEqual("waGiManPutr4Pet1r", obj.ObjectId);
             Assert.AreEqual("Pagi", obj.ClassName);
@@ -96,65 +101,70 @@ namespace Parse.Test
         [TestMethod]
         public void TestRegisterSubclass()
         {
-            Assert.ThrowsException<InvalidCastException>(() => ParseObject.Create<SubClass>());
+            Assert.ThrowsException<InvalidCastException>(() => Client.CreateObject<SubClass>());
 
             try
             {
-                ParseObject.RegisterDerivative<SubClass>();
-                ParseObject.Create<SubClass>();
+                Client.AddValidClass<SubClass>();
+                Client.CreateObject<SubClass>();
 
-                ParseCorePlugins.Instance.SubclassingController.RemoveClass(typeof(UnregisteredSubClass));
-                ParseObject.Create<SubClass>();
+                Client.ClassController.RemoveClass(typeof(UnregisteredSubClass));
+                Client.CreateObject<SubClass>();
             }
             catch { Assert.Fail(); }
 
-            ParseCorePlugins.Instance.SubclassingController.RemoveClass(typeof(SubClass));
-            Assert.ThrowsException<InvalidCastException>(() => ParseObject.Create<SubClass>());
+            Client.ClassController.RemoveClass(typeof(SubClass));
+            Assert.ThrowsException<InvalidCastException>(() => Client.CreateObject<SubClass>());
         }
 
         [TestMethod]
         public void TestRevert()
         {
-            ParseObject obj = ParseObject.Create("Corgi");
+            ParseObject obj = Client.CreateObject("Corgi");
             obj["gogo"] = true;
 
             Assert.IsTrue(obj.IsDirty);
-            Assert.AreEqual(1, obj.GetCurrentOperations().Count);
+            Assert.AreEqual(1, obj.CurrentOperations.Count);
             Assert.IsTrue(obj.ContainsKey("gogo"));
 
             obj.Revert();
 
             Assert.IsTrue(obj.IsDirty);
-            Assert.AreEqual(0, obj.GetCurrentOperations().Count);
+            Assert.AreEqual(0, obj.CurrentOperations.Count);
             Assert.IsFalse(obj.ContainsKey("gogo"));
         }
 
         [TestMethod]
         public void TestDeepTraversal()
         {
-            ParseObject obj = ParseObject.Create("Corgi");
-            IDictionary<string, object> someDict = new Dictionary<string, object>() {
-        { "someList", new List<object>() }
-      };
-            obj[nameof(obj)] = ParseObject.Create("Pug");
-            obj["obj2"] = ParseObject.Create("Pug");
+            ParseObject obj = Client.CreateObject("Corgi");
+
+            IDictionary<string, object> someDict = new Dictionary<string, object>
+            {
+                ["someList"] = new List<object> { }
+            };
+
+            obj[nameof(obj)] = Client.CreateObject("Pug");
+            obj["obj2"] = Client.CreateObject("Pug");
             obj["list"] = new List<object>();
             obj["dict"] = someDict;
             obj["someBool"] = true;
             obj["someInt"] = 23;
 
-            IEnumerable<object> traverseResult = ParseObjectExtensions.DeepTraversal(obj, true, true);
+            IEnumerable<object> traverseResult = Client.TraverseObjectDeep(obj, true, true);
             Assert.AreEqual(8, traverseResult.Count());
 
-            // Don't traverse beyond the root (since root is ParseObject)
-            traverseResult = ParseObjectExtensions.DeepTraversal(obj, false, true);
+            // Don't traverse beyond the root (since root is ParseObject).
+
+            traverseResult = Client.TraverseObjectDeep(obj, false, true);
             Assert.AreEqual(1, traverseResult.Count());
 
-            traverseResult = ParseObjectExtensions.DeepTraversal(someDict, false, true);
+            traverseResult = Client.TraverseObjectDeep(someDict, false, true);
             Assert.AreEqual(2, traverseResult.Count());
 
-            // Should ignore root
-            traverseResult = ParseObjectExtensions.DeepTraversal(obj, true, false);
+            // Should ignore root.
+
+            traverseResult = Client.TraverseObjectDeep(obj, true, false);
             Assert.AreEqual(7, traverseResult.Count());
 
         }
@@ -162,7 +172,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestRemove()
         {
-            ParseObject obj = ParseObject.Create("Corgi");
+            ParseObject obj = Client.CreateObject("Corgi");
             obj["gogo"] = true;
             Assert.IsTrue(obj.ContainsKey("gogo"));
 
@@ -173,14 +183,15 @@ namespace Parse.Test
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
-                CreatedAt = new DateTime(),
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                CreatedAt = new DateTime { },
+                ServerData = new Dictionary<string, object>
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
 
-            obj = ParseObjectExtensions.FromState<ParseObject>(state, "Corgi");
+            obj = Client.GenerateObjectFromState<ParseObject>(state, "Corgi");
             Assert.IsTrue(obj.ContainsKey("username"));
             Assert.IsTrue(obj.ContainsKey("sessionToken"));
 
@@ -192,7 +203,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestIndexGetterSetter()
         {
-            ParseObject obj = ParseObject.Create("Corgi");
+            ParseObject obj = Client.CreateObject("Corgi");
             obj["gogo"] = true;
             obj["list"] = new List<string>();
             obj["dict"] = new Dictionary<string, object>();
@@ -220,18 +231,21 @@ namespace Parse.Test
         [TestMethod]
         public void TestPropertiesGetterSetter()
         {
-            DateTime now = new DateTime();
+            DateTime now = new DateTime { };
+
             IObjectState state = new MutableObjectState
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
                 CreatedAt = now,
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                ServerData = new Dictionary<string, object>
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+
+            ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
 
             Assert.AreEqual("Pagi", obj.ClassName);
             Assert.AreEqual(now, obj.CreatedAt);
@@ -306,13 +320,14 @@ namespace Parse.Test
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
-                CreatedAt = new DateTime(),
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                CreatedAt = new DateTime { },
+                ServerData = new Dictionary<string, object>()
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+            ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
             obj.TryGetValue("username", out string res);
             Assert.AreEqual("kevin", res);
 
@@ -330,13 +345,14 @@ namespace Parse.Test
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
-                CreatedAt = new DateTime(),
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                CreatedAt = new DateTime { },
+                ServerData = new Dictionary<string, object>()
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+            ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
             Assert.AreEqual("kevin", obj.Get<string>("username"));
             Assert.ThrowsException<InvalidCastException>(() => obj.Get<ParseObject>("username"));
             Assert.ThrowsException<KeyNotFoundException>(() => obj.Get<string>("missingItem"));
@@ -361,13 +377,14 @@ namespace Parse.Test
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
-                CreatedAt = new DateTime(),
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                CreatedAt = new DateTime { },
+                ServerData = new Dictionary<string, object>()
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+            ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
             Assert.AreEqual(2, obj.Keys.Count);
 
             obj["additional"] = true;
@@ -384,13 +401,14 @@ namespace Parse.Test
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
-                CreatedAt = new DateTime(),
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                CreatedAt = new DateTime { },
+                ServerData = new Dictionary<string, object>()
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+            ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
             Assert.ThrowsException<ArgumentException>(() => obj.Add("username", "kevin"));
 
             obj.Add("zeus", "bewithyou");
@@ -404,42 +422,49 @@ namespace Parse.Test
             {
                 ObjectId = "waGiManPutr4Pet1r",
                 ClassName = "Pagi",
-                CreatedAt = new DateTime(),
-                ServerData = new Dictionary<string, object>() {
-          { "username", "kevin" },
-          { "sessionToken", "se551onT0k3n" }
-        }
+                CreatedAt = new DateTime { },
+                ServerData = new Dictionary<string, object>()
+                {
+                    ["username"] = "kevin",
+                    ["sessionToken"] = "se551onT0k3n"
+                }
             };
-            ParseObject obj = ParseObjectExtensions.FromState<ParseObject>(state, "Omitted");
+            ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
 
             int count = 0;
+
             foreach (KeyValuePair<string, object> key in obj)
             {
                 count++;
             }
+
             Assert.AreEqual(2, count);
 
             obj["newDirtyItem"] = "newItem";
             count = 0;
+
             foreach (KeyValuePair<string, object> key in obj)
             {
                 count++;
             }
+
             Assert.AreEqual(3, count);
         }
 
         [TestMethod]
         public void TestGetQuery()
         {
-            ParseObject.RegisterDerivative<SubClass>();
+            Client.AddValidClass<SubClass>();
 
-            ParseQuery<ParseObject> query = ParseObject.GetQuery(nameof(UnregisteredSubClass));
+            ParseQuery<ParseObject> query = Client.GetQuery(nameof(UnregisteredSubClass));
             Assert.AreEqual(nameof(UnregisteredSubClass), query.GetClassName());
 
-            Assert.ThrowsException<ArgumentException>(() => ParseObject.GetQuery(nameof(SubClass)));
+            Assert.ThrowsException<ArgumentException>(() => Client.GetQuery(nameof(SubClass)));
 
-            ParseCorePlugins.Instance.SubclassingController.RemoveClass(typeof(SubClass));
+            Client.ClassController.RemoveClass(typeof(SubClass));
         }
+
+#warning These tests are incomplete.
 
         [TestMethod]
         public void TestPropertyChanged()

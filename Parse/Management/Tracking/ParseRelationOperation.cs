@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Parse.Abstractions.Library;
 
 namespace Parse.Core.Internal
 {
@@ -34,9 +35,9 @@ namespace Parse.Core.Internal
             Removals = new ReadOnlyCollection<string>(GetIdsFromObjects(removes).ToList());
         }
 
-        public object Encode()
+        public object Encode(IServiceHub serviceHub)
         {
-            List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id))).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id))).ToList();
+            List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList();
 
             Dictionary<string, object> addition = additions.Count == 0 ? default : new Dictionary<string, object>
             {

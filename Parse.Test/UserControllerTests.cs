@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using Parse.Abstractions.Library;
 using Parse.Core.Internal;
 using Parse.Library;
 
@@ -14,8 +15,10 @@ namespace Parse.Test
     [TestClass]
     public class UserControllerTests
     {
+        ParseClient Client { get; set; }
+
         [TestInitialize]
-        public void SetUp() => ParseClient.Initialize(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(UserControllerTests))]
@@ -45,18 +48,16 @@ namespace Parse.Test
                 ["createdAt"] = "2015-09-18T18:11:28.943Z"
             };
 
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict);
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict));
 
-            ParseUserController controller = new ParseUserController(mockRunner.Object);
-            return controller.SignUpAsync(state, operations, CancellationToken.None).ContinueWith(t =>
+            return new ParseUserController(mockRunner.Object, Client.Decoder).SignUpAsync(state, operations, Client, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/classes/_User"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/classes/_User"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-                IObjectState newState = t.Result;
+                IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
                 Assert.AreEqual("d3ImSh3ki", newState.ObjectId);
                 Assert.IsNotNull(newState.CreatedAt);
@@ -77,18 +78,16 @@ namespace Parse.Test
                 ["createdAt"] = "2015-09-18T18:11:28.943Z"
             };
 
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict);
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict));
 
-            ParseUserController controller = new ParseUserController(mockRunner.Object);
-            return controller.LogInAsync("grantland", "123grantland123", CancellationToken.None).ContinueWith(t =>
+            return new ParseUserController(mockRunner.Object, Client.Decoder).LogInAsync("grantland", "123grantland123", Client, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/login"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/login"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-                IObjectState newState = t.Result;
+                IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
                 Assert.AreEqual("d3ImSh3ki", newState.ObjectId);
                 Assert.IsNotNull(newState.CreatedAt);
@@ -109,18 +108,16 @@ namespace Parse.Test
                 ["createdAt"] = "2015-09-18T18:11:28.943Z" 
             };
 
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict);
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict));
 
-            ParseUserController controller = new ParseUserController(mockRunner.Object);
-            return controller.LogInAsync("facebook", data: null, cancellationToken: CancellationToken.None).ContinueWith(t =>
+            return new ParseUserController(mockRunner.Object, Client.Decoder).LogInAsync("facebook", data: null, serviceHub: Client, cancellationToken: CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/users"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/users"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-                IObjectState newState = t.Result;
+                IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
                 Assert.AreEqual("d3ImSh3ki", newState.ObjectId);
                 Assert.IsNotNull(newState.CreatedAt);
@@ -132,7 +129,8 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(UserControllerTests))]
         public Task TestGetUserFromSessionToken()
         {
-            Dictionary<string, object> responseDict = new Dictionary<string, object>() {
+            Dictionary<string, object> responseDict = new Dictionary<string, object>
+            {
                 ["__type"] = "Object",
                 ["className"] = "_User",
                 ["objectId"] = "d3ImSh3ki",
@@ -140,18 +138,16 @@ namespace Parse.Test
                 ["createdAt"] = "2015-09-18T18:11:28.943Z"
             };
 
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict);
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict));
 
-            ParseUserController controller = new ParseUserController(mockRunner.Object);
-            return controller.GetUserAsync("s3ss10nt0k3n", CancellationToken.None).ContinueWith(t =>
+            return new ParseUserController(mockRunner.Object, Client.Decoder).GetUserAsync("s3ss10nt0k3n", Client, CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/users/me"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/users/me"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
-                IObjectState newState = t.Result;
+                IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
                 Assert.AreEqual("d3ImSh3ki", newState.ObjectId);
                 Assert.IsNotNull(newState.CreatedAt);
@@ -163,24 +159,21 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(UserControllerTests))]
         public Task TestRequestPasswordReset()
         {
-            Dictionary<string, object> responseDict = new Dictionary<string, object>();
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, responseDict);
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { }));
 
-            ParseUserController controller = new ParseUserController(mockRunner.Object);
-            return controller.RequestPasswordResetAsync("gogo@parse.com", CancellationToken.None).ContinueWith(t =>
+            return new ParseUserController(mockRunner.Object, Client.Decoder).RequestPasswordResetAsync("gogo@parse.com", CancellationToken.None).ContinueWith(t =>
             {
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/requestPasswordReset"), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/requestPasswordReset"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
-        private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
+        Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
         {
-            Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
-            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<DataTransmissionAdvancementLevel>>(), It.IsAny<IProgress<DataRecievalPresenter>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
+            Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner> { };
+            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
 
             return mockRunner;
         }

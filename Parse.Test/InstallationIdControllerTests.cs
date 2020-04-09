@@ -5,15 +5,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
+using Parse.Library;
 using Parse.Management;
 
 namespace Parse.Test
 {
+#warning Class refactoring may be required.
+
     [TestClass]
     public class InstallationIdControllerTests
     {
+        ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
+
         [TestCleanup]
-        public void TearDown() => ParseCorePlugins.Instance = null;
+        public void TearDown() => (Client.Services as ServiceHub).Reset();
 
         [TestMethod]
         public void TestConstructor()
@@ -22,6 +27,7 @@ namespace Parse.Test
             ParseInstallationController controller = new ParseInstallationController(storageMock.Object);
 
             // Make sure it didn't touch storageMock.
+
             storageMock.Verify();
         }
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 using Parse.Management;
@@ -34,12 +35,12 @@ namespace Parse
 
         internal static ThreadLocal<bool> CreatingPointer { get; } = new ThreadLocal<bool>(() => false);
 
-        internal TaskQueue taskQueue = new TaskQueue { };
+        internal TaskQueue TaskQueue { get; } = new TaskQueue { };
 
         /// <summary>
         /// The <see cref="ParseClient"/> instance being targeted.
         /// </summary>
-        internal ParseClient Client { get; }
+        internal IServiceHub Services { get; private protected set; }
 
         /// <summary>
         /// Constructs a new ParseObject with no data in it. A ParseObject constructed in this way will
@@ -51,8 +52,8 @@ namespace Parse
         /// to name classes in PascalCase.
         /// </remarks>
         /// <param name="className">The className for this ParseObject.</param>
-        /// <param name="client">The <see cref="ParseClient"/> instance to target for any resources.</param>
-        public ParseObject(string className, ParseClient client = default)
+        /// <param name="serviceHub">The <see cref="IServiceHub"/> implementation instance to target for any resources. This paramater can be effectively set after construction via <see cref="Bind(IServiceHub)"/>.</param>
+        public ParseObject(string className, IServiceHub serviceHub = default)
         {
             // We use a ThreadLocal rather than passing a parameter so that createWithoutData can do the
             // right thing with subclasses. It's ugly and terrible, but it does provide the development
@@ -62,16 +63,16 @@ namespace Parse
             bool isPointer = CreatingPointer.Value;
             CreatingPointer.Value = false;
 
-            Client = client ?? ParseClient.Instance ?? throw new InvalidOperationException("A ParseClient needs to be initialized as the configured default instance before any ParseObjects can be instantiated.");
+            Services = serviceHub ?? ParseClient.Instance /* Technically, it is not possible to throw an exception here for when serviceHub is null because ParseObjectClass.Constructor for derived classes will call this constructor with a null serviceHub, then call Bind, so that would fail. */ /* ?? throw new InvalidOperationException("A ParseClient needs to be initialized as the configured default instance before any ParseObjects can be instantiated.") */;
 
             if (AutoClassName.Equals(className ?? throw new ArgumentException("You must specify a Parse class name when creating a new ParseObject.")))
             {
                 className = GetType().GetParseClassName();
             }
 
-            // If this is supposed to be created by a factory but wasn't, throw an exception
+            // If this is supposed to be created by a factory but wasn't, throw an exception.
 
-            if (!Client.Services.ClassController.GetClassMatch(className, GetType()))
+            if (!Services.ClassController.GetClassMatch(className, GetType()))
             {
                 throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
             }
@@ -100,7 +101,14 @@ namespace Parse
         /// <summary>
         /// Constructor for use in ParseObject subclasses. Subclasses must specify a ParseClassName attribute.
         /// </summary>
-        protected ParseObject(ParseClient client = default) : this(AutoClassName, client) { }
+        protected ParseObject(IServiceHub serviceHub = default) : this(AutoClassName, serviceHub) { }
+
+        /// <summary>
+        /// Attaches the given <see cref="IServiceHub"/> implementation instance to this <see cref="ParseObject"/> or <see cref="ParseObject"/>-derived class instance.
+        /// </summary>
+        /// <param name="serviceHub">The serviceHub to use for all operations.</param>
+        /// <returns>The instance which was mutated.</returns>
+        public ParseObject Bind(IServiceHub serviceHub) => (Instance: this, Services = serviceHub).Instance;
 
         /// <summary>
         /// Occurs when a property value changes.
@@ -123,7 +131,7 @@ namespace Parse
         [ParseFieldName("ACL")]
         public ParseACL ACL
         {
-            get => GetProperty<ParseACL>(null, nameof(ACL));
+            get => GetProperty<ParseACL>(default, nameof(ACL));
             set => SetProperty(value, nameof(ACL));
         }
 
@@ -258,7 +266,7 @@ namespace Parse
 
                 lock (Mutex)
                 {
-                    return Client.CanBeSerializedAsValue(EstimatedData);
+                    return Services.CanBeSerializedAsValue(EstimatedData);
                 }
             }
         }
@@ -417,13 +425,8 @@ namespace Parse
         /// <summary>
         /// Deletes this object on the server.
         /// </summary>
-        public Task DeleteAsync() => DeleteAsync(CancellationToken.None);
-
-        /// <summary>
-        /// Deletes this object on the server.
-        /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public Task DeleteAsync(CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait => DeleteAsync(toAwait, cancellationToken), cancellationToken);
+        public Task DeleteAsync(CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => DeleteAsync(toAwait, cancellationToken), cancellationToken);
 
         /// <summary>
         /// Gets a value for the key of a particular type.
@@ -547,8 +550,7 @@ namespace Parse
         {
             lock (Mutex)
             {
-                bool wasDirty = CurrentOperations.Count > 0;
-                if (wasDirty)
+                if (CurrentOperations.Count > 0)
                 {
                     CurrentOperations.Clear();
                     RebuildEstimatedData();
@@ -560,13 +562,8 @@ namespace Parse
         /// <summary>
         /// Saves this object to the server.
         /// </summary>
-        public Task SaveAsync() => SaveAsync(CancellationToken.None);
-
-        /// <summary>
-        /// Saves this object to the server.
-        /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public Task SaveAsync(CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait => SaveAsync(toAwait, cancellationToken), cancellationToken);
+        public Task SaveAsync(CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => SaveAsync(toAwait, cancellationToken), cancellationToken);
 
         /// <summary>
         /// Populates result with the value for the key, if possible.
@@ -612,12 +609,12 @@ namespace Parse
                 return Task.FromResult(0);
             }
 
-            string sessionToken = Client.GetCurrentSessionToken();
+            string sessionToken = Services.GetCurrentSessionToken();
 
-            return toAwait.OnSuccess(_ => Client.ObjectController.DeleteAsync(State, sessionToken, cancellationToken)).Unwrap().OnSuccess(_ => IsDirty = true);
+            return toAwait.OnSuccess(_ => Services.ObjectController.DeleteAsync(State, sessionToken, cancellationToken)).Unwrap().OnSuccess(_ => IsDirty = true);
         }
 
-        internal virtual Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken) => toAwait.OnSuccess(_ => ObjectId == null ? throw new InvalidOperationException("Cannot refresh an object that hasn't been saved to the server.") : Client.ObjectController.FetchAsync(State, Client.GetCurrentSessionToken(), cancellationToken)).Unwrap().OnSuccess(task =>
+        internal virtual Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken) => toAwait.OnSuccess(_ => ObjectId == null ? throw new InvalidOperationException("Cannot refresh an object that hasn't been saved to the server.") : Services.ObjectController.FetchAsync(State, Services.GetCurrentSessionToken(), Services, cancellationToken)).Unwrap().OnSuccess(task =>
         {
             HandleFetchResult(task.Result);
             return this;
@@ -631,7 +628,7 @@ namespace Parse
         /// Fetches this object with the data from the server.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        internal Task<ParseObject> FetchAsyncInternal(CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait => FetchAsyncInternal(toAwait, cancellationToken), cancellationToken);
+        internal Task<ParseObject> FetchAsyncInternal(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => FetchAsyncInternal(toAwait, cancellationToken), cancellationToken);
 
         internal Task<ParseObject> FetchIfNeededAsyncInternal(Task toAwait, CancellationToken cancellationToken) => !IsDataAvailable ? FetchAsyncInternal(toAwait, cancellationToken) : Task.FromResult(this);
 
@@ -640,7 +637,7 @@ namespace Parse
         /// false), fetches this object with the data from the server.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        internal Task<ParseObject> FetchIfNeededAsyncInternal(CancellationToken cancellationToken) => taskQueue.Enqueue(toAwait => FetchIfNeededAsyncInternal(toAwait, cancellationToken), cancellationToken);
+        internal Task<ParseObject> FetchIfNeededAsyncInternal(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => FetchIfNeededAsyncInternal(toAwait, cancellationToken), cancellationToken);
 
         internal void HandleFailedSave(IDictionary<string, IParseFieldOperation> operationsBeforeSave)
         {
@@ -863,7 +860,7 @@ namespace Parse
             }
         }
 
-        public IDictionary<string, object> ServerDataToJSONObjectForSerialization() => PointerOrLocalIdEncoder.Instance.Encode(State.ToDictionary(pair => pair.Key, t => t.Value)) as IDictionary<string, object>;
+        public IDictionary<string, object> ServerDataToJSONObjectForSerialization() => PointerOrLocalIdEncoder.Instance.Encode(State.ToDictionary(pair => pair.Key, pair => pair.Value), Services) as IDictionary<string, object>;
 
         /// <summary>
         /// Perform Set internally which is not gated by mutability check.
@@ -944,7 +941,7 @@ namespace Parse
         /// <param name="defaultValue">The value to return if the property is not present on the ParseObject.</param>
         /// <param name="propertyName">The name of the property.</param>
         /// <typeparam name="T">The return type of the property.</typeparam>
-        protected T GetProperty<T>(T defaultValue, [CallerMemberName] string propertyName = null) => TryGetValue(Client.GetFieldForPropertyName(ClassName, propertyName), out T result) ? result : defaultValue;
+        protected T GetProperty<T>(T defaultValue, [CallerMemberName] string propertyName = null) => TryGetValue(Services.GetFieldForPropertyName(ClassName, propertyName), out T result) ? result : defaultValue;
 
         /// <summary>
         /// Gets a relation for a property based upon its associated ParseFieldName attribute.
@@ -952,7 +949,7 @@ namespace Parse
         /// <returns>The ParseRelation for the property.</returns>
         /// <param name="propertyName">The name of the property.</param>
         /// <typeparam name="T">The ParseObject subclass type of the ParseRelation.</typeparam>
-        protected ParseRelation<T> GetRelationProperty<T>([CallerMemberName] string propertyName = null) where T : ParseObject => GetRelation<T>(Client.GetFieldForPropertyName(ClassName, propertyName));
+        protected ParseRelation<T> GetRelationProperty<T>([CallerMemberName] string propertyName = null) where T : ParseObject => GetRelation<T>(Services.GetFieldForPropertyName(ClassName, propertyName));
 
         protected virtual bool CheckKeyMutable(string key) => true;
 
@@ -963,7 +960,7 @@ namespace Parse
         /// </summary>
         protected void OnFieldsChanged(IEnumerable<string> fields)
         {
-            IDictionary<string, string> mappings = Client.ClassController.GetPropertyMappings(ClassName);
+            IDictionary<string, string> mappings = Services.ClassController.GetPropertyMappings(ClassName);
 
             foreach (string property in mappings is { } ? fields is { } ? from mapping in mappings join field in fields on mapping.Value equals field select mapping.Key : mappings.Keys : Enumerable.Empty<string>())
             {
@@ -998,11 +995,11 @@ namespace Parse
                 // Get the JSON representation of the object.
 
                 currentOperations = StartSave();
-                sessionToken = Client.GetCurrentSessionToken();
-                deepSaveTask = Client.DeepSaveAsync(EstimatedData, sessionToken, cancellationToken);
+                sessionToken = Services.GetCurrentSessionToken();
+                deepSaveTask = Services.DeepSaveAsync(EstimatedData, sessionToken, cancellationToken);
             }
 
-            return deepSaveTask.OnSuccess(_ => toAwait).Unwrap().OnSuccess(_ => Client.ObjectController.SaveAsync(State, currentOperations, sessionToken, cancellationToken)).Unwrap().ContinueWith(task =>
+            return deepSaveTask.OnSuccess(_ => toAwait).Unwrap().OnSuccess(_ => Services.ObjectController.SaveAsync(State, currentOperations, sessionToken, Services, cancellationToken)).Unwrap().ContinueWith(task =>
             {
                 if (task.IsFaulted || task.IsCanceled)
                 {
@@ -1023,7 +1020,7 @@ namespace Parse
         /// <param name="value">The new value.</param>
         /// <param name="propertyName">The name of the property.</param>
         /// <typeparam name="T">The type for the property.</typeparam>
-        protected void SetProperty<T>(T value, [CallerMemberName] string propertyName = null) => this[Client.GetFieldForPropertyName(ClassName, propertyName)] = value;
+        protected void SetProperty<T>(T value, [CallerMemberName] string propertyName = null) => this[Services.GetFieldForPropertyName(ClassName, propertyName)] = value;
 
         void ApplyOperations(IDictionary<string, IParseFieldOperation> operations, IDictionary<string, object> map)
         {
@@ -1087,9 +1084,9 @@ namespace Parse
         /// refreshing or saving.
         /// </summary>
         /// <returns>Map of objectId to ParseObject which have been fetched.</returns>
-        IDictionary<string, ParseObject> CollectFetchedObjects() => Client.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.ObjectId != null && o.IsDataAvailable).GroupBy(o => o.ObjectId).ToDictionary(group => group.Key, group => group.Last());
+        IDictionary<string, ParseObject> CollectFetchedObjects() => Services.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.ObjectId != null && o.IsDataAvailable).GroupBy(o => o.ObjectId).ToDictionary(group => group.Key, group => group.Last());
 
-        IEnumerable<ParseObject> FindUnsavedChildren() => Client.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.IsDirty);
+        IEnumerable<ParseObject> FindUnsavedChildren() => Services.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.IsDirty);
 
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {

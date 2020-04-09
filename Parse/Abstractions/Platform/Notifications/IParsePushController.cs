@@ -2,11 +2,12 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 
 namespace Parse.Push.Internal
 {
     public interface IParsePushController
     {
-        Task SendPushNotificationAsync(IPushState state, CancellationToken cancellationToken);
+        Task SendPushNotificationAsync(IPushState state, IServiceHub serviceHub, CancellationToken cancellationToken = default);
     }
 }

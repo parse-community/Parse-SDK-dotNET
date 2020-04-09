@@ -4,76 +4,64 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Parse.Abstractions.Library;
 using Parse.Utilities;
 
 namespace Parse.Core.Internal
 {
     public class ParseAddUniqueOperation : IParseFieldOperation
     {
-        private ReadOnlyCollection<object> objects;
-        public ParseAddUniqueOperation(IEnumerable<object> objects) => this.objects = new ReadOnlyCollection<object>(objects.Distinct().ToList());
+        ReadOnlyCollection<object> Data { get; }
 
-        public object Encode() => new Dictionary<string, object> {
-        {"__op", "AddUnique"},
-        {nameof(objects), PointerOrLocalIdEncoder.Instance.Encode(objects)}
-      };
+        public ParseAddUniqueOperation(IEnumerable<object> objects) => Data = new ReadOnlyCollection<object>(objects.Distinct().ToList());
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+        public object Encode(IServiceHub serviceHub) => new Dictionary<string, object>
         {
-            if (previous == null)
-            {
-                return this;
-            }
-            if (previous is ParseDeleteOperation)
-            {
-                return new ParseSetOperation(objects.ToList());
-            }
-            if (previous is ParseSetOperation)
-            {
-                ParseSetOperation setOp = (ParseSetOperation) previous;
-                IList<object> oldList = Conversion.To<IList<object>>(setOp.Value);
-                object result = Apply(oldList, null);
-                return new ParseSetOperation(result);
-            }
-            if (previous is ParseAddUniqueOperation)
-            {
-                IEnumerable<object> oldList = ((ParseAddUniqueOperation) previous).Objects;
-                return new ParseAddUniqueOperation((IList<object>) Apply(oldList, null));
-            }
-            throw new InvalidOperationException("Operation is invalid after previous operation.");
-        }
+            ["__op"] = "AddUnique",
+            ["objects"] = PointerOrLocalIdEncoder.Instance.Encode(Data, serviceHub)
+        };
+
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
+        {
+            null => this,
+            ParseDeleteOperation _ => new ParseSetOperation(Data.ToList()),
+            ParseSetOperation setOp => new ParseSetOperation(Apply(Conversion.To<IList<object>>(setOp.Value), default)),
+            ParseAddUniqueOperation addition => new ParseAddUniqueOperation(Apply(addition.Objects, default) as IList<object>),
+            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+        };
 
         public object Apply(object oldValue, string key)
         {
             if (oldValue == null)
             {
-                return objects.ToList();
+                return Data.ToList();
             }
-            List<object> newList = Conversion.To<IList<object>>(oldValue).ToList();
+
+            List<object> result = Conversion.To<IList<object>>(oldValue).ToList();
             IEqualityComparer<object> comparer = ParseFieldOperations.ParseObjectComparer;
-            foreach (object objToAdd in objects)
+
+            foreach (object target in Data)
             {
-                if (objToAdd is ParseObject)
+                if (target is ParseObject)
                 {
-                    object matchedObj = newList.FirstOrDefault(listObj => comparer.Equals(objToAdd, listObj));
-                    if (matchedObj == null)
+                    if (!(result.FirstOrDefault(reference => comparer.Equals(target, reference)) is { } matched))
                     {
-                        newList.Add(objToAdd);
+                        result.Add(target);
                     }
                     else
                     {
-                        int index = newList.IndexOf(matchedObj);
-                        newList[index] = objToAdd;
+                        result[result.IndexOf(matched)] = target;
                     }
                 }
-                else if (!newList.Contains(objToAdd, comparer))
+                else if (!result.Contains(target, comparer))
                 {
-                    newList.Add(objToAdd);
+                    result.Add(target);
                 }
             }
-            return newList;
+
+            return result;
         }
 
-        public IEnumerable<object> Objects => objects;
+        public IEnumerable<object> Objects => Data;
     }
 }

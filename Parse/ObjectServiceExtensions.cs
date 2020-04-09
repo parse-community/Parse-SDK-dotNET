@@ -64,19 +64,19 @@ namespace Parse
         /// </summary>
         /// <param name="className">The class of object to create.</param>
         /// <returns>A new ParseObject for the given class name.</returns>
-        public static ParseObject CreateObject(this IServiceHub serviceHub, string className) => serviceHub.ClassController.Instantiate(className);
+        public static ParseObject CreateObject(this IServiceHub serviceHub, string className) => serviceHub.ClassController.Instantiate(className, serviceHub);
 
         /// <summary>
         /// Creates a new ParseObject based upon a given subclass type.
         /// </summary>
         /// <returns>A new ParseObject for the given class name.</returns>
-        public static T CreateObject<T>(this IServiceHub serviceHub) where T : ParseObject => (T) serviceHub.ClassController.CreateObject<T>();
+        public static T CreateObject<T>(this IServiceHub serviceHub) where T : ParseObject => (T) serviceHub.ClassController.CreateObject<T>(serviceHub);
 
         /// <summary>
         /// Creates a new ParseObject based upon a given subclass type.
         /// </summary>
         /// <returns>A new ParseObject for the given class name.</returns>
-        public static T CreateObject<T>(this IParseObjectClassController classController) where T : ParseObject => (T) classController.Instantiate(classController.GetClassName(typeof(T)));
+        public static T CreateObject<T>(this IParseObjectClassController classController, IServiceHub serviceHub) where T : ParseObject => (T) classController.Instantiate(classController.GetClassName(typeof(T)), serviceHub);
 
         /// <summary>
         /// Creates a reference to an existing ParseObject for use in creating associations between
@@ -87,7 +87,7 @@ namespace Parse
         /// <param name="className">The object's class.</param>
         /// <param name="objectId">The object id for the referenced object.</param>
         /// <returns>A ParseObject without data.</returns>
-        public static ParseObject CreateObjectWithoutData(this IServiceHub serviceHub, string className, string objectId) => serviceHub.ClassController.CreateObjectWithoutData(className, objectId);
+        public static ParseObject CreateObjectWithoutData(this IServiceHub serviceHub, string className, string objectId) => serviceHub.ClassController.CreateObjectWithoutData(className, objectId, serviceHub);
 
         /// <summary>
         /// Creates a reference to an existing ParseObject for use in creating associations between
@@ -98,14 +98,17 @@ namespace Parse
         /// <param name="className">The object's class.</param>
         /// <param name="objectId">The object id for the referenced object.</param>
         /// <returns>A ParseObject without data.</returns>
-        public static ParseObject CreateObjectWithoutData(this IParseObjectClassController classController, string className, string objectId)
+        public static ParseObject CreateObjectWithoutData(this IParseObjectClassController classController, string className, string objectId, IServiceHub serviceHub)
         {
             ParseObject.CreatingPointer.Value = true;
             try
             {
-                ParseObject result = classController.Instantiate(className);
+                ParseObject result = classController.Instantiate(className, serviceHub);
                 result.ObjectId = objectId;
-                result.IsDirty = false; // Left in because the property setter might be doing something funky.
+
+                // Left in because the property setter might be doing something funky.
+
+                result.IsDirty = false;
                 return result.IsDirty ? throw new InvalidOperationException("A ParseObject subclass default constructor must not make changes to the object that cause it to be dirty.") : result;
             }
             finally { ParseObject.CreatingPointer.Value = false; }
@@ -119,7 +122,7 @@ namespace Parse
         /// </summary>
         /// <param name="objectId">The object id for the referenced object.</param>
         /// <returns>A ParseObject without data.</returns>
-        public static T CreateObjectWithoutData<T>(this IServiceHub serviceHub, string objectId) where T : ParseObject => (T) CreateObjectWithoutData(serviceHub, serviceHub.ClassController.GetClassName(typeof(T)), objectId);
+        public static T CreateObjectWithoutData<T>(this IServiceHub serviceHub, string objectId) where T : ParseObject => (T) serviceHub.CreateObjectWithoutData(serviceHub.ClassController.GetClassName(typeof(T)), objectId);
 
         /// <summary>
         /// Deletes each object in the provided list.
@@ -228,23 +231,23 @@ namespace Parse
         }
 
         // TODO (hallucinogen): add unit test
-        internal static T GenerateObjectFromState<T>(this IServiceHub serviceHub, IObjectState state, string defaultClassName) where T : ParseObject => serviceHub.ClassController.GenerateObjectFromState<T>(state, defaultClassName);
+        internal static T GenerateObjectFromState<T>(this IServiceHub serviceHub, IObjectState state, string defaultClassName) where T : ParseObject => serviceHub.ClassController.GenerateObjectFromState<T>(state, defaultClassName, serviceHub);
 
-        internal static T GenerateObjectFromState<T>(this IParseObjectClassController classController, IObjectState state, string defaultClassName) where T : ParseObject
+        internal static T GenerateObjectFromState<T>(this IParseObjectClassController classController, IObjectState state, string defaultClassName, IServiceHub serviceHub) where T : ParseObject
         {
-            T obj = (T) classController.CreateObjectWithoutData(state.ClassName ?? defaultClassName, state.ObjectId);
+            T obj = (T) classController.CreateObjectWithoutData(state.ClassName ?? defaultClassName, state.ObjectId, serviceHub);
             obj.HandleFetchResult(state);
 
             return obj;
         }
 
-        internal static IDictionary<string, object> GenerateJSONObjectForSaving(this IDictionary<string, IParseFieldOperation> operations)
+        internal static IDictionary<string, object> GenerateJSONObjectForSaving(this IServiceHub serviceHub, IDictionary<string, IParseFieldOperation> operations)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
 
             foreach (KeyValuePair<string, IParseFieldOperation> pair in operations)
             {
-                result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value);
+                result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value, serviceHub);
             }
 
             return result;
@@ -343,7 +346,7 @@ namespace Parse
                         List<IObjectState> states = (from item in current select item.State).ToList();
                         List<IDictionary<string, IParseFieldOperation>> operationsList = (from item in current select item.StartSave()).ToList();
 
-                        IList<Task<IObjectState>> saveTasks = serviceHub.ObjectController.SaveAllAsync(states, operationsList, sessionToken, cancellationToken);
+                        IList<Task<IObjectState>> saveTasks = serviceHub.ObjectController.SaveAllAsync(states, operationsList, sessionToken, serviceHub, cancellationToken);
 
                         return Task.WhenAll(saveTasks).ContinueWith(task =>
                         {
@@ -356,8 +359,7 @@ namespace Parse
                             }
                             else
                             {
-                                IObjectState[] serverStates = task.Result;
-                                foreach ((ParseObject item, IObjectState state) pair in current.Zip(serverStates, (item, state) => (item, state)))
+                                foreach ((ParseObject item, IObjectState state) pair in current.Zip(task.Result, (item, state) => (item, state)))
                                 {
                                     pair.item.HandleSave(pair.state);
                                 }
@@ -427,7 +429,7 @@ namespace Parse
             // The locks have to be sorted so that we always acquire them in the same order.
             // Otherwise, there's some risk of deadlock.
 
-            LockSet lockSet = new LockSet(objects.Select(o => o.taskQueue.Mutex));
+            LockSet lockSet = new LockSet(objects.Select(o => o.TaskQueue.Mutex));
 
             lockSet.Enter();
             try
@@ -442,7 +444,7 @@ namespace Parse
                 List<Task> childTasks = new List<Task>();
                 foreach (ParseObject obj in objects)
                 {
-                    obj.taskQueue.Enqueue((Task task) =>
+                    obj.TaskQueue.Enqueue((Task task) =>
                     {
                         childTasks.Add(task);
                         return fullTask;

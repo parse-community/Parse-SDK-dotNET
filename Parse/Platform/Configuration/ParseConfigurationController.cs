@@ -2,6 +2,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 
 namespace Parse.Core.Internal
@@ -27,10 +28,10 @@ namespace Parse.Core.Internal
             Decoder = decoder;
         }
 
-        public Task<ParseConfiguration> FetchConfigAsync(string sessionToken, CancellationToken cancellationToken) => CommandRunner.RunCommandAsync(new ParseCommand("config", method: "GET", sessionToken: sessionToken, data: default), cancellationToken: cancellationToken).OnSuccess(task =>
+        public Task<ParseConfiguration> FetchConfigAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand("config", method: "GET", sessionToken: sessionToken, data: default), cancellationToken: cancellationToken).OnSuccess(task =>
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Decoder.BuildConfiguration(task.Result.Item2);
+            return Decoder.BuildConfiguration(task.Result.Item2, serviceHub);
         }).OnSuccess(task =>
         {
             cancellationToken.ThrowIfCancellationRequested();

@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 using Parse.Common.Internal;
 using Parse.Core.Internal;
 using Parse.Library;
@@ -61,7 +62,7 @@ namespace Parse.Push.Internal
             return saveTask;
         }).Unwrap(), cancellationToken);
 
-        public Task<ParseInstallation> GetAsync(CancellationToken cancellationToken)
+        public Task<ParseInstallation> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
         {
             ParseInstallation cachedCurrent;
             cachedCurrent = CurrentInstallation;
@@ -80,13 +81,13 @@ namespace Parse.Push.Internal
                 if (temp is string installationDataString)
                 {
                     IDictionary<string, object> installationData = Json.Parse(installationDataString) as IDictionary<string, object>;
-                    installation = InstallationCoder.Decode(installationData);
+                    installation = InstallationCoder.Decode(installationData, serviceHub);
 
                     fetchTask = Task.FromResult<object>(null);
                 }
                 else
                 {
-                    installation = ClassController.CreateObject<ParseInstallation>();
+                    installation = ClassController.CreateObject<ParseInstallation>(serviceHub);
                     fetchTask = InstallationController.GetAsync().ContinueWith(t => installation.SetIfDifferent("installationId", t.Result.ToString()));
                 }
 

@@ -2,16 +2,17 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Library;
 
 namespace Parse.Core.Internal
 {
     public interface IParseSessionController
     {
-        Task<IObjectState> GetSessionAsync(string sessionToken, CancellationToken cancellationToken);
+        Task<IObjectState> GetSessionAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default);
 
-        Task RevokeAsync(string sessionToken, CancellationToken cancellationToken);
+        Task RevokeAsync(string sessionToken, CancellationToken cancellationToken = default);
 
-        Task<IObjectState> UpgradeToRevocableSessionAsync(string sessionToken, CancellationToken cancellationToken);
+        Task<IObjectState> UpgradeToRevocableSessionAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default);
 
         bool IsRevocableSessionToken(string sessionToken);
     }

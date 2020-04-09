@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Parse.Abstractions.Library;
 
 namespace Parse.Core.Internal
 {
@@ -11,13 +12,13 @@ namespace Parse.Core.Internal
 
         bool GetClassMatch(string className, Type type);
 
-        void AddValid(Type t);
+        void AddValid(Type type);
 
-        void RemoveClass(Type t);
+        void RemoveClass(Type type);
 
-        void AddRegisterHook(Type t, Action action);
+        void AddRegisterHook(Type type, Action action);
 
-        ParseObject Instantiate(string className);
+        ParseObject Instantiate(string className, IServiceHub serviceHub);
 
         IDictionary<string, string> GetPropertyMappings(string className);
 

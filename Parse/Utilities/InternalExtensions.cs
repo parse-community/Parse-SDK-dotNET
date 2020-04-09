@@ -45,8 +45,7 @@ namespace Parse.Common.Internal
                    a != null && b != null &&
                    a.SequenceEqual(b);
 
-        public static Task<TResult> OnSuccess<TIn, TResult>(this Task<TIn> task,
-            Func<Task<TIn>, TResult> continuation) => ((Task) task).OnSuccess(t => continuation((Task<TIn>) t));
+        public static Task<TResult> OnSuccess<TIn, TResult>(this Task<TIn> task, Func<Task<TIn>, TResult> continuation) => ((Task) task).OnSuccess(t => continuation((Task<TIn>) t));
 
         public static Task OnSuccess<TIn>(this Task<TIn> task, Action<Task<TIn>> continuation) => task.OnSuccess((Func<Task<TIn>, object>) (t =>
                                                                                                              {
@@ -54,8 +53,7 @@ namespace Parse.Common.Internal
                                                                                                                  return null;
                                                                                                              }));
 
-        public static Task<TResult> OnSuccess<TResult>(this Task task,
-            Func<Task, TResult> continuation) => task.ContinueWith(t =>
+        public static Task<TResult> OnSuccess<TResult>(this Task task, Func<Task, TResult> continuation) => task.ContinueWith(t =>
                                                            {
                                                                if (t.IsFaulted)
                                                                {
