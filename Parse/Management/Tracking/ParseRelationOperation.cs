@@ -74,7 +74,7 @@ namespace Parse.Core.Internal
         public object Apply(object oldValue, string key) => oldValue switch
         {
             _ when Additions.Count == 0 && Removals.Count == 0 => default,
-            null => ParseRelationBase.CreateRelation(null, key, TargetClassName),
+            null => ClassController.CreateRelation(null, key, TargetClassName),
             ParseRelationBase { TargetClassName: { } oldClassname } when oldClassname != TargetClassName => throw new InvalidOperationException($"Related object must be a {oldClassname}, but a {TargetClassName} was passed in."),
             ParseRelationBase { } oldRelation => (Relation: oldRelation, oldRelation.TargetClassName = TargetClassName).Relation,
             _ => throw new InvalidOperationException("Operation is invalid after previous operation.")

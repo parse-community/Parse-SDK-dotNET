@@ -259,7 +259,8 @@ namespace Parse.Test
         [TestMethod]
         public void TestAddToList()
         {
-            ParseObject obj = new ParseObject("Corgi");
+            ParseObject obj = new ParseObject("Corgi").Bind(Client);
+
             obj.AddToList("emptyList", "gogo");
             obj["existingList"] = new List<string>() { "rich" };
 
@@ -280,7 +281,8 @@ namespace Parse.Test
         [TestMethod]
         public void TestAddUniqueToList()
         {
-            ParseObject obj = new ParseObject("Corgi");
+            ParseObject obj = new ParseObject("Corgi").Bind(Client);
+
             obj.AddUniqueToList("emptyList", "gogo");
             obj["existingList"] = new List<string>() { "gogo" };
 
@@ -301,7 +303,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestRemoveAllFromList()
         {
-            ParseObject obj = new ParseObject("Corgi") { ["existingList"] = new List<string>() { "gogo", "Queen of Pain" } };
+            ParseObject obj = new ParseObject("Corgi", Client) { ["existingList"] = new List<string> { "gogo", "Queen of Pain" } };
 
             obj.RemoveAllFromList("existingList", new List<string>() { "gogo", "missingItem" });
             Assert.AreEqual(1, obj.Get<List<object>>("existingList").Count);
@@ -327,7 +329,9 @@ namespace Parse.Test
                     ["sessionToken"] = "se551onT0k3n"
                 }
             };
+
             ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
+
             obj.TryGetValue("username", out string res);
             Assert.AreEqual("kevin", res);
 
@@ -352,11 +356,14 @@ namespace Parse.Test
                     ["sessionToken"] = "se551onT0k3n"
                 }
             };
+
             ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Omitted");
             Assert.AreEqual("kevin", obj.Get<string>("username"));
             Assert.ThrowsException<InvalidCastException>(() => obj.Get<ParseObject>("username"));
             Assert.ThrowsException<KeyNotFoundException>(() => obj.Get<string>("missingItem"));
         }
+
+#warning Some tests are not implemented.
 
         [TestMethod]
         public void TestIsDataAvailable()

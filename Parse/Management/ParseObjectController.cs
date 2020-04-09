@@ -17,7 +17,9 @@ namespace Parse.Core.Internal
 
         IParseDataDecoder Decoder { get; }
 
-        public ParseObjectController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
+        IServerConnectionData ServerConnectionData { get; }
+
+        public ParseObjectController(IParseCommandRunner commandRunner, IParseDataDecoder decoder, IServerConnectionData serverConnectionData) => (CommandRunner, Decoder, ServerConnectionData) = (commandRunner, decoder, serverConnectionData);
 
         public Task<IObjectState> FetchAsync(IObjectState state, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
         {
@@ -81,7 +83,7 @@ namespace Parse.Core.Internal
                 Dictionary<string, object> results = new Dictionary<string, object>
                 {
                     ["method"] = request.Method,
-                    ["path"] = request.Target.AbsolutePath,
+                    ["path"] = request is { Path: { }, Resource: { } } ? request.Target.AbsolutePath : new Uri(new Uri(ServerConnectionData.ServerURI), request.Path).AbsolutePath,
                 };
 
                 if (request.DataObject != null)

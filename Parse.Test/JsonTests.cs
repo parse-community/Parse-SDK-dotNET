@@ -221,7 +221,10 @@ namespace Parse.Test
             list.Add(12.34);
             list.Add(1.23456789123456789);
             encoded = Json.Encode(list);
-            Assert.AreEqual("[{},\"1234          a\\t\\r\\n\",1234,12.34,1.23456789123457]", encoded);
+
+            // This string should be [{},\"1234          a\\t\\r\\n\",1234,12.34,1.23456789123457] for .NET Framework (https://github.com/dotnet/runtime/issues/31483).
+
+            Assert.AreEqual("[{},\"1234          a\\t\\r\\n\",1234,12.34,1.234567891234568]", encoded);
 
             dict["arr"] = new List<object>();
             encoded = Json.Encode(dict);

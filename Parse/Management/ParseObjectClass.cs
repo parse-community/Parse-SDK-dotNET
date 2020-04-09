@@ -8,7 +8,13 @@ namespace Parse.Core.Internal
 {
     internal class ParseObjectClass
     {
-        public ParseObjectClass(Type type, ConstructorInfo constructor) => (TypeInfo, DeclaredName, Constructor, PropertyMappings) = (type.GetTypeInfo(), TypeInfo.GetParseClassName(), Constructor = constructor, PropertyMappings = type.GetProperties().Select(property => (Property: property, FieldNameAttribute: property.GetCustomAttribute<ParseFieldNameAttribute>(true))).Where(set => set.FieldNameAttribute is { }).ToDictionary(set => set.Property.Name, set => set.FieldNameAttribute.FieldName));
+        public ParseObjectClass(Type type, ConstructorInfo constructor)
+        {
+            TypeInfo = type.GetTypeInfo();
+            DeclaredName = TypeInfo.GetParseClassName();
+            Constructor = Constructor = constructor;
+            PropertyMappings = type.GetProperties().Select(property => (Property: property, FieldNameAttribute: property.GetCustomAttribute<ParseFieldNameAttribute>(true))).Where(set => set.FieldNameAttribute is { }).ToDictionary(set => set.Property.Name, set => set.FieldNameAttribute.FieldName);
+        }
 
         public TypeInfo TypeInfo { get; }
 

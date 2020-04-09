@@ -18,7 +18,7 @@ namespace Parse.Test
             state.Alert = "alert";
 
             Assert.ThrowsException<InvalidOperationException>(() => ParsePushEncoder.Instance.Encode(state));
-            state.Channels = new List<string> { { "channel" } };
+            state.Channels = new List<string> { "channel" };
 
             ParsePushEncoder.Instance.Encode(state);
         }
@@ -28,28 +28,27 @@ namespace Parse.Test
         {
             MutablePushState state = new MutablePushState
             {
-                Data = new Dictionary<string, object> {
-          { "alert", "Some Alert" }
-        },
-                Channels = new List<string> {
-          { "channel" }
-        }
+                Data = new Dictionary<string, object>
+                {
+                    ["alert"] = "Some Alert"
+                },
+                Channels = new List<string> { "channel" }
             };
 
-            IDictionary<string, object> expected = new Dictionary<string, object> {
-        {
-          "data", new Dictionary<string, object> {{
-            "alert", "Some Alert"
-          }}
-        },
-        {
-          "where", new Dictionary<string, object> {{
-            "channels", new Dictionary<string, object> {{
-              "$in", new List<string> {{ "channel" }}
-            }}
-          }}
-        }
-      };
+            IDictionary<string, object> expected = new Dictionary<string, object>
+            {
+                ["data"] = new Dictionary<string, object>
+                {
+                    ["alert"] = "Some Alert"
+                },
+                ["where"] = new Dictionary<string, object>
+                {
+                    ["channels"] = new Dictionary<string, object>
+                    {
+                        ["$in"] = new List<string> { "channel" }
+                    }
+                }
+            };
 
             Assert.AreEqual(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(ParsePushEncoder.Instance.Encode(state)));
         }

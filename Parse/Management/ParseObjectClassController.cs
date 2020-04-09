@@ -78,7 +78,9 @@ namespace Parse.Core.Internal
                     }
                 }
 
-                ConstructorInfo constructor = type.FindConstructor();
+#warning Constructor detection may erroneously find a constructor which should not be used.
+
+                ConstructorInfo constructor = type.FindConstructor() ?? type.FindConstructor(typeof(string), typeof(IServiceHub));
 
                 if (constructor is null)
                 {

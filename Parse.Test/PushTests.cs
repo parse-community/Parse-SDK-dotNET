@@ -95,18 +95,20 @@ namespace Parse.Test
             hub.PushChannelsController = GetMockedPushChannelsController(channels);
 
             channels.Add("test");
-            return Client.SubscribeToPushChannelAsync("test").ContinueWith(task =>
+
+            return client.SubscribeToPushChannelAsync("test").ContinueWith(task =>
             {
                 Assert.IsTrue(task.IsCompleted);
                 Assert.IsFalse(task.IsFaulted);
 
-                return Client.SubscribeToPushChannelsAsync(new List<string> { { "test" } });
+                return client.SubscribeToPushChannelsAsync(new List<string> { "test" });
             }).Unwrap().ContinueWith(task =>
             {
                 Assert.IsTrue(task.IsCompleted);
                 Assert.IsFalse(task.IsFaulted);
 
-                return Client.SubscribeToPushChannelsAsync(new List<string> { { "test" } }, new CancellationTokenSource { }.Token);
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource { };
+                return client.SubscribeToPushChannelsAsync(new List<string> { "test" }, cancellationTokenSource.Token);
             }).Unwrap().ContinueWith(task =>
             {
                 Assert.IsTrue(task.IsCompleted);
@@ -127,18 +129,19 @@ namespace Parse.Test
 
             channels.Add("test");
 
-            return Client.UnsubscribeToPushChannelAsync("test").ContinueWith(task =>
+            return client.UnsubscribeToPushChannelAsync("test").ContinueWith(task =>
             {
                 Assert.IsTrue(task.IsCompleted);
                 Assert.IsFalse(task.IsFaulted);
 
-                return Client.UnsubscribeToPushChannelsAsync(new List<string> { { "test" } });
+                return client.UnsubscribeToPushChannelsAsync(new List<string> { { "test" } });
             }).ContinueWith(task =>
             {
                 Assert.IsTrue(task.IsCompleted);
                 Assert.IsFalse(task.IsFaulted);
 
-                return Client.UnsubscribeToPushChannelsAsync(new List<string> { { "test" } }, new CancellationTokenSource { }.Token);
+                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource { };
+                return client.UnsubscribeToPushChannelsAsync(new List<string> { { "test" } }, cancellationTokenSource.Token);
             }).ContinueWith(task =>
             {
                 Assert.IsTrue(task.IsCompleted);

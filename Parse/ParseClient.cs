@@ -86,7 +86,16 @@ namespace Parse
             IServerConnectionData GenerateServerConnectionData() => configuration switch
             {
                 null => throw new ArgumentNullException(nameof(configuration)),
-                ServerConnectionData { Test: true } data => data,
+                ServerConnectionData { Test: true, ServerURI: { } } data => data,
+                ServerConnectionData { Test: true } data => new ServerConnectionData
+                {
+                    ApplicationID = data.ApplicationID,
+                    Headers = data.Headers,
+                    MasterKey = data.MasterKey,
+                    Test = data.Test,
+                    Key = data.Key,
+                    ServerURI = "https://api.parse.com/1/"
+                },
                 { ServerURI: "https://api.parse.com/1/" } => throw new InvalidOperationException("Since the official parse server has shut down, you must specify a URI that points to a hosted instance."),
                 { ApplicationID: { }, ServerURI: { }, Key: { } } data => data,
                 _ => throw new InvalidOperationException("The IClientConfiguration implementation instance provided to the ParseClient constructor must be populated with configuration information.")

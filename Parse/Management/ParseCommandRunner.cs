@@ -76,7 +76,7 @@ namespace Parse.Core.Internal
 
                 if (responseCode < 200 || responseCode > 299)
                 {
-                    throw new ParseFailureException(contentJson.ContainsKey("code") ? (ParseFailureException.ErrorCode) contentJson["code"] : ParseFailureException.ErrorCode.OtherCause, contentJson.ContainsKey("error") ? contentJson["error"] as string : content);
+                    throw new ParseFailureException(contentJson.ContainsKey("code") ? (ParseFailureException.ErrorCode) (long) contentJson["code"] : ParseFailureException.ErrorCode.OtherCause, contentJson.ContainsKey("error") ? contentJson["error"] as string : content);
                 }
 
                 return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, contentJson);

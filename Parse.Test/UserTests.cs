@@ -35,7 +35,7 @@ namespace Parse.Test
             };
 
             ParseUser user = Client.GenerateObjectFromState<ParseUser>(state, "_User");
-            Assert.ThrowsException<ArgumentException>(() => user.Remove("username"));
+            Assert.ThrowsException<InvalidOperationException>(() => user.Remove("username"));
 
             try
             {
@@ -762,7 +762,7 @@ namespace Parse.Test
         [TestMethod]
         public void TestImmutableKeys()
         {
-            ParseUser user = new ParseUser();
+            ParseUser user = new ParseUser { }.Bind(Client) as ParseUser;
             string[] immutableKeys = new string[] { "sessionToken", "isNew" };
 
             foreach (string key in immutableKeys)

@@ -31,7 +31,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/events/SomeEvent"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "events/SomeEvent"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -46,7 +46,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath.Contains("/1/events/SomeEvent")), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path.Contains("events/SomeEvent")), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -54,14 +54,14 @@ namespace Parse.Test
         [AsyncStateMachine(typeof(AnalyticsControllerTests))]
         public Task TestTrackAppOpenedWithEmptyPushHash()
         {
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>()));
+            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { }));
 
-            return new ParseAnalyticsController(mockRunner.Object).TrackAppOpenedAsync(default, sessionToken: default, serviceHub: Client, cancellationToken: CancellationToken.None).ContinueWith(t =>
+            return new ParseAnalyticsController(mockRunner.Object).TrackAppOpenedAsync(default, sessionToken: default, serviceHub: Client, cancellationToken: CancellationToken.None).ContinueWith(task =>
             {
-                Assert.IsFalse(t.IsFaulted);
-                Assert.IsFalse(t.IsCanceled);
+                Assert.IsFalse(task.IsFaulted);
+                Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/events/AppOpened"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "events/AppOpened"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 

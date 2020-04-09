@@ -31,10 +31,10 @@ namespace Parse.Core.Internal
                 "File" => new ParseFile(dictionary["name"] as string, new Uri(dictionary["url"] as string)),
                 "GeoPoint" => new ParseGeoPoint(Conversion.To<double>(dictionary["latitude"]), Conversion.To<double>(dictionary["longitude"])),
                 "Object" => ClassController.GenerateObjectFromState<ParseObject>(ParseObjectCoder.Instance.Decode(dictionary, this, serviceHub), dictionary["className"] as string, serviceHub),
-                "Relation" => ParseRelationBase.CreateRelation(null, null, dictionary["className"] as string)
+                "Relation" => serviceHub.CreateRelation(null, null, dictionary["className"] as string)
             },
             IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value, serviceHub)),
-            IList<object> { } list => list.Select(item => Decode(item, serviceHub)),
+            IList<object> { } list => list.Select(item => Decode(item, serviceHub)).ToList(),
             _ => data
         };
 

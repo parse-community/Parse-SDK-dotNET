@@ -49,10 +49,10 @@ namespace Parse.Abstractions.Library
 
         public virtual IParseCurrentInstallationController CurrentInstallationController => Services.CurrentInstallationController;
 
-        public virtual IServerConnectionData ServerConnectionData { set; get; }
+        public virtual IServerConnectionData ServerConnectionData => Services.ServerConnectionData;
 
-        public virtual IParseDataDecoder Decoder { set; get; }
+        public virtual IParseDataDecoder Decoder => Services.Decoder;
 
-        public virtual IParseInstallationDataFinalizer InstallationDataFinalizer { set; get; }
+        public virtual IParseInstallationDataFinalizer InstallationDataFinalizer => Services.InstallationDataFinalizer;
     }
 }

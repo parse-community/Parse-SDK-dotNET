@@ -18,7 +18,7 @@ namespace Parse.Test
         ParseClient Client { get; set; }
 
         [TestInitialize]
-        public void SetUp() => new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
+        public void SetUp() => Client = new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
 
         [TestMethod]
         [AsyncStateMachine(typeof(UserControllerTests))]
@@ -55,7 +55,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/classes/_User"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "classes/_User"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
@@ -85,7 +85,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/login"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "login?username=grantland&password=123grantland123"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
@@ -115,7 +115,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/users"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "users"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
@@ -145,7 +145,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/users/me"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "users/me"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState newState = task.Result;
                 Assert.AreEqual("s3ss10nt0k3n", newState["sessionToken"]);
@@ -166,7 +166,7 @@ namespace Parse.Test
                 Assert.IsFalse(t.IsFaulted);
                 Assert.IsFalse(t.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/requestPasswordReset"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "requestPasswordReset"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 

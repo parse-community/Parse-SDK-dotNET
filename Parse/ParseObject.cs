@@ -63,18 +63,22 @@ namespace Parse
             bool isPointer = CreatingPointer.Value;
             CreatingPointer.Value = false;
 
-            Services = serviceHub ?? ParseClient.Instance /* Technically, it is not possible to throw an exception here for when serviceHub is null because ParseObjectClass.Constructor for derived classes will call this constructor with a null serviceHub, then call Bind, so that would fail. */ /* ?? throw new InvalidOperationException("A ParseClient needs to be initialized as the configured default instance before any ParseObjects can be instantiated.") */;
-
             if (AutoClassName.Equals(className ?? throw new ArgumentException("You must specify a Parse class name when creating a new ParseObject.")))
             {
                 className = GetType().GetParseClassName();
             }
 
-            // If this is supposed to be created by a factory but wasn't, throw an exception.
+            // Technically, an exception should be thrown here for when both serviceHub and ParseClient.Instance is null, but it is not possible because ParseObjectClass.Constructor for derived classes is a reference to this constructor, and it will be called with a null serviceHub, then Bind will be called on the constructed object, so this needs to fail softly, unfortunately.
+            // Services = ... ?? throw new InvalidOperationException("A ParseClient needs to be initialized as the configured default instance before any ParseObjects can be instantiated.")
 
-            if (!Services.ClassController.GetClassMatch(className, GetType()))
+            if ((Services = serviceHub ?? ParseClient.Instance) is { })
             {
-                throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
+                // If this is supposed to be created by a factory but wasn't, throw an exception.
+
+                if (!Services.ClassController.GetClassMatch(className, GetType()))
+                {
+                    throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
+                }
             }
 
             State = new MutableObjectState { ClassName = className };
@@ -99,7 +103,7 @@ namespace Parse
         #region ParseObject Creation
 
         /// <summary>
-        /// Constructor for use in ParseObject subclasses. Subclasses must specify a ParseClassName attribute.
+        /// Constructor for use in ParseObject subclasses. Subclasses must specify a ParseClassName attribute. Subclasses that do not implement a constructor accepting <see cref="IServiceHub"/> will need to be bond to an implementation instance via <see cref="Bind(IServiceHub)"/> after construction.
         /// </summary>
         protected ParseObject(IServiceHub serviceHub = default) : this(AutoClassName, serviceHub) { }
 

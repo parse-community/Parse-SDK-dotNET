@@ -68,7 +68,7 @@ namespace Parse.Library
             CloudCodeController ??= new ParseCloudCodeController(CommandRunner, Decoder);
             ConfigurationController ??= new ParseConfigurationController(CommandRunner, StorageController, Decoder);
             FileController ??= new ParseFileController(CommandRunner);
-            ObjectController ??= new ParseObjectController(CommandRunner, Decoder);
+            ObjectController ??= new ParseObjectController(CommandRunner, Decoder, ServerConnectionData);
             QueryController ??= new ParseQueryController(CommandRunner, Decoder);
             SessionController ??= new ParseSessionController(CommandRunner, Decoder);
             UserController ??= new ParseUserController(CommandRunner, Decoder);

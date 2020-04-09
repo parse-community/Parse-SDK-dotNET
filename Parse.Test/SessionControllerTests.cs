@@ -49,7 +49,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/sessions/me"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "sessions/me"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState session = task.Result;
                 Assert.AreEqual(2, session.Count());
@@ -69,7 +69,7 @@ namespace Parse.Test
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
 
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/logout"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "logout"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
             });
         }
 
@@ -92,7 +92,7 @@ namespace Parse.Test
             {
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
-                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Target.AbsolutePath == "/1/upgradeToRevocableSession"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
+                mockRunner.Verify(obj => obj.RunCommandAsync(It.Is<ParseCommand>(command => command.Path == "upgradeToRevocableSession"), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()), Times.Exactly(1));
 
                 IObjectState session = task.Result;
                 Assert.AreEqual(2, session.Count());

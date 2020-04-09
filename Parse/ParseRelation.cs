@@ -13,6 +13,22 @@ using Parse.Management;
 
 namespace Parse
 {
+    public static class RelationServiceExtensions
+    {
+        /// <summary>
+        /// Produces the proper ParseRelation&lt;T&gt; instance for the given classname.
+        /// </summary>
+        internal static ParseRelationBase CreateRelation(this IServiceHub serviceHub, ParseObject parent, string key, string targetClassName) => serviceHub.ClassController.CreateRelation(parent, key, targetClassName);
+
+        internal static ParseRelationBase CreateRelation(this IParseObjectClassController classController, ParseObject parent, string key, string targetClassName)
+        {
+            Expression<Func<ParseRelation<ParseObject>>> createRelationExpr = () => CreateRelation<ParseObject>(parent, key, targetClassName);
+            return (createRelationExpr.Body as MethodCallExpression).Method.GetGenericMethodDefinition().MakeGenericMethod(classController.GetType(targetClassName) ?? typeof(ParseObject)).Invoke(default, new object[] { parent, key, targetClassName }) as ParseRelationBase;
+        }
+
+        static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName) where T : ParseObject => new ParseRelation<T>(parent, key, targetClassName);
+    }
+
     /// <summary>
     /// A common base class for ParseRelations.
     /// </summary>
@@ -61,17 +77,6 @@ namespace Parse
         internal ParseQuery<T> GetQuery<T>() where T : ParseObject => TargetClassName is { } ? new ParseQuery<T>(Parent.Services, TargetClassName).WhereRelatedTo(Parent, Key) : new ParseQuery<T>(Parent.Services, Parent.ClassName).RedirectClassName(Key).WhereRelatedTo(Parent, Key);
 
         internal string TargetClassName { get; set; }
-
-        /// <summary>
-        /// Produces the proper ParseRelation&lt;T&gt; instance for the given classname.
-        /// </summary>
-        internal static ParseRelationBase CreateRelation(ParseObject parent, string key, string targetClassName)
-        {
-            Expression<Func<ParseRelation<ParseObject>>> createRelationExpr = () => CreateRelation<ParseObject>(parent, key, targetClassName);
-            return (createRelationExpr.Body as MethodCallExpression).Method.GetGenericMethodDefinition().MakeGenericMethod(parent.Services.ClassController.GetType(targetClassName) ?? typeof(ParseObject)).Invoke(default, new object[] { parent, key, targetClassName }) as ParseRelationBase;
-        }
-
-        static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName) where T : ParseObject => new ParseRelation<T>(parent, key, targetClassName);
     }
 
     /// <summary>

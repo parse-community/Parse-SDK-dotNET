@@ -442,7 +442,17 @@ namespace Parse
         /// <param name="keyInQuery">The key in the objects from the subquery to look in.</param>
         /// <param name="query">The subquery to run</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$select", new Dictionary<string, object> { { nameof(query), query.BuildParameters(true) }, { nameof(key), keyInQuery } } } } } });
+        public ParseQuery<T> WhereMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$select"] = new Dictionary<string, object>
+                {
+                    [nameof(query)] = query.BuildParameters(true),
+                    [nameof(key)] = keyInQuery
+                }
+            }
+        });
 
         /// <summary>
         /// Adds a constraint to the query that requires a particular key's value
@@ -452,7 +462,17 @@ namespace Parse
         /// <param name="keyInQuery">The key in the objects from the subquery to look in.</param>
         /// <param name="query">The subquery to run</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereDoesNotMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$dontSelect", new Dictionary<string, object> { { nameof(query), query.BuildParameters(true) }, { nameof(key), keyInQuery } } } } } });
+        public ParseQuery<T> WhereDoesNotMatchesKeyInQuery<TOther>(string key, string keyInQuery, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$dontSelect"] = new Dictionary<string, object>
+                {
+                    [nameof(query)] = query.BuildParameters(true),
+                    [nameof(key)] = keyInQuery
+                }
+            }
+        });
 
         /// <summary>
         /// Adds a constraint to the query that requires that a particular key's value
@@ -462,7 +482,13 @@ namespace Parse
         /// <param name="key">The key to check.</param>
         /// <param name="query">The query that the value should match.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereMatchesQuery<TOther>(string key, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$inQuery", query.BuildParameters(true) } } } });
+        public ParseQuery<T> WhereMatchesQuery<TOther>(string key, ParseQuery<TOther> query) where TOther : ParseObject => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$inQuery"] = query.BuildParameters(true)
+            }
+        });
 
         /// <summary>
         /// Adds a proximity-based constraint for finding objects with keys whose GeoPoint
@@ -471,7 +497,13 @@ namespace Parse
         /// <param name="key">The key that the ParseGeoPoint is stored in.</param>
         /// <param name="point">The reference ParseGeoPoint.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereNear(string key, ParseGeoPoint point) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$nearSphere", point } } } });
+        public ParseQuery<T> WhereNear(string key, ParseGeoPoint point) => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$nearSphere"] = point
+            }
+        });
 
         /// <summary>
         /// Adds a constraint to the query that requires a particular key's value to be
@@ -480,7 +512,13 @@ namespace Parse
         /// <param name="key">The key to check.</param>
         /// <param name="values">The values that will match.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereNotContainedIn<TIn>(string key, IEnumerable<TIn> values) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$nin", values.ToList() } } } });
+        public ParseQuery<T> WhereNotContainedIn<TIn>(string key, IEnumerable<TIn> values) => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$nin"] = values.ToList()
+            }
+        });
 
         /// <summary>
         /// Adds a constraint to the query that requires a particular key's value not
@@ -489,7 +527,13 @@ namespace Parse
         /// <param name="key">The key to check.</param>
         /// <param name="value">The value that that must not be equalled.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereNotEqualTo(string key, object value) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$ne", value } } } });
+        public ParseQuery<T> WhereNotEqualTo(string key, object value) => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$ne"] = value
+            }
+        });
 
         /// <summary>
         /// Adds a constraint for finding string values that start with the provided string.
@@ -498,7 +542,13 @@ namespace Parse
         /// <param name="key">The key that the string to match is stored in.</param>
         /// <param name="suffix">The substring that the value must start with.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereStartsWith(string key, string suffix) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$regex", "^" + RegexQuote(suffix) } } } });
+        public ParseQuery<T> WhereStartsWith(string key, string suffix) => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$regex"] = $"^{RegexQuote(suffix)}"
+            }
+        });
 
         /// <summary>
         /// Add a constraint to the query that requires a particular key's coordinates to be
@@ -508,7 +558,20 @@ namespace Parse
         /// <param name="southwest">The lower-left inclusive corner of the box.</param>
         /// <param name="northeast">The upper-right inclusive corner of the box.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereWithinGeoBox(string key, ParseGeoPoint southwest, ParseGeoPoint northeast) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$within", new Dictionary<string, object> { { "$box", new[] { southwest, northeast } } } } } } });
+        public ParseQuery<T> WhereWithinGeoBox(string key, ParseGeoPoint southwest, ParseGeoPoint northeast) => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$within"] = new Dictionary<string, object>
+                {
+                    ["$box"] = new[]
+                    {
+                        southwest,
+                        northeast
+                    }
+                }
+            }
+        });
 
         /// <summary>
         /// Adds a proximity-based constraint for finding objects with keys whose GeoPoint
@@ -518,9 +581,22 @@ namespace Parse
         /// <param name="point">The reference ParseGeoPoint.</param>
         /// <param name="maxDistance">The maximum distance (in radians) of results to return.</param>
         /// <returns>A new query with the additional constraint.</returns>
-        public ParseQuery<T> WhereWithinDistance(string key, ParseGeoPoint point, ParseGeoDistance maxDistance) => new ParseQuery<T>(WhereNear(key, point), where: new Dictionary<string, object> { { key, new Dictionary<string, object> { { "$maxDistance", maxDistance.Radians } } } });
+        public ParseQuery<T> WhereWithinDistance(string key, ParseGeoPoint point, ParseGeoDistance maxDistance) => new ParseQuery<T>(WhereNear(key, point), where: new Dictionary<string, object>
+        {
+            [key] = new Dictionary<string, object>
+            {
+                ["$maxDistance"] = maxDistance.Radians
+            }
+        });
 
-        internal ParseQuery<T> WhereRelatedTo(ParseObject parent, string key) => new ParseQuery<T>(this, where: new Dictionary<string, object> { { "$relatedTo", new Dictionary<string, object> { { "object", parent }, { nameof(key), key } } } });
+        internal ParseQuery<T> WhereRelatedTo(ParseObject parent, string key) => new ParseQuery<T>(this, where: new Dictionary<string, object>
+        {
+            ["$relatedTo"] = new Dictionary<string, object>
+            {
+                ["object"] = parent,
+                [nameof(key)] = key
+            }
+        });
 
         #endregion
 
@@ -618,21 +694,21 @@ namespace Parse
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             if (Filters != null)
-                result[nameof(Filters)] = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services);
+                result["where"] = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services);
             if (Orderings != null)
                 result["order"] = String.Join(",", Orderings.ToArray());
             if (SkipAmount != null)
-                result[nameof(SkipAmount)] = SkipAmount.Value;
+                result["skip"] = SkipAmount.Value;
             if (LimitAmount != null)
-                result[nameof(LimitAmount)] = LimitAmount.Value;
+                result["limit"] = LimitAmount.Value;
             if (Includes != null)
                 result["include"] = String.Join(",", Includes.ToArray());
             if (KeySelections != null)
                 result["keys"] = String.Join(",", KeySelections.ToArray());
             if (includeClassName)
-                result[nameof(ClassName)] = ClassName;
+                result["className"] = ClassName;
             if (RedirectClassNameForKey != null)
-                result[nameof(RedirectClassNameForKey)] = RedirectClassNameForKey;
+                result["redirectClassNameForKey"] = RedirectClassNameForKey;
             return result;
         }
 
@@ -652,16 +728,23 @@ namespace Parse
         {
             string options = GetRegexOptions(regex, modifiers);
             Dictionary<string, object> dict = new Dictionary<string, object> { ["$regex"] = regex.ToString() };
+
             if (!String.IsNullOrEmpty(options))
+            {
                 dict["$options"] = options;
+            }
+
             return dict;
         }
 
         void EnsureNotInstallationQuery()
         {
             // The ParseInstallation class is not accessible from this project; using string literal.
+
             if (ClassName.Equals("_Installation"))
+            {
                 throw new InvalidOperationException("Cannot directly query the Installation class.");
+            }
         }
 
         /// <summary>

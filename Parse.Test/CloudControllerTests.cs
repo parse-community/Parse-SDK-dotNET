@@ -47,7 +47,7 @@ namespace Parse.Test
 
         [TestMethod]
         [AsyncStateMachine(typeof(CloudControllerTests))]
-        public Task TestCallFunctionWithComplexType() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>() { { "result", new Dictionary<string, object> { { "fosco", "ben" }, { "list", new List<object> { 1, 2, 3 } } } } })).Object, Client.Decoder).CallFunctionAsync<IDictionary<string, object>>("someFunction", default, default, Client, CancellationToken.None).ContinueWith(task =>
+        public Task TestCallFunctionWithComplexType() => new ParseCloudCodeController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { { "result", new Dictionary<string, object> { { "fosco", "ben" }, { "list", new List<object> { 1, 2, 3 } } } } })).Object, Client.Decoder).CallFunctionAsync<IDictionary<string, object>>("someFunction", default, default, Client, CancellationToken.None).ContinueWith(task =>
         {
             Assert.IsFalse(task.IsFaulted);
             Assert.IsFalse(task.IsCanceled);
