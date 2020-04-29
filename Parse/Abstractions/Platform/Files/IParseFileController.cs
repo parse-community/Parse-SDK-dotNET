@@ -4,8 +4,10 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Infrastructure;
+using Parse.Platform.Files;
 
-namespace Parse.Core.Internal
+namespace Parse.Abstractions.Platform.Files
 {
     public interface IParseFileController
     {

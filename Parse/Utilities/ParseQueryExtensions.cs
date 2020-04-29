@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Parse.Common.Internal;
+using Parse.Infrastructure.Data;
 
-namespace Parse.Core.Internal
+namespace Parse.Abstractions.Internal
 {
 #warning Fully refactor at some point.
 

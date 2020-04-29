@@ -4,10 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Abstractions.Library;
-using Parse.Core.Internal;
+using Parse.Abstractions.Infrastructure;
+using Parse.Abstractions.Infrastructure.Execution;
+using Parse.Abstractions.Platform.Analytics;
+using Parse.Infrastructure.Data;
+using Parse.Infrastructure.Execution;
 
-namespace Parse.Analytics.Internal
+namespace Parse.Platform.Analytics
 {
     /// <summary>
     /// The controller for the Parse Analytics API.
@@ -58,9 +61,7 @@ namespace Parse.Analytics.Internal
             IDictionary<string, object> data = new Dictionary<string, object> { ["at"] = DateTime.Now };
 
             if (pushHash != null)
-            {
                 data["push_hash"] = pushHash;
-            }
 
             return Runner.RunCommandAsync(new ParseCommand("events/AppOpened", "POST", sessionToken, data: PointerOrLocalIdEncoder.Instance.Encode(data, serviceHub) as IDictionary<string, object>), cancellationToken: cancellationToken);
         }

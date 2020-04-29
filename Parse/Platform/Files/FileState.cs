@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Parse.Core.Internal
+namespace Parse.Platform.Files
 {
     public class FileState
     {

@@ -3,9 +3,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Abstractions.Library;
+using Parse.Abstractions.Infrastructure;
 
-namespace Parse.Analytics.Internal
+namespace Parse.Abstractions.Platform.Analytics
 {
     /// <summary>
     /// The interface for the Parse Analytics API controller.

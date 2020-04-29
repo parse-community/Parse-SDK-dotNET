@@ -6,9 +6,13 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Common.Internal;
+using Parse.Abstractions.Infrastructure;
+using Parse.Abstractions.Infrastructure.Execution;
+using Parse.Abstractions.Platform.Files;
+using Parse.Infrastructure.Execution;
+using Parse.Infrastructure.Utilities;
 
-namespace Parse.Core.Internal
+namespace Parse.Platform.Files
 {
     public class ParseFileController : IParseFileController
     {
@@ -19,16 +23,12 @@ namespace Parse.Core.Internal
         public Task<FileState> SaveAsync(FileState state, Stream dataStream, string sessionToken, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default)
         {
             if (state.Location != null)
-            {
                 // !isDirty
 
                 return Task.FromResult(state);
-            }
 
             if (cancellationToken.IsCancellationRequested)
-            {
                 return Task.FromCanceled<FileState>(cancellationToken);
-            }
 
             long oldPosition = dataStream.Position;
 
@@ -49,9 +49,7 @@ namespace Parse.Core.Internal
                 // Rewind the stream on failure or cancellation (if possible).
 
                 if ((task.IsFaulted || task.IsCanceled) && dataStream.CanSeek)
-                {
                     dataStream.Seek(oldPosition, SeekOrigin.Begin);
-                }
 
                 return task;
             }).Unwrap();

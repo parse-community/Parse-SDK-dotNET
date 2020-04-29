@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse.Core.Internal
+namespace Parse.Abstractions.Platform.Authentication
 {
     public interface IParseAuthenticationProvider
     {

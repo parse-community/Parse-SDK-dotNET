@@ -2,7 +2,7 @@
 
 using System;
 
-namespace Parse.Core.Internal
+namespace Parse.Abstractions.Internal
 {
     /// <summary>
     /// So here's the deal. We have a lot of internal APIs for ParseObject, ParseUser, etc.

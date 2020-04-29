@@ -2,9 +2,10 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Abstractions.Library;
+using Parse.Abstractions.Infrastructure;
+using Parse.Platform.Configuration;
 
-namespace Parse.Core.Internal
+namespace Parse.Abstractions.Platform.Configuration
 {
     public interface IParseConfigurationController
     {

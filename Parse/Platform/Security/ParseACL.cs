@@ -3,8 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Parse.Common.Internal;
-using Parse.Core.Internal;
+using Parse.Abstractions.Internal;
+using Parse.Abstractions.Infrastructure;
 
 namespace Parse
 {
