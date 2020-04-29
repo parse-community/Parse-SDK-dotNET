@@ -13,7 +13,7 @@ namespace Parse.Common.Internal
         /// <summary>
         /// Cleans up any temporary files and/or directories created during SDK operation.
         /// </summary>
-        public void Clean();
+        public void Clear();
 
         /// <summary>
         /// Gets the file wrapper for the specified <paramref name="path"/>.

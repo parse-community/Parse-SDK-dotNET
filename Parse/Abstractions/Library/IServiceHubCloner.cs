@@ -5,6 +5,6 @@ namespace Parse.Abstractions.Library
 {
     public interface IServiceHubCloner
     {
-        public IServiceHub BuildHub(in IServiceHub reference, IServiceHubComposer composer);
+        public IServiceHub BuildHub(in IServiceHub reference, IServiceHubComposer composer, params IServiceHubMutator[] requestedMutators);
     }
 }

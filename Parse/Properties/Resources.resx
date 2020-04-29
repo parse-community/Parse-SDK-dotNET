@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ConcurrentUserStorageControllerFileOperationNotSupportedMessage" xml:space="preserve">
+    <value>This storage controller is not configured to use physical files to store information. Data is hosted in system memory.</value>
+  </data>
   <data name="StorageDictionarySynchronousMutationNotSupportedMessage" xml:space="preserve">
     <value>Mutating a storage dictionary is an asynchronous operation as the storing file needs to be modified.</value>
   </data>

@@ -61,6 +61,15 @@ namespace Parse.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This storage controller is not configured to use physical files to store information. Data is hosted in system memory..
+        /// </summary>
+        internal static string ConcurrentUserStorageControllerFileOperationNotSupportedMessage {
+            get {
+                return ResourceManager.GetString("ConcurrentUserStorageControllerFileOperationNotSupportedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mutating a storage dictionary is an asynchronous operation as the storing file needs to be modified..
         /// </summary>
         internal static string StorageDictionarySynchronousMutationNotSupportedMessage {

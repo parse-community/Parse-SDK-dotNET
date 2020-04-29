@@ -123,6 +123,6 @@ namespace Parse.Core.Internal
 
         public Task<string> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default) => GetAsync(serviceHub, cancellationToken).OnSuccess(task => task.Result?.SessionToken);
 
-        public Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(serviceHub, cancellationToken)).Unwrap().OnSuccess(t => ClearFromDisk()), cancellationToken);
+        public Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(serviceHub, cancellationToken)).Unwrap().OnSuccess(task => ClearFromDisk()), cancellationToken);
     }
 }

@@ -18,7 +18,7 @@ namespace Parse.Core.Internal
 
         public IDictionary<string, object> Encode<T>(T state, IDictionary<string, IParseFieldOperation> operations, ParseDataEncoder encoder, IServiceHub serviceHub) where T : IObjectState
         {
-            Dictionary<string, object> result = new Dictionary<string, object>();
+            Dictionary<string, object> result = new Dictionary<string, object> { };
             foreach (KeyValuePair<string, IParseFieldOperation> pair in operations)
             {
                 // Serialize the data

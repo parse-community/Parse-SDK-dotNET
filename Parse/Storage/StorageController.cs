@@ -11,15 +11,54 @@ using Parse.Internal.Utilities;
 using Parse.Library;
 using Parse.Management;
 using Parse.Storage;
+using static Parse.Properties.Resources;
 
 namespace Parse.Common.Internal
 {
+    public class ConcurrentUserStorageController : IStorageController
+    {
+        class VirtualStorageDictionary : Dictionary<string, object>, IStorageDictionary<string, object>
+        {
+            public Task AddAsync(string key, object value)
+            {
+                Add(key, value);
+                return Task.CompletedTask;
+            }
+
+            public Task RemoveAsync(string key)
+            {
+                Remove(key);
+                return Task.CompletedTask;
+            }
+        }
+
+        VirtualStorageDictionary Storage { get; } = new VirtualStorageDictionary { };
+
+        public void Clear() => Storage.Clear();
+
+        public FileInfo GetWrapperForRelativePersistentStorageFilePath(string path) => throw new NotSupportedException(ConcurrentUserStorageControllerFileOperationNotSupportedMessage);
+
+        public Task<IStorageDictionary<string, object>> LoadAsync() => Task.FromResult<IStorageDictionary<string, object>>(Storage);
+
+        public Task<IStorageDictionary<string, object>> SaveAsync(IDictionary<string, object> contents)
+        {
+            foreach (KeyValuePair<string, object> pair in contents)
+            {
+                ((IDictionary<string, object>)Storage).Add(pair);
+            }
+
+            return Task.FromResult<IStorageDictionary<string, object>>(Storage);
+        }
+
+        public Task TransferAsync(string originFilePath, string targetFilePath) => Task.FromException(new NotSupportedException(ConcurrentUserStorageControllerFileOperationNotSupportedMessage));
+    }
+
     /// <summary>
     /// Implements `IStorageController` for PCL targets, based off of PCLStorage.
     /// </summary>
     public class StorageController : IStorageController
     {
-        private class StorageDictionary : IStorageDictionary<string, object>
+        class StorageDictionary : IStorageDictionary<string, object>
         {
             public StorageDictionary(FileInfo file) => File = file;
 
@@ -39,6 +78,8 @@ namespace Parse.Common.Internal
                     }
                 }
             });
+
+            // TODO: Check if the call to ToDictionary is necessary here considering contents is IDictionary<string object>.
 
             internal void Update(IDictionary<string, object> contents) => Lock(() => Storage = contents.ToDictionary(element => element.Key, element => element.Value));
 
@@ -60,13 +101,13 @@ namespace Parse.Common.Internal
                 }
             }
 
-            public void Add(string key, object value) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+            public void Add(string key, object value) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
 
-            public bool Remove(string key) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+            public bool Remove(string key) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
 
-            public void Add(KeyValuePair<string, object> item) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+            public void Add(KeyValuePair<string, object> item) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
 
-            public bool Remove(KeyValuePair<string, object> item) => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+            public bool Remove(KeyValuePair<string, object> item) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
 
             public bool ContainsKey(string key) => Lock(() => Storage.ContainsKey(key));
 
@@ -125,7 +166,7 @@ namespace Parse.Common.Internal
             public object this[string key]
             {
                 get => Storage[key];
-                set => throw new NotSupportedException(Properties.Resources.StorageDictionarySynchronousMutationNotSupportedMessage);
+                set => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
             }
         }
 
@@ -168,9 +209,9 @@ namespace Parse.Common.Internal
             return Storage.SaveAsync().OnSuccess(__ => Storage as IStorageDictionary<string, object>);
         }).Unwrap());
 
-        // TODO: Attach the following method to AppDomain.CurrentDomain.ProcessExit.
+        // TODO: Attach the following method to AppDomain.CurrentDomain.ProcessExit if that actually ever made sense for anything except randomly generated file names, otherwise attach the delegate when it is known the file name is a randomly generated string.
 
-        public void Clean()
+        public void Clear()
         {
             if (new FileInfo(FallbackPersistentStorageFilePath) is { Exists: true } file)
             {
