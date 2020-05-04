@@ -21,10 +21,34 @@ namespace Parse
 
         internal static Task<string> GetCurrentSessionTokenAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken);
 
+        // TODO: Consider renaming SignUpAsync and LogInAsync to SignUpWithAsync and LogInWithAsync, respectively.
+        // TODO: Consider returning the created user from the SignUpAsync overload that accepts a username and password.
+
         /// <summary>
-        /// Logs in a user with a username and password. On success, this saves the session to disk so you
-        /// can retrieve the currently logged in user using <see cref="GetCurrentUser()"/>.
+        /// Creates a new <see cref="ParseUser"/>, saves it with the target Parse Server instance, and then authenticates it on the target client.
         /// </summary>
+        /// <param name="serviceHub">The <see cref="IServiceHub"/> instance to target when creating the user and authenticating.</param>
+        /// <param name="username">The value that should be used for <see cref="ParseUser.Username"/>.</param>
+        /// <param name="password">The value that should be used for <see cref="ParseUser.Password"/>.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public static Task SignUpAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default) => serviceHub.SignUpAsync(new ParseUser { Username = username, Password = password }, cancellationToken);
+
+        /// <summary>
+        /// Saves the provided <see cref="ParseUser"/> instance with the target Parse Server instance and then authenticates it on the target client.
+        /// </summary>
+        /// <param name="serviceHub">The <see cref="IServiceHub"/> instance to target when creating the user and authenticating.</param>
+        /// <param name="user">The <see cref="ParseUser"/> instance to save on the target Parse Server instance and authenticate.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public static Task SignUpAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default)
+        {
+            user.Bind(serviceHub);
+            return user.SignUpAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// Logs in a user with a username and password. On success, this saves the session to disk or to memory so you can retrieve the currently logged in user using <see cref="GetCurrentUser(IServiceHub)"/>.
+        /// </summary>
+        /// <param name="serviceHub">The <see cref="IServiceHub"/> instance to target when logging in.</param>
         /// <param name="username">The username to log in with.</param>
         /// <param name="password">The password to log in with.</param>
         /// <param name="cancellationToken">The cancellation token.</param>

@@ -55,27 +55,21 @@ namespace Parse
         // TODO: Implement IServiceHubMutator in all IServiceHub-implementing classes in Parse.Library and possibly require all implementations to do so as an efficiency improvement over instantiating an OrchestrationServiceHub, only for another one to be possibly instantiated when configurators are specified.
 
         /// <summary>
-        /// Authenticates this client as belonging to your application. This must be
-        /// called before your application can use the Parse library. The recommended
-        /// way is to put a call to <c>ParseClient.Initialize</c> in your
-        /// Application startup.
+        /// Creates a new <see cref="ParseClient"/> and authenticates it as belonging to your application. This class is a hub for interacting with the SDK. The recommended way to use this class on client applications is to instantiate it, then call <see cref="Publicize"/> on it in your application entry point. This allows you to access <see cref="Instance"/>.
         /// </summary>
-        /// <param name="application">The Application ID provided in the Parse dashboard.
-        /// </param>
-        /// <param name="serverURI">The server URI provided in the Parse dashboard.
-        /// </param>
+        /// <param name="applicationID">The Application ID provided in the Parse dashboard.</param>
+        /// <param name="serverURI">The server URI provided in the Parse dashboard.</param>
+        /// <param name="key">The .NET Key provided in the Parse dashboard.</param>
         /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
-        public ParseClient(string application, string serverURI, string key, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators) : this(new ServerConnectionData { ApplicationID = application, ServerURI = serverURI, Key = key }, serviceHub, configurators) { }
+        /// <param name="configurators">A set of <see cref="IServiceHubMutator"/> implementation instances to tweak the behaviour of the SDK.</param>
+        public ParseClient(string applicationID, string serverURI, string key, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators) : this(new ServerConnectionData { ApplicationID = applicationID, ServerURI = serverURI, Key = key }, serviceHub, configurators) { }
 
         /// <summary>
-        /// Authenticates this client as belonging to your application. This must be
-        /// called before your application can use the Parse library. The recommended
-        /// way is to put a call to <c>ParseClient.Initialize</c> in your
-        /// Application startup.
+        /// Creates a new <see cref="ParseClient"/> and authenticates it as belonging to your application. This class is a hub for interacting with the SDK. The recommended way to use this class on client applications is to instantiate it, then call <see cref="Publicize"/> on it in your application entry point. This allows you to access <see cref="Instance"/>.
         /// </summary>
-        /// <param name="configuration">The configuration to initialize Parse with.
-        /// </param>
+        /// <param name="configuration">The configuration to initialize Parse with.</param>
         /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
+        /// <param name="configurators">A set of <see cref="IServiceHubMutator"/> implementation instances to tweak the behaviour of the SDK.</param>
         public ParseClient(IServerConnectionData configuration, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators)
         {
             Services = serviceHub is { } ? new OrchestrationServiceHub { Custom = serviceHub, Default = new ServiceHub { ServerConnectionData = GenerateServerConnectionData() } } : new ServiceHub { ServerConnectionData = GenerateServerConnectionData() } as IServiceHub;
