@@ -100,49 +100,58 @@ namespace Parse.Infrastructure.Execution
 
             Task<ParseCommand> installationIdFetchTask = InstallationController.GetAsync().ContinueWith(task =>
             {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Installation-Id", task.Result.ToString()));
+                lock (newCommand.Headers)
+                {
+                    newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Installation-Id", task.Result.ToString()));
+                }
 
                 return newCommand;
             });
 
-            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", ServerConnectionData.ApplicationID));
-            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.Version.ToString()));
+            // Locks needed due to installationFetchTask continuation newCommand.Headers.Add-call-related race condition (occurred once in Unity).
+            // TODO: Consider removal of installationFetchTask variable.
 
-            if (ServerConnectionData.Headers != null)
+            lock (newCommand.Headers)
             {
-                foreach (KeyValuePair<string, string> header in ServerConnectionData.Headers)
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", ServerConnectionData.ApplicationID));
+                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.Version.ToString()));
+
+                if (ServerConnectionData.Headers != null)
                 {
-                    newCommand.Headers.Add(header);
+                    foreach (KeyValuePair<string, string> header in ServerConnectionData.Headers)
+                    {
+                        newCommand.Headers.Add(header);
+                    }
                 }
-            }
 
-            if (!String.IsNullOrEmpty(MetadataController.HostManifestData.Version))
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", MetadataController.HostManifestData.Version));
-            }
+                if (!String.IsNullOrEmpty(MetadataController.HostManifestData.Version))
+                {
+                    newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", MetadataController.HostManifestData.Version));
+                }
 
-            if (!String.IsNullOrEmpty(MetadataController.HostManifestData.ShortVersion))
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", MetadataController.HostManifestData.ShortVersion));
-            }
+                if (!String.IsNullOrEmpty(MetadataController.HostManifestData.ShortVersion))
+                {
+                    newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", MetadataController.HostManifestData.ShortVersion));
+                }
 
-            if (!String.IsNullOrEmpty(MetadataController.EnvironmentData.OSVersion))
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", MetadataController.EnvironmentData.OSVersion));
-            }
+                if (!String.IsNullOrEmpty(MetadataController.EnvironmentData.OSVersion))
+                {
+                    newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", MetadataController.EnvironmentData.OSVersion));
+                }
 
-            if (!String.IsNullOrEmpty(ServerConnectionData.MasterKey))
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", ServerConnectionData.MasterKey));
-            }
-            else
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Windows-Key", ServerConnectionData.Key));
-            }
+                if (!String.IsNullOrEmpty(ServerConnectionData.MasterKey))
+                {
+                    newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", ServerConnectionData.MasterKey));
+                }
+                else
+                {
+                    newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Windows-Key", ServerConnectionData.Key));
+                }
 
-            if (UserController.Value.RevocableSessionEnabled)
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Revocable-Session", "1"));
+                if (UserController.Value.RevocableSessionEnabled)
+                {
+                    newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Revocable-Session", "1"));
+                }
             }
 
             return installationIdFetchTask;

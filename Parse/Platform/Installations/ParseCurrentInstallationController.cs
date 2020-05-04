@@ -41,12 +41,16 @@ namespace Parse.Platform.Installations
             get
             {
                 lock (Mutex)
+                {
                     return CurrentInstallationValue;
+                }
             }
             set
             {
                 lock (Mutex)
+                {
                     CurrentInstallationValue = value;
+                }
             }
         }
 
@@ -63,10 +67,7 @@ namespace Parse.Platform.Installations
             ParseInstallation cachedCurrent;
             cachedCurrent = CurrentInstallation;
 
-            if (cachedCurrent != null)
-                return Task.FromResult(cachedCurrent);
-
-            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(stroage =>
+            return cachedCurrent is { } ? Task.FromResult(cachedCurrent) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(stroage =>
             {
                 Task fetchTask;
                 stroage.Result.TryGetValue(ParseInstallationKey, out object temp);
@@ -90,17 +91,11 @@ namespace Parse.Platform.Installations
             })).Unwrap().Unwrap(), cancellationToken);
         }
 
-        public Task<bool> ExistsAsync(CancellationToken cancellationToken)
-        {
-            if (CurrentInstallation != null)
-                return Task.FromResult(true);
-
-            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(s => s.Result.ContainsKey(ParseInstallationKey))).Unwrap(), cancellationToken);
-        }
+        public Task<bool> ExistsAsync(CancellationToken cancellationToken) => CurrentInstallation is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(storageTask => storageTask.Result.ContainsKey(ParseInstallationKey))).Unwrap(), cancellationToken);
 
         public bool IsCurrent(ParseInstallation installation) => CurrentInstallation == installation;
 
-        public void ClearFromMemory() => CurrentInstallation = null;
+        public void ClearFromMemory() => CurrentInstallation = default;
 
         public void ClearFromDisk()
         {

@@ -65,7 +65,7 @@ namespace Parse
         /// <param name="serverURI">The server URI provided in the Parse dashboard.
         /// </param>
         /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
-        public ParseClient(string application, string serverURI, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators) : this(new ServerConnectionData { ApplicationID = application, ServerURI = serverURI }, serviceHub, configurators) { }
+        public ParseClient(string application, string serverURI, string key, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators) : this(new ServerConnectionData { ApplicationID = application, ServerURI = serverURI, Key = key }, serviceHub, configurators) { }
 
         /// <summary>
         /// Authenticates this client as belonging to your application. This must be
@@ -100,7 +100,11 @@ namespace Parse
 
             if (configurators is { Length: int length } && length > 0)
             {
-                Services = BuildHub(default, Services, configurators);
+                Services = serviceHub switch
+                {
+                    IMutableServiceHub { } mutableServiceHub => BuildHub((Hub: mutableServiceHub, mutableServiceHub.ServerConnectionData = serviceHub.ServerConnectionData ?? Services.ServerConnectionData).Hub, Services, configurators),
+                    { } => BuildHub(default, Services, configurators)
+                };
             }
 
             Services.ClassController.AddIntrinsic();
