@@ -23,7 +23,7 @@ namespace Parse.Abstractions.Infrastructure
         IServiceHubCloner Cloner { set; }
 
         IWebClient WebClient { set; }
-        IStorageController StorageController { set; }
+        ICacheController CacheController { set; }
         IParseObjectClassController ClassController { set; }
 
         IParseDataDecoder Decoder { set; }

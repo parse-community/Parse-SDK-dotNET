@@ -16,9 +16,9 @@ namespace Parse.Platform.Installations
 
         Guid? InstallationId { get; set; }
 
-        IStorageController StorageController { get; }
+        ICacheController StorageController { get; }
 
-        public ParseInstallationController(IStorageController storageController) => StorageController = storageController;
+        public ParseInstallationController(ICacheController storageController) => StorageController = storageController;
 
         public Task SetAsync(Guid? installationId)
         {

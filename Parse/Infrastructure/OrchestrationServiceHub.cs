@@ -26,7 +26,7 @@ namespace Parse.Infrastructure
 
         public IWebClient WebClient => Custom.WebClient ?? Default.WebClient;
 
-        public IStorageController StorageController => Custom.StorageController ?? Default.StorageController;
+        public ICacheController CacheController => Custom.CacheController ?? Default.CacheController;
 
         public IParseObjectClassController ClassController => Custom.ClassController ?? Default.ClassController;
 

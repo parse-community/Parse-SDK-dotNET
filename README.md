@@ -58,7 +58,7 @@ new ParseClient(/* Parameters */).Publicize();
 
 ### Use In Unity Client
 
-In Unity, the same logic applies to use the SDK as in [any other client](#client-side-use), except that a special `IServiceHub` impelementation instance and a `MetadataMutator` need to be passed in to one of the non-cloning `ParseClient` constructors in order to specify the environment and platform metadata manually. This step is needed because the logic that creates these values automatically will fail. The functionality to do this automatically may eventually be provided as a Unity package in the future, but for now, the following code can be used.
+In Unity, the same logic applies to use the SDK as in [any other client](#client-side-use), except that a special `IServiceHub` impelementation instance, a `MetadataMutator`, and an `AbsoluteCacheLocationMutator` need to be passed in to one of the non-cloning `ParseClient` constructors in order to specify the environment and platform metadata, as well as the absolute cache location manually. This step is needed because the logic that creates these values automatically will fail and create incorrect values. The functionality to do this automatically may eventually be provided as a Unity package in the future, but for now, the following code can be used.
 
 ```csharp
 using System;
@@ -67,10 +67,12 @@ using Parse.Infrastructure;
 ```
 
 ```csharp
-new ParseClient(/* Parameters */, new LateInitializedMutableServiceHub { }, new MetadataMutator { EnvironmentData = new EnvironmentData { OSVersion = SystemInfo.operatingSystem, Platform = $"Unity {Application.unityVersion} on {SystemInfo.operatingSystemFamily}", TimeZone = TimeZoneInfo.Local.StandardName }, HostManifestData = new HostManifestData { Name = Application.productName, Identifier = Application.productName, ShortVersion = Application.version, Version = Application.version } }).Publicize();
+new ParseClient(/* Parameters */, new LateInitializedMutableServiceHub { }, new MetadataMutator { EnvironmentData = new EnvironmentData { OSVersion = SystemInfo.operatingSystem, Platform = $"Unity {Application.unityVersion} on {SystemInfo.operatingSystemFamily}", TimeZone = TimeZoneInfo.Local.StandardName }, HostManifestData = new HostManifestData { Name = Application.productName, Identifier = Application.productName, ShortVersion = Application.version, Version = Application.version } }, new AbsoluteCacheLocationMutator { CustomAbsoluteCacheFilePath = $"{Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar)}{Path.DirectorySeparatorChar}Parse.cache" }).Publicize();
 ```
 
-Other `IServiceHubMutator` implementations are available that do different things, such as the `CacheLocationMutator`, which allows a custom cache location to be specified.
+Other `IServiceHubMutator` implementations are available that do different things, such as the `RelativeCacheLocationMutator`, which allows a custom cache location relative to the default base folder (`System.Environment.SpecialFolder.LocalApplicationData`) to be specified.
+
+If you are having trouble getting the SDK to work on other platforms, try to use the above code to control what values for various metadata information items the SDK will use, to see if that fixes the issue.
 
 ### Server-Side Use
 

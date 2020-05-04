@@ -55,7 +55,7 @@ namespace Parse.Infrastructure
         public bool IsDefault => Version is null && ShortVersion is null && Identifier is null && Name is null;
 
         /// <summary>
-        /// Gets a value for whether or not this instance of <see cref="HostManifestData"/> can currently be used for the generation of <see cref="MetadataBasedCacheLocationConfiguration.Inferred"/>.
+        /// Gets a value for whether or not this instance of <see cref="HostManifestData"/> can currently be used for the generation of <see cref="MetadataBasedRelativeCacheLocationGenerator.Inferred"/>.
         /// </summary>
         public bool CanBeUsedForInference => !(IsDefault || String.IsNullOrWhiteSpace(ShortVersion));
     }

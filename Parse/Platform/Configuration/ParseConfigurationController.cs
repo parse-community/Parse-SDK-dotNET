@@ -26,7 +26,7 @@ namespace Parse.Platform.Configuration
         /// <summary>
         /// Initializes a new instance of the <see cref="ParseConfigurationController"/> class.
         /// </summary>
-        public ParseConfigurationController(IParseCommandRunner commandRunner, IStorageController storageController, IParseDataDecoder decoder)
+        public ParseConfigurationController(IParseCommandRunner commandRunner, ICacheController storageController, IParseDataDecoder decoder)
         {
             CommandRunner = commandRunner;
             CurrentConfigurationController = new ParseCurrentConfigurationController(storageController, decoder);

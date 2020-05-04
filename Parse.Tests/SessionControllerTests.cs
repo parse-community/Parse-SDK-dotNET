@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Execution;
-using Parse.Abstractions.Internal;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Sessions;
 using Parse.Infrastructure;

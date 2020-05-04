@@ -20,13 +20,13 @@ namespace Parse.Platform.Installations
 
         IParseInstallationController InstallationController { get; }
 
-        IStorageController StorageController { get; }
+        ICacheController StorageController { get; }
 
         IParseInstallationCoder InstallationCoder { get; }
 
         IParseObjectClassController ClassController { get; }
 
-        public ParseCurrentInstallationController(IParseInstallationController installationIdController, IStorageController storageController, IParseInstallationCoder installationCoder, IParseObjectClassController classController)
+        public ParseCurrentInstallationController(IParseInstallationController installationIdController, ICacheController storageController, IParseInstallationCoder installationCoder, IParseObjectClassController classController)
         {
             InstallationController = installationIdController;
             StorageController = storageController;

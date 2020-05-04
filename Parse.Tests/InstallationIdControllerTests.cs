@@ -22,7 +22,7 @@ namespace Parse.Tests
         [TestMethod]
         public void TestConstructor()
         {
-            Mock<IStorageController> storageMock = new Mock<IStorageController>(MockBehavior.Strict);
+            Mock<ICacheController> storageMock = new Mock<ICacheController>(MockBehavior.Strict);
             ParseInstallationController controller = new ParseInstallationController(storageMock.Object);
 
             // Make sure it didn't touch storageMock.
@@ -34,8 +34,8 @@ namespace Parse.Tests
         [AsyncStateMachine(typeof(InstallationIdControllerTests))]
         public Task TestGet()
         {
-            Mock<IStorageController> storageMock = new Mock<IStorageController>(MockBehavior.Strict);
-            Mock<IStorageDictionary<string, object>> storageDictionary = new Mock<IStorageDictionary<string, object>>();
+            Mock<ICacheController> storageMock = new Mock<ICacheController>(MockBehavior.Strict);
+            Mock<IDataCache<string, object>> storageDictionary = new Mock<IDataCache<string, object>>();
 
             storageMock.Setup(s => s.LoadAsync()).Returns(Task.FromResult(storageDictionary.Object));
 
@@ -81,8 +81,8 @@ namespace Parse.Tests
         [AsyncStateMachine(typeof(InstallationIdControllerTests))]
         public Task TestSet()
         {
-            Mock<IStorageController> storageMock = new Mock<IStorageController>(MockBehavior.Strict);
-            Mock<IStorageDictionary<string, object>> storageDictionary = new Mock<IStorageDictionary<string, object>>();
+            Mock<ICacheController> storageMock = new Mock<ICacheController>(MockBehavior.Strict);
+            Mock<IDataCache<string, object>> storageDictionary = new Mock<IDataCache<string, object>>();
 
             storageMock.Setup(s => s.LoadAsync()).Returns(Task.FromResult(storageDictionary.Object));
 

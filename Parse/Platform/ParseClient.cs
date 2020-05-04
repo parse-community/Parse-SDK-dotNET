@@ -40,11 +40,6 @@ namespace Parse
         /// </summary>
         public static ParseClient Instance { get; private set; }
 
-        /// <summary>
-        /// The current configuration that parse has been initialized with.
-        /// </summary>
-        public IServerConnectionData Configuration => Services.ServerConnectionData;
-
         internal static string Version => typeof(ParseClient)?.Assembly?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? typeof(ParseClient)?.Assembly?.GetName()?.Version?.ToString();
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace Parse.Tests
         public void TearDown() => (Client.Services as ServiceHub).Reset();
 
         [TestMethod]
-        public void TestConstructor() => Assert.IsNull(new ParseCurrentUserController(new Mock<IStorageController> { }.Object, Client.ClassController, Client.Decoder).CurrentUser);
+        public void TestConstructor() => Assert.IsNull(new ParseCurrentUserController(new Mock<ICacheController> { }.Object, Client.ClassController, Client.Decoder).CurrentUser);
 
         [TestMethod]
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
@@ -33,8 +33,8 @@ namespace Parse.Tests
         {
 #warning This method may need a fully custom ParseClient setup.
 
-            Mock<IStorageController> storageController = new Mock<IStorageController>(MockBehavior.Strict);
-            Mock<IStorageDictionary<string, object>> mockedStorage = new Mock<IStorageDictionary<string, object>>();
+            Mock<ICacheController> storageController = new Mock<ICacheController>(MockBehavior.Strict);
+            Mock<IDataCache<string, object>> mockedStorage = new Mock<IDataCache<string, object>>();
 
             ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object, Client.ClassController, Client.Decoder);
 
@@ -78,8 +78,8 @@ namespace Parse.Tests
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
         public Task TestExistsAsync()
         {
-            Mock<IStorageController> storageController = new Mock<IStorageController>();
-            Mock<IStorageDictionary<string, object>> mockedStorage = new Mock<IStorageDictionary<string, object>>();
+            Mock<ICacheController> storageController = new Mock<ICacheController>();
+            Mock<IDataCache<string, object>> mockedStorage = new Mock<IDataCache<string, object>>();
             ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object, Client.ClassController, Client.Decoder);
             ParseUser user = new ParseUser { }.Bind(Client) as ParseUser;
 
@@ -120,13 +120,13 @@ namespace Parse.Tests
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
         public Task TestIsCurrent()
         {
-            Mock<IStorageController> storageController = new Mock<IStorageController>(MockBehavior.Strict);
+            Mock<ICacheController> storageController = new Mock<ICacheController>(MockBehavior.Strict);
             ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object, Client.ClassController, Client.Decoder);
 
             ParseUser user = new ParseUser { }.Bind(Client) as ParseUser;
             ParseUser user2 = new ParseUser { }.Bind(Client) as ParseUser;
 
-            storageController.Setup(storage => storage.LoadAsync()).Returns(Task.FromResult(new Mock<IStorageDictionary<string, object>>().Object));
+            storageController.Setup(storage => storage.LoadAsync()).Returns(Task.FromResult(new Mock<IDataCache<string, object>>().Object));
 
             return controller.SetAsync(user, CancellationToken.None).OnSuccess(task =>
             {
@@ -159,8 +159,8 @@ namespace Parse.Tests
         [AsyncStateMachine(typeof(CurrentUserControllerTests))]
         public Task TestCurrentSessionToken()
         {
-            Mock<IStorageController> storageController = new Mock<IStorageController>();
-            Mock<IStorageDictionary<string, object>> mockedStorage = new Mock<IStorageDictionary<string, object>>();
+            Mock<ICacheController> storageController = new Mock<ICacheController>();
+            Mock<IDataCache<string, object>> mockedStorage = new Mock<IDataCache<string, object>>();
             ParseCurrentUserController controller = new ParseCurrentUserController(storageController.Object, Client.ClassController, Client.Decoder);
 
             storageController.Setup(c => c.LoadAsync()).Returns(Task.FromResult(mockedStorage.Object));
@@ -180,7 +180,7 @@ namespace Parse.Tests
 
         public Task TestLogOut()
         {
-            ParseCurrentUserController controller = new ParseCurrentUserController(new Mock<IStorageController>(MockBehavior.Strict).Object, Client.ClassController, Client.Decoder);
+            ParseCurrentUserController controller = new ParseCurrentUserController(new Mock<ICacheController>(MockBehavior.Strict).Object, Client.ClassController, Client.Decoder);
             ParseUser user = new ParseUser { }.Bind(Client) as ParseUser;
 
             return controller.SetAsync(user, CancellationToken.None).OnSuccess(_ =>

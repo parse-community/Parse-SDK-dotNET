@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Execution;
@@ -48,9 +46,9 @@ namespace Parse.Infrastructure
             set => LateInitializer.SetValue(value);
         }
 
-        public IStorageController StorageController
+        public ICacheController CacheController
         {
-            get => LateInitializer.GetValue<IStorageController>(() => new StorageController { });
+            get => LateInitializer.GetValue<ICacheController>(() => new CacheController { });
             set => LateInitializer.SetValue(value);
         }
 
@@ -62,7 +60,7 @@ namespace Parse.Infrastructure
 
         public IParseInstallationController InstallationController
         {
-            get => LateInitializer.GetValue<IParseInstallationController>(() => new ParseInstallationController(StorageController));
+            get => LateInitializer.GetValue<IParseInstallationController>(() => new ParseInstallationController(CacheController));
             set => LateInitializer.SetValue(value);
         }
 
@@ -80,7 +78,7 @@ namespace Parse.Infrastructure
 
         public IParseConfigurationController ConfigurationController
         {
-            get => LateInitializer.GetValue<IParseConfigurationController>(() => new ParseConfigurationController(CommandRunner, StorageController, Decoder));
+            get => LateInitializer.GetValue<IParseConfigurationController>(() => new ParseConfigurationController(CommandRunner, CacheController, Decoder));
             set => LateInitializer.SetValue(value);
         }
 
@@ -116,7 +114,7 @@ namespace Parse.Infrastructure
 
         public IParseCurrentUserController CurrentUserController
         {
-            get => LateInitializer.GetValue(() => new ParseCurrentUserController(StorageController, ClassController, Decoder));
+            get => LateInitializer.GetValue(() => new ParseCurrentUserController(CacheController, ClassController, Decoder));
             set => LateInitializer.SetValue(value);
         }
 
@@ -146,7 +144,7 @@ namespace Parse.Infrastructure
 
         public IParseCurrentInstallationController CurrentInstallationController
         {
-            get => LateInitializer.GetValue<IParseCurrentInstallationController>(() => new ParseCurrentInstallationController(InstallationController, StorageController, InstallationCoder, ClassController));
+            get => LateInitializer.GetValue<IParseCurrentInstallationController>(() => new ParseCurrentInstallationController(InstallationController, CacheController, InstallationCoder, ClassController));
             set => LateInitializer.SetValue(value);
         }
 

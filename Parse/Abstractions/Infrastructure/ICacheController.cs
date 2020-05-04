@@ -4,10 +4,12 @@ using System.Threading.Tasks;
 
 namespace Parse.Abstractions.Infrastructure
 {
+    // TODO: Move TransferAsync to IDiskFileCacheController and find viable alternative for use in ICacheController if needed.
+
     /// <summary>
     /// An abstraction for accessing persistent storage in the Parse SDK.
     /// </summary>
-    public interface IStorageController
+    public interface ICacheController
     {
         /// <summary>
         /// Cleans up any temporary files and/or directories created during SDK operation.
@@ -19,7 +21,7 @@ namespace Parse.Abstractions.Infrastructure
         /// </summary>
         /// <param name="path">The relative path to the target file</param>
         /// <returns>An instance of <see cref="FileInfo"/> wrapping the the <paramref name="path"/> value</returns>
-        FileInfo GetWrapperForRelativePersistentStorageFilePath(string path);
+        FileInfo GetRelativeFile(string path);
 
         /// <summary>
         /// Transfers a file from <paramref name="originFilePath"/> to <paramref name="targetFilePath"/>.
@@ -33,36 +35,13 @@ namespace Parse.Abstractions.Infrastructure
         /// Load the contents of this storage controller asynchronously.
         /// </summary>
         /// <returns></returns>
-        Task<IStorageDictionary<string, object>> LoadAsync();
+        Task<IDataCache<string, object>> LoadAsync();
 
         /// <summary>
         /// Overwrites the contents of this storage controller asynchronously.
         /// </summary>
         /// <param name="contents"></param>
         /// <returns></returns>
-        Task<IStorageDictionary<string, object>> SaveAsync(IDictionary<string, object> contents);
-    }
-
-    /// <summary>
-    /// An interface for a dictionary that is persisted to disk asynchronously.
-    /// </summary>
-    /// <typeparam name="TKey">They key type of the dictionary.</typeparam>
-    /// <typeparam name="TValue">The value type of the dictionary.</typeparam>
-    public interface IStorageDictionary<TKey, TValue> : IDictionary<TKey, TValue>
-    {
-        /// <summary>
-        /// Adds a key to this dictionary, and saves it asynchronously.
-        /// </summary>
-        /// <param name="key">The key to insert.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <returns></returns>
-        Task AddAsync(TKey key, TValue value);
-
-        /// <summary>
-        /// Removes a key from this dictionary, and saves it asynchronously.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        Task RemoveAsync(TKey key);
+        Task<IDataCache<string, object>> SaveAsync(IDictionary<string, object> contents);
     }
 }

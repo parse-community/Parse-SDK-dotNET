@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Abstractions.Infrastructure;
-using Parse.Abstractions.Internal;
 using Parse.Infrastructure;
 using Parse.Abstractions.Infrastructure.Control;
 using Parse.Abstractions.Platform.Objects;

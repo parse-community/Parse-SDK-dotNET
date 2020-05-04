@@ -22,13 +22,16 @@ namespace Parse.Abstractions.Infrastructure
     /// </summary>
     public interface IServiceHub
     {
+        /// <summary>
+        /// The current server connection data that the the Parse SDK has been initialized with.
+        /// </summary>
         IServerConnectionData ServerConnectionData { get; }
         IMetadataController MetadataController { get; }
 
         IServiceHubCloner Cloner { get; }
 
         IWebClient WebClient { get; }
-        IStorageController StorageController { get; }
+        ICacheController CacheController { get; }
         IParseObjectClassController ClassController { get; }
 
         IParseDataDecoder Decoder { get; }

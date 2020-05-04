@@ -42,22 +42,22 @@ namespace Parse.Infrastructure
         public IServiceHubCloner Cloner => LateInitializer.GetValue(() => new { } as object as IServiceHubCloner);
 
         public IWebClient WebClient => LateInitializer.GetValue(() => new UniversalWebClient { });
-        public IStorageController StorageController => LateInitializer.GetValue(() => new StorageController { });
+        public ICacheController CacheController => LateInitializer.GetValue(() => new CacheController { });
         public IParseObjectClassController ClassController => LateInitializer.GetValue(() => new ParseObjectClassController { });
 
         public IParseDataDecoder Decoder => LateInitializer.GetValue(() => new ParseDataDecoder(ClassController));
 
-        public IParseInstallationController InstallationController => LateInitializer.GetValue(() => new ParseInstallationController(StorageController));
+        public IParseInstallationController InstallationController => LateInitializer.GetValue(() => new ParseInstallationController(CacheController));
         public IParseCommandRunner CommandRunner => LateInitializer.GetValue(() => new ParseCommandRunner(WebClient, InstallationController, MetadataController, ServerConnectionData, new Lazy<IParseUserController>(() => UserController)));
 
         public IParseCloudCodeController CloudCodeController => LateInitializer.GetValue(() => new ParseCloudCodeController(CommandRunner, Decoder));
-        public IParseConfigurationController ConfigurationController => LateInitializer.GetValue(() => new ParseConfigurationController(CommandRunner, StorageController, Decoder));
+        public IParseConfigurationController ConfigurationController => LateInitializer.GetValue(() => new ParseConfigurationController(CommandRunner, CacheController, Decoder));
         public IParseFileController FileController => LateInitializer.GetValue(() => new ParseFileController(CommandRunner));
         public IParseObjectController ObjectController => LateInitializer.GetValue(() => new ParseObjectController(CommandRunner, Decoder, ServerConnectionData));
         public IParseQueryController QueryController => LateInitializer.GetValue(() => new ParseQueryController(CommandRunner, Decoder));
         public IParseSessionController SessionController => LateInitializer.GetValue(() => new ParseSessionController(CommandRunner, Decoder));
         public IParseUserController UserController => LateInitializer.GetValue(() => new ParseUserController(CommandRunner, Decoder));
-        public IParseCurrentUserController CurrentUserController => LateInitializer.GetValue(() => new ParseCurrentUserController(StorageController, ClassController, Decoder));
+        public IParseCurrentUserController CurrentUserController => LateInitializer.GetValue(() => new ParseCurrentUserController(CacheController, ClassController, Decoder));
 
         public IParseAnalyticsController AnalyticsController => LateInitializer.GetValue(() => new ParseAnalyticsController(CommandRunner));
 
@@ -65,7 +65,7 @@ namespace Parse.Infrastructure
 
         public IParsePushChannelsController PushChannelsController => LateInitializer.GetValue(() => new ParsePushChannelsController(CurrentInstallationController));
         public IParsePushController PushController => LateInitializer.GetValue(() => new ParsePushController(CommandRunner, CurrentUserController));
-        public IParseCurrentInstallationController CurrentInstallationController => LateInitializer.GetValue(() => new ParseCurrentInstallationController(InstallationController, StorageController, InstallationCoder, ClassController));
+        public IParseCurrentInstallationController CurrentInstallationController => LateInitializer.GetValue(() => new ParseCurrentInstallationController(InstallationController, CacheController, InstallationCoder, ClassController));
         public IParseInstallationDataFinalizer InstallationDataFinalizer => LateInitializer.GetValue(() => new ParseInstallationDataFinalizer { });
 
         public bool Reset() => LateInitializer.Used && LateInitializer.Reset();

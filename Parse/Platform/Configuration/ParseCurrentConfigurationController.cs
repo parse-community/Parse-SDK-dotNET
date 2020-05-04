@@ -20,14 +20,14 @@ namespace Parse.Platform.Configuration
 
         ParseConfiguration CurrentConfiguration { get; set; }
 
-        IStorageController StorageController { get; }
+        ICacheController StorageController { get; }
 
         IParseDataDecoder Decoder { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParseCurrentConfigurationController"/> class.
         /// </summary>
-        public ParseCurrentConfigurationController(IStorageController storageController, IParseDataDecoder decoder)
+        public ParseCurrentConfigurationController(ICacheController storageController, IParseDataDecoder decoder)
         {
             StorageController = storageController;
             Decoder = decoder;

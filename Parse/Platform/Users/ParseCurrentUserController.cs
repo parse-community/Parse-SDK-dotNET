@@ -10,7 +10,6 @@ using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Users;
 using Parse.Infrastructure.Utilities;
-using Parse;
 using Parse.Infrastructure.Data;
 
 namespace Parse.Platform.Users
@@ -23,13 +22,13 @@ namespace Parse.Platform.Users
 
         TaskQueue TaskQueue { get; } = new TaskQueue { };
 
-        IStorageController StorageController { get; }
+        ICacheController StorageController { get; }
 
         IParseObjectClassController ClassController { get; }
 
         IParseDataDecoder Decoder { get; }
 
-        public ParseCurrentUserController(IStorageController storageController, IParseObjectClassController classController, IParseDataDecoder decoder) => (StorageController, ClassController, Decoder) = (storageController, classController, decoder);
+        public ParseCurrentUserController(ICacheController storageController, IParseObjectClassController classController, IParseDataDecoder decoder) => (StorageController, ClassController, Decoder) = (storageController, classController, decoder);
 
         ParseUser currentUser;
         public ParseUser CurrentUser

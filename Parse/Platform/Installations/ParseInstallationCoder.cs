@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Parse;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Platform.Installations;

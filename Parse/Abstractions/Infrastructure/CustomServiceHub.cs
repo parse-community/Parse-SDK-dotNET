@@ -23,7 +23,7 @@ namespace Parse.Abstractions.Infrastructure
 
         public virtual IWebClient WebClient => Services.WebClient;
 
-        public virtual IStorageController StorageController => Services.StorageController;
+        public virtual ICacheController CacheController => Services.CacheController;
 
         public virtual IParseObjectClassController ClassController => Services.ClassController;
 
