@@ -41,13 +41,13 @@ namespace Parse
         internal TaskQueue TaskQueue { get; } = new TaskQueue { };
 
         /// <summary>
-        /// The <see cref="ParseClient"/> instance being targeted.
+        /// The <see cref="ParseClient"/> instance being targeted. This should generally not be set except when an object is being constructed, as otherwise race conditions may occur. The preferred method to set this property is via calling <see cref="Bind(IServiceHub)"/>.
         /// </summary>
-        internal IServiceHub Services { get; private protected set; }
+        public IServiceHub Services { get; set; }
 
         /// <summary>
         /// Constructs a new ParseObject with no data in it. A ParseObject constructed in this way will
-        /// not have an ObjectId and will not persist to the database until <see cref="SaveAsync()"/>
+        /// not have an ObjectId and will not persist to the database until <see cref="SaveAsync(CancellationToken)"/>
         /// is called.
         /// </summary>
         /// <remarks>

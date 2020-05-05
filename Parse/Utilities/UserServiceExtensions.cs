@@ -31,10 +31,10 @@ namespace Parse
         /// <param name="username">The value that should be used for <see cref="ParseUser.Username"/>.</param>
         /// <param name="password">The value that should be used for <see cref="ParseUser.Password"/>.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SignUpAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default) => serviceHub.SignUpAsync(new ParseUser { Username = username, Password = password }, cancellationToken);
+        public static Task SignUpAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default) => new ParseUser { Services = serviceHub, Username = username, Password = password }.SignUpAsync(cancellationToken);
 
         /// <summary>
-        /// Saves the provided <see cref="ParseUser"/> instance with the target Parse Server instance and then authenticates it on the target client.
+        /// Saves the provided <see cref="ParseUser"/> instance with the target Parse Server instance and then authenticates it on the target client. This method should only be used once <see cref="ParseClient.Publicize"/> has been called and <see cref="ParseClient.Instance"/> is the wanted bind target, or if <see cref="ParseObject.Services"/> has already been set or <see cref="ParseObject.Bind(IServiceHub)"/> has already been called on the <paramref name="user"/>.
         /// </summary>
         /// <param name="serviceHub">The <see cref="IServiceHub"/> instance to target when creating the user and authenticating.</param>
         /// <param name="user">The <see cref="ParseUser"/> instance to save on the target Parse Server instance and authenticate.</param>
