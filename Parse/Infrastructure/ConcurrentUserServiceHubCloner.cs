@@ -13,7 +13,7 @@ namespace Parse.Infrastructure
         public void Mutate(ref IMutableServiceHub target, in IServiceHub composedHub)
         {
             target.Cloner = this;
-            target.CurrentUserController = new ParseCurrentUserController(new VirtualCacheController { }, composedHub.ClassController, composedHub.Decoder);
+            target.CurrentUserController = new ParseCurrentUserController(new TransientCacheController { }, composedHub.ClassController, composedHub.Decoder);
         }
     }
 }

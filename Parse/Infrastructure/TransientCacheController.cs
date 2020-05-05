@@ -7,9 +7,9 @@ using static Parse.Resources;
 
 namespace Parse.Infrastructure
 {
-    public class VirtualCacheController : ICacheController
+    public class TransientCacheController : ICacheController
     {
-        class VirtualDataStore : Dictionary<string, object>, IDataCache<string, object>
+        class VirtualCache : Dictionary<string, object>, IDataCache<string, object>
         {
             public Task AddAsync(string key, object value)
             {
@@ -24,11 +24,11 @@ namespace Parse.Infrastructure
             }
         }
 
-        VirtualDataStore Cache { get; } = new VirtualDataStore { };
+        VirtualCache Cache { get; } = new VirtualCache { };
 
         public void Clear() => Cache.Clear();
 
-        public FileInfo GetRelativeFile(string path) => throw new NotSupportedException(ConcurrentUserStorageControllerFileOperationNotSupportedMessage);
+        public FileInfo GetRelativeFile(string path) => throw new NotSupportedException(TransientCacheControllerDiskFileOperationNotSupportedMessage);
 
         public Task<IDataCache<string, object>> LoadAsync() => Task.FromResult<IDataCache<string, object>>(Cache);
 
@@ -42,6 +42,6 @@ namespace Parse.Infrastructure
             return Task.FromResult<IDataCache<string, object>>(Cache);
         }
 
-        public Task TransferAsync(string originFilePath, string targetFilePath) => Task.FromException(new NotSupportedException(ConcurrentUserStorageControllerFileOperationNotSupportedMessage));
+        public Task TransferAsync(string originFilePath, string targetFilePath) => Task.FromException(new NotSupportedException(TransientCacheControllerDiskFileOperationNotSupportedMessage));
     }
 }

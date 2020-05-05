@@ -60,13 +60,13 @@ namespace Parse.Infrastructure
                 }
             }
 
-            public void Add(string key, object value) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
+            public void Add(string key, object value) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
 
-            public bool Remove(string key) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
+            public bool Remove(string key) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
 
-            public void Add(KeyValuePair<string, object> item) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
+            public void Add(KeyValuePair<string, object> item) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
 
-            public bool Remove(KeyValuePair<string, object> item) => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
+            public bool Remove(KeyValuePair<string, object> item) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
 
             public bool ContainsKey(string key) => Lock(() => Storage.ContainsKey(key));
 
@@ -125,7 +125,7 @@ namespace Parse.Infrastructure
             public object this[string key]
             {
                 get => Storage[key];
-                set => throw new NotSupportedException(StorageDictionarySynchronousMutationNotSupportedMessage);
+                set => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
             }
         }
 
