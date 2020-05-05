@@ -29,9 +29,16 @@ ParseClient client = new ParseClient(new ServerConnectionData
 {
     ApplicationID = "Your Application ID",
     ServerURI = "The Parse Server Instance Host URI",
-    Key = "Your .NET Key"
+    Key = "Your .NET Key", // This is unnecessary if a value for MasterKey is specified.
+    MasterKey = "Your Master Key",
+    Headers = new Dictionary<string, string>
+    {
+        ["X-Extra-Header"] = "Some Value"
+    }
 });
 ```
+
+`ServerConnectionData` is available in the `Parse.Infrastructure` namespace.
 
 The two non-cloning `ParseClient` constructors contain optional parameters for an `IServiceHub` implementation instance and an array of `IServiceHubMutator`s. These should only be used when the behaviour of the SDK needs to be changed such as [when it is used with the Unity game engine](#use-in-unity-client).
 
