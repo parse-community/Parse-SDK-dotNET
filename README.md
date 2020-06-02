@@ -30,9 +30,9 @@ ParseClient.Initialize(new ParseClient.Configuration
 });
 ```
 
-`ApplicationID` is your app's `ApplicationId` field from your Parse Server.
-`Key` is your app's `DotNetKey` field from your Parse Server.
-`ServerURI` is the full URL to your web-hosted Parse Server.
+`ApplicationIx` is your app's `ApplicationId` field from your Parse Server.
+`WindowsKey` is your app's `DotNetKey` field from your Parse Server.
+`Server` is the full URL to your web-hosted Parse Server.
 
 If you would like to, you can also set the `MasterKey` property, which will allow the SDK to bypass any CLPs and object permissions that are set. This property should be compatible with read-only master keys as well.
 
