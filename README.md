@@ -30,7 +30,7 @@ ParseClient.Initialize(new ParseClient.Configuration
 });
 ```
 
-`ApplicationIx` is your app's `ApplicationId` field from your Parse Server.
+`ApplicationId` is your app's `ApplicationId` field from your Parse Server.
 `WindowsKey` is your app's `DotNetKey` field from your Parse Server.
 `Server` is the full URL to your web-hosted Parse Server.
 
