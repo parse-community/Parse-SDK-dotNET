@@ -24,9 +24,9 @@ Then, in your program's entry point, paste the following code, with the text ref
 ```cs
 ParseClient.Initialize(new ParseClient.Configuration
 {
-    ApplicationID = "",
-    Key = "",
-    ServerURI = ""
+    ApplicationId = "",
+    WindowsKey = "",
+    Server = "",
 });
 ```
 
