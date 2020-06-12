@@ -24,15 +24,15 @@ Then, in your program's entry point, paste the following code, with the text ref
 ```cs
 ParseClient.Initialize(new ParseClient.Configuration
 {
-    ApplicationID = "",
+    ApplicationId = "",
     Key = "",
-    ServerURI = ""
+    Server = "",
 });
 ```
 
-`ApplicationID` is your app's `ApplicationId` field from your Parse Server.
+`ApplicationId` is your app's `ApplicationId` field from your Parse Server.
 `Key` is your app's `DotNetKey` field from your Parse Server.
-`ServerURI` is the full URL to your web-hosted Parse Server.
+`Server` is the full URL to your web-hosted Parse Server.
 
 If you would like to, you can also set the `MasterKey` property, which will allow the SDK to bypass any CLPs and object permissions that are set. This property should be compatible with read-only master keys as well.
 
