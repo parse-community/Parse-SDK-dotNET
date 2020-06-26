@@ -42,6 +42,7 @@ ParseClient client = new ParseClient(new ServerConnectionData
 
 The two non-cloning `ParseClient` constructors contain optional parameters for an `IServiceHub` implementation instance and an array of `IServiceHubMutator`s. These should only be used when the behaviour of the SDK needs to be changed such as [when it is used with the Unity game engine](#use-in-unity-client).
 
+
 To find full usage instructions for the latest stable release, please visit the [Parse docs website][parse-docs-link]. Please note that the latest stable release is quite old and does not reflect the work being done at the moment.
 
 ### Common Definitions
