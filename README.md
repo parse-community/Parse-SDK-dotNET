@@ -75,7 +75,18 @@ using Parse.Infrastructure;
 ```
 
 ```csharp
-new ParseClient(/* Parameters */, new LateInitializedMutableServiceHub { }, new MetadataMutator { EnvironmentData = new EnvironmentData { OSVersion = SystemInfo.operatingSystem, Platform = $"Unity {Application.unityVersion} on {SystemInfo.operatingSystemFamily}", TimeZone = TimeZoneInfo.Local.StandardName }, HostManifestData = new HostManifestData { Name = Application.productName, Identifier = Application.productName, ShortVersion = Application.version, Version = Application.version } }, new AbsoluteCacheLocationMutator { CustomAbsoluteCacheFilePath = $"{Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar)}{Path.DirectorySeparatorChar}Parse.cache" }).Publicize();
+new ParseClient(/* Parameters */,
+    new LateInitializedMutableServiceHub { },
+    new MetadataMutator
+    {
+        EnvironmentData = new EnvironmentData { OSVersion = SystemInfo.operatingSystem, Platform = $"Unity {Application.unityVersion} on {SystemInfo.operatingSystemFamily}", TimeZone = TimeZoneInfo.Local.StandardName },
+        HostManifestData = new HostManifestData { Name = Application.productName, Identifier = Application.productName, ShortVersion = Application.version, Version = Application.version }
+    },
+    new AbsoluteCacheLocationMutator
+    {
+        CustomAbsoluteCacheFilePath = $"{Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar)}{Path.DirectorySeparatorChar}Parse.cache"
+    }
+    ).Publicize();
 ```
 
 Other `IServiceHubMutator` implementations are available that do different things, such as the `RelativeCacheLocationMutator`, which allows a custom cache location relative to the default base folder (`System.Environment.SpecialFolder.LocalApplicationData`) to be specified.
