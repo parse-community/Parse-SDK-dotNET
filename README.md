@@ -9,7 +9,12 @@
 ![Twitter Follow](https://img.shields.io/twitter/follow/ParsePlatform.svg?label=Follow%20us%20on%20Twitter&style=social)
 
 ## Getting Started
-The latest stable release of the SDK is available as [a NuGet package][nuget-link]. Note that the latest package currently available on the official distribution channel is quite old; to use the most up-to-date code, build this project and reference the generated NuGet package.
+The previous stable release version 1.7.0 is available as [a NuGet package][nuget-link].
+
+The latest development release is also available as [a NuGet package (Prerelease)][nuget-link-prerelease].
+
+Note that the previous stable package currently available on the official distribution channel is quite old.
+To use the most up-to-date code, either build this project and reference the generated NuGet package, download the pre-built assembly from [releases][releases-link] or check the [NuGet package (Prerelease)][nuget-link-prerelease] on NuGet.
 
 ## Using the Code
 Make sure you are using the project's root namespace.
@@ -192,7 +197,7 @@ await client.LogOutAsync();
 ```
 
 ## Local Builds
-You can build the SDK on any system with the MSBuild or .NET Core CLI installed. Results can be found under either the `Release/netstandard` or `Debug/netstandard` in the `bin` folder unless a non-standard build configuration is used.
+You can build the SDK on any system with the MSBuild or .NET Core CLI installed. Results can be found under either the `Release/netstandard2.0` or `Debug/netstandard2.0` in the `bin` folder unless a non-standard build configuration is used.
 
 ## .NET Core CLI
 
@@ -219,4 +224,6 @@ of patent rights can be found in the PATENTS file in the same directory.
  [license-link]: https://github.com/parse-community/Parse-SDK-dotNET/blob/master/LICENSE
  [nuget-link]: http://nuget.org/packages/parse
  [nuget-svg]: https://img.shields.io/nuget/v/parse.svg
+ [nuget-link-prerelease]: http://nuget.org/packages/parse/absoluteLatest
  [parse-docs-link]: http://docs.parseplatform.org/
+ [releases-link]: https://github.com/TobiasPott/Parse-SDK-dotNET/releases
