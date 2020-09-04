@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Parse.Abstractions.Infrastructure;
 
 namespace Parse.Infrastructure
@@ -22,7 +24,8 @@ namespace Parse.Infrastructure
         /// </summary>
         /// <param name="target"><inheritdoc/></param>
         /// <param name="composedHub"><inheritdoc/></param>
-        public void Mutate(ref IMutableServiceHub target, in IServiceHub composedHub)
+        /// <param name="futureMutators"><inheritdoc/></param>
+        public void Mutate(ref IMutableServiceHub target, in IServiceHub composedHub, Stack<IServiceHubMutator> futureMutators)
         {
             if ((target as IServiceHub).CacheController is IDiskFileCacheController { } diskFileCacheController)
             {

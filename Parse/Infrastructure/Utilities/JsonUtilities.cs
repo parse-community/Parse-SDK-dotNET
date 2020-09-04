@@ -13,34 +13,49 @@ namespace Parse.Infrastructure.Utilities
     /// A simple recursive-descent JSON Parser based on the grammar defined at http://www.json.org
     /// and http://tools.ietf.org/html/rfc4627
     /// </summary>
-    public class JsonUtilities
+    public static class JsonUtilities
     {
+        internal static IDictionary<string, object> DeserializeJsonText(string text) => Parse(text) as IDictionary<string, object>;
+
+        internal static string SerializeToJsonText(IDictionary<string, object> data) => Encode(data);
+
         /// <summary>
         /// Place at the start of a regex to force the match to begin wherever the search starts (i.e.
         /// anchored at the index of the first character of the search, even when that search starts
         /// in the middle of the string).
         /// </summary>
-        private static readonly string startOfString = "\\G";
-        private static readonly char startObject = '{';
-        private static readonly char endObject = '}';
-        private static readonly char startArray = '[';
-        private static readonly char endArray = ']';
-        private static readonly char valueSeparator = ',';
-        private static readonly char nameSeparator = ':';
-        private static readonly char[] falseValue = "false".ToCharArray();
-        private static readonly char[] trueValue = "true".ToCharArray();
-        private static readonly char[] nullValue = "null".ToCharArray();
-        private static readonly Regex numberValue = new Regex(startOfString + @"-?(?:0|[1-9]\d*)(?<frac>\.\d+)?(?<exp>(?:e|E)(?:-|\+)?\d+)?");
-        private static readonly Regex stringValue = new Regex(startOfString + "\"(?<content>(?:[^\\\\\"]|(?<escape>\\\\(?:[\\\\\"/bfnrt]|u[0-9a-fA-F]{4})))*)\"", RegexOptions.Multiline);
+        static readonly string startOfString = "\\G";
 
-        private static readonly Regex escapePattern = new Regex("\\\\|\"|[\u0000-\u001F]");
+        static readonly char startObject = '{';
 
-        private class JsonStringParser
+        static readonly char endObject = '}';
+
+        static readonly char startArray = '[';
+
+        static readonly char endArray = ']';
+
+        static readonly char valueSeparator = ',';
+
+        static readonly char nameSeparator = ':';
+
+        static readonly char[] falseValue = "false".ToCharArray();
+
+        static readonly char[] trueValue = "true".ToCharArray();
+
+        static readonly char[] nullValue = "null".ToCharArray();
+
+        static readonly Regex numberValue = new Regex(startOfString + @"-?(?:0|[1-9]\d*)(?<frac>\.\d+)?(?<exp>(?:e|E)(?:-|\+)?\d+)?");
+
+        static readonly Regex stringValue = new Regex(startOfString + "\"(?<content>(?:[^\\\\\"]|(?<escape>\\\\(?:[\\\\\"/bfnrt]|u[0-9a-fA-F]{4})))*)\"", RegexOptions.Multiline);
+
+        static readonly Regex escapePattern = new Regex("\\\\|\"|[\u0000-\u001F]");
+
+        class JsonStringParser
         {
-            public string Input { get; private set; }
+            public string Input { get; set; }
 
-            public char[] InputAsArray { get; private set; }
-            public int CurrentIndex { get; private set; }
+            public char[] InputAsArray { get; set; }
+            public int CurrentIndex { get; set; }
 
             public void Skip(int skip) => CurrentIndex += skip;
 
@@ -80,7 +95,7 @@ namespace Parse.Infrastructure.Utilities
             /// <summary>
             /// Parses JSON member syntax (e.g. '"keyname" : null')
             /// </summary>
-            private bool ParseMember(out object output)
+            bool ParseMember(out object output)
             {
                 output = null;
                 if (!ParseString(out object key))
@@ -120,7 +135,7 @@ namespace Parse.Infrastructure.Utilities
             /// Parses a value (i.e. the right-hand side of an object member assignment or
             /// an element in an array)
             /// </summary>
-            private bool ParseValue(out object output)
+            bool ParseValue(out object output)
             {
                 if (Accept(falseValue))
                 {
@@ -146,7 +161,7 @@ namespace Parse.Infrastructure.Utilities
             /// <summary>
             /// Parses a JSON string (e.g. '"foo\u1234bar\n"')
             /// </summary>
-            private bool ParseString(out object output)
+            bool ParseString(out object output)
             {
                 output = null;
                 if (!Accept(stringValue, out Match m))
@@ -201,7 +216,7 @@ namespace Parse.Infrastructure.Utilities
             /// Parses a number. Returns a long if the number is an integer or has an exponent,
             /// otherwise returns a double.
             /// </summary>
-            private bool ParseNumber(out object output)
+            bool ParseNumber(out object output)
             {
                 output = null;
                 if (!Accept(numberValue, out Match m))
@@ -222,7 +237,7 @@ namespace Parse.Infrastructure.Utilities
             /// <summary>
             /// Matches the string to a regex, consuming part of the string and returning the match.
             /// </summary>
-            private bool Accept(Regex matcher, out Match match)
+            bool Accept(Regex matcher, out Match match)
             {
                 match = matcher.Match(Input, CurrentIndex);
                 if (match.Success)
@@ -233,7 +248,7 @@ namespace Parse.Infrastructure.Utilities
             /// <summary>
             /// Find the first occurrences of a character, consuming part of the string.
             /// </summary>
-            private bool Accept(char condition)
+            bool Accept(char condition)
             {
                 int step = 0;
                 int strLen = InputAsArray.Length;
@@ -276,7 +291,7 @@ namespace Parse.Infrastructure.Utilities
             /// <summary>
             /// Find the first occurrences of a string, consuming part of the string.
             /// </summary>
-            private bool Accept(char[] condition)
+            bool Accept(char[] condition)
             {
                 int step = 0;
                 int strLen = InputAsArray.Length;

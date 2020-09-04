@@ -4,8 +4,8 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
         <Version>2.0.0-develop-0001</Version>
-        <LangVersion>latest</LangVersion>
-        
+        <LangVersion>preview</LangVersion>
+
         <Authors>Parse</Authors>
         <PackageProjectUrl>https://parseplatform.org/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/parse-community/Parse-SDK-dotNET/</RepositoryUrl>

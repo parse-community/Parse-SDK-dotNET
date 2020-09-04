@@ -13,6 +13,6 @@ namespace Parse.Abstractions.Infrastructure
         /// Converts the object to a data structure that can be converted to JSON.
         /// </summary>
         /// <returns>An object to be JSONified.</returns>
-        IDictionary<string, object> ConvertToJSON();
+        IDictionary<string, object> ConvertToJson();
     }
 }

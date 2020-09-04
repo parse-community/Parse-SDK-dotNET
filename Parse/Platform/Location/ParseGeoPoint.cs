@@ -90,7 +90,7 @@ namespace Parse
             return new ParseGeoDistance(2 * Math.Asin(Math.Sqrt(a)));
         }
 
-        IDictionary<string, object> IJsonConvertible.ConvertToJSON() => new Dictionary<string, object> {
+        IDictionary<string, object> IJsonConvertible.ConvertToJson() => new Dictionary<string, object> {
         {"__type", "GeoPoint"},
         {nameof(latitude), Latitude},
         {nameof(longitude), Longitude}

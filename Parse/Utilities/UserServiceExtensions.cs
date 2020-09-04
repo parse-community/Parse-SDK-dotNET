@@ -182,21 +182,14 @@ namespace Parse
         /// user account. This email allows the user to securely reset their password on the Parse site.
         /// </summary>
         /// <param name="email">The email address associated with the user that forgot their password.</param>
-        public static Task RequestPasswordResetAsync(this IServiceHub serviceHub, string email) => RequestPasswordResetAsync(serviceHub, email, CancellationToken.None);
-
-        /// <summary>
-        /// Requests a password reset email to be sent to the specified email address associated with the
-        /// user account. This email allows the user to securely reset their password on the Parse site.
-        /// </summary>
-        /// <param name="email">The email address associated with the user that forgot their password.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task RequestPasswordResetAsync(this IServiceHub serviceHub, string email, CancellationToken cancellationToken) => serviceHub.UserController.RequestPasswordResetAsync(email, cancellationToken);
+        public static Task RequestPasswordResetAsync(this IServiceHub serviceHub, string email, CancellationToken cancellationToken = default) => serviceHub.UserController.RequestPasswordResetAsync(email, cancellationToken);
 
-        public static Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string authType, IDictionary<string, object> data, CancellationToken cancellationToken)
+        public static Task<ParseUser> AuthenticateWithServiceAsync(this IServiceHub serviceHub, string authenticationServiceName, IDictionary<string, object> data, CancellationToken cancellationToken)
         {
             ParseUser user = null;
 
-            return serviceHub.UserController.LogInAsync(authType, data, serviceHub, cancellationToken).OnSuccess(task =>
+            return serviceHub.UserController.LogInAsync(authenticationServiceName, data, serviceHub, cancellationToken).OnSuccess(task =>
             {
                 user = serviceHub.GenerateObjectFromState<ParseUser>(task.Result, "_User");
 
@@ -207,7 +200,7 @@ namespace Parse
                         user.AuthData = new Dictionary<string, IDictionary<string, object>>();
                     }
 
-                    user.AuthData[authType] = data;
+                    user.AuthData[authenticationServiceName] = data;
 
 #warning Check if SynchronizeAllAuthData should accept an IServiceHub for consistency on which actions take place on which IServiceHub implementation instance.
 
@@ -218,22 +211,22 @@ namespace Parse
             }).Unwrap().OnSuccess(t => user);
         }
 
-        public static Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string authType, CancellationToken cancellationToken)
+        public static Task<ParseUser> AuthenticateWithServiceAsync(this IServiceHub serviceHub, string authenticationServiceName, CancellationToken cancellationToken)
         {
-            IParseAuthenticationProvider provider = ParseUser.GetProvider(authType);
-            return provider.AuthenticateAsync(cancellationToken).OnSuccess(authData => LogInWithAsync(serviceHub, authType, authData.Result, cancellationToken)).Unwrap();
+            IParseAuthenticationProvider provider = ParseUser.GetProvider(authenticationServiceName);
+            return provider.AuthenticateAsync(cancellationToken).OnSuccess(authData => AuthenticateWithServiceAsync(serviceHub, authenticationServiceName, authData.Result, cancellationToken)).Unwrap();
         }
 
-        internal static void RegisterProvider(this IServiceHub serviceHub, IParseAuthenticationProvider provider)
+        internal static void SetAuthenticationProvider(this IServiceHub serviceHub, IParseAuthenticationProvider provider)
         {
-            ParseUser.Authenticators[provider.AuthType] = provider;
-            ParseUser curUser = GetCurrentUser(serviceHub);
+            ParseUser.Authenticators[provider.Name] = provider;
+            ParseUser currentUser = GetCurrentUser(serviceHub);
 
-            if (curUser != null)
+            if (currentUser != null)
             {
 #warning Check if SynchronizeAllAuthData should accept an IServiceHub for consistency on which actions take place on which IServiceHub implementation instance.
 
-                curUser.SynchronizeAuthData(provider);
+                currentUser.SynchronizeAuthenticationData(provider);
             }
         }
     }
