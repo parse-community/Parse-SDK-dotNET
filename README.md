@@ -9,7 +9,12 @@
 ![Twitter Follow](https://img.shields.io/twitter/follow/ParsePlatform.svg?label=Follow%20us%20on%20Twitter&style=social)
 
 ## Getting Started
-The latest stable release of the SDK is available as [a NuGet package][nuget-link]. Note that the latest package currently available on the official distribution channel is quite old; to use the most up-to-date code, build this project and reference the generated NuGet package.
+The previous stable release version 1.7.0 is available as [a NuGet package][nuget-link].
+
+The latest development release is also available as [a NuGet package (Prerelease)][nuget-link-prerelease].
+
+Note that the previous stable package currently available on the official distribution channel is quite old.
+To use the most up-to-date code, either build this project and reference the generated NuGet package, download the pre-built assembly from [releases][releases-link] or check the [NuGet package (Prerelease)][nuget-link-prerelease] on NuGet.
 
 ## Using the Code
 Make sure you are using the project's root namespace.
@@ -41,6 +46,7 @@ ParseClient client = new ParseClient(new ServerConnectionData
 `ServerConnectionData` is available in the `Parse.Infrastructure` namespace.
 
 The two non-cloning `ParseClient` constructors contain optional parameters for an `IServiceHub` implementation instance and an array of `IServiceHubMutator`s. These should only be used when the behaviour of the SDK needs to be changed such as [when it is used with the Unity game engine](#use-in-unity-client).
+
 
 To find full usage instructions for the latest stable release, please visit the [Parse docs website][parse-docs-link]. Please note that the latest stable release is quite old and does not reflect the work being done at the moment.
 
@@ -74,12 +80,44 @@ using Parse.Infrastructure;
 ```
 
 ```csharp
-new ParseClient(/* Parameters */, new LateInitializedMutableServiceHub { }, new MetadataMutator { EnvironmentData = new EnvironmentData { OSVersion = SystemInfo.operatingSystem, Platform = $"Unity {Application.unityVersion} on {SystemInfo.operatingSystemFamily}", TimeZone = TimeZoneInfo.Local.StandardName }, HostManifestData = new HostManifestData { Name = Application.productName, Identifier = Application.productName, ShortVersion = Application.version, Version = Application.version } }, new AbsoluteCacheLocationMutator { CustomAbsoluteCacheFilePath = $"{Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar)}{Path.DirectorySeparatorChar}Parse.cache" }).Publicize();
+new ParseClient(/* Parameters */,
+    new LateInitializedMutableServiceHub { },
+    new MetadataMutator
+    {
+        EnvironmentData = new EnvironmentData { OSVersion = SystemInfo.operatingSystem, Platform = $"Unity {Application.unityVersion} on {SystemInfo.operatingSystemFamily}", TimeZone = TimeZoneInfo.Local.StandardName },
+        HostManifestData = new HostManifestData { Name = Application.productName, Identifier = Application.productName, ShortVersion = Application.version, Version = Application.version }
+    },
+    new AbsoluteCacheLocationMutator
+    {
+        CustomAbsoluteCacheFilePath = $"{Application.persistentDataPath.Replace('/', Path.DirectorySeparatorChar)}{Path.DirectorySeparatorChar}Parse.cache"
+    }
+    ).Publicize();
 ```
 
 Other `IServiceHubMutator` implementations are available that do different things, such as the `RelativeCacheLocationMutator`, which allows a custom cache location relative to the default base folder (`System.Environment.SpecialFolder.LocalApplicationData`) to be specified.
 
 If you are having trouble getting the SDK to work on other platforms, try to use the above code to control what values for various metadata information items the SDK will use, to see if that fixes the issue.
+
+#### Unity3D on iOS
+
+When using the Parse SDK on iOS/iPadOS target platforms you may encounter issues during runtime where the creation of ParseObjects using subclassing or other Parse methods fail. This occurs due to the fact that Unity strips code from the project and it will most likely do so for some parts of the Parse.dll assembly file.
+
+To prevent Unity to remove necessary code from the assembly it is necessary to include a link.xml file in your project which tells Unity to not touch anything from the Parse.dll.
+
+```xml
+<linker>
+  <assembly fullname="Parse" preserve="all"/>
+</linker>
+```
+Save the above xml code to a file called 'link.xml' and place it in the Assets folder of your project.
+
+#### Unity3D on Android
+
+When using the Parse SDK on Android target platform you may encounter an issue related to network communication and resolution of host addresses when using the Parse SDK. This occurs in situations where you might use the Parse SDK but did not configure your Android app to require internet access. Whenever a project does not explicitly state it requires internet access Unity will try to remove classes and system assemblies during the build process, causing Parse-calls to fail with different exceptions.
+This may not be the case if your project uses any Unity specific web/networking code, as this will be detected by the engine and the code stripping will not be done.
+
+To set your project, navigate to `Project Settings -> Player -> Other Settings -> Internet Access` and switch it to Require.
+Depending on the version of Unity you are using this setting may be found in a slightly different location or with slightly different naming, use the above path as a guidance.
 
 ### Server-Side Use
 
@@ -159,7 +197,7 @@ await client.LogOutAsync();
 ```
 
 ## Local Builds
-You can build the SDK on any system with the MSBuild or .NET Core CLI installed. Results can be found under either the `Release/netstandard` or `Debug/netstandard` in the `bin` folder unless a non-standard build configuration is used.
+You can build the SDK on any system with the MSBuild or .NET Core CLI installed. Results can be found under either the `Release/netstandard2.0` or `Debug/netstandard2.0` in the `bin` folder unless a non-standard build configuration is used.
 
 ## .NET Core CLI
 
@@ -186,4 +224,6 @@ of patent rights can be found in the PATENTS file in the same directory.
  [license-link]: https://github.com/parse-community/Parse-SDK-dotNET/blob/master/LICENSE
  [nuget-link]: http://nuget.org/packages/parse
  [nuget-svg]: https://img.shields.io/nuget/v/parse.svg
+ [nuget-link-prerelease]: http://nuget.org/packages/parse/absoluteLatest
  [parse-docs-link]: http://docs.parseplatform.org/
+ [releases-link]: https://github.com/TobiasPott/Parse-SDK-dotNET/releases
