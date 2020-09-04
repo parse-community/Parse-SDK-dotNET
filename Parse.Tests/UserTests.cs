@@ -602,7 +602,7 @@ namespace Parse.Tests
             hub.ObjectController = mockObjectController.Object;
             hub.CurrentUserController = new Mock<IParseCurrentUserController> { }.Object;
 
-            return user.LinkWithAsync("parse", new Dictionary<string, object> { }, CancellationToken.None).ContinueWith(task =>
+            return user.LinkToServiceAsync("parse", new Dictionary<string, object> { }, CancellationToken.None).ContinueWith(task =>
             {
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
@@ -656,7 +656,7 @@ namespace Parse.Tests
             hub.ObjectController = mockObjectController.Object;
             hub.CurrentUserController = mockCurrentUserController.Object;
 
-            return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(task =>
+            return user.UnlinkFromServiceAsync("parse", CancellationToken.None).ContinueWith(task =>
             {
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
@@ -710,7 +710,7 @@ namespace Parse.Tests
             hub.ObjectController = mockObjectController.Object;
             hub.CurrentUserController = mockCurrentUserController.Object;
 
-            return user.UnlinkFromAsync("parse", CancellationToken.None).ContinueWith(task =>
+            return user.UnlinkFromServiceAsync("parse", CancellationToken.None).ContinueWith(task =>
             {
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);
@@ -747,7 +747,7 @@ namespace Parse.Tests
 
             hub.UserController = mockController.Object;
 
-            return client.LogInWithAsync("parse", new Dictionary<string, object> { }, CancellationToken.None).ContinueWith(task =>
+            return client.AuthenticateWithServiceAsync("parse", new Dictionary<string, object> { }, CancellationToken.None).ContinueWith(task =>
             {
                 Assert.IsFalse(task.IsFaulted);
                 Assert.IsFalse(task.IsCanceled);

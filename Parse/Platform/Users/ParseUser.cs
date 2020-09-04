@@ -179,16 +179,20 @@ namespace Parse
                 return Task.FromResult(0);
             }
 
-            // Cleanup in-memory session.
+            // TODO: Consider use of toAwait to make sure all tasks are finished before the revokeSession task is executed.
+            // Cleans the stored session.
 
             MutateState(mutableClone => mutableClone.ServerData.Remove("sessionToken"));
             Task revokeSessionTask = Services.RevokeSessionAsync(oldSessionToken, cancellationToken);
             return Task.WhenAll(revokeSessionTask, Services.CurrentUserController.LogOutAsync(Services, cancellationToken));
         }
 
-        internal Task UpgradeToRevocableSessionAsync() => UpgradeToRevocableSessionAsync(CancellationToken.None);
-
-        internal Task UpgradeToRevocableSessionAsync(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => UpgradeToRevocableSessionAsync(toAwait, cancellationToken), cancellationToken);
+        /// <summary>
+        /// Uses a revocable session token for this <see cref="ParseUser"/> instance. 
+        /// </summary>
+        /// <param name="cancellationToken">The cancellation token to use to halt this task if needed before it has finished.</param>
+        /// <returns>A task which will be finished once the move to a revocable session token has occurred.</returns>
+        public Task UpgradeToRevocableSessionAsync(CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => UpgradeToRevocableSessionAsync(toAwait, cancellationToken), cancellationToken);
 
         internal Task UpgradeToRevocableSessionAsync(Task toAwait, CancellationToken cancellationToken)
         {
@@ -259,12 +263,12 @@ namespace Parse
 
                 foreach (KeyValuePair<string, IDictionary<string, object>> pair in authData)
                 {
-                    SynchronizeAuthData(GetProvider(pair.Key));
+                    SynchronizeAuthenticationData(GetProvider(pair.Key));
                 }
             }
         }
 
-        internal void SynchronizeAuthData(IParseAuthenticationProvider provider)
+        internal void SynchronizeAuthenticationData(IParseAuthenticationProvider authenticator)
         {
             bool restorationSuccess = false;
 
@@ -272,57 +276,72 @@ namespace Parse
             {
                 IDictionary<string, IDictionary<string, object>> authData = AuthData;
 
-                if (authData == null || provider == null)
+                if (authData == null || authenticator == null)
                 {
                     return;
                 }
 
-                if (authData.TryGetValue(provider.AuthType, out IDictionary<string, object> data))
+                if (authData.TryGetValue(authenticator.Name, out IDictionary<string, object> data))
                 {
-                    restorationSuccess = provider.RestoreAuthentication(data);
+                    restorationSuccess = authenticator.RestoreAuthentication(data);
                 }
             }
 
             if (!restorationSuccess)
             {
-                UnlinkFromAsync(provider.AuthType, CancellationToken.None);
+                // TODO: Check if lack of await here causes issues.
+
+                UnlinkFromServiceAsync(authenticator.Name, CancellationToken.None);
             }
         }
 
-        internal Task LinkWithAsync(string authType, IDictionary<string, object> data, CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait =>
+        /// <summary>
+        /// Links a user to a service.
+        /// </summary>
+        /// <param name="name">The name of the service to link the user to.</param>
+        /// <param name="data">The authentication data for the service.</param>
+        /// <param name="cancellationToken">The cancellation token which should be used if the link task needs to be halted.</param>
+        /// <returns></returns>
+        public Task LinkToServiceAsync(string name, IDictionary<string, object> data, CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait =>
         {
             IDictionary<string, IDictionary<string, object>> authData = AuthData;
 
             if (authData == null)
             {
-                authData = AuthData = new Dictionary<string, IDictionary<string, object>>();
+                authData = AuthData = new Dictionary<string, IDictionary<string, object>> { };
             }
 
-            authData[authType] = data;
+            authData[name] = data;
             AuthData = authData;
 
             return SaveAsync(cancellationToken);
         }, cancellationToken);
 
-        internal Task LinkWithAsync(string authType, CancellationToken cancellationToken)
+        /// <summary>
+        /// Links a user to a service if the SDK was initialized with an <see cref="IParseAuthenticationProvider"/> with the data needed to authenticate this user.
+        /// </summary>
+        /// <param name="name">The name of the service to link the user to.</param>
+        /// <param name="cancellationToken">The cancellation token which should be used if the link task needs to be halted.</param>
+        /// <returns>A task which completes once the user has been linked to the service</returns>
+        public Task LinkToServiceWithInitializedAuthenticationProviderAsync(string name, CancellationToken cancellationToken = default)
         {
-            IParseAuthenticationProvider provider = GetProvider(authType);
-            return provider.AuthenticateAsync(cancellationToken).OnSuccess(t => LinkWithAsync(authType, t.Result, cancellationToken)).Unwrap();
+            IParseAuthenticationProvider authenticator = GetProvider(name);
+            return authenticator.AuthenticateAsync(cancellationToken).OnSuccess(task => LinkToServiceAsync(name, task.Result, cancellationToken)).Unwrap();
         }
 
         /// <summary>
         /// Unlinks a user from a service.
         /// </summary>
-        internal Task UnlinkFromAsync(string authType, CancellationToken cancellationToken) => LinkWithAsync(authType, null, cancellationToken);
+        public Task UnlinkFromServiceAsync(string name, CancellationToken cancellationToken = default) => LinkToServiceAsync(name, default, cancellationToken);
 
         /// <summary>
         /// Checks whether a user is linked to a service.
         /// </summary>
-        internal bool IsLinked(string authType)
+        public bool CheckLinkedToService(string name)
         {
             lock (Mutex)
             {
-                return AuthData != null && AuthData.ContainsKey(authType) && AuthData[authType] != null;
+                return AuthData != null && AuthData.ContainsKey(name) && AuthData[name] != null;
             }
         }
     }

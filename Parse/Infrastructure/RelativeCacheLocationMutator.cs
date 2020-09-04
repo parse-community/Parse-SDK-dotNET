@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Parse.Abstractions.Infrastructure;
 
 namespace Parse.Infrastructure
@@ -12,17 +14,11 @@ namespace Parse.Infrastructure
         /// </summary>
         public IRelativeCacheLocationGenerator RelativeCacheLocationGenerator { get; set; }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
         public bool Valid => RelativeCacheLocationGenerator is { };
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <param name="target"><inheritdoc/></param>
-        /// <param name="referenceHub"><inheritdoc/></param>
-        public void Mutate(ref IMutableServiceHub target, in IServiceHub referenceHub) => target.CacheController = (target as IServiceHub).CacheController switch
+        public void Mutate(ref IMutableServiceHub target, in IServiceHub referenceHub, Stack<IServiceHubMutator> futureMutators) => target.CacheController = (target as IServiceHub).CacheController switch
         {
             null => new CacheController { RelativeCacheFilePath = RelativeCacheLocationGenerator.GetRelativeCacheFilePath(referenceHub) },
             IDiskFileCacheController { } controller => (Controller: controller, controller.RelativeCacheFilePath = RelativeCacheLocationGenerator.GetRelativeCacheFilePath(referenceHub)).Controller,
