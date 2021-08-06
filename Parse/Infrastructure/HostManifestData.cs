@@ -22,9 +22,9 @@ namespace Parse.Infrastructure
         /// <remarks>Should not be used with Unity.</remarks>
         public static HostManifestData Inferred => new HostManifestData
         {
-            Version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
-            Name = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? Assembly.GetEntryAssembly().GetName().Name,
-            ShortVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(),
+            Version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "",
+            Name = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? Assembly.GetEntryAssembly()?.GetName()?.Name ?? "",
+            ShortVersion = Assembly.GetEntryAssembly()?.GetName()?.Version?.ToString() ?? "",
             // TODO: For Xamarin, use manifest parsing, and for Unity, use some kind of package identifier API.
             Identifier = AppDomain.CurrentDomain.FriendlyName
         };
