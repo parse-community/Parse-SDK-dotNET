@@ -214,8 +214,20 @@ namespace Parse.Infrastructure.Utilities
                 }
                 else
                 {
-                    output = Int64.Parse(m.Value, CultureInfo.InvariantCulture);
-                    return true;
+                    // try to parse to a long assuming it is an integer value (this might fail due to value range differences when storing as double without decimal point or exponent)
+                    if (Int64.TryParse(m.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out long longValue))
+                    {
+                        output = longValue;
+                        return true;
+                    }
+                    // try to parse as double again (most likely due to value range exceeding long type
+                    else if (Double.TryParse(m.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out double doubleValue))
+                    {
+                        output = doubleValue;
+                        return true;
+                    }
+                    else
+                        return false;
                 }
             }
 

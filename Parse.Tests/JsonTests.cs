@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parse.Infrastructure.Utilities;
 
@@ -250,5 +251,29 @@ namespace Parse.Tests
 
             Assert.AreEqual(123456789123456789, (JsonUtilities.Parse("{ \"mura\": 123456789123456789 }") as IDictionary)["mura"]);
         }
+
+
+        [TestMethod]
+        public void TestJsonNumbersAndValueRanges()
+        {
+            //Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("+123456789"));
+            Assert.IsInstanceOfType((JsonUtilities.Parse("{ \"long\": " + long.MaxValue + " }") as IDictionary)["long"], typeof(long));
+            Assert.IsInstanceOfType((JsonUtilities.Parse("{ \"long\": " + long.MinValue + " }") as IDictionary)["long"], typeof(long));
+
+            Assert.AreEqual((JsonUtilities.Parse("{ \"long\": " + long.MaxValue + " }") as IDictionary)["long"], long.MaxValue);
+            Assert.AreEqual((JsonUtilities.Parse("{ \"long\": " + long.MinValue + " }") as IDictionary)["long"], long.MinValue);
+
+
+            Assert.IsInstanceOfType((JsonUtilities.Parse("{ \"double\": " + double.MaxValue.ToString(CultureInfo.InvariantCulture) + " }") as IDictionary)["double"], typeof(double));
+            Assert.IsInstanceOfType((JsonUtilities.Parse("{ \"double\": " + double.MinValue.ToString(CultureInfo.InvariantCulture) + " }") as IDictionary)["double"], typeof(double));
+
+            Assert.AreEqual((JsonUtilities.Parse("{ \"double\": " + double.MaxValue.ToString(CultureInfo.InvariantCulture) + " }") as IDictionary)["double"], double.MaxValue);
+            Assert.AreEqual((JsonUtilities.Parse("{ \"double\": " + double.MinValue.ToString(CultureInfo.InvariantCulture) + " }") as IDictionary)["double"], double.MinValue);
+
+            double outOfInt64RangeValue = -9223372036854776000d;
+            Assert.IsInstanceOfType((JsonUtilities.Parse("{ \"double\": " + outOfInt64RangeValue.ToString(CultureInfo.InvariantCulture) + " }") as IDictionary)["double"], typeof(double));
+            Assert.AreEqual((JsonUtilities.Parse("{ \"double\": " + outOfInt64RangeValue.ToString(CultureInfo.InvariantCulture) + " }") as IDictionary)["double"], outOfInt64RangeValue);
+        }
+
     }
 }
