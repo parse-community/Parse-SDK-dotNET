@@ -119,6 +119,32 @@ This may not be the case if your project uses any Unity specific web/networking 
 To set your project, navigate to `Project Settings -> Player -> Other Settings -> Internet Access` and switch it to Require.
 Depending on the version of Unity you are using this setting may be found in a slightly different location or with slightly different naming, use the above path as a guidance.
 
+### Use in Xamarin
+
+As with [Unity clients](#use-in-unity-client), special configuration is required to use the Parse SDK in Xamarin. The following code can be used to initialize Parse SDK in Xamarin
+projects.
+
+```csharp
+using System;
+using Parse.Infrastructure;
+```
+
+```csharp
+new ParseClient(/* Parameters */,
+    new LateInitializedMutableServiceHub { },
+    new MetadataMutator
+    {
+        EnvironmentData = new EnvironmentData { OSVersion = Environment.OSVersion.ToString(), Platform = Device.RuntimePlatform, TimeZone = TimeZoneInfo.Local.StandardName },
+        HostManifestData = new HostManifestData {
+            Version = this.GetType().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
+            Name = this.GetType().Assembly.GetName().Name,
+            ShortVersion = this.GetType().Assembly.GetName().Version.ToString(),
+            Identifier = AppDomain.CurrentDomain.FriendlyName
+        }
+    }
+    ).Publicize();
+```
+
 ### Server-Side Use
 
 The SDK can be set up in a way such that every new `ParseClient` instance can authenticate a different user concurrently. This is enabled by an `IServiceHubMutator` implementation which adds itself as an `IServiceHubCloner` implementation to the service hub which, making it so that consecutive calls to the cloning `ParseClient` constructor (the one without parameters) will clone the publicized `ParseClient` instance, exposed by `ParseClient.Instance`, replacing the `IParseCurrentUserController` implementation instance with a fresh one with no caching every time. This allows you to configure the original instance, and have the clones retain the general behaviour, while also allowing the differnt users to be signed into the their respective clones and execute requests concurrently, without causing race conditions. To use this feature of the SDK, the first `ParseClient` instance must be constructued and publicized as follows once, before any other `ParseClient` instantiations. Any classes that need to be registered must be done so with the original instance.
