@@ -8,7 +8,7 @@ on:
     paths-ignore:
       - '**/**.md'
 jobs:
-  build:
+  check-ci:
     runs-on: windows-latest
     steps:
     - name: Checkout repository
@@ -22,13 +22,18 @@ jobs:
     - name: Restore NuGet packages
       run: nuget restore Parse.sln
     - name: Install Chocolatey
-      run: Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      run: |
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    # - name: Install Chocolatey
+    #   run: Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
     - name: Install OpenCover and Codecov
       run: |
         choco install opencover.portable -y
         choco install codecov -y
     - name: Build
-      run: msbuild Parse.sln /verbosity:minimal
+      run: dotnet build Parse.sln --configuration Release --no-restore
     - name: Run tests with coverage
       run: |
         OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --test-adapter-path:. --logger:console /p:DebugType=full .\Parse.Tests\Parse.Tests.csproj" -filter:"+[Parse*]* -[Parse.Tests*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
