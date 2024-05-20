@@ -21,17 +21,21 @@ jobs:
       uses: NuGet/setup-nuget@v2.0.0
     - name: Restore NuGet packages
       run: nuget restore Parse.sln
-    - name: Install Chocolatey
-      run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    - name: Install Chocolatey packages
+      uses: crazy-max/ghaction-chocolatey@v1
+      with:
+        args: 'install opencover.portable codecov -y'
+    # - name: Install Chocolatey
+    #   run: |
+    #     Set-ExecutionPolicy Bypass -Scope Process -Force
+    #     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+    #     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
     # - name: Install Chocolatey
     #   run: Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    - name: Install OpenCover and Codecov
-      run: |
-        choco install opencover.portable -y
-        choco install codecov -y
+    # - name: Install OpenCover and Codecov
+    #   run: |
+    #     choco install opencover.portable -y
+    #     choco install codecov -y
     - name: Build
       run: dotnet build Parse.sln --configuration Release --no-restore
     - name: Run tests with coverage
