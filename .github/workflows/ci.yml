@@ -1,0 +1,41 @@
+name: ci
+on:
+  push:
+    branches: [release, alpha, beta, next-major, 'release-[0-9]+.x.x', master, main]
+  pull_request:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**/**.md'
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up NuGet
+      uses: NuGet/setup-nuget@v1.1.1
+    - name: Restore NuGet packages
+      run: nuget restore Parse.sln
+    - name: Install Chocolatey
+      run: Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    - name: Install OpenCover and Codecov
+      run: |
+        choco install opencover.portable -y
+        choco install codecov -y
+    - name: Build
+      run: msbuild Parse.sln /verbosity:minimal
+    - name: Run tests with coverage
+      run: |
+        OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --test-adapter-path:. --logger:console /p:DebugType=full .\Parse.Tests\Parse.Tests.csproj" -filter:"+[Parse*]* -[Parse.Tests*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
+    - name: Upload coverage to Codecov
+      run: codecov -f "parse_sdk_dotnet_coverage.xml"
+    # - name: Upload artifacts
+    #   if: always()
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: Parse NuGet Package
+    #     path: '**/*.nupkg'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
