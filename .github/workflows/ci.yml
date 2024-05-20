@@ -17,8 +17,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '5.0.x'
-    # - name: Set up NuGet
-    #   uses: NuGet/setup-nuget@v2.0.0
     - name: Cache NuGet packages
       uses: actions/cache@v2
       with:
@@ -34,17 +32,6 @@ jobs:
       uses: crazy-max/ghaction-chocolatey@v1
       with:
         args: 'install opencover.portable codecov -y'
-    # - name: Install Chocolatey
-    #   run: |
-    #     Set-ExecutionPolicy Bypass -Scope Process -Force
-    #     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    #     iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    # - name: Install Chocolatey
-    #   run: Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    # - name: Install OpenCover and Codecov
-    #   run: |
-    #     choco install opencover.portable -y
-    #     choco install codecov -y
     - name: Build
       run: dotnet build Parse.sln --configuration Release --no-restore
     - name: Run tests with coverage
