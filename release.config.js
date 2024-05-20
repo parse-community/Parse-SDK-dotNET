@@ -48,7 +48,7 @@ async function config() {
       // { name: 'release-3', range: '3.x.x', channel: '3.x' },
       // { name: 'release-4', range: '4.x.x', channel: '4.x' },
     ],
-    dryRun: true,
+    dryRun: false,
     debug: true,
     ci: false,
     tagFormat: '${version}',
@@ -90,12 +90,12 @@ async function config() {
           }
         ]
       }],
-      // ['@droidsolutions-oss/semantic-release-nuget', {}],
+      ['@droidsolutions-oss/semantic-release-nuget', {}],
       ['@semantic-release/npm', {
         'npmPublish': false,
       }],
       // ['@semantic-release/git', {
-      //   assets: [changelogFile, 'package.json', 'package-lock.json', 'gradle.properties'],
+      //   assets: [changelogFile, 'package.json', 'package-lock.json', './Parse/Parse.csproj'],
       // }],
       // ['@semantic-release/github', {
       //   successComment: getReleaseComment(),
