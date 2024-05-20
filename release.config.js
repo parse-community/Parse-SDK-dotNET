@@ -24,7 +24,7 @@ const templates = {
 async function config() {
 
   // Get branch
-  const branch = 'feat/add-auto-release';//ref.split('/').pop();
+  const branch = ref.split('/').pop();
   console.log(`Running on branch: ${branch}`);
   
   // Set changelog file
@@ -38,7 +38,6 @@ async function config() {
   const config = {
     branches: [
       'master',
-      'feat/add-auto-release',
       // { name: 'alpha', prerelease: true },
       // { name: 'beta', prerelease: true },
       'next-major',
@@ -48,9 +47,9 @@ async function config() {
       // { name: 'release-3', range: '3.x.x', channel: '3.x' },
       // { name: 'release-4', range: '4.x.x', channel: '4.x' },
     ],
-    dryRun: false,
+    dryRun: true,
     debug: true,
-    ci: false,
+    ci: true,
     tagFormat: '${version}',
     plugins: [
       ['@semantic-release/commit-analyzer', {
@@ -94,14 +93,14 @@ async function config() {
       ['@semantic-release/npm', {
         'npmPublish': false,
       }],
-      // ['@semantic-release/git', {
-      //   assets: [changelogFile, 'package.json', 'package-lock.json', './Parse/Parse.csproj'],
-      // }],
-      // ['@semantic-release/github', {
-      //   successComment: getReleaseComment(),
-      //   labels: ['type:ci'],
-      //   releasedLabels: ['state:released<%= nextRelease.channel ? `-\${nextRelease.channel}` : "" %>']
-      // }],
+      ['@semantic-release/git', {
+        assets: [changelogFile, 'package.json', 'package-lock.json', './Parse/Parse.csproj'],
+      }],
+      ['@semantic-release/github', {
+        successComment: getReleaseComment(),
+        labels: ['type:ci'],
+        releasedLabels: ['state:released<%= nextRelease.channel ? `-\${nextRelease.channel}` : "" %>']
+      }],
     ],
   };
 
