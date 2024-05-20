@@ -195,7 +195,7 @@ namespace Parse
         /// Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
         /// to send push notifications but has not necessarily finished sending all notifications
         /// requested. The current status of recent push notifications can be seen in your Push Notifications
-        /// console on http://parse.com
+        /// console.
         /// </summary>
         /// <returns>A Task for continuation.</returns>
         public Task SendAsync() => SendAsync(CancellationToken.None);
@@ -204,7 +204,7 @@ namespace Parse
         /// Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
         /// to send push notifications but has not necessarily finished sending all notifications
         /// requested. The current status of recent push notifications can be seen in your Push Notifications
-        /// console on http://parse.com
+        /// console.
         /// </summary>
         /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
         public Task SendAsync(CancellationToken cancellationToken) => Services.PushController.SendPushNotificationAsync(State, Services, cancellationToken);
