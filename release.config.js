@@ -24,7 +24,7 @@ const templates = {
 async function config() {
 
   // Get branch
-  const branch = ref.split('/').pop();
+  const branch = 'feat/add-auto-release';//ref.split('/').pop();
   console.log(`Running on branch: ${branch}`);
   
   // Set changelog file
@@ -79,18 +79,18 @@ async function config() {
         'changelogFile': changelogFile,
       }],
       ['@droidsolutions-oss/semantic-release-update-file', {}],
-      ['@droidsolutions-oss/semantic-release-nuget', {}],
+      // ['@droidsolutions-oss/semantic-release-nuget', {}],
       ['@semantic-release/npm', {
         'npmPublish': false,
       }],
-      ['@semantic-release/git', {
-        assets: [changelogFile, 'package.json', 'package-lock.json', 'gradle.properties'],
-      }],
-      ['@semantic-release/github', {
-        successComment: getReleaseComment(),
-        labels: ['type:ci'],
-        releasedLabels: ['state:released<%= nextRelease.channel ? `-\${nextRelease.channel}` : "" %>']
-      }],
+      // ['@semantic-release/git', {
+      //   assets: [changelogFile, 'package.json', 'package-lock.json', 'gradle.properties'],
+      // }],
+      // ['@semantic-release/github', {
+      //   successComment: getReleaseComment(),
+      //   labels: ['type:ci'],
+      //   releasedLabels: ['state:released<%= nextRelease.channel ? `-\${nextRelease.channel}` : "" %>']
+      // }],
     ],
   };
 
