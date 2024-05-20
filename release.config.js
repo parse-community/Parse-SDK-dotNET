@@ -38,6 +38,7 @@ async function config() {
   const config = {
     branches: [
       'master',
+      'feat/add-auto-release',
       // { name: 'alpha', prerelease: true },
       // { name: 'beta', prerelease: true },
       'next-major',
@@ -78,7 +79,17 @@ async function config() {
       ['@semantic-release/changelog', {
         'changelogFile': changelogFile,
       }],
-      ['@droidsolutions-oss/semantic-release-update-file', {}],
+      ['@droidsolutions-oss/semantic-release-update-file', {
+        'files': [
+          {
+            'path': ['./Parse/Parse.csproj'],
+            'type': 'xml',
+            'replacements': [
+              { 'key': 'Version', 'value': '${nextRelease.version}' },
+            ]
+          }
+        ]
+      }],
       // ['@droidsolutions-oss/semantic-release-nuget', {}],
       ['@semantic-release/npm', {
         'npmPublish': false,
