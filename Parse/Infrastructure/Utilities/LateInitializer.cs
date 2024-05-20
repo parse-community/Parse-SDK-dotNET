@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#if DEBUG
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Parse.Tests")]
+#endif
+
 namespace Parse.Infrastructure.Utilities
 {
     /// <summary>
