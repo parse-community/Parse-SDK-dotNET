@@ -13,8 +13,12 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '5.0.x'
     - name: Set up NuGet
-      uses: NuGet/setup-nuget@v1.1.1
+      uses: NuGet/setup-nuget@v2.0.0
     - name: Restore NuGet packages
       run: nuget restore Parse.sln
     - name: Install Chocolatey
