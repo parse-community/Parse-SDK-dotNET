@@ -89,7 +89,10 @@ async function config() {
           }
         ]
       }],
-      ['@droidsolutions-oss/semantic-release-nuget', {}],
+      ['@droidsolutions-oss/semantic-release-nuget', {
+        projectPath: './Parse/Parse.csproj',
+        includeSymbols: true,
+      }],
       ['@semantic-release/npm', {
         'npmPublish': false,
       }],
