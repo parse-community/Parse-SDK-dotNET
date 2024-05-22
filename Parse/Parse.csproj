@@ -14,7 +14,7 @@
         <Description>This is the official package for the Parse .NET Standard SDK. Add a cloud backend to any platform supporting .NET Standard 2.0.</Description>
         <Copyright>Copyright © Parse Platform</Copyright>
 
-        <PackageTags>Parse;parse-platform;netstandard;netstandard2.0;backend;sdk;app</PackageTags>
+        <PackageTags>Parse;parse-platform;parse-server;netstandard;netstandard2.0;backend;sdk;app</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageIcon>parse-logo.png</PackageIcon>
