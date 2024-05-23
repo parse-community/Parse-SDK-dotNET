@@ -18,15 +18,15 @@ jobs:
       with:
         dotnet-version: '8'
         cache: true
-    - name: Cache NuGet packages
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.nuget/packages
-          ~/.local/share/NuGet/Cache
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+    # - name: Cache NuGet packages
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: |
+    #       ~/.nuget/packages
+    #       ~/.local/share/NuGet/Cache
+    #     key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-nuget-
     - name: Restore NuGet packages
       run: nuget restore Parse.sln
     - name: Install Chocolatey packages
