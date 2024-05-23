@@ -1,12 +1,38 @@
 # Parse SDK for .NET
-[![Build status](https://ci.appveyor.com/api/projects/status/uoit0ona7m3x9bw6?svg=true)](https://ci.appveyor.com/project/ParseCommunity/parse-sdk-dotnet)
-[![codecov](https://codecov.io/gh/parse-community/Parse-SDK-dotNET/branch/master/graph/badge.svg)](https://codecov.io/gh/parse-community/Parse-SDK-dotNET)
-[![Nuget][nuget-svg]][nuget-link]
-[![License][license-svg]][license-link]
-[![Join The Conversation](https://img.shields.io/discourse/https/community.parseplatform.org/topics.svg)](https://community.parseplatform.org/c/parse-server)
-[![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/parse-server/sponsors/badge.svg)](#sponsors)
-![Twitter Follow](https://img.shields.io/twitter/follow/ParsePlatform.svg?label=Follow%20us%20on%20Twitter&style=social)
+
+---
+
+[![Build Status](https://github.com/parse-community/Parse-SDK-dotNET/workflows/ci/badge.svg?branch=master)](https://github.com/parse-community/Parse-SDK-dotNET/actions?query=workflow%3Aci+branch%3Amaster)
+[![Coverage](https://img.shields.io/codecov/c/github/parse-community/Parse-SDK-dotNET/master.svg)](https://codecov.io/github/parse-community/Parse-SDK-dotNET?branch=master)
+
+
+[![Nuget](https://img.shields.io/nuget/v/parse.svg)](http://nuget.org/packages/parse)
+
+[![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)][open-collective-link]
+[![Sponsors on Open Collective](https://opencollective.com/parse-server/sponsors/badge.svg)][open-collective-link]
+[![Forum](https://img.shields.io/discourse/https/community.parseplatform.org/topics.svg)](https://community.parseplatform.org/c/parse-server)
+[![Twitter](https://img.shields.io/twitter/follow/ParsePlatform.svg?label=Follow&style=social)](https://twitter.com/intent/follow?screen_name=ParsePlatform)
+[![Chat](https://img.shields.io/badge/Chat-Join!-%23fff?style=social&logo=slack)](https://chat.parseplatform.org)
+
+---
+
+A library that gives you access to the powerful Parse Server backend from any platform supporting .NET Standard 2.0. For more information about Parse and its features, visit [parseplatform.org](https://parseplatform.org/).
+
+---
+
+- [Parse SDK for .NET](#parse-sdk-for-net)
+  - [Getting Started](#getting-started)
+  - [Using the Code](#using-the-code)
+    - [Common Definitions](#common-definitions)
+    - [Client-Side Use](#client-side-use)
+    - [Use In Unity Client](#use-in-unity-client)
+      - [Unity3D on iOS](#unity3d-on-ios)
+      - [Unity3D on Android](#unity3d-on-android)
+    - [Server-Side Use](#server-side-use)
+    - [Basic Demonstration](#basic-demonstration)
+  - [Local Builds](#local-builds)
+  - [.NET Core CLI](#net-core-cli)
+
 
 ## Getting Started
 The previous stable release version 1.7.0 is available as [a NuGet package][nuget-link].
@@ -205,25 +231,4 @@ You can build the SDK on any system with the MSBuild or .NET Core CLI installed.
 dotnet build Parse.sln
 ```
 
-## Contributions
-We want to make contributing to this project as easy and transparent as possible. Please refer to the [Contribution Guidelines][contributing].
-
-## License
-
-```
-Copyright (c) 2015-present, Parse, LLC.
-All rights reserved.
-
-This source code is licensed under the BSD-style license found in the
-LICENSE file in the root directory of this source tree. An additional grant 
-of patent rights can be found in the PATENTS file in the same directory.
-```
-
- [contributing]: https://github.com/parse-community/Parse-SDK-dotNET/blob/master/CONTRIBUTING.md
- [license-svg]: https://img.shields.io/badge/license-BSD-lightgrey.svg
- [license-link]: https://github.com/parse-community/Parse-SDK-dotNET/blob/master/LICENSE
- [nuget-link]: http://nuget.org/packages/parse
- [nuget-svg]: https://img.shields.io/nuget/v/parse.svg
- [nuget-link-prerelease]: http://nuget.org/packages/parse/absoluteLatest
- [parse-docs-link]: http://docs.parseplatform.org/
- [releases-link]: https://github.com/TobiasPott/Parse-SDK-dotNET/releases
+[open-collective-link]: https://opencollective.com/parse-server
