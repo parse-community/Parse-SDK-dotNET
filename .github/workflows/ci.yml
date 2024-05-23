@@ -16,17 +16,17 @@ jobs:
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '5'
-        cache: true
-    # - name: Cache NuGet packages
-    #   uses: actions/cache@v2
-    #   with:
-    #     path: |
-    #       ~/.nuget/packages
-    #       ~/.local/share/NuGet/Cache
-    #     key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-    #     restore-keys: |
-    #       ${{ runner.os }}-nuget-
+        dotnet-version: '8'
+        # cache: true
+    - name: Cache NuGet packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.nuget/packages
+          ~/.local/share/NuGet/Cache
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
     - name: Restore NuGet packages
       run: nuget restore Parse.sln
     - name: Install Chocolatey packages
