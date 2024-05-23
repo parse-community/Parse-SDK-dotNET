@@ -13,9 +13,10 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8'
+          cache: true
       # - name: Restore .NET dependencies
       #   run: dotnet restore /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/Parse.csproj
       # - name: Build .NET project
