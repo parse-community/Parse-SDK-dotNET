@@ -51,7 +51,7 @@ namespace Parse
             SetWriteAccess(owner, true);
         }
 
-        IDictionary<string, object> IJsonConvertible.ConvertToJSON()
+        IDictionary<string, object> IJsonConvertible.ConvertToJson()
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             foreach (string user in readers.Union(writers))

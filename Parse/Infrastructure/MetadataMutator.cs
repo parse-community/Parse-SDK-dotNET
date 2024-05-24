@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Parse.Abstractions.Infrastructure;
 
 namespace Parse.Infrastructure
@@ -13,10 +15,11 @@ namespace Parse.Infrastructure
         public bool Valid => this is { EnvironmentData: { OSVersion: { }, Platform: { }, TimeZone: { } }, HostManifestData: { Identifier: { }, Name: { }, ShortVersion: { }, Version: { } } };
 
         /// <summary>
-        /// Sets the <paramref name="target"/> to the <see cref="MetadataMutator"/> instance.
+        /// Sets the <paramref name="mutableHub"/>'s <see cref="IServiceHub.MetadataController"/> to the <see cref="MetadataMutator"/> instance.
         /// </summary>
-        /// <param name="target">The <see cref="IMutableServiceHub"/> to compose the information onto.</param>
-        /// <param name="referenceHub">Thhe <see cref="IServiceHub"/> to use if a default service instance is required.</param>
-        public void Mutate(ref IMutableServiceHub target, in IServiceHub referenceHub) => target.MetadataController = this;
+        /// <param name="mutableHub">The <see cref="IMutableServiceHub"/> to compose the information onto.</param>
+        /// <param name="consumableHub">The <see cref="IServiceHub"/> to use if a default service instance is required.</param>
+        /// <param name="futureMutators">The mutators that will be executed after this one.</param>
+        public void Mutate(ref IMutableServiceHub mutableHub, in IServiceHub consumableHub, Stack<IServiceHubMutator> futureMutators) => mutableHub.MetadataController = this;
     }
 }
