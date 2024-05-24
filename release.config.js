@@ -78,6 +78,7 @@ async function config() {
       ['@semantic-release/changelog', {
         'changelogFile': changelogFile,
       }],
+      // Updates the project version in the semantic release prepare step
       ['@droidsolutions-oss/semantic-release-update-file', {
         'files': [
           {
@@ -103,6 +104,10 @@ async function config() {
       //   'successCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
       //   'failCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
       // }],
+      // Build the DLL file after the version has been updated
+      ["@semantic-release/exec", {
+        'prepareCmd': 'dotnet build ./Parse/Parse.csproj -c Release',
+      }],
       ['@droidsolutions-oss/semantic-release-nuget', {
         projectPath: './Parse/Parse.csproj',
         includeSymbols: true,
