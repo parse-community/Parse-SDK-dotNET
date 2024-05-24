@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/parse-community/Parse-SDK-dotNET/compare/3.0.0...3.0.1) (2024-05-24)
+
+
+### Bug Fixes
+
+* SDK crash on conversion of double type range values to long type ([#342](https://github.com/parse-community/Parse-SDK-dotNET/issues/342)) ([816ba02](https://github.com/parse-community/Parse-SDK-dotNET/commit/816ba02fa3765e01825da741cedb377eb53c97f6))
+
 # [3.0.0](https://github.com/parse-community/Parse-SDK-dotNET/compare/2.0.0...3.0.0) (2024-05-23)
 
 
