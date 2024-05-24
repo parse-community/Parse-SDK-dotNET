@@ -90,11 +90,18 @@ async function config() {
         ]
       }],
       ["@semantic-release/exec", {
-        'verifyConditionsCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin/Release/netstandard2.0',
-        'prepareCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin/Release/netstandard2.0',
-        'publishCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin/Release/netstandard2.0',
-        'successCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin/Release/netstandard2.0',
-        'failCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin/Release/netstandard2.0',
+        'verifyConditionsCmd': 'find / -name "Parse.dll" 2>/dev/null',
+        'prepareCmd': 'find / -name "Parse.dll" 2>/dev/null',
+        'publishCmd': 'find / -name "Parse.dll" 2>/dev/null',
+        'successCmd': 'find / -name "Parse.dll" 2>/dev/null',
+        'failCmd': 'find / -name "Parse.dll" 2>/dev/null',
+      }],
+      ["@semantic-release/exec", {
+        'verifyConditionsCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
+        'prepareCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
+        'publishCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
+        'successCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
+        'failCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
       }],
       ['@droidsolutions-oss/semantic-release-nuget', {
         projectPath: './Parse/Parse.csproj',
