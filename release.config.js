@@ -97,11 +97,11 @@ async function config() {
         'failCmd': 'find / -name "Parse.dll" 2>/dev/null',
       }],
       ["@semantic-release/exec", {
-        'verifyConditionsCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
-        'prepareCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
-        'publishCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
-        'successCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
-        'failCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin',
+        'verifyConditionsCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
+        'prepareCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
+        'publishCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
+        'successCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
+        'failCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
       }],
       ['@droidsolutions-oss/semantic-release-nuget', {
         projectPath: './Parse/Parse.csproj',
