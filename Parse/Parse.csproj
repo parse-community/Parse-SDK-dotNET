@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
-        <Version>3.0.1</Version>
+        <Version>3.0.2</Version>
         <LangVersion>latest</LangVersion>
         
         <Authors>Parse</Authors>

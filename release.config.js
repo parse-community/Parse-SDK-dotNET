@@ -90,20 +90,6 @@ async function config() {
           }
         ]
       }],
-      // ["@semantic-release/exec", {
-      //   'verifyConditionsCmd': 'find / -name "Parse.dll" 2>/dev/null',
-      //   'prepareCmd': 'find / -name "Parse.dll" 2>/dev/null',
-      //   'publishCmd': 'find / -name "Parse.dll" 2>/dev/null',
-      //   'successCmd': 'find / -name "Parse.dll" 2>/dev/null',
-      //   'failCmd': 'find / -name "Parse.dll" 2>/dev/null',
-      // }],
-      // ["@semantic-release/exec", {
-      //   'verifyConditionsCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
-      //   'prepareCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
-      //   'publishCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
-      //   'successCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
-      //   'failCmd': 'ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin 2>/dev/null',
-      // }],
       // Build the DLL file after the version has been updated
       ["@semantic-release/exec", {
         'prepareCmd': 'dotnet build ./Parse/Parse.csproj -c Release',

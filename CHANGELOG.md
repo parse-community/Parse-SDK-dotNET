@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/parse-community/Parse-SDK-dotNET/compare/3.0.1...3.0.2) (2024-05-24)
+
+
+### Bug Fixes
+
+* Cannot access objects without user login ([#368](https://github.com/parse-community/Parse-SDK-dotNET/issues/368)) ([aa278df](https://github.com/parse-community/Parse-SDK-dotNET/commit/aa278df8147516a2ff8a95e1fa0f5f7972c63cc4))
+
 ## [3.0.1](https://github.com/parse-community/Parse-SDK-dotNET/compare/3.0.0...3.0.1) (2024-05-24)
 
 
