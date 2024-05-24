@@ -16,19 +16,13 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '6.x'
-      # - name: Restore .NET dependencies
-      #   run: dotnet restore /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/Parse.csproj
-      # - name: Build .NET project
-      #   run: dotnet build /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/Parse.csproj -c Release
-      # - name: List output directory contents
-      #   run: ls -la /home/runner/work/Parse-SDK-dotNET/Parse-SDK-dotNET/Parse/bin/Release/netstandard2.0
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 18
       - name: Install Node dependencies
         run: npm ci
-      - name: Release
+      - name: Build and publish release
         run: npx semantic-release
         env:
           GH_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
