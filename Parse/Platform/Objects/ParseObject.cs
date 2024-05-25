@@ -113,7 +113,7 @@ namespace Parse
         /// </summary>
         /// <param name="serviceHub">The serviceHub to use for all operations.</param>
         /// <returns>The instance which was mutated.</returns>
-        public ParseObject Bind(IServiceHub serviceHub) => (Instance: this, Services = serviceHub).Instance;
+        public ParseObject Bind(IServiceHub serviceHub) => (Instance: this, Services = ParseClient.Instance).Instance;
 
         /// <summary>
         /// Occurs when a property value changes.
