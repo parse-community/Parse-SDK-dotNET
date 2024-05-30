@@ -112,6 +112,7 @@ namespace Parse.Platform.Objects
             Classes.TryGetValue(className, out ParseObjectClass info);
             Mutex.ExitReadLock();
 
+            serviceHub = serviceHub ?? ParseClient.Instance;
             return info is { } ? info.Instantiate().Bind(serviceHub) : new ParseObject(className, serviceHub);
         }
 
