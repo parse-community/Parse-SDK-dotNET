@@ -32,7 +32,7 @@ namespace Parse.Infrastructure.Data
                 ["base64"] = Convert.ToBase64String(bytes)
             },
             ParseObject { } entity => EncodeObject(entity),
-            IJsonConvertible { } jsonConvertible => jsonConvertible.ConvertToJSON(),
+            IJsonConvertible { } jsonConvertible => jsonConvertible.ConvertToJson(),
             { } when Conversion.As<IDictionary<string, object>>(value) is { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Encode(pair.Value, serviceHub)),
             { } when Conversion.As<IList<object>>(value) is { } list => EncodeList(list, serviceHub),
 

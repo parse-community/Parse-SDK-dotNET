@@ -138,7 +138,7 @@ namespace Parse
 
         #endregion
 
-        IDictionary<string, object> IJsonConvertible.ConvertToJSON()
+        IDictionary<string, object> IJsonConvertible.ConvertToJson()
         {
             if (IsDirty)
             {

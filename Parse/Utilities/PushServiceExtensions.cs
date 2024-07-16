@@ -8,6 +8,9 @@ using Parse.Platform.Push;
 
 namespace Parse
 {
+    /// <summary>
+    /// Utilities to control and interact with the Parse Push service via this SDK.
+    /// </summary>
     public static class PushServiceExtensions
     {
         /// <summary>
