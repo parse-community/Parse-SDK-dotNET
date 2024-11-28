@@ -22,12 +22,15 @@ namespace Parse.Infrastructure
         /// <remarks>Should not be used with Unity.</remarks>
         public static HostManifestData Inferred => new HostManifestData
         {
-            Version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
-            Name = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>()?.Product ?? Assembly.GetEntryAssembly().GetName().Name,
-            ShortVersion = Assembly.GetEntryAssembly().GetName().Version.ToString(),
-            // TODO: For Xamarin, use manifest parsing, and for Unity, use some kind of package identifier API.
-            Identifier = AppDomain.CurrentDomain.FriendlyName
+            Version = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+              ?? "1.0.0", // Default version if not available
+            Name = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyTitleAttribute>()?.Title
+           ?? Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyProductAttribute>()?.Product
+           ?? AppDomain.CurrentDomain.FriendlyName, // Fallback for MAUI
+            ShortVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "1.0",
+            Identifier = AppDomain.CurrentDomain.FriendlyName ?? "UnknownApp"
         };
+
 
         /// <summary>
         /// The build version of your app.
