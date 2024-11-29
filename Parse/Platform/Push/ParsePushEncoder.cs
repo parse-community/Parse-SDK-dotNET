@@ -24,9 +24,11 @@ namespace Parse.Platform.Push
                 ["alert"] = state.Alert
             };
 
+#pragma warning disable CS1030 // #warning directive
 #warning Verify that it is fine to instantiate a ParseQuery<ParseInstallation> here with a default(IServiceHub).
 
             ParseQuery<ParseInstallation> query = state.Query ?? new ParseQuery<ParseInstallation>(default, "_Installation") { };
+#pragma warning restore CS1030 // #warning directive
 
             if (state.Channels != null)
                 query = query.WhereContainedIn("channels", state.Channels);

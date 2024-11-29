@@ -19,12 +19,14 @@ namespace Parse
 
         IServiceHub Services { get; }
 
+#pragma warning disable CS1030 // #warning directive
 #warning Make default(IServiceHub) the default value of serviceHub once all dependents properly inject it.
 
         /// <summary>
         /// Creates a push which will target every device. The Data field must be set before calling SendAsync.
         /// </summary>
         public ParsePush(IServiceHub serviceHub)
+#pragma warning restore CS1030 // #warning directive
         {
             Services = serviceHub ?? ParseClient.Instance;
             State = new MutablePushState { Query = Services.GetInstallationQuery() };

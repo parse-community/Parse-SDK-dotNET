@@ -22,9 +22,11 @@ namespace Parse.Platform.Installations
         {
             lock (Mutex)
             {
+#pragma warning disable CS1030 // #warning directive
 #warning Should refactor here if this operates correctly.
 
                 Task saveTask = installationId is { } ? StorageController.LoadAsync().OnSuccess(storage => storage.Result.AddAsync(InstallationIdKey, installationId.ToString())).Unwrap() : StorageController.LoadAsync().OnSuccess(storage => storage.Result.RemoveAsync(InstallationIdKey)).Unwrap();
+#pragma warning restore CS1030 // #warning directive
 
                 InstallationId = installationId;
                 return saveTask;

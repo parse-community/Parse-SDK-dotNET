@@ -120,12 +120,14 @@ namespace Parse
 
         #region Receiving Push
 
+#pragma warning disable CS1030 // #warning directive
 #warning Check if this should be moved into IParsePushController.
 
         /// <summary>
         /// An event fired when a push notification is received.
         /// </summary>
         public static event EventHandler<ParsePushNotificationEvent> ParsePushNotificationReceived
+#pragma warning restore CS1030 // #warning directive
         {
             add
             {

@@ -71,9 +71,11 @@ namespace Parse.Platform.Objects
                     else
                         throw new ArgumentException($"Tried to register both {previousInfo.TypeInfo.FullName} and {typeInfo.FullName} as the ParseObject subclass of {className}. Cannot determine the right class to use because neither inherits from the other.");
 
+#pragma warning disable CS1030 // #warning directive
 #warning Constructor detection may erroneously find a constructor which should not be used.
 
                 ConstructorInfo constructor = type.FindConstructor() ?? type.FindConstructor(typeof(string), typeof(IServiceHub));
+#pragma warning restore CS1030 // #warning directive
 
                 if (constructor is null)
                     throw new ArgumentException("Cannot register a type that does not implement the default constructor!");

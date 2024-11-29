@@ -192,6 +192,7 @@ namespace Parse
             Task platformHookTask = null;
 
             if (Services.CurrentInstallationController.IsCurrent(this))
+#pragma warning disable CS1030 // #warning directive
             {
                 SetIfDifferent("deviceType", Services.MetadataController.EnvironmentData.Platform);
                 SetIfDifferent("timeZone", Services.MetadataController.EnvironmentData.TimeZone);
@@ -205,6 +206,7 @@ namespace Parse
 
                 //platformHookTask = Client.InstallationDataFinalizer.FinalizeAsync(this);
             }
+#pragma warning restore CS1030 // #warning directive
 
             return platformHookTask.Safe().OnSuccess(_ => base.SaveAsync(toAwait, cancellationToken)).Unwrap().OnSuccess(_ => Services.CurrentInstallationController.IsCurrent(this) ? Task.CompletedTask : Services.CurrentInstallationController.SetAsync(this, cancellationToken)).Unwrap();
         }

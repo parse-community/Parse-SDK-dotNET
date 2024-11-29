@@ -22,12 +22,14 @@ namespace Parse
         /// </remarks>
         public static ParseQuery<ParseInstallation> GetInstallationQuery(this IServiceHub serviceHub) => new ParseQuery<ParseInstallation>(serviceHub);
 
+#pragma warning disable CS1030 // #warning directive
 #warning Consider making the following method asynchronous.
 
         /// <summary>
         /// Gets the ParseInstallation representing this app on this device.
         /// </summary>
         public static ParseInstallation GetCurrentInstallation(this IServiceHub serviceHub)
+#pragma warning restore CS1030 // #warning directive
         {
             Task<ParseInstallation> task = serviceHub.CurrentInstallationController.GetAsync(serviceHub);
 

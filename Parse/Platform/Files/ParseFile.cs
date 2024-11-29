@@ -24,6 +24,7 @@ namespace Parse
         /// <param name="cancellationToken">The cancellation token.</param>
         public static Task SaveFileAsync(this IServiceHub serviceHub, ParseFile file, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default) => file.TaskQueue.Enqueue(toAwait => serviceHub.FileController.SaveAsync(file.State, file.DataStream, serviceHub.GetCurrentSessionToken(), progress, cancellationToken), cancellationToken).OnSuccess(task => file.State = task.Result);
 
+#pragma warning disable CS1030 // #warning directive
 #warning Make serviceHub null by default once dependents properly inject it when needed.
 
         /// <summary>
@@ -31,6 +32,7 @@ namespace Parse
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         public static Task SaveAsync(this ParseFile file, IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.SaveFileAsync(file, cancellationToken);
+#pragma warning restore CS1030 // #warning directive
 
         /// <summary>
         /// Saves the file to the Parse cloud.
@@ -66,6 +68,7 @@ namespace Parse
 
         #region Constructor
 
+#pragma warning disable CS1030 // #warning directive
 #warning Make IServiceHub optionally null once all dependents are injecting it if necessary.
 
         internal ParseFile(string name, Uri uri, string mimeType = null) => State = new FileState
@@ -74,6 +77,7 @@ namespace Parse
             Location = uri,
             MediaType = mimeType
         };
+#pragma warning restore CS1030 // #warning directive
 
         /// <summary>
         /// Creates a new file from a byte array and a name.

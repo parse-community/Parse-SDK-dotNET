@@ -3,12 +3,14 @@ using System.Collections.Generic;
 
 namespace Parse.Infrastructure.Utilities
 {
+#pragma warning disable CS1030 // #warning directive
 #warning Possibly should be refactored.
 
     /// <summary>
     /// A set of utilities for converting generic types between each other.
     /// </summary>
     public static class Conversion
+#pragma warning restore CS1030 // #warning directive
     {
         /// <summary>
         /// Converts a value to the requested type -- coercing primitives to

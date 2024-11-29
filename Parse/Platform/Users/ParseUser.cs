@@ -233,9 +233,11 @@ namespace Parse
             }
         }
 
+#pragma warning disable CS1030 // #warning directive
 #warning Check if the following properties should be injected via IServiceHub.UserController (except for ImmutableKeys).
 
         internal static IParseAuthenticationProvider GetProvider(string providerName) => Authenticators.TryGetValue(providerName, out IParseAuthenticationProvider provider) ? provider : null;
+#pragma warning restore CS1030 // #warning directive
 
         internal static IDictionary<string, IParseAuthenticationProvider> Authenticators { get; } = new Dictionary<string, IParseAuthenticationProvider> { };
 

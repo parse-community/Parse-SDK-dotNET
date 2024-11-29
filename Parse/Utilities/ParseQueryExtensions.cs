@@ -8,6 +8,7 @@ using Parse.Infrastructure.Data;
 
 namespace Parse.Abstractions.Internal
 {
+#pragma warning disable CS1030 // #warning directive
 #warning Fully refactor at some point.
 
     /// <summary>
@@ -21,6 +22,7 @@ namespace Parse.Abstractions.Internal
     /// namespace, which 'wrap' the intenral APIs that already exist.
     /// </summary>
     public static class ParseQueryExtensions
+#pragma warning restore CS1030 // #warning directive
     {
         static MethodInfo ParseObjectGetMethod { get; }
 

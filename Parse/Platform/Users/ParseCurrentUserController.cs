@@ -12,9 +12,11 @@ using Parse.Infrastructure.Data;
 
 namespace Parse.Platform.Users
 {
+#pragma warning disable CS1030 // #warning directive
 #warning This class needs to be rewritten (PCuUsC).
 
     public class ParseCurrentUserController : IParseCurrentUserController
+#pragma warning restore CS1030 // #warning directive
     {
         object Mutex { get; } = new object { };
 

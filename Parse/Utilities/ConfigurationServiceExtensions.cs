@@ -13,6 +13,7 @@ namespace Parse
 
         public static ParseConfiguration BuildConfiguration(this IParseDataDecoder dataDecoder, IDictionary<string, object> configurationData, IServiceHub serviceHub) => ParseConfiguration.Create(configurationData, dataDecoder, serviceHub);
 
+#pragma warning disable CS1030 // #warning directive
 #warning Investigate if these methods which simply block a thread waiting for an asynchronous process to complete should be eliminated.
 
         /// <summary>
@@ -20,6 +21,7 @@ namespace Parse
         /// </summary>
         /// <returns>ParseConfig object</returns>
         public static ParseConfiguration GetCurrentConfiguration(this IServiceHub serviceHub)
+#pragma warning restore CS1030 // #warning directive
         {
             Task<ParseConfiguration> task = serviceHub.ConfigurationController.CurrentConfigurationController.GetCurrentConfigAsync(serviceHub);
 

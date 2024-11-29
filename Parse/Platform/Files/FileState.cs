@@ -12,6 +12,7 @@ namespace Parse.Platform.Files
 
         public Uri Location { get; set; }
 
+#pragma warning disable CS1030 // #warning directive
         public Uri SecureLocation => Location switch
         {
 #warning Investigate if the first branch of this swhich expression should be removed or an explicit failure case when not testing.
@@ -26,5 +27,6 @@ namespace Parse.Platform.Files
             }.Uri,
             _ => Location
         };
+#pragma warning restore CS1030 // #warning directive
     }
 }

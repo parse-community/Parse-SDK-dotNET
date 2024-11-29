@@ -207,9 +207,11 @@ namespace Parse
 
                     user.AuthData[authType] = data;
 
+#pragma warning disable CS1030 // #warning directive
 #warning Check if SynchronizeAllAuthData should accept an IServiceHub for consistency on which actions take place on which IServiceHub implementation instance.
 
                     user.SynchronizeAllAuthData();
+#pragma warning restore CS1030 // #warning directive
                 }
 
                 return SaveCurrentUserAsync(serviceHub, user);
@@ -229,9 +231,11 @@ namespace Parse
 
             if (curUser != null)
             {
+#pragma warning disable CS1030 // #warning directive
 #warning Check if SynchronizeAllAuthData should accept an IServiceHub for consistency on which actions take place on which IServiceHub implementation instance.
 
                 curUser.SynchronizeAuthData(provider);
+#pragma warning restore CS1030 // #warning directive
             }
         }
     }
