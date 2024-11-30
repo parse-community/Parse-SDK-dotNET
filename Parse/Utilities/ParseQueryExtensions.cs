@@ -326,7 +326,7 @@ namespace Parse.Abstractions.Internal
 
                 if (node.Method.Name == "Equals" && node.Method.ReturnType == typeof(bool) && node.Method.GetParameters().Length == 1)
                 {
-                    MethodCallExpression obj = new ObjectNormalizer().Visit(node.Object) as MethodCallExpression,  parameter = new ObjectNormalizer().Visit(node.Arguments[0]) as MethodCallExpression;
+                    MethodCallExpression obj = new ObjectNormalizer().Visit(node.Object) as MethodCallExpression, parameter = new ObjectNormalizer().Visit(node.Arguments[0]) as MethodCallExpression;
 
                     if (IsParseObjectGet(obj) && obj.Object is ParameterExpression || IsParseObjectGet(parameter) && parameter.Object is ParameterExpression)
                     {
@@ -586,7 +586,7 @@ namespace Parse.Abstractions.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> OrderByDescending<TSource, TSelector>( this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.OrderByDescending(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> OrderByDescending<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.OrderByDescending(GetOrderByPath(keySelector));
 
         /// <summary>
         /// Performs a subsequent ordering of a query based upon the key selector provided.
@@ -682,5 +682,9 @@ namespace Parse.Abstractions.Internal
         public static IDictionary<string, object> BuildParameters<T>(this ParseQuery<T> query) where T : ParseObject => query.BuildParameters(false);
 
         public static object GetConstraint<T>(this ParseQuery<T> query, string key) where T : ParseObject => query.GetConstraint(key);
+
     }
+
+
+    
 }

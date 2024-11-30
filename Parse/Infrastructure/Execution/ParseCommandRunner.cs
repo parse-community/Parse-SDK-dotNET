@@ -76,12 +76,27 @@ namespace Parse.Infrastructure.Execution
                 }
                 catch (Exception e)
                 {
-                    throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Invalid or alternatively-formatted response recieved from server.", e);
+                    return new Tuple<HttpStatusCode, IDictionary<string, object>>(
+                        HttpStatusCode.BadRequest, // Use an appropriate error status code
+                        new Dictionary<string, object>
+                        {
+        { "error", "Invalid or alternatively-formatted response received from server." },
+        { "exception", e.Message }
+                        }
+                    );
                 }
 
                 if (responseCode < 200 || responseCode > 299)
                 {
-                    throw new ParseFailureException(contentJson.ContainsKey("code") ? (ParseFailureException.ErrorCode) (long) contentJson["code"] : ParseFailureException.ErrorCode.OtherCause, contentJson.ContainsKey("error") ? contentJson["error"] as string : content);
+
+                    return new Tuple<HttpStatusCode, IDictionary<string, object>>(
+                        (HttpStatusCode) (contentJson.ContainsKey("code") ? (int) (long) contentJson["code"] : 400), // Use the code from contentJson or fallback to 400 (BadRequest)
+                        new Dictionary<string, object>
+                        {
+        { "error", contentJson.ContainsKey("error") ? contentJson["error"] as string : content },
+        { "code", contentJson.ContainsKey("code") ? contentJson["code"] : null }
+                        }
+                    );
                 }
 
                 return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, contentJson);

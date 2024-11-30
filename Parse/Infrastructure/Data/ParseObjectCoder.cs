@@ -37,6 +37,10 @@ namespace Parse.Infrastructure.Data
             IDictionary<string, object> serverData = new Dictionary<string, object> { }, mutableData = new Dictionary<string, object>(data);
 
             string objectId = Extract(mutableData, "objectId", (obj) => obj as string);
+            string email = Extract(mutableData, "email", (obj) => obj as string);
+            string username = Extract(mutableData, "username", (obj) => obj as string);
+            string sessionToken = Extract(mutableData, "sessionToken", (obj) => obj as string);
+            bool emailVerified = Extract(mutableData, "emailVerified", (obj) => (bool) obj);    
             DateTime? createdAt = Extract<DateTime?>(mutableData, "createdAt", (obj) => ParseDataDecoder.ParseDate(obj as string)), updatedAt = Extract<DateTime?>(mutableData, "updatedAt", (obj) => ParseDataDecoder.ParseDate(obj as string));
 
             if (mutableData.ContainsKey("ACL"))
@@ -66,7 +70,11 @@ namespace Parse.Infrastructure.Data
                 ObjectId = objectId,
                 CreatedAt = createdAt,
                 UpdatedAt = updatedAt,
-                ServerData = serverData
+                ServerData = serverData,
+                Email = email,
+                Username = username,
+                EmailVerified = emailVerified,
+                SessionToken = sessionToken 
             };
         }
 

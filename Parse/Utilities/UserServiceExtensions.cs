@@ -54,8 +54,17 @@ namespace Parse
         public static Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default) => serviceHub.UserController.LogInAsync(username, password, serviceHub, cancellationToken).OnSuccess(task =>
         {
             ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(task.Result, "_User");
-            return SaveCurrentUserAsync(serviceHub, user).OnSuccess(_ => user);
+            InstanceUser = user;
+            return SaveCurrentUserAsync(serviceHub, user)
+            .OnSuccess(_ =>
+            {
+                InstanceUser = user;
+                return user;
+            });
         }).Unwrap();
+
+        public static ParseUser InstanceUser { get; set; }
+
 
         /// <summary>
         /// Logs in a user with a username and password. On success, this saves the session to disk so you
@@ -64,11 +73,26 @@ namespace Parse
         /// <param name="sessionToken">The session token to authorize with</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The user if authorization was successful</returns>
-        public static Task<ParseUser> BecomeAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken = default) => serviceHub.UserController.GetUserAsync(sessionToken, serviceHub, cancellationToken).OnSuccess(t =>
+        public static Task<ParseUser> BecomeAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken = default)
         {
-            ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(t.Result, "_User");
-            return SaveCurrentUserAsync(serviceHub, user).OnSuccess(_ => user);
-        }).Unwrap();
+            return serviceHub.UserController.GetUserAsync(sessionToken, serviceHub, cancellationToken)
+                .OnSuccess(t =>
+                {
+                    // Generate the ParseUser object from the returned state
+                    ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(t.Result, "_User");
+
+                    // Save the user locally
+                    return SaveCurrentUserAsync(serviceHub, user)
+                        .OnSuccess(_ =>
+                        {
+                            // Set the authenticated user as the current instance only after successful save
+                            InstanceUser = user;
+                            return user;
+                        });
+                })
+                .Unwrap();
+        }
+
 
         /// <summary>
         /// Logs out the currently logged in user session. This will remove the session from disk, log out of

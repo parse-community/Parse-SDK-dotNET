@@ -114,7 +114,10 @@ namespace Parse.Platform.Objects
             Classes.TryGetValue(className, out ParseObjectClass info);
             Mutex.ExitReadLock();
 
-            return info is { } ? info.Instantiate().Bind(serviceHub) : new ParseObject(className, serviceHub);
+            if (info is { })
+                return  info.Instantiate().Bind(serviceHub);
+            else
+                return  new ParseObject(className, serviceHub);
         }
 
         public IDictionary<string, string> GetPropertyMappings(string className)

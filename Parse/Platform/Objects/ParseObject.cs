@@ -13,6 +13,7 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Utilities;
 using Parse.Platform.Objects;
 using Parse.Infrastructure.Data;
+using System.Diagnostics;
 
 namespace Parse
 {
@@ -56,50 +57,53 @@ namespace Parse
         /// <param name="serviceHub">The <see cref="IServiceHub"/> implementation instance to target for any resources. This paramater can be effectively set after construction via <see cref="Bind(IServiceHub)"/>.</param>
         public ParseObject(string className, IServiceHub serviceHub = default)
         {
-            // We use a ThreadLocal rather than passing a parameter so that createWithoutData can do the
-            // right thing with subclasses. It's ugly and terrible, but it does provide the development
-            // experience we generally want, so... yeah. Sorry to whomever has to deal with this in the
-            // future. I pinky-swear we won't make a habit of this -- you believe me, don't you?
-
-            bool isPointer = CreatingPointer.Value;
-            CreatingPointer.Value = false;
-
-            if (AutoClassName.Equals(className ?? throw new ArgumentException("You must specify a Parse class name when creating a new ParseObject.")))
+            // Validate serviceHub
+            if (serviceHub == null && ParseClient.Instance == null)
             {
-                className = GetType().GetParseClassName();
+                Debug.WriteLine("Warning: Both serviceHub and ParseClient.Instance are null. ParseObject requires explicit initialization via Bind(IServiceHub).");
+
+                //throw new InvalidOperationException("A valid IServiceHub or ParseClient.Instance must be available to construct a ParseObject.");
             }
 
-            // Technically, an exception should be thrown here for when both serviceHub and ParseClient.Instance is null, but it is not possible because ParseObjectClass.Constructor for derived classes is a reference to this constructor, and it will be called with a null serviceHub, then Bind will be called on the constructed object, so this needs to fail softly, unfortunately.
-            // Services = ... ?? throw new InvalidOperationException("A ParseClient needs to be initialized as the configured default instance before any ParseObjects can be instantiated.")
+            Services = serviceHub ?? ParseClient.Instance;
 
-            if ((Services = serviceHub ?? ParseClient.Instance) is { })
+            // Validate and set className
+            if (string.IsNullOrWhiteSpace(className))
             {
-                // If this is supposed to be created by a factory but wasn't, throw an exception.
+                throw new ArgumentException("You must specify a Parse class name when creating a new ParseObject.");
+            }
 
-                if (!Services.ClassController.GetClassMatch(className, GetType()))
+            if (AutoClassName.Equals(className))
+            {
+                className = GetType().GetParseClassName() ?? throw new ArgumentException("Unable to determine class name for ParseObject.");
+            }
+            if (Services is not null)
+            {
+                // Validate against factory requirements
+                if (!Services.ClassController.GetClassMatch(className, GetType()) && GetType() != typeof(ParseObject))
                 {
                     throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
                 }
             }
 
+            // Initialize state
             State = new MutableObjectState { ClassName = className };
             OnPropertyChanged(nameof(ClassName));
-
             OperationSetQueue.AddLast(new Dictionary<string, IParseFieldOperation>());
+
+            // Handle pointer creation
+            bool isPointer = CreatingPointer.Value;
+            CreatingPointer.Value = false;
+
+            Fetched = !isPointer;
+            IsDirty = !isPointer;
 
             if (!isPointer)
             {
-                Fetched = true;
-                IsDirty = true;
-
                 SetDefaultValues();
             }
-            else
-            {
-                IsDirty = false;
-                Fetched = false;
-            }
         }
+
 
         #region ParseObject Creation
 
@@ -314,7 +318,7 @@ namespace Parse
                 {
                     CheckGetAccess(key);
                     object value = EstimatedData[key];
-
+                    //TODO THIS WILL THROW, MAKE IT END GRACEFULLY
                     // A relation may be deserialized without a parent or key. Either way,
                     // make sure it's consistent.
 
@@ -1047,17 +1051,19 @@ namespace Parse
                 }
             }
         }
-
         void CheckGetAccess(string key)
         {
             lock (Mutex)
             {
                 if (!CheckIsDataAvailable(key))
                 {
-                    throw new InvalidOperationException("ParseObject has no data for this key. Call FetchIfNeededAsync() to get the data.");
+                    Debug.WriteLine($"Warning: ParseObject has no data for key '{key}'. Ensure FetchIfNeededAsync() is called before accessing data.");
+                    // Optionally, set a flag or return early to signal the issue.
+                    return;
                 }
             }
         }
+
 
         bool CheckIsDataAvailable(string key)
         {

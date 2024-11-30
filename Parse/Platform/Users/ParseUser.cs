@@ -140,14 +140,14 @@ namespace Parse
 
         /// <summary>
         /// Signs up a new user. This will create a new ParseUser on the server and will also persist the
-        /// session on disk so that you can access the user using <see cref="CurrentUser"/>. A username and
+        /// session on disk so that you can access the user using <see cref="InstanceUser"/>. A username and
         /// password must be set before calling SignUpAsync.
         /// </summary>
         public Task SignUpAsync() => SignUpAsync(CancellationToken.None);
 
         /// <summary>
         /// Signs up a new user. This will create a new ParseUser on the server and will also persist the
-        /// session on disk so that you can access the user using <see cref="CurrentUser"/>. A username and
+        /// session on disk so that you can access the user using <see cref="InstanceUser"/>. A username and
         /// password must be set before calling SignUpAsync.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>

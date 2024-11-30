@@ -110,9 +110,15 @@ namespace Parse
                 // Left in because the property setter might be doing something funky.
 
                 result.IsDirty = false;
-                return result.IsDirty ? throw new InvalidOperationException("A ParseObject subclass default constructor must not make changes to the object that cause it to be dirty.") : result;
+                if (result.IsDirty)
+                    throw new InvalidOperationException("A ParseObject subclass default constructor must not make changes to the object that cause it to be dirty.");
+                else
+                    return  result;
             }
-            finally { ParseObject.CreatingPointer.Value = false; }
+            finally
+            {
+                ParseObject.CreatingPointer.Value = false;
+            }
         }
 
         /// <summary>
