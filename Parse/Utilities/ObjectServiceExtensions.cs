@@ -9,6 +9,7 @@ using Parse.Abstractions.Infrastructure.Control;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
+using System.Diagnostics;
 
 namespace Parse
 {
@@ -507,6 +508,43 @@ namespace Parse
             });
         }).Unwrap();
 
-        internal static string GetFieldForPropertyName(this IServiceHub serviceHub, string className, string propertyName) => serviceHub.ClassController.GetPropertyMappings(className).TryGetValue(propertyName, out string fieldName) ? fieldName : fieldName;
+        internal static string GetFieldForPropertyName(this IServiceHub serviceHub, string className, string propertyName)
+        {
+            if (serviceHub == null)
+            {
+                return null;
+                Debug.WriteLine("ServiceHub is null.");
+            }
+
+            if (string.IsNullOrEmpty(className))
+            {
+                throw new ArgumentException("ClassName cannot be null or empty.", nameof(className));
+            }
+
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                throw new ArgumentException("PropertyName cannot be null or empty.", nameof(propertyName));
+            }
+
+            var classController = serviceHub.ClassController;
+            if (classController == null)
+            {
+                throw new InvalidOperationException("ClassController is null.");
+            }
+
+            var propertyMappings = classController.GetPropertyMappings(className);
+            if (propertyMappings == null)
+            {
+                throw new InvalidOperationException($"Property mappings for class '{className}' are null.");
+            }
+
+            if (!propertyMappings.TryGetValue(propertyName, out string fieldName))
+            {
+                throw new KeyNotFoundException($"Property '{propertyName}' not found in class '{className}'.");
+            }
+
+            return fieldName;
+        }
+
     }
 }
