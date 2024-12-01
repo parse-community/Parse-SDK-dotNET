@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Parse.Platform.Objects;
 
 namespace Parse.Infrastructure.Utilities;
 
@@ -435,10 +436,27 @@ public class JsonUtilities
             return (bool) obj ? "true" : "false";
         if (!obj.GetType().GetTypeInfo().IsPrimitive)
         {
+            if (obj is MutableObjectState state)
+            {
+                // Convert MutableObjectState to a dictionary
+                var stateDict = new Dictionary<string, object>
+            {
+                { "ObjectId", state.ObjectId },
+                { "ClassName", state.ClassName },
+                { "CreatedAt", state.CreatedAt },
+                { "UpdatedAt", state.UpdatedAt },
+                { "ServerData", state.ServerData }
+            };
+
+                // Encode the dictionary recursively
+                return Encode(stateDict);
+            }
+
             Debug.WriteLine("Unable to encode objects of type " + obj.GetType());
-            return string.Empty;
+            return "null"; // Return "null" for unsupported types
         }
-            
+
         return Convert.ToString(obj, CultureInfo.InvariantCulture);
     }
+
 }

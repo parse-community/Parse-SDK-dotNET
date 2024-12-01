@@ -33,28 +33,38 @@ namespace Parse.Platform.Installations
             }
         }
 
-        public Task<Guid?> GetAsync()
+        public async Task<Guid?> GetAsync()
         {
             lock (Mutex)
-                if (InstallationId is { })
-                    return Task.FromResult(InstallationId);
-
-            return StorageController.LoadAsync().OnSuccess(storageTask =>
             {
-                storageTask.Result.TryGetValue(InstallationIdKey, out object id);
+                if (InstallationId != null)
+                {
+                    return InstallationId;
+                }
+            }
 
-                try
+            // Await the asynchronous storage loading task
+            var storageResult = await StorageController.LoadAsync();
+
+            // Try to get the installation ID from the storage result
+            if (storageResult.TryGetValue(InstallationIdKey, out object id) && id is string idString && Guid.TryParse(idString, out Guid parsedId))
+            {
+                lock (Mutex)
                 {
-                    lock (Mutex)
-                        return Task.FromResult(InstallationId = new Guid(id as string));
+                    InstallationId = parsedId; // Cache the parsed ID
+                    return InstallationId;
                 }
-                catch (Exception)
-                {
-                    Guid newInstallationId = Guid.NewGuid();
-                    return SetAsync(newInstallationId).OnSuccess<Guid?>(_ => newInstallationId);
-                }
-            })
-            .Unwrap();
+            }
+
+            // If no valid ID is found, generate a new one
+            Guid newInstallationId = Guid.NewGuid();
+            await SetAsync(newInstallationId); // Save the new ID
+
+            lock (Mutex)
+            {
+                InstallationId = newInstallationId; // Cache the new ID
+                return InstallationId;
+            }
         }
 
         public Task ClearAsync()

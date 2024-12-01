@@ -57,7 +57,9 @@ namespace Parse.Platform.Users
             {
                 // TODO (hallucinogen): we need to use ParseCurrentCoder instead of this janky encoding
 
-                IDictionary<string, object> data = user.ServerDataToJSONObjectForSerialization();
+
+                //IDictionary<string, object> data = user.ServerDataToJSONObjectForSerialization();
+                Dictionary<string, object> data = new();
                 data["objectId"] = user.ObjectId;
 
                 if (user.CreatedAt != null)

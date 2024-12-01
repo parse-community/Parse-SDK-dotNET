@@ -52,10 +52,7 @@ namespace Parse
                     // If the ObjectIds match, it means this ParseUser is the currently
                     // authenticated user.
                     bool isSameUser = currentUser.ObjectId == ObjectId;
-                    if(isSameUser)
-                    {
-                        Debug.WriteLine("Ok");
-                    }
+                   
                     // Return the final result of the comparison
                     return isSameUser;
                 }

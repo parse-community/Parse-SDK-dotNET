@@ -11,127 +11,108 @@ using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Infrastructure.Utilities;
 using BCLWebClient = System.Net.Http.HttpClient;
 
-namespace Parse.Infrastructure.Execution
+namespace Parse.Infrastructure.Execution;
+
+/// <summary>
+/// A universal implementation of <see cref="IWebClient"/>.
+/// </summary>
+public class UniversalWebClient : IWebClient
 {
-    /// <summary>
-    /// A universal implementation of <see cref="IWebClient"/>.
-    /// </summary>
-    public class UniversalWebClient : IWebClient
+    static HashSet<string> ContentHeaders { get; } = new HashSet<string>
     {
-        static HashSet<string> ContentHeaders { get; } = new HashSet<string>
+        { "Allow" },
+        { "Content-Disposition" },
+        { "Content-Encoding" },
+        { "Content-Language" },
+        { "Content-Length" },
+        { "Content-Location" },
+        { "Content-MD5" },
+        { "Content-Range" },
+        { "Content-Type" },
+        { "Expires" },
+        { "Last-Modified" }
+    };
+
+    public UniversalWebClient() : this(new BCLWebClient { }) { }
+
+    public UniversalWebClient(BCLWebClient client) => Client = client;
+
+    BCLWebClient Client { get; set; }
+
+    public async Task<Tuple<HttpStatusCode, string>> ExecuteAsync(
+WebRequest httpRequest,
+IProgress<IDataTransferLevel> uploadProgress,
+IProgress<IDataTransferLevel> downloadProgress,
+CancellationToken cancellationToken)
+    {
+        uploadProgress ??= new Progress<IDataTransferLevel>();
+        downloadProgress ??= new Progress<IDataTransferLevel>();
+
+        using var message = new HttpRequestMessage(new HttpMethod(httpRequest.Method), httpRequest.Target);
+
+        Stream data = httpRequest.Data;
+        if (data != null || httpRequest.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
         {
-            { "Allow" },
-            { "Content-Disposition" },
-            { "Content-Encoding" },
-            { "Content-Language" },
-            { "Content-Length" },
-            { "Content-Location" },
-            { "Content-MD5" },
-            { "Content-Range" },
-            { "Content-Type" },
-            { "Expires" },
-            { "Last-Modified" }
-        };
+            message.Content = new StreamContent(data ?? new MemoryStream(new byte[0]));
+        }
 
-        public UniversalWebClient() : this(new BCLWebClient { }) { }
 
-        public UniversalWebClient(BCLWebClient client) => Client = client;
-
-        BCLWebClient Client { get; set; }
-
-        public Task<Tuple<HttpStatusCode, string>> ExecuteAsync(WebRequest httpRequest, IProgress<IDataTransferLevel> uploadProgress, IProgress<IDataTransferLevel> downloadProgress, CancellationToken cancellationToken)
+        // Add headers to the message
+        if (httpRequest.Headers != null)
         {
-            uploadProgress ??= new Progress<IDataTransferLevel> { };
-            downloadProgress ??= new Progress<IDataTransferLevel> { };
-
-            HttpRequestMessage message = new HttpRequestMessage(new HttpMethod(httpRequest.Method), httpRequest.Target);
-
-            // Fill in zero-length data if method is post.
-            if ((httpRequest.Data is null && httpRequest.Method.ToLower().Equals("post") ? new MemoryStream(new byte[0]) : httpRequest.Data) is Stream { } data)
+            foreach (var header in httpRequest.Headers)
             {
-                message.Content = new StreamContent(data);
-            }
-
-            if (httpRequest.Headers != null)
-            {
-                foreach (KeyValuePair<string, string> header in httpRequest.Headers)
+                if (ContentHeaders.Contains(header.Key))
                 {
-                    if (ContentHeaders.Contains(header.Key))
-                    {
-                        message.Content.Headers.Add(header.Key, header.Value);
-                    }
-                    else
-                    {
-                        message.Headers.Add(header.Key, header.Value);
-                    }
+                    message.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                }
+                else
+                {
+                    message.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
             }
-
-            // Avoid aggressive caching on Windows Phone 8.1.
-
-            message.Headers.Add("Cache-Control", "no-cache");
-            message.Headers.IfModifiedSince = DateTimeOffset.UtcNow;
-
-            // TODO: (richardross) investigate progress here, maybe there's something we're missing in order to support this.
-
-            uploadProgress.Report(new DataTransferLevel { Amount = 0 });
-
-            return Client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ContinueWith(httpMessageTask =>
-            {
-                HttpResponseMessage response = httpMessageTask.Result;
-                uploadProgress.Report(new DataTransferLevel { Amount = 1 });
-
-                return response.Content.ReadAsStreamAsync().ContinueWith(streamTask =>
-                {
-                    MemoryStream resultStream = new MemoryStream { };
-                    Stream responseStream = streamTask.Result;
-
-                    int bufferSize = 4096, bytesRead = 0;
-                    byte[] buffer = new byte[bufferSize];
-                    long totalLength = -1, readSoFar = 0;
-
-                    try
-                    {
-                        totalLength = responseStream.Length;
-                    }
-                    catch { };
-
-                    return InternalExtensions.WhileAsync(() => responseStream.ReadAsync(buffer, 0, bufferSize, cancellationToken).OnSuccess(readTask => (bytesRead = readTask.Result) > 0), () =>
-                    {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        return resultStream.WriteAsync(buffer, 0, bytesRead, cancellationToken).OnSuccess(_ =>
-                        {
-                            cancellationToken.ThrowIfCancellationRequested();
-                            readSoFar += bytesRead;
-
-                            if (totalLength > -1)
-                            {
-                                downloadProgress.Report(new DataTransferLevel { Amount = 1.0 * readSoFar / totalLength });
-                            }
-                        });
-                    }).ContinueWith(_ =>
-                    {
-                        responseStream.Dispose();
-                        return _;
-                    }).Unwrap().OnSuccess(_ =>
-                    {
-                        // If getting stream size is not supported, then report download only once.
-
-                        if (totalLength == -1)
-                        {
-                            downloadProgress.Report(new DataTransferLevel { Amount = 1.0 });
-                        }
-
-                        byte[] resultAsArray = resultStream.ToArray();
-                        resultStream.Dispose();
-
-                        // Assume UTF-8 encoding.
-
-                        return new Tuple<HttpStatusCode, string>(response.StatusCode, Encoding.UTF8.GetString(resultAsArray, 0, resultAsArray.Length));
-                    });
-                });
-            }).Unwrap().Unwrap();
         }
+
+        // Avoid aggressive caching
+        message.Headers.Add("Cache-Control", "no-cache");
+        message.Headers.IfModifiedSince = DateTimeOffset.UtcNow;
+
+        uploadProgress.Report(new DataTransferLevel { Amount = 0 });
+
+        using var response = await Client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        uploadProgress.Report(new DataTransferLevel { Amount = 1 });
+
+        using var responseStream = await response.Content.ReadAsStreamAsync();
+        using var resultStream = new MemoryStream();
+
+        var buffer = new byte[4096];
+        int bytesRead;
+        long totalLength = response.Content.Headers.ContentLength ?? -1;
+        long readSoFar = 0;
+
+        // Read response stream and report progress
+        while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+        {
+            await resultStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
+            readSoFar += bytesRead;
+
+            if (totalLength > 0)
+            {
+                downloadProgress.Report(new DataTransferLevel { Amount = 1.0 * readSoFar / totalLength });
+            }
+        }
+
+        // Report final progress if total length was unknown
+        if (totalLength == -1)
+        {
+            downloadProgress.Report(new DataTransferLevel { Amount = 1.0 });
+        }
+
+        // Convert response to string (assuming UTF-8 encoding)
+        var resultAsArray = resultStream.ToArray();
+        string responseContent = Encoding.UTF8.GetString(resultAsArray);
+
+        return new Tuple<HttpStatusCode, string>(response.StatusCode, responseContent);
     }
+
 }
