@@ -34,6 +34,9 @@ namespace Parse.Platform.Installations
             return data;
         }
 
-        public ParseInstallation Decode(IDictionary<string, object> data, IServiceHub serviceHub) => ClassController.GenerateObjectFromState<ParseInstallation>(ParseObjectCoder.Instance.Decode(data, Decoder, serviceHub), "_Installation", serviceHub);
+        public ParseInstallation Decode(IDictionary<string, object> data, IServiceHub serviceHub)
+        {
+            return ClassController.GenerateObjectFromState<ParseInstallation>(ParseObjectCoder.Instance.Decode(data, Decoder, serviceHub), "_Installation", serviceHub);
+        }
     }
 }

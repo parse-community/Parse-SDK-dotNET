@@ -22,7 +22,10 @@ namespace Parse.Infrastructure.Utilities
         /// JSON deserialization can be safely assumed to be lists or dictionaries of
         /// objects.
         /// </summary>
-        public static T As<T>(object value) where T : class => ConvertTo<T>(value) as T;
+        public static T As<T>(object value) where T : class
+        {
+            return ConvertTo<T>(value) as T;
+        }
 
         /// <summary>
         /// Converts a value to the requested type -- coercing primitives to
@@ -34,7 +37,10 @@ namespace Parse.Infrastructure.Utilities
         /// JSON deserialization can be safely assumed to be lists or dictionaries of
         /// objects.
         /// </summary>
-        public static T To<T>(object value) => (T) ConvertTo<T>(value);
+        public static T To<T>(object value)
+        {
+            return (T) ConvertTo<T>(value);
+        }
 
         /// <summary>
         /// Converts a value to the requested type -- coercing primitives to

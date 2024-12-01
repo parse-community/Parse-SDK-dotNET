@@ -22,7 +22,10 @@ namespace Parse
         /// </summary>
         /// <param name="serviceHub">The target <see cref="IServiceHub"/> instance.</param>
         /// <typeparam name="T">The ParseObject subclass type to register.</typeparam>
-        public static void AddValidClass<T>(this IServiceHub serviceHub) where T : ParseObject, new() => serviceHub.ClassController.AddValid(typeof(T));
+        public static void AddValidClass<T>(this IServiceHub serviceHub) where T : ParseObject, new()
+        {
+            serviceHub.ClassController.AddValid(typeof(T));
+        }
 
         /// <summary>
         /// Registers a custom subclass type with the Parse SDK, enabling strong-typing of those ParseObjects whenever
@@ -44,7 +47,10 @@ namespace Parse
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="serviceHub"></param>
-        public static void RemoveClass<T>(this IServiceHub serviceHub) where T : ParseObject, new() => serviceHub.ClassController.RemoveClass(typeof(T));
+        public static void RemoveClass<T>(this IServiceHub serviceHub) where T : ParseObject, new()
+        {
+            serviceHub.ClassController.RemoveClass(typeof(T));
+        }
 
         /// <summary>
         /// Unregisters a previously-registered sub-class of <see cref="ParseObject"/> with the subclassing controller.
@@ -65,19 +71,28 @@ namespace Parse
         /// </summary>
         /// <param name="className">The class of object to create.</param>
         /// <returns>A new ParseObject for the given class name.</returns>
-        public static ParseObject CreateObject(this IServiceHub serviceHub, string className) => serviceHub.ClassController.Instantiate(className, serviceHub);
+        public static ParseObject CreateObject(this IServiceHub serviceHub, string className)
+        {
+            return serviceHub.ClassController.Instantiate(className, serviceHub);
+        }
 
         /// <summary>
         /// Creates a new ParseObject based upon a given subclass type.
         /// </summary>
         /// <returns>A new ParseObject for the given class name.</returns>
-        public static T CreateObject<T>(this IServiceHub serviceHub) where T : ParseObject => (T) serviceHub.ClassController.CreateObject<T>(serviceHub);
+        public static T CreateObject<T>(this IServiceHub serviceHub) where T : ParseObject
+        {
+            return (T) serviceHub.ClassController.CreateObject<T>(serviceHub);
+        }
 
         /// <summary>
         /// Creates a new ParseObject based upon a given subclass type.
         /// </summary>
         /// <returns>A new ParseObject for the given class name.</returns>
-        public static T CreateObject<T>(this IParseObjectClassController classController, IServiceHub serviceHub) where T : ParseObject => (T) classController.Instantiate(classController.GetClassName(typeof(T)), serviceHub);
+        public static T CreateObject<T>(this IParseObjectClassController classController, IServiceHub serviceHub) where T : ParseObject
+        {
+            return (T) classController.Instantiate(classController.GetClassName(typeof(T)), serviceHub);
+        }
 
         /// <summary>
         /// Creates a reference to an existing ParseObject for use in creating associations between
@@ -88,7 +103,10 @@ namespace Parse
         /// <param name="className">The object's class.</param>
         /// <param name="objectId">The object id for the referenced object.</param>
         /// <returns>A ParseObject without data.</returns>
-        public static ParseObject CreateObjectWithoutData(this IServiceHub serviceHub, string className, string objectId) => serviceHub.ClassController.CreateObjectWithoutData(className, objectId, serviceHub);
+        public static ParseObject CreateObjectWithoutData(this IServiceHub serviceHub, string className, string objectId)
+        {
+            return serviceHub.ClassController.CreateObjectWithoutData(className, objectId, serviceHub);
+        }
 
         /// <summary>
         /// Creates a reference to an existing ParseObject for use in creating associations between
@@ -129,13 +147,19 @@ namespace Parse
         /// </summary>
         /// <param name="objectId">The object id for the referenced object.</param>
         /// <returns>A ParseObject without data.</returns>
-        public static T CreateObjectWithoutData<T>(this IServiceHub serviceHub, string objectId) where T : ParseObject => (T) serviceHub.CreateObjectWithoutData(serviceHub.ClassController.GetClassName(typeof(T)), objectId);
+        public static T CreateObjectWithoutData<T>(this IServiceHub serviceHub, string objectId) where T : ParseObject
+        {
+            return (T) serviceHub.CreateObjectWithoutData(serviceHub.ClassController.GetClassName(typeof(T)), objectId);
+        }
 
         /// <summary>
         /// Deletes each object in the provided list.
         /// </summary>
         /// <param name="objects">The objects to delete.</param>
-        public static Task DeleteObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject => DeleteObjectsAsync(serviceHub, objects, CancellationToken.None);
+        public static Task DeleteObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject
+        {
+            return DeleteObjectsAsync(serviceHub, objects, CancellationToken.None);
+        }
 
         /// <summary>
         /// Deletes each object in the provided list.
@@ -164,7 +188,10 @@ namespace Parse
         /// </summary>
         /// <param name="objects">The objects to fetch.</param>
         /// <returns>The list passed in for convenience.</returns>
-        public static Task<IEnumerable<T>> FetchObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject => FetchObjectsAsync(serviceHub, objects, CancellationToken.None);
+        public static Task<IEnumerable<T>> FetchObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject
+        {
+            return FetchObjectsAsync(serviceHub, objects, CancellationToken.None);
+        }
 
         /// <summary>
         /// Fetches all of the objects in the provided list.
@@ -172,14 +199,20 @@ namespace Parse
         /// <param name="objects">The objects to fetch.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The list passed in for convenience.</returns>
-        public static Task<IEnumerable<T>> FetchObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) => serviceHub.FetchAllInternalAsync(objects, true, toAwait, cancellationToken), cancellationToken);
+        public static Task<IEnumerable<T>> FetchObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject
+        {
+            return EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) => serviceHub.FetchAllInternalAsync(objects, true, toAwait, cancellationToken), cancellationToken);
+        }
 
         /// <summary>
         /// Fetches all of the objects that don't have data in the provided list.
         /// </summary>
         /// <param name="objects">todo: describe objects parameter on FetchAllIfNeededAsync</param>
         /// <returns>The list passed in for convenience.</returns>
-        public static Task<IEnumerable<T>> FetchObjectsIfNeededAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject => FetchObjectsIfNeededAsync(serviceHub, objects, CancellationToken.None);
+        public static Task<IEnumerable<T>> FetchObjectsIfNeededAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject
+        {
+            return FetchObjectsIfNeededAsync(serviceHub, objects, CancellationToken.None);
+        }
 
         /// <summary>
         /// Fetches all of the objects that don't have data in the provided list.
@@ -187,7 +220,10 @@ namespace Parse
         /// <param name="objects">The objects to fetch.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The list passed in for convenience.</returns>
-        public static Task<IEnumerable<T>> FetchObjectsIfNeededAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) => serviceHub.FetchAllInternalAsync(objects, false, toAwait, cancellationToken), cancellationToken);
+        public static Task<IEnumerable<T>> FetchObjectsIfNeededAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject
+        {
+            return EnqueueForAll(objects.Cast<ParseObject>(), (Task toAwait) => serviceHub.FetchAllInternalAsync(objects, false, toAwait, cancellationToken), cancellationToken);
+        }
 
         /// <summary>
         /// Gets a <see cref="ParseQuery{ParseObject}"/> for the type of object specified by
@@ -214,14 +250,20 @@ namespace Parse
         /// Saves each object in the provided list.
         /// </summary>
         /// <param name="objects">The objects to save.</param>
-        public static Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject => SaveObjectsAsync(serviceHub, objects, CancellationToken.None);
+        public static Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects) where T : ParseObject
+        {
+            return SaveObjectsAsync(serviceHub, objects, CancellationToken.None);
+        }
 
         /// <summary>
         /// Saves each object in the provided list.
         /// </summary>
         /// <param name="objects">The objects to save.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject => DeepSaveAsync(serviceHub, objects.ToList(), serviceHub.GetCurrentSessionToken(), cancellationToken);
+        public static Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject
+        {
+            return DeepSaveAsync(serviceHub, objects.ToList(), serviceHub.GetCurrentSessionToken(), cancellationToken);
+        }
 
         /// <summary>
         /// Flattens dictionaries and lists into a single enumerable of all contained objects
@@ -238,15 +280,40 @@ namespace Parse
         }
 
         // TODO (hallucinogen): add unit test
-        internal static T GenerateObjectFromState<T>(this IServiceHub serviceHub, IObjectState state, string defaultClassName) where T : ParseObject => serviceHub.ClassController.GenerateObjectFromState<T>(state, defaultClassName, serviceHub);
-
-        internal static T GenerateObjectFromState<T>(this IParseObjectClassController classController, IObjectState state, string defaultClassName, IServiceHub serviceHub) where T : ParseObject
+        internal static T GenerateObjectFromState<T>(this IServiceHub serviceHub, IObjectState state, string defaultClassName) where T : ParseObject
         {
-            T obj = (T) classController.CreateObjectWithoutData(state.ClassName ?? defaultClassName, state.ObjectId, serviceHub);
+            var obj = serviceHub.ClassController.GenerateObjectFromState<T>(state, defaultClassName, serviceHub);
+            return obj;
+        }
+
+        internal static T GenerateObjectFromState<T>(
+    this IParseObjectClassController classController,
+    IObjectState state,
+    string defaultClassName,
+    IServiceHub serviceHub
+) where T : ParseObject
+        {
+            if (state == null)
+            {
+                throw new ArgumentNullException(nameof(state), "The state cannot be null.");
+            }
+
+            if (string.IsNullOrEmpty(state.ClassName) && string.IsNullOrEmpty(defaultClassName))
+            {
+                throw new InvalidOperationException("Both state.ClassName and defaultClassName are null or empty. Unable to determine class name.");
+            }
+
+            // Use the provided class name from the state, or fall back to the default class name
+            string className = state.ClassName ?? defaultClassName;
+            state.ClassName = className;    //to make it so that user cl
+            var obj = (T) ParseClient.Instance.CreateObject(className);
+            
+            
             obj.HandleFetchResult(state);
 
             return obj;
         }
+
 
         internal static IDictionary<string, object> GenerateJSONObjectForSaving(this IServiceHub serviceHub, IDictionary<string, IParseFieldOperation> operations)
         {
@@ -264,7 +331,10 @@ namespace Parse
         /// Returns true if the given object can be serialized for saving as a value
         /// that is pointed to by a ParseObject.
         /// </summary>
-        internal static bool CanBeSerializedAsValue(this IServiceHub serviceHub, object value) => TraverseObjectDeep(serviceHub, value, yieldRoot: true).OfType<ParseObject>().All(entity => entity.ObjectId is { });
+        internal static bool CanBeSerializedAsValue(this IServiceHub serviceHub, object value)
+        {
+            return TraverseObjectDeep(serviceHub, value, yieldRoot: true).OfType<ParseObject>().All(entity => entity.ObjectId is { });
+        }
 
         static void CollectDirtyChildren(this IServiceHub serviceHub, object node, IList<ParseObject> dirtyChildren, ICollection<ParseObject> seen, ICollection<ParseObject> seenNew)
         {
@@ -316,7 +386,10 @@ namespace Parse
         /// Helper version of CollectDirtyChildren so that callers don't have to add the internally
         /// used parameters.
         /// </summary>
-        static void CollectDirtyChildren(this IServiceHub serviceHub, object node, IList<ParseObject> dirtyChildren) => CollectDirtyChildren(serviceHub, node, dirtyChildren, new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()), new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()));
+        static void CollectDirtyChildren(this IServiceHub serviceHub, object node, IList<ParseObject> dirtyChildren)
+        {
+            CollectDirtyChildren(serviceHub, node, dirtyChildren, new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()), new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()));
+        }
 
         internal static Task DeepSaveAsync(this IServiceHub serviceHub, object target, string sessionToken, CancellationToken cancellationToken)
         {
@@ -476,7 +549,9 @@ namespace Parse
         /// <param name="toAwait">A task to await before starting.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The list passed in for convenience.</returns>
-        static Task<IEnumerable<T>> FetchAllInternalAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, bool force, Task toAwait, CancellationToken cancellationToken) where T : ParseObject => toAwait.OnSuccess(_ =>
+        static Task<IEnumerable<T>> FetchAllInternalAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, bool force, Task toAwait, CancellationToken cancellationToken) where T : ParseObject
+        {
+            return toAwait.OnSuccess(_ =>
         {
             if (objects.Any(obj => obj.State.ObjectId == null))
             {
@@ -513,13 +588,14 @@ namespace Parse
                 return objects;
             });
         }).Unwrap();
+        }
 
         internal static string GetFieldForPropertyName(this IServiceHub serviceHub, string className, string propertyName)
         {
             if (serviceHub == null)
             {
-                return null;
                 Debug.WriteLine("ServiceHub is null.");
+                return null;
             }
 
             if (string.IsNullOrEmpty(className))

@@ -39,6 +39,9 @@ namespace Parse.Infrastructure
         /// Generates a path for use in the <see cref="GetRelativeCacheFilePath(IServiceHub)"/> method.
         /// </summary>
         /// <returns>A potential path to the cachefile</returns>
-        string GeneratePath() => Path.Combine(nameof(Parse), IsFallback ? "_fallback" : "_global", $"{(IsFallback ? new Random { }.Next().ToString() : Identifier)}.cachefile");
+        string GeneratePath()
+        {
+            return Path.Combine(nameof(Parse), IsFallback ? "_fallback" : "_global", $"{(IsFallback ? new Random { }.Next().ToString() : Identifier)}.cachefile");
+        }
     }
 }

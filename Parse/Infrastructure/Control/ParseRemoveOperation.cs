@@ -15,22 +15,31 @@ namespace Parse.Infrastructure.Control
 
         public ParseRemoveOperation(IEnumerable<object> objects) => Data = new ReadOnlyCollection<object>(objects.Distinct().ToList());
 
-        public object Encode(IServiceHub serviceHub) => new Dictionary<string, object>
+        public object Encode(IServiceHub serviceHub)
         {
-            ["__op"] = "Remove",
-            ["objects"] = PointerOrLocalIdEncoder.Instance.Encode(Data, serviceHub)
-        };
+            return new Dictionary<string, object>
+            {
+                ["__op"] = "Remove",
+                ["objects"] = PointerOrLocalIdEncoder.Instance.Encode(Data, serviceHub)
+            };
+        }
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
         {
-            null => this,
-            ParseDeleteOperation _ => previous,
-            ParseSetOperation setOp => new ParseSetOperation(Apply(Conversion.As<IList<object>>(setOp.Value), default)),
-            ParseRemoveOperation oldOp => new ParseRemoveOperation(oldOp.Objects.Concat(Data)),
-            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
-        };
+            return previous switch
+            {
+                null => this,
+                ParseDeleteOperation _ => previous,
+                ParseSetOperation setOp => new ParseSetOperation(Apply(Conversion.As<IList<object>>(setOp.Value), default)),
+                ParseRemoveOperation oldOp => new ParseRemoveOperation(oldOp.Objects.Concat(Data)),
+                _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+            };
+        }
 
-        public object Apply(object oldValue, string key) => oldValue is { } ? Conversion.As<IList<object>>(oldValue).Except(Data, ParseFieldOperations.ParseObjectComparer).ToList() : new List<object> { };
+        public object Apply(object oldValue, string key)
+        {
+            return oldValue is { } ? Conversion.As<IList<object>>(oldValue).Except(Data, ParseFieldOperations.ParseObjectComparer).ToList() : new List<object> { };
+        }
 
         public IEnumerable<object> Objects => Data;
     }

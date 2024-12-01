@@ -32,24 +32,36 @@ namespace Parse.Platform.Configuration
             TaskQueue = new TaskQueue { };
         }
 
-        public Task<ParseConfiguration> GetCurrentConfigAsync(IServiceHub serviceHub) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration is { } ? Task.FromResult(CurrentConfiguration) : StorageController.LoadAsync().OnSuccess(task =>
+        public Task<ParseConfiguration> GetCurrentConfigAsync(IServiceHub serviceHub)
+        {
+            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration is { } ? Task.FromResult(CurrentConfiguration) : StorageController.LoadAsync().OnSuccess(task =>
         {
             task.Result.TryGetValue(CurrentConfigurationKey, out object data);
             return CurrentConfiguration = data is string { } configuration ? Decoder.BuildConfiguration(ParseClient.DeserializeJsonString(configuration), serviceHub) : new ParseConfiguration(serviceHub);
         })), CancellationToken.None).Unwrap();
+        }
 
-        public Task SetCurrentConfigAsync(ParseConfiguration target) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
+        public Task SetCurrentConfigAsync(ParseConfiguration target)
+        {
+            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
         {
             CurrentConfiguration = target;
             return StorageController.LoadAsync().OnSuccess(task => task.Result.AddAsync(CurrentConfigurationKey, ParseClient.SerializeJsonString(((IJsonConvertible) target).ConvertToJSON())));
         }).Unwrap().Unwrap(), CancellationToken.None);
+        }
 
-        public Task ClearCurrentConfigAsync() => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
+        public Task ClearCurrentConfigAsync()
+        {
+            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
         {
             CurrentConfiguration = null;
             return StorageController.LoadAsync().OnSuccess(task => task.Result.RemoveAsync(CurrentConfigurationKey));
         }).Unwrap().Unwrap(), CancellationToken.None);
+        }
 
-        public Task ClearCurrentConfigInMemoryAsync() => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration = null), CancellationToken.None);
+        public Task ClearCurrentConfigInMemoryAsync()
+        {
+            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration = null), CancellationToken.None);
+        }
     }
 }

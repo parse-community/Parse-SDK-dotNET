@@ -16,13 +16,22 @@ namespace Parse.Infrastructure.Utilities
         private readonly IDictionary<string, TIn> toWrap;
         public FlexibleDictionaryWrapper(IDictionary<string, TIn> toWrap) => this.toWrap = toWrap;
 
-        public void Add(string key, TOut value) => toWrap.Add(key, (TIn) Conversion.ConvertTo<TIn>(value));
+        public void Add(string key, TOut value)
+        {
+            toWrap.Add(key, (TIn) Conversion.ConvertTo<TIn>(value));
+        }
 
-        public bool ContainsKey(string key) => toWrap.ContainsKey(key);
+        public bool ContainsKey(string key)
+        {
+            return toWrap.ContainsKey(key);
+        }
 
         public ICollection<string> Keys => toWrap.Keys;
 
-        public bool Remove(string key) => toWrap.Remove(key);
+        public bool Remove(string key)
+        {
+            return toWrap.Remove(key);
+        }
 
         public bool TryGetValue(string key, out TOut value)
         {
@@ -40,13 +49,22 @@ namespace Parse.Infrastructure.Utilities
             set => toWrap[key] = (TIn) Conversion.ConvertTo<TIn>(value);
         }
 
-        public void Add(KeyValuePair<string, TOut> item) => toWrap.Add(new KeyValuePair<string, TIn>(item.Key,
+        public void Add(KeyValuePair<string, TOut> item)
+        {
+            toWrap.Add(new KeyValuePair<string, TIn>(item.Key,
                 (TIn) Conversion.ConvertTo<TIn>(item.Value)));
+        }
 
-        public void Clear() => toWrap.Clear();
+        public void Clear()
+        {
+            toWrap.Clear();
+        }
 
-        public bool Contains(KeyValuePair<string, TOut> item) => toWrap.Contains(new KeyValuePair<string, TIn>(item.Key,
+        public bool Contains(KeyValuePair<string, TOut> item)
+        {
+            return toWrap.Contains(new KeyValuePair<string, TIn>(item.Key,
                 (TIn) Conversion.ConvertTo<TIn>(item.Value)));
+        }
 
         public void CopyTo(KeyValuePair<string, TOut>[] array, int arrayIndex)
         {
@@ -60,8 +78,11 @@ namespace Parse.Infrastructure.Utilities
 
         public bool IsReadOnly => toWrap.IsReadOnly;
 
-        public bool Remove(KeyValuePair<string, TOut> item) => toWrap.Remove(new KeyValuePair<string, TIn>(item.Key,
+        public bool Remove(KeyValuePair<string, TOut> item)
+        {
+            return toWrap.Remove(new KeyValuePair<string, TIn>(item.Key,
                 (TIn) Conversion.ConvertTo<TIn>(item.Value)));
+        }
 
         public IEnumerator<KeyValuePair<string, TOut>> GetEnumerator()
         {
@@ -70,6 +91,9 @@ namespace Parse.Infrastructure.Utilities
                     (TOut) Conversion.ConvertTo<TOut>(pair.Value));
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

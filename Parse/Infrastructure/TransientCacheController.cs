@@ -26,11 +26,20 @@ namespace Parse.Infrastructure
 
         VirtualCache Cache { get; } = new VirtualCache { };
 
-        public void Clear() => Cache.Clear();
+        public void Clear()
+        {
+            Cache.Clear();
+        }
 
-        public FileInfo GetRelativeFile(string path) => throw new NotSupportedException(TransientCacheControllerDiskFileOperationNotSupportedMessage);
+        public FileInfo GetRelativeFile(string path)
+        {
+            throw new NotSupportedException(TransientCacheControllerDiskFileOperationNotSupportedMessage);
+        }
 
-        public Task<IDataCache<string, object>> LoadAsync() => Task.FromResult<IDataCache<string, object>>(Cache);
+        public Task<IDataCache<string, object>> LoadAsync()
+        {
+            return Task.FromResult<IDataCache<string, object>>(Cache);
+        }
 
         public Task<IDataCache<string, object>> SaveAsync(IDictionary<string, object> contents)
         {
@@ -42,6 +51,9 @@ namespace Parse.Infrastructure
             return Task.FromResult<IDataCache<string, object>>(Cache);
         }
 
-        public Task TransferAsync(string originFilePath, string targetFilePath) => Task.FromException(new NotSupportedException(TransientCacheControllerDiskFileOperationNotSupportedMessage));
+        public Task TransferAsync(string originFilePath, string targetFilePath)
+        {
+            return Task.FromException(new NotSupportedException(TransientCacheControllerDiskFileOperationNotSupportedMessage));
+        }
     }
 }

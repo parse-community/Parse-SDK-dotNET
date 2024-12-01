@@ -20,7 +20,10 @@ namespace Parse.Platform.Configuration
 
         ParseConfiguration(IDictionary<string, object> properties, IServiceHub serviceHub) : this(serviceHub) => Properties = properties;
 
-        internal static ParseConfiguration Create(IDictionary<string, object> configurationData, IParseDataDecoder decoder, IServiceHub serviceHub) => new ParseConfiguration(decoder.Decode(configurationData["params"], serviceHub) as IDictionary<string, object>, serviceHub);
+        internal static ParseConfiguration Create(IDictionary<string, object> configurationData, IParseDataDecoder decoder, IServiceHub serviceHub)
+        {
+            return new ParseConfiguration(decoder.Decode(configurationData["params"], serviceHub) as IDictionary<string, object>, serviceHub);
+        }
 
         /// <summary>
         /// Gets a value for the key of a particular type.
@@ -33,7 +36,10 @@ namespace Parse.Platform.Configuration
         /// and <paramref name="key"/> is not found.</exception>
         /// <exception cref="System.FormatException">The property under this <paramref name="key"/>
         /// key was found, but of a different type.</exception>
-        public T Get<T>(string key) => Conversion.To<T>(Properties[key]);
+        public T Get<T>(string key)
+        {
+            return Conversion.To<T>(Properties[key]);
+        }
 
         /// <summary>
         /// Populates result with the value for the key, if possible.
@@ -70,9 +76,12 @@ namespace Parse.Platform.Configuration
         /// <returns>The value for the key.</returns>
         virtual public object this[string key] => Properties[key];
 
-        IDictionary<string, object> IJsonConvertible.ConvertToJSON() => new Dictionary<string, object>
+        IDictionary<string, object> IJsonConvertible.ConvertToJSON()
         {
-            ["params"] = NoObjectsEncoder.Instance.Encode(Properties, Services)
-        };
+            return new Dictionary<string, object>
+            {
+                ["params"] = NoObjectsEncoder.Instance.Encode(Properties, Services)
+            };
+        }
     }
 }

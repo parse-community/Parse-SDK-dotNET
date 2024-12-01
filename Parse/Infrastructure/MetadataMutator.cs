@@ -17,6 +17,9 @@ namespace Parse.Infrastructure
         /// </summary>
         /// <param name="target">The <see cref="IMutableServiceHub"/> to compose the information onto.</param>
         /// <param name="referenceHub">Thhe <see cref="IServiceHub"/> to use if a default service instance is required.</param>
-        public void Mutate(ref IMutableServiceHub target, in IServiceHub referenceHub) => target.MetadataController = this;
+        public void Mutate(ref IMutableServiceHub target, in IServiceHub referenceHub)
+        {
+            target.MetadataController = this;
+        }
     }
 }

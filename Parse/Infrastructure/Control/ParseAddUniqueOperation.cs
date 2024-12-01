@@ -15,20 +15,26 @@ namespace Parse.Infrastructure.Control
 
         public ParseAddUniqueOperation(IEnumerable<object> objects) => Data = new ReadOnlyCollection<object>(objects.Distinct().ToList());
 
-        public object Encode(IServiceHub serviceHub) => new Dictionary<string, object>
+        public object Encode(IServiceHub serviceHub)
         {
-            ["__op"] = "AddUnique",
-            ["objects"] = PointerOrLocalIdEncoder.Instance.Encode(Data, serviceHub)
-        };
+            return new Dictionary<string, object>
+            {
+                ["__op"] = "AddUnique",
+                ["objects"] = PointerOrLocalIdEncoder.Instance.Encode(Data, serviceHub)
+            };
+        }
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
         {
-            null => this,
-            ParseDeleteOperation _ => new ParseSetOperation(Data.ToList()),
-            ParseSetOperation setOp => new ParseSetOperation(Apply(Conversion.To<IList<object>>(setOp.Value), default)),
-            ParseAddUniqueOperation addition => new ParseAddUniqueOperation(Apply(addition.Objects, default) as IList<object>),
-            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
-        };
+            return previous switch
+            {
+                null => this,
+                ParseDeleteOperation _ => new ParseSetOperation(Data.ToList()),
+                ParseSetOperation setOp => new ParseSetOperation(Apply(Conversion.To<IList<object>>(setOp.Value), default)),
+                ParseAddUniqueOperation addition => new ParseAddUniqueOperation(Apply(addition.Objects, default) as IList<object>),
+                _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+            };
+        }
 
         public object Apply(object oldValue, string key)
         {

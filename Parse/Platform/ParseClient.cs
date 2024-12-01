@@ -116,7 +116,10 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
 
     static object Mutex { get; } = new object { };
 
-    internal static string BuildQueryString(IDictionary<string, object> parameters) => String.Join("&", (from pair in parameters let valueString = pair.Value as string select $"{Uri.EscapeDataString(pair.Key)}={Uri.EscapeDataString(String.IsNullOrEmpty(valueString) ? JsonUtilities.Encode(pair.Value) : valueString)}").ToArray());
+    internal static string BuildQueryString(IDictionary<string, object> parameters)
+    {
+        return String.Join("&", (from pair in parameters let valueString = pair.Value as string select $"{Uri.EscapeDataString(pair.Key)}={Uri.EscapeDataString(String.IsNullOrEmpty(valueString) ? JsonUtilities.Encode(pair.Value) : valueString)}").ToArray());
+    }
 
     internal static IDictionary<string, string> DecodeQueryString(string queryString)
     {
@@ -131,9 +134,15 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
         return query;
     }
 
-    internal static IDictionary<string, object> DeserializeJsonString(string jsonData) => JsonUtilities.Parse(jsonData) as IDictionary<string, object>;
+    internal static IDictionary<string, object> DeserializeJsonString(string jsonData)
+    {
+        return JsonUtilities.Parse(jsonData) as IDictionary<string, object>;
+    }
 
-    internal static string SerializeJsonString(IDictionary<string, object> jsonData) => JsonUtilities.Encode(jsonData);
+    internal static string SerializeJsonString(IDictionary<string, object> jsonData)
+    {
+        return JsonUtilities.Encode(jsonData);
+    }
 
     public IServiceHub BuildHub(IMutableServiceHub target = default, IServiceHub extension = default, params IServiceHubMutator[] configurators)
     {

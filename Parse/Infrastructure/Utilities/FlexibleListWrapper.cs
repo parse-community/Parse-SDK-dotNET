@@ -17,11 +17,20 @@ namespace Parse.Infrastructure.Utilities
         private IList<TIn> toWrap;
         public FlexibleListWrapper(IList<TIn> toWrap) => this.toWrap = toWrap;
 
-        public int IndexOf(TOut item) => toWrap.IndexOf((TIn) Conversion.ConvertTo<TIn>(item));
+        public int IndexOf(TOut item)
+        {
+            return toWrap.IndexOf((TIn) Conversion.ConvertTo<TIn>(item));
+        }
 
-        public void Insert(int index, TOut item) => toWrap.Insert(index, (TIn) Conversion.ConvertTo<TIn>(item));
+        public void Insert(int index, TOut item)
+        {
+            toWrap.Insert(index, (TIn) Conversion.ConvertTo<TIn>(item));
+        }
 
-        public void RemoveAt(int index) => toWrap.RemoveAt(index);
+        public void RemoveAt(int index)
+        {
+            toWrap.RemoveAt(index);
+        }
 
         public TOut this[int index]
         {
@@ -29,20 +38,35 @@ namespace Parse.Infrastructure.Utilities
             set => toWrap[index] = (TIn) Conversion.ConvertTo<TIn>(value);
         }
 
-        public void Add(TOut item) => toWrap.Add((TIn) Conversion.ConvertTo<TIn>(item));
+        public void Add(TOut item)
+        {
+            toWrap.Add((TIn) Conversion.ConvertTo<TIn>(item));
+        }
 
-        public void Clear() => toWrap.Clear();
+        public void Clear()
+        {
+            toWrap.Clear();
+        }
 
-        public bool Contains(TOut item) => toWrap.Contains((TIn) Conversion.ConvertTo<TIn>(item));
+        public bool Contains(TOut item)
+        {
+            return toWrap.Contains((TIn) Conversion.ConvertTo<TIn>(item));
+        }
 
-        public void CopyTo(TOut[] array, int arrayIndex) => toWrap.Select(item => (TOut) Conversion.ConvertTo<TOut>(item))
+        public void CopyTo(TOut[] array, int arrayIndex)
+        {
+            toWrap.Select(item => (TOut) Conversion.ConvertTo<TOut>(item))
                 .ToList().CopyTo(array, arrayIndex);
+        }
 
         public int Count => toWrap.Count;
 
         public bool IsReadOnly => toWrap.IsReadOnly;
 
-        public bool Remove(TOut item) => toWrap.Remove((TIn) Conversion.ConvertTo<TIn>(item));
+        public bool Remove(TOut item)
+        {
+            return toWrap.Remove((TIn) Conversion.ConvertTo<TIn>(item));
+        }
 
         public IEnumerator<TOut> GetEnumerator()
         {
@@ -50,6 +74,9 @@ namespace Parse.Infrastructure.Utilities
                 yield return (TOut) Conversion.ConvertTo<TOut>(item);
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

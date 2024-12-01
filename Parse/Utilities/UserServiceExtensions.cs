@@ -17,7 +17,10 @@ namespace Parse
             return sessionTokenTask.Result;
         }
 
-        internal static Task<string> GetCurrentSessionTokenAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken);
+        internal static Task<string> GetCurrentSessionTokenAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken);
+        }
 
         // TODO: Consider renaming SignUpAsync and LogInAsync to SignUpWithAsync and LogInWithAsync, respectively.
         // TODO: Consider returning the created user from the SignUpAsync overload that accepts a username and password.
@@ -29,7 +32,10 @@ namespace Parse
         /// <param name="username">The value that should be used for <see cref="ParseUser.Username"/>.</param>
         /// <param name="password">The value that should be used for <see cref="ParseUser.Password"/>.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SignUpAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default) => new ParseUser { Services = serviceHub, Username = username, Password = password }.SignUpAsync(cancellationToken);
+        public static Task SignUpAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
+        {
+            return new ParseUser { Services = serviceHub, Username = username, Password = password }.SignUpAsync(cancellationToken);
+        }
 
         /// <summary>
         /// Saves the provided <see cref="ParseUser"/> instance with the target Parse Server instance and then authenticates it on the target client. This method should only be used once <see cref="ParseClient.Publicize"/> has been called and <see cref="ParseClient.Instance"/> is the wanted bind target, or if <see cref="ParseObject.Services"/> has already been set or <see cref="ParseObject.Bind(IServiceHub)"/> has already been called on the <paramref name="user"/>.
@@ -51,10 +57,14 @@ namespace Parse
         /// <param name="password">The password to log in with.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The newly logged-in user.</returns>
-        public static Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default) => serviceHub.UserController.LogInAsync(username, password, serviceHub, cancellationToken).OnSuccess(task =>
+        public static Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
+        {
+            return serviceHub.UserController.LogInAsync(username, password, serviceHub, cancellationToken).OnSuccess(task =>
         {
             ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(task.Result, "_User");
             InstanceUser = user;
+            var s = user.IsAuthenticated;
+            //user.IsAuthenticated
             return SaveCurrentUserAsync(serviceHub, user)
             .OnSuccess(_ =>
             {
@@ -62,6 +72,7 @@ namespace Parse
                 return user;
             });
         }).Unwrap();
+        }
 
         public static ParseUser InstanceUser { get; set; }
 
@@ -101,7 +112,10 @@ namespace Parse
         /// <remarks>
         /// Typically, you should use <see cref="LogOutAsync()"/>, unless you are managing your own threading.
         /// </remarks>
-        public static void LogOut(this IServiceHub serviceHub) => LogOutAsync(serviceHub).Wait(); // TODO (hallucinogen): this will without a doubt fail in Unity. But what else can we do?
+        public static void LogOut(this IServiceHub serviceHub)
+        {
+            LogOutAsync(serviceHub).Wait(); // TODO (hallucinogen): this will without a doubt fail in Unity. But what else can we do?
+        }
 
         /// <summary>
         /// Logs out the currently logged in user session. This will remove the session from disk, log out of
@@ -111,7 +125,10 @@ namespace Parse
         /// This is preferable to using <see cref="LogOut()"/>, unless your code is already running from a
         /// background thread.
         /// </remarks>
-        public static Task LogOutAsync(this IServiceHub serviceHub) => LogOutAsync(serviceHub, CancellationToken.None);
+        public static Task LogOutAsync(this IServiceHub serviceHub)
+        {
+            return LogOutAsync(serviceHub, CancellationToken.None);
+        }
 
         /// <summary>
         /// Logs out the currently logged in user session. This will remove the session from disk, log out of
@@ -120,11 +137,14 @@ namespace Parse
         /// This is preferable to using <see cref="LogOut()"/>, unless your code is already running from a
         /// background thread.
         /// </summary>
-        public static Task LogOutAsync(this IServiceHub serviceHub, CancellationToken cancellationToken) => GetCurrentUserAsync(serviceHub).OnSuccess(task =>
+        public static Task LogOutAsync(this IServiceHub serviceHub, CancellationToken cancellationToken)
+        {
+            return GetCurrentUserAsync(serviceHub).OnSuccess(task =>
         {
             LogOutWithProviders();
             return task.Result is { } user ? user.TaskQueue.Enqueue(toAwait => user.LogOutAsync(toAwait, cancellationToken), cancellationToken) : Task.CompletedTask;
         }).Unwrap();
+        }
 
         static void LogOutWithProviders()
         {
@@ -152,16 +172,28 @@ namespace Parse
         /// Gets the currently logged in ParseUser with a valid session, either from memory or disk
         /// if necessary, asynchronously.
         /// </summary>
-        internal static Task<ParseUser> GetCurrentUserAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.GetAsync(serviceHub, cancellationToken);
+        internal static Task<ParseUser> GetCurrentUserAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return serviceHub.CurrentUserController.GetAsync(serviceHub, cancellationToken);
+        }
 
-        internal static Task SaveCurrentUserAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default) => serviceHub.CurrentUserController.SetAsync(user, cancellationToken);
+        internal static Task SaveCurrentUserAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default)
+        {
+            return serviceHub.CurrentUserController.SetAsync(user, cancellationToken);
+        }
 
-        internal static void ClearInMemoryUser(this IServiceHub serviceHub) => serviceHub.CurrentUserController.ClearFromMemory();
+        internal static void ClearInMemoryUser(this IServiceHub serviceHub)
+        {
+            serviceHub.CurrentUserController.ClearFromMemory();
+        }
 
         /// <summary>
         /// Constructs a <see cref="ParseQuery{ParseUser}"/> for <see cref="ParseUser"/>s.
         /// </summary>
-        public static ParseQuery<ParseUser> GetUserQuery(this IServiceHub serviceHub) => serviceHub.GetQuery<ParseUser>();
+        public static ParseQuery<ParseUser> GetUserQuery(this IServiceHub serviceHub)
+        {
+            return serviceHub.GetQuery<ParseUser>();
+        }
 
         #region Legacy / Revocable Session Tokens
 
@@ -204,7 +236,10 @@ namespace Parse
         /// user account. This email allows the user to securely reset their password on the Parse site.
         /// </summary>
         /// <param name="email">The email address associated with the user that forgot their password.</param>
-        public static Task RequestPasswordResetAsync(this IServiceHub serviceHub, string email) => RequestPasswordResetAsync(serviceHub, email, CancellationToken.None);
+        public static Task RequestPasswordResetAsync(this IServiceHub serviceHub, string email)
+        {
+            return RequestPasswordResetAsync(serviceHub, email, CancellationToken.None);
+        }
 
         /// <summary>
         /// Requests a password reset email to be sent to the specified email address associated with the
@@ -212,7 +247,10 @@ namespace Parse
         /// </summary>
         /// <param name="email">The email address associated with the user that forgot their password.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task RequestPasswordResetAsync(this IServiceHub serviceHub, string email, CancellationToken cancellationToken) => serviceHub.UserController.RequestPasswordResetAsync(email, cancellationToken);
+        public static Task RequestPasswordResetAsync(this IServiceHub serviceHub, string email, CancellationToken cancellationToken)
+        {
+            return serviceHub.UserController.RequestPasswordResetAsync(email, cancellationToken);
+        }
 
         public static Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string authType, IDictionary<string, object> data, CancellationToken cancellationToken)
         {

@@ -13,6 +13,9 @@ namespace Parse.Infrastructure.Data
     {
         public static NoObjectsEncoder Instance { get; } = new NoObjectsEncoder();
 
-        protected override IDictionary<string, object> EncodeObject(ParseObject value) => throw new ArgumentException("ParseObjects not allowed here.");
+        protected override IDictionary<string, object> EncodeObject(ParseObject value)
+        {
+            throw new ArgumentException("ParseObjects not allowed here.");
+        }
     }
 }

@@ -13,20 +13,23 @@ namespace Parse.Platform.Objects;
 public class MutableObjectState : IObjectState
 {
     public bool IsNew { get; set; }
-    public bool EmailVerified { get; set; }
+    //public bool EmailVerified { get; set; }
     public string ClassName { get; set; }
     public string ObjectId { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public DateTime? CreatedAt { get; set; }
-    public string Username { get; set; } // Added
-    public string Email { get; set; } // Added
-    public string SessionToken { get; set; } // Added
+    //public string Username { get; set; } // Added
+    //public string Email { get; set; } // Added
+    //public string SessionToken { get; set; } // Added
 
     public IDictionary<string, object> ServerData { get; set; } = new Dictionary<string, object>();
 
     public object this[string key] => ServerData.ContainsKey(key) ? ServerData[key] : null;
 
-    public bool ContainsKey(string key) => ServerData.ContainsKey(key);
+    public bool ContainsKey(string key)
+    {
+        return ServerData.ContainsKey(key);
+    }
 
     public void Apply(IDictionary<string, IParseFieldOperation> operationSet)
     {
@@ -73,22 +76,21 @@ public class MutableObjectState : IObjectState
             }
         }
     }
-
     public IObjectState MutatedClone(Action<MutableObjectState> func)
     {
         var clone = MutableClone();
         try
         {
+            // Apply the mutation function to the clone
             func(clone);
         }
-        catch
+        catch (Exception ex)
         {
-            // Log and skip mutation failures
-            Debug.WriteLine("Skipped incompatible mutation during clone.");
+            // Log the failure and continue
+            Debug.WriteLine($"Skipped incompatible mutation during clone: {ex.Message}");
         }
         return clone;
     }
-
     protected virtual MutableObjectState MutableClone()
     {
         return new MutableObjectState
@@ -98,18 +100,24 @@ public class MutableObjectState : IObjectState
             ObjectId = ObjectId,
             CreatedAt = CreatedAt,
             UpdatedAt = UpdatedAt,
-            Username= Username,
-            Email = Email,
-            EmailVerified = EmailVerified,
-            SessionToken = SessionToken,
+            //Username= Username,
+            //Email = Email,
+            //EmailVerified = EmailVerified,
+            //SessionToken = SessionToken,
             
             ServerData = ServerData.ToDictionary(entry => entry.Key, entry => entry.Value)
         };
     }
 
-    IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator() => ServerData.GetEnumerator();
+    IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
+    {
+        return ServerData.GetEnumerator();
+    }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => ServerData.GetEnumerator();
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+        return ServerData.GetEnumerator();
+    }
 
     public static MutableObjectState Decode(object data, IServiceHub serviceHub)
     {
@@ -124,11 +132,10 @@ public class MutableObjectState : IObjectState
                     CreatedAt = dictionary.ContainsKey("createdAt") ? DecodeDateTime(dictionary["createdAt"]) : null,
                     UpdatedAt = dictionary.ContainsKey("updatedAt") ? DecodeDateTime(dictionary["updatedAt"]) : null,
                     IsNew = dictionary.ContainsKey("isNew") && Convert.ToBoolean(dictionary["isNew"]),
-                    EmailVerified = dictionary.ContainsKey("emailVerified") && Convert.ToBoolean(dictionary["emailVerified"]),
-                    Username = dictionary.ContainsKey("username") ? dictionary["username"]?.ToString() : null,
-                    Email = dictionary.ContainsKey("email") ? dictionary["email"]?.ToString() : null,
-                    SessionToken = dictionary.ContainsKey("sessionToken") ? dictionary["sessionToken"]?.ToString() : null,
-
+                    //EmailVerified = dictionary.ContainsKey("emailVerified") && Convert.ToBoolean(dictionary["emailVerified"]),
+                    //Username = dictionary.ContainsKey("username") ? dictionary["username"]?.ToString() : null,
+                    //Email = dictionary.ContainsKey("email") ? dictionary["email"]?.ToString() : null,
+                    //SessionToken = dictionary.ContainsKey("sessionToken") ? dictionary["sessionToken"]?.ToString() : null,
                     ServerData = dictionary
                         .Where(pair => IsValidField(pair.Key, pair.Value))
                         .ToDictionary(pair => pair.Key, pair => pair.Value)

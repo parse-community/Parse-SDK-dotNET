@@ -8,7 +8,10 @@ namespace Parse
 {
     public static class QueryServiceExtensions
     {
-        public static ParseQuery<T> GetQuery<T>(this IServiceHub serviceHub) where T : ParseObject => new ParseQuery<T>(serviceHub);
+        public static ParseQuery<T> GetQuery<T>(this IServiceHub serviceHub) where T : ParseObject
+        {
+            return new ParseQuery<T>(serviceHub);
+        }
 
         // ALTERNATE NAME: BuildOrQuery
 
@@ -19,7 +22,10 @@ namespace Parse
         /// <param name="source">An initial query to 'or' with additional queries.</param>
         /// <param name="queries">The list of ParseQueries to 'or' together.</param>
         /// <returns>A query that is the or of the given queries.</returns>
-        public static ParseQuery<T> ConstructOrQuery<T>(this IServiceHub serviceHub, ParseQuery<T> source, params ParseQuery<T>[] queries) where T : ParseObject => serviceHub.ConstructOrQuery(queries.Concat(new[] { source }));
+        public static ParseQuery<T> ConstructOrQuery<T>(this IServiceHub serviceHub, ParseQuery<T> source, params ParseQuery<T>[] queries) where T : ParseObject
+        {
+            return serviceHub.ConstructOrQuery(queries.Concat(new[] { source }));
+        }
 
         /// <summary>
         /// Constructs a query that is the or of the given queries.

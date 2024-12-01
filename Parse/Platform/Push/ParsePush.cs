@@ -181,7 +181,10 @@ namespace Parse
 
         #endregion
 
-        internal IDictionary<string, object> Encode() => ParsePushEncoder.Instance.Encode(State);
+        internal IDictionary<string, object> Encode()
+        {
+            return ParsePushEncoder.Instance.Encode(State);
+        }
 
         void MutateState(Action<MutablePushState> func)
         {
@@ -200,7 +203,10 @@ namespace Parse
         /// console.
         /// </summary>
         /// <returns>A Task for continuation.</returns>
-        public Task SendAsync() => SendAsync(CancellationToken.None);
+        public Task SendAsync()
+        {
+            return SendAsync(CancellationToken.None);
+        }
 
         /// <summary>
         /// Request a push to be sent. When this task completes, Parse has successfully acknowledged a request
@@ -209,7 +215,10 @@ namespace Parse
         /// console.
         /// </summary>
         /// <param name="cancellationToken">CancellationToken to cancel the current operation.</param>
-        public Task SendAsync(CancellationToken cancellationToken) => Services.PushController.SendPushNotificationAsync(State, Services, cancellationToken);
+        public Task SendAsync(CancellationToken cancellationToken)
+        {
+            return Services.PushController.SendPushNotificationAsync(State, Services, cancellationToken);
+        }
 
         #endregion
     }

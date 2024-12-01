@@ -26,7 +26,10 @@ namespace Parse.Infrastructure.Execution
 
         Lazy<IParseUserController> UserController { get; }
 
-        IWebClient GetWebClient() => WebClient;
+        IWebClient GetWebClient()
+        {
+            return WebClient;
+        }
 
         /// <summary>
         /// Creates a new Parse SDK command runner.
@@ -50,7 +53,9 @@ namespace Parse.Infrastructure.Execution
         /// <param name="downloadProgress">An <see cref="IProgress{ParseDownloadProgressEventArgs}"/> instance to push download progress data to.</param>
         /// <param name="cancellationToken">An asynchronous operation cancellation token that dictates if and when the operation should be cancelled.</param>
         /// <returns></returns>
-        public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command, IProgress<IDataTransferLevel> uploadProgress = null, IProgress<IDataTransferLevel> downloadProgress = null, CancellationToken cancellationToken = default) => PrepareCommand(command).ContinueWith(commandTask => GetWebClient().ExecuteAsync(commandTask.Result, uploadProgress, downloadProgress, cancellationToken).OnSuccess(task =>
+        public Task<Tuple<HttpStatusCode, IDictionary<string, object>>> RunCommandAsync(ParseCommand command, IProgress<IDataTransferLevel> uploadProgress = null, IProgress<IDataTransferLevel> downloadProgress = null, CancellationToken cancellationToken = default)
+        {
+            return PrepareCommand(command).ContinueWith(commandTask => GetWebClient().ExecuteAsync(commandTask.Result, uploadProgress, downloadProgress, cancellationToken).OnSuccess(task =>
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -73,6 +78,11 @@ namespace Parse.Infrastructure.Execution
                     // TODO: Newer versions of Parse Server send the failure results back as HTML.
 
                     contentJson = content.StartsWith("[") ? new Dictionary<string, object> { ["results"] = JsonUtilities.Parse(content) } : JsonUtilities.Parse(content) as IDictionary<string, object>;
+                    // Check if "username" exists in contentJson and add "className" if so.
+                    if (contentJson != null && contentJson.ContainsKey("username"))
+                    {
+                        contentJson["className"] = "_User"; // Add the className field
+                    }
                 }
                 catch (Exception e)
                 {
@@ -103,6 +113,7 @@ namespace Parse.Infrastructure.Execution
             }
             return new Tuple<HttpStatusCode, IDictionary<string, object>>(response.Item1, null);
         })).Unwrap();
+        }
 
         Task<ParseCommand> PrepareCommand(ParseCommand command)
         {

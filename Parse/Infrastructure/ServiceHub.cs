@@ -68,6 +68,9 @@ namespace Parse.Infrastructure
         public IParseCurrentInstallationController CurrentInstallationController => LateInitializer.GetValue(() => new ParseCurrentInstallationController(InstallationController, CacheController, InstallationCoder, ClassController));
         public IParseInstallationDataFinalizer InstallationDataFinalizer => LateInitializer.GetValue(() => new ParseInstallationDataFinalizer { });
 
-        public bool Reset() => LateInitializer.Used && LateInitializer.Reset();
+        public bool Reset()
+        {
+            return LateInitializer.Used && LateInitializer.Reset();
+        }
     }
 }

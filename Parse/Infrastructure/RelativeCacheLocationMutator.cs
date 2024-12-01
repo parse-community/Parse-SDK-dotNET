@@ -22,11 +22,14 @@ namespace Parse.Infrastructure
         /// </summary>
         /// <param name="target"><inheritdoc/></param>
         /// <param name="referenceHub"><inheritdoc/></param>
-        public void Mutate(ref IMutableServiceHub target, in IServiceHub referenceHub) => target.CacheController = (target as IServiceHub).CacheController switch
+        public void Mutate(ref IMutableServiceHub target, in IServiceHub referenceHub)
         {
-            null => new CacheController { RelativeCacheFilePath = RelativeCacheLocationGenerator.GetRelativeCacheFilePath(referenceHub) },
-            IDiskFileCacheController { } controller => (Controller: controller, controller.RelativeCacheFilePath = RelativeCacheLocationGenerator.GetRelativeCacheFilePath(referenceHub)).Controller,
-            { } controller => controller
-        };
+            target.CacheController = (target as IServiceHub).CacheController switch
+            {
+                null => new CacheController { RelativeCacheFilePath = RelativeCacheLocationGenerator.GetRelativeCacheFilePath(referenceHub) },
+                IDiskFileCacheController { } controller => (Controller: controller, controller.RelativeCacheFilePath = RelativeCacheLocationGenerator.GetRelativeCacheFilePath(referenceHub)).Controller,
+                { } controller => controller
+            };
+        }
     }
 }

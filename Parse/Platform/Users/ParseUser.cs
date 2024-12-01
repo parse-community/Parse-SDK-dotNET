@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure.Control;
@@ -16,19 +17,51 @@ namespace Parse
     public class ParseUser : ParseObject
     {
         /// <summary>
-        /// Whether the ParseUser has been authenticated on this device. Only an authenticated
-        /// ParseUser can be saved and deleted.
+        /// Indicates whether the current ParseUser has been authenticated on this device. 
+        /// Authentication means that the user has a valid session token and has been logged 
+        /// into the application.
         /// </summary>
         public bool IsAuthenticated
         {
             get
             {
+                // Synchronize access to the critical section to ensure thread safety
                 lock (Mutex)
                 {
-                    return SessionToken is { } && Services.GetCurrentUser() is { } user && user.ObjectId == ObjectId;
+                    // Step 1: Check if the session token exists
+                    // The session token is generated when the user logs in successfully
+                    // or signs up. If it is null or empty, the user is not authenticated.
+                    if (SessionToken == null)
+                    {
+                        return false; // No session token means the user is not authenticated
+                    }
+
+                    // Step 2: Get the current user from the IServiceHub (via the Services instance)
+                    // This typically represents the currently logged-in user.
+                    var currentUser = Services.GetCurrentUser();
+
+                    // Step 3: Ensure the current user is not null
+                    // If no user is retrieved from the service hub, the current ParseUser
+                    // cannot be considered authenticated.
+                    if (currentUser == null)
+                    {
+                        return false; // No current user means the user is not authenticated
+                    }
+
+                    // Step 4: Compare the current user's ObjectId with this user's ObjectId
+                    // If the ObjectIds match, it means this ParseUser is the currently
+                    // authenticated user.
+                    bool isSameUser = currentUser.ObjectId == ObjectId;
+                    if(isSameUser)
+                    {
+                        Debug.WriteLine("Ok");
+                    }
+                    // Return the final result of the comparison
+                    return isSameUser;
                 }
             }
         }
+
 
         /// <summary>
         /// Removes a key from the object's data if it exists.
@@ -45,7 +78,10 @@ namespace Parse
             base.Remove(key);
         }
 
-        protected override bool CheckKeyMutable(string key) => !ImmutableKeys.Contains(key);
+        protected override bool CheckKeyMutable(string key)
+        {
+            return !ImmutableKeys.Contains(key);
+        }
 
         internal override void HandleSave(IObjectState serverState)
         {
@@ -59,7 +95,10 @@ namespace Parse
 
         public string SessionToken => State.ContainsKey("sessionToken") ? State["sessionToken"] as string : null;
 
-        internal Task SetSessionTokenAsync(string newSessionToken) => SetSessionTokenAsync(newSessionToken, CancellationToken.None);
+        internal Task SetSessionTokenAsync(string newSessionToken)
+        {
+            return SetSessionTokenAsync(newSessionToken, CancellationToken.None);
+        }
 
         internal Task SetSessionTokenAsync(string newSessionToken, CancellationToken cancellationToken)
         {
@@ -143,7 +182,10 @@ namespace Parse
         /// session on disk so that you can access the user using <see cref="InstanceUser"/>. A username and
         /// password must be set before calling SignUpAsync.
         /// </summary>
-        public Task SignUpAsync() => SignUpAsync(CancellationToken.None);
+        public Task SignUpAsync()
+        {
+            return SignUpAsync(CancellationToken.None);
+        }
 
         /// <summary>
         /// Signs up a new user. This will create a new ParseUser on the server and will also persist the
@@ -151,7 +193,10 @@ namespace Parse
         /// password must be set before calling SignUpAsync.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public Task SignUpAsync(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => SignUpAsync(toAwait, cancellationToken), cancellationToken);
+        public Task SignUpAsync(CancellationToken cancellationToken)
+        {
+            return TaskQueue.Enqueue(toAwait => SignUpAsync(toAwait, cancellationToken), cancellationToken);
+        }
 
         protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
         {
@@ -167,7 +212,10 @@ namespace Parse
         }
 
         // If this is already the current user, refresh its state on disk.
-        internal override Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken) => base.FetchAsyncInternal(toAwait, cancellationToken).OnSuccess(t => !Services.CurrentUserController.IsCurrent(this) ? Task.FromResult(t.Result) : Services.SaveCurrentUserAsync(this).OnSuccess(_ => t.Result)).Unwrap();
+        internal override Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken)
+        {
+            return base.FetchAsyncInternal(toAwait, cancellationToken).OnSuccess(t => !Services.CurrentUserController.IsCurrent(this) ? Task.FromResult(t.Result) : Services.SaveCurrentUserAsync(this).OnSuccess(_ => t.Result)).Unwrap();
+        }
 
         internal Task LogOutAsync(Task toAwait, CancellationToken cancellationToken)
         {
@@ -184,9 +232,15 @@ namespace Parse
             return Task.WhenAll(revokeSessionTask, Services.CurrentUserController.LogOutAsync(Services, cancellationToken));
         }
 
-        internal Task UpgradeToRevocableSessionAsync() => UpgradeToRevocableSessionAsync(CancellationToken.None);
+        internal Task UpgradeToRevocableSessionAsync()
+        {
+            return UpgradeToRevocableSessionAsync(CancellationToken.None);
+        }
 
-        internal Task UpgradeToRevocableSessionAsync(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => UpgradeToRevocableSessionAsync(toAwait, cancellationToken), cancellationToken);
+        internal Task UpgradeToRevocableSessionAsync(CancellationToken cancellationToken)
+        {
+            return TaskQueue.Enqueue(toAwait => UpgradeToRevocableSessionAsync(toAwait, cancellationToken), cancellationToken);
+        }
 
         internal Task UpgradeToRevocableSessionAsync(Task toAwait, CancellationToken cancellationToken)
         {
@@ -236,7 +290,10 @@ namespace Parse
 #pragma warning disable CS1030 // #warning directive
 #warning Check if the following properties should be injected via IServiceHub.UserController (except for ImmutableKeys).
 
-        internal static IParseAuthenticationProvider GetProvider(string providerName) => Authenticators.TryGetValue(providerName, out IParseAuthenticationProvider provider) ? provider : null;
+        internal static IParseAuthenticationProvider GetProvider(string providerName)
+        {
+            return Authenticators.TryGetValue(providerName, out IParseAuthenticationProvider provider) ? provider : null;
+        }
 #pragma warning restore CS1030 // #warning directive
 
         internal static IDictionary<string, IParseAuthenticationProvider> Authenticators { get; } = new Dictionary<string, IParseAuthenticationProvider> { };
@@ -289,7 +346,9 @@ namespace Parse
             }
         }
 
-        internal Task LinkWithAsync(string authType, IDictionary<string, object> data, CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait =>
+        internal Task LinkWithAsync(string authType, IDictionary<string, object> data, CancellationToken cancellationToken)
+        {
+            return TaskQueue.Enqueue(toAwait =>
         {
             IDictionary<string, IDictionary<string, object>> authData = AuthData;
 
@@ -303,6 +362,7 @@ namespace Parse
 
             return SaveAsync(cancellationToken);
         }, cancellationToken);
+        }
 
         internal Task LinkWithAsync(string authType, CancellationToken cancellationToken)
         {
@@ -313,7 +373,10 @@ namespace Parse
         /// <summary>
         /// Unlinks a user from a service.
         /// </summary>
-        internal Task UnlinkFromAsync(string authType, CancellationToken cancellationToken) => LinkWithAsync(authType, null, cancellationToken);
+        internal Task UnlinkFromAsync(string authType, CancellationToken cancellationToken)
+        {
+            return LinkWithAsync(authType, null, cancellationToken);
+        }
 
         /// <summary>
         /// Checks whether a user is linked to a service.

@@ -7,6 +7,9 @@ namespace Parse
         /// <summary>
         /// Gets a <see cref="ParseQuery{ParseRole}"/> over the Role collection.
         /// </summary>
-        public static ParseQuery<ParseRole> GetRoleQuery(this IServiceHub serviceHub) => serviceHub.GetQuery<ParseRole>();
+        public static ParseQuery<ParseRole> GetRoleQuery(this IServiceHub serviceHub)
+        {
+            return serviceHub.GetQuery<ParseRole>();
+        }
     }
 }

@@ -18,7 +18,10 @@ namespace Parse
         /// Tracks this application being launched.
         /// </summary>
         /// <returns>An Async Task that can be waited on or ignored.</returns>
-        public static Task TrackLaunchAsync(this IServiceHub serviceHub) => TrackLaunchWithPushHashAsync(serviceHub);
+        public static Task TrackLaunchAsync(this IServiceHub serviceHub)
+        {
+            return TrackLaunchWithPushHashAsync(serviceHub);
+        }
 
         /// <summary>
         /// Tracks the occurrence of a custom event with additional dimensions.
@@ -44,7 +47,10 @@ namespace Parse
         /// <param name="name">The name of the custom event to report to ParseClient
         /// as having happened.</param>
         /// <returns>An Async Task that can be waited on or ignored.</returns>
-        public static Task TrackAnalyticsEventAsync(this IServiceHub serviceHub, string name) => TrackAnalyticsEventAsync(serviceHub, name, default);
+        public static Task TrackAnalyticsEventAsync(this IServiceHub serviceHub, string name)
+        {
+            return TrackAnalyticsEventAsync(serviceHub, name, default);
+        }
 
         /// <summary>
         /// Tracks the occurrence of a custom event with additional dimensions.
@@ -89,6 +95,9 @@ namespace Parse
         /// <param name="pushHash">An identifying hash for a given push notification,
         /// passed down from the server.</param>
         /// <returns>An Async Task that can be waited on or ignored.</returns>
-        static Task TrackLaunchWithPushHashAsync(this IServiceHub serviceHub, string pushHash = null) => serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub).OnSuccess(task => serviceHub.AnalyticsController.TrackAppOpenedAsync(pushHash, task.Result, serviceHub)).Unwrap();
+        static Task TrackLaunchWithPushHashAsync(this IServiceHub serviceHub, string pushHash = null)
+        {
+            return serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub).OnSuccess(task => serviceHub.AnalyticsController.TrackAppOpenedAsync(pushHash, task.Result, serviceHub)).Unwrap();
+        }
     }
 }

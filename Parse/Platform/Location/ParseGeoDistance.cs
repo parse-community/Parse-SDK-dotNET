@@ -35,20 +35,29 @@ namespace Parse
         /// </summary>
         /// <param name="miles">The number of miles.</param>
         /// <returns>A ParseGeoDistance for the given number of miles.</returns>
-        public static ParseGeoDistance FromMiles(double miles) => new ParseGeoDistance(miles / EarthMeanRadiusMiles);
+        public static ParseGeoDistance FromMiles(double miles)
+        {
+            return new ParseGeoDistance(miles / EarthMeanRadiusMiles);
+        }
 
         /// <summary>
         /// Gets a ParseGeoDistance from a number of kilometers.
         /// </summary>
         /// <param name="kilometers">The number of kilometers.</param>
         /// <returns>A ParseGeoDistance for the given number of kilometers.</returns>
-        public static ParseGeoDistance FromKilometers(double kilometers) => new ParseGeoDistance(kilometers / EarthMeanRadiusKilometers);
+        public static ParseGeoDistance FromKilometers(double kilometers)
+        {
+            return new ParseGeoDistance(kilometers / EarthMeanRadiusKilometers);
+        }
 
         /// <summary>
         /// Gets a ParseGeoDistance from a number of radians.
         /// </summary>
         /// <param name="radians">The number of radians.</param>
         /// <returns>A ParseGeoDistance for the given number of radians.</returns>
-        public static ParseGeoDistance FromRadians(double radians) => new ParseGeoDistance(radians);
+        public static ParseGeoDistance FromRadians(double radians)
+        {
+            return new ParseGeoDistance(radians);
+        }
     }
 }

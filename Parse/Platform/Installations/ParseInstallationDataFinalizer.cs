@@ -8,7 +8,10 @@ namespace Parse.Platform.Installations
     /// </summary>
     public class ParseInstallationDataFinalizer : IParseInstallationDataFinalizer
     {
-        public Task FinalizeAsync(ParseInstallation installation) => Task.FromResult<object>(null);
+        public Task FinalizeAsync(ParseInstallation installation)
+        {
+            return Task.FromResult<object>(null);
+        }
 
         public void Initialize() { }
     }

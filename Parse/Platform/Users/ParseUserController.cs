@@ -25,9 +25,15 @@ namespace Parse.Platform.Users
 
         public ParseUserController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
 
-        public Task<IObjectState> SignUpAsync(IObjectState state, IDictionary<string, IParseFieldOperation> operations, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand("classes/_User", method: "POST", data: serviceHub.GenerateJSONObjectForSaving(operations)), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub).MutatedClone(mutableClone => mutableClone.IsNew = true));
+        public Task<IObjectState> SignUpAsync(IObjectState state, IDictionary<string, IParseFieldOperation> operations, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CommandRunner.RunCommandAsync(new ParseCommand("classes/_User", method: "POST", data: serviceHub.GenerateJSONObjectForSaving(operations)), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub).MutatedClone(mutableClone => mutableClone.IsNew = true));
+        }
 
-        public Task<IObjectState> LogInAsync(string username, string password, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand($"login?{ParseClient.BuildQueryString(new Dictionary<string, object> { [nameof(username)] = username, [nameof(password)] = password })}", method: "GET", data: null), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub).MutatedClone(mutableClone => mutableClone.IsNew = task.Result.Item1 == System.Net.HttpStatusCode.Created));
+        public Task<IObjectState> LogInAsync(string username, string password, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CommandRunner.RunCommandAsync(new ParseCommand($"login?{ParseClient.BuildQueryString(new Dictionary<string, object> { [nameof(username)] = username, [nameof(password)] = password })}", method: "GET", data: null), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub).MutatedClone(mutableClone => mutableClone.IsNew = task.Result.Item1 == System.Net.HttpStatusCode.Created));
+        }
 
         public Task<IObjectState> LogInAsync(string authType, IDictionary<string, object> data, IServiceHub serviceHub, CancellationToken cancellationToken = default)
         {
@@ -39,8 +45,14 @@ namespace Parse.Platform.Users
             return CommandRunner.RunCommandAsync(new ParseCommand("users", method: "POST", data: new Dictionary<string, object> { [nameof(authData)] = authData }), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub).MutatedClone(mutableClone => mutableClone.IsNew = task.Result.Item1 == System.Net.HttpStatusCode.Created));
         }
 
-        public Task<IObjectState> GetUserAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand("users/me", method: "GET", sessionToken: sessionToken, data: default), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub));
+        public Task<IObjectState> GetUserAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CommandRunner.RunCommandAsync(new ParseCommand("users/me", method: "GET", sessionToken: sessionToken, data: default), cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub));
+        }
 
-        public Task RequestPasswordResetAsync(string email, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand("requestPasswordReset", method: "POST", data: new Dictionary<string, object> { [nameof(email)] = email }), cancellationToken: cancellationToken);
+        public Task RequestPasswordResetAsync(string email, CancellationToken cancellationToken = default)
+        {
+            return CommandRunner.RunCommandAsync(new ParseCommand("requestPasswordReset", method: "POST", data: new Dictionary<string, object> { [nameof(email)] = email }), cancellationToken: cancellationToken);
+        }
     }
 }

@@ -22,16 +22,19 @@ namespace Parse.Platform.Push
             return clone;
         }
 
-        protected virtual MutablePushState MutableClone() => new MutablePushState
+        protected virtual MutablePushState MutableClone()
         {
-            Query = Query,
-            Channels = Channels == null ? null : new List<string>(Channels),
-            Expiration = Expiration,
-            ExpirationInterval = ExpirationInterval,
-            PushTime = PushTime,
-            Data = Data == null ? null : new Dictionary<string, object>(Data),
-            Alert = Alert
-        };
+            return new MutablePushState
+            {
+                Query = Query,
+                Channels = Channels == null ? null : new List<string>(Channels),
+                Expiration = Expiration,
+                ExpirationInterval = ExpirationInterval,
+                PushTime = PushTime,
+                Data = Data == null ? null : new Dictionary<string, object>(Data),
+                Alert = Alert
+            };
+        }
 
         public override bool Equals(object obj)
         {
@@ -48,8 +51,10 @@ namespace Parse.Platform.Push
                    Equals(Alert, other.Alert);
         }
 
-        public override int GetHashCode() =>
+        public override int GetHashCode()
+        {
             // TODO (richardross): Implement this.
-            0;
+            return 0;
+        }
     }
 }

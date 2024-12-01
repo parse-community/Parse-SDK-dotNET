@@ -14,7 +14,10 @@ namespace Parse
         /// <summary>
         /// Produces the proper ParseRelation&lt;T&gt; instance for the given classname.
         /// </summary>
-        internal static ParseRelationBase CreateRelation(this IServiceHub serviceHub, ParseObject parent, string key, string targetClassName) => serviceHub.ClassController.CreateRelation(parent, key, targetClassName);
+        internal static ParseRelationBase CreateRelation(this IServiceHub serviceHub, ParseObject parent, string key, string targetClassName)
+        {
+            return serviceHub.ClassController.CreateRelation(parent, key, targetClassName);
+        }
 
         internal static ParseRelationBase CreateRelation(this IParseObjectClassController classController, ParseObject parent, string key, string targetClassName)
         {
@@ -22,7 +25,10 @@ namespace Parse
             return (createRelationExpr.Body as MethodCallExpression).Method.GetGenericMethodDefinition().MakeGenericMethod(classController.GetType(targetClassName) ?? typeof(ParseObject)).Invoke(default, new object[] { parent, key, targetClassName }) as ParseRelationBase;
         }
 
-        static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName) where T : ParseObject => new ParseRelation<T>(parent, key, targetClassName);
+        static ParseRelation<T> CreateRelation<T>(ParseObject parent, string key, string targetClassName) where T : ParseObject
+        {
+            return new ParseRelation<T>(parent, key, targetClassName);
+        }
     }
 
     /// <summary>
@@ -64,13 +70,19 @@ namespace Parse
             TargetClassName = change.TargetClassName;
         }
 
-        IDictionary<string, object> IJsonConvertible.ConvertToJSON() => new Dictionary<string, object>
+        IDictionary<string, object> IJsonConvertible.ConvertToJSON()
         {
-            ["__type"] = "Relation",
-            ["className"] = TargetClassName
-        };
+            return new Dictionary<string, object>
+            {
+                ["__type"] = "Relation",
+                ["className"] = TargetClassName
+            };
+        }
 
-        internal ParseQuery<T> GetQuery<T>() where T : ParseObject => TargetClassName is { } ? new ParseQuery<T>(Parent.Services, TargetClassName).WhereRelatedTo(Parent, Key) : new ParseQuery<T>(Parent.Services, Parent.ClassName).RedirectClassName(Key).WhereRelatedTo(Parent, Key);
+        internal ParseQuery<T> GetQuery<T>() where T : ParseObject
+        {
+            return TargetClassName is { } ? new ParseQuery<T>(Parent.Services, TargetClassName).WhereRelatedTo(Parent, Key) : new ParseQuery<T>(Parent.Services, Parent.ClassName).RedirectClassName(Key).WhereRelatedTo(Parent, Key);
+        }
 
         internal string TargetClassName { get; set; }
     }
@@ -90,13 +102,19 @@ namespace Parse
         /// Adds an object to this relation. The object must already have been saved.
         /// </summary>
         /// <param name="obj">The object to add.</param>
-        public void Add(T obj) => base.Add(obj);
+        public void Add(T obj)
+        {
+            base.Add(obj);
+        }
 
         /// <summary>
         /// Removes an object from this relation. The object must already have been saved.
         /// </summary>
         /// <param name="obj">The object to remove.</param>
-        public void Remove(T obj) => base.Remove(obj);
+        public void Remove(T obj)
+        {
+            base.Remove(obj);
+        }
 
         /// <summary>
         /// Gets a query that can be used to query the objects in this relation.

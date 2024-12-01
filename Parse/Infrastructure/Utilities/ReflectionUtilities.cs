@@ -12,7 +12,10 @@ namespace Parse.Infrastructure.Utilities
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static IEnumerable<ConstructorInfo> GetInstanceConstructors(this Type type) => type.GetTypeInfo().DeclaredConstructors.Where(constructor => (constructor.Attributes & MethodAttributes.Static) == 0);
+        public static IEnumerable<ConstructorInfo> GetInstanceConstructors(this Type type)
+        {
+            return type.GetTypeInfo().DeclaredConstructors.Where(constructor => (constructor.Attributes & MethodAttributes.Static) == 0);
+        }
 
         /// <summary>
         /// This method helps simplify the process of getting a constructor for a type.
@@ -22,20 +25,29 @@ namespace Parse.Infrastructure.Utilities
         /// <param name="self"></param>
         /// <param name="parameterTypes"></param>
         /// <returns></returns>
-        public static ConstructorInfo FindConstructor(this Type self, params Type[] parameterTypes) => self.GetConstructors().Where(constructor => constructor.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(parameterTypes)).SingleOrDefault();
+        public static ConstructorInfo FindConstructor(this Type self, params Type[] parameterTypes)
+        {
+            return self.GetConstructors().Where(constructor => constructor.GetParameters().Select(parameter => parameter.ParameterType).SequenceEqual(parameterTypes)).SingleOrDefault();
+        }
 
         /// <summary>
         /// Checks if a <see cref="Type"/> instance is another <see cref="Type"/> instance wrapped with <see cref="Nullable{T}"/>.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static bool CheckWrappedWithNullable(this Type type) => type.IsConstructedGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+        public static bool CheckWrappedWithNullable(this Type type)
+        {
+            return type.IsConstructedGenericType && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+        }
 
         /// <summary>
         /// Gets the value of <see cref="ParseClassNameAttribute.ClassName"/> if the type has a custom attribute of type <see cref="ParseClassNameAttribute"/>.
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetParseClassName(this Type type) => type.GetCustomAttribute<ParseClassNameAttribute>()?.ClassName;
+        public static string GetParseClassName(this Type type)
+        {
+            return type.GetCustomAttribute<ParseClassNameAttribute>()?.ClassName;
+        }
     }
 }

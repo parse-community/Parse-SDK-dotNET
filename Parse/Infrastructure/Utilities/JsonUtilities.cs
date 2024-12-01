@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -40,7 +41,10 @@ public class JsonUtilities
         public char[] InputAsArray { get; private set; }
         public int CurrentIndex { get; private set; }
 
-        public void Skip(int skip) => CurrentIndex += skip;
+        public void Skip(int skip)
+        {
+            CurrentIndex += skip;
+        }
 
         public JsonStringParser(string input)
         {
@@ -430,7 +434,11 @@ public class JsonUtilities
         if (obj is bool)
             return (bool) obj ? "true" : "false";
         if (!obj.GetType().GetTypeInfo().IsPrimitive)
-            throw new ArgumentException("Unable to encode objects of type " + obj.GetType());
+        {
+            Debug.WriteLine("Unable to encode objects of type " + obj.GetType());
+            return string.Empty;
+        }
+            
         return Convert.ToString(obj, CultureInfo.InvariantCulture);
     }
 }

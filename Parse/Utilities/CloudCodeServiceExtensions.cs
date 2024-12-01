@@ -31,7 +31,10 @@ namespace Parse
         /// dictionary can contain anything that could be passed into a ParseObject except for
         /// ParseObjects themselves.</param>
         /// <returns>The result of the cloud call.</returns>
-        public static Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters) => CallCloudCodeFunctionAsync<T>(serviceHub, name, parameters, CancellationToken.None);
+        public static Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters)
+        {
+            return CallCloudCodeFunctionAsync<T>(serviceHub, name, parameters, CancellationToken.None);
+        }
 
         /// <summary>
         /// Calls a cloud function.
@@ -45,6 +48,9 @@ namespace Parse
         /// ParseObjects themselves.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result of the cloud call.</returns>
-        public static Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters, CancellationToken cancellationToken) => serviceHub.CloudCodeController.CallFunctionAsync<T>(name, parameters, serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
+        public static Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters, CancellationToken cancellationToken)
+        {
+            return serviceHub.CloudCodeController.CallFunctionAsync<T>(name, parameters, serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
+        }
     }
 }

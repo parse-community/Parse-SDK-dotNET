@@ -31,7 +31,9 @@ namespace Parse.Platform.Configuration
             Decoder = decoder;
         }
 
-        public Task<ParseConfiguration> FetchConfigAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand("config", method: "GET", sessionToken: sessionToken, data: default), cancellationToken: cancellationToken).OnSuccess(task =>
+        public Task<ParseConfiguration> FetchConfigAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CommandRunner.RunCommandAsync(new ParseCommand("config", method: "GET", sessionToken: sessionToken, data: default), cancellationToken: cancellationToken).OnSuccess(task =>
         {
             cancellationToken.ThrowIfCancellationRequested();
             return Decoder.BuildConfiguration(task.Result.Item2, serviceHub);
@@ -41,5 +43,6 @@ namespace Parse.Platform.Configuration
             CurrentConfigurationController.SetCurrentConfigAsync(task.Result);
             return task;
         }).Unwrap();
+        }
     }
 }

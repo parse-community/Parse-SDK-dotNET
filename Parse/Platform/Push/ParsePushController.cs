@@ -21,6 +21,9 @@ namespace Parse.Platform.Push
             CurrentUserController = currentUserController;
         }
 
-        public Task SendPushNotificationAsync(IPushState state, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken).OnSuccess(sessionTokenTask => CommandRunner.RunCommandAsync(new ParseCommand("push", method: "POST", sessionToken: sessionTokenTask.Result, data: ParsePushEncoder.Instance.Encode(state)), cancellationToken: cancellationToken)).Unwrap();
+        public Task SendPushNotificationAsync(IPushState state, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken).OnSuccess(sessionTokenTask => CommandRunner.RunCommandAsync(new ParseCommand("push", method: "POST", sessionToken: sessionTokenTask.Result, data: ParsePushEncoder.Instance.Encode(state)), cancellationToken: cancellationToken)).Unwrap();
+        }
     }
 }

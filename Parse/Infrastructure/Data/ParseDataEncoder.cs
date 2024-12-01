@@ -15,32 +15,38 @@ namespace Parse.Infrastructure.Data
     /// <seealso cref="ParseDataDecoder"/>
     public abstract class ParseDataEncoder
     {
-        public static bool Validate(object value) => value is null || value.GetType().IsPrimitive || value is string || value is ParseObject || value is ParseACL || value is ParseFile || value is ParseGeoPoint || value is ParseRelationBase || value is DateTime || value is byte[] || Conversion.As<IDictionary<string, object>>(value) is { } || Conversion.As<IList<object>>(value) is { };
+        public static bool Validate(object value)
+        {
+            return value is null || value.GetType().IsPrimitive || value is string || value is ParseObject || value is ParseACL || value is ParseFile || value is ParseGeoPoint || value is ParseRelationBase || value is DateTime || value is byte[] || Conversion.As<IDictionary<string, object>>(value) is { } || Conversion.As<IList<object>>(value) is { };
+        }
 
         // If this object has a special encoding, encode it and return the encoded object. Otherwise, just return the original object.
 
-        public object Encode(object value, IServiceHub serviceHub) => value switch
+        public object Encode(object value, IServiceHub serviceHub)
         {
-            DateTime { } date => new Dictionary<string, object>
+            return value switch
             {
-                ["iso"] = date.ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture),
-                ["__type"] = "Date"
-            },
-            byte[] { } bytes => new Dictionary<string, object>
-            {
-                ["__type"] = "Bytes",
-                ["base64"] = Convert.ToBase64String(bytes)
-            },
-            ParseObject { } entity => EncodeObject(entity),
-            IJsonConvertible { } jsonConvertible => jsonConvertible.ConvertToJSON(),
-            { } when Conversion.As<IDictionary<string, object>>(value) is { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Encode(pair.Value, serviceHub)),
-            { } when Conversion.As<IList<object>>(value) is { } list => EncodeList(list, serviceHub),
+                DateTime { } date => new Dictionary<string, object>
+                {
+                    ["iso"] = date.ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture),
+                    ["__type"] = "Date"
+                },
+                byte[] { } bytes => new Dictionary<string, object>
+                {
+                    ["__type"] = "Bytes",
+                    ["base64"] = Convert.ToBase64String(bytes)
+                },
+                ParseObject { } entity => EncodeObject(entity),
+                IJsonConvertible { } jsonConvertible => jsonConvertible.ConvertToJSON(),
+                { } when Conversion.As<IDictionary<string, object>>(value) is { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Encode(pair.Value, serviceHub)),
+                { } when Conversion.As<IList<object>>(value) is { } list => EncodeList(list, serviceHub),
 
-            // TODO (hallucinogen): convert IParseFieldOperation to IJsonConvertible
+                // TODO (hallucinogen): convert IParseFieldOperation to IJsonConvertible
 
-            IParseFieldOperation { } fieldOperation => fieldOperation.Encode(serviceHub),
-            _ => value
-        };
+                IParseFieldOperation { } fieldOperation => fieldOperation.Encode(serviceHub),
+                _ => value
+            };
+        }
 
         protected abstract IDictionary<string, object> EncodeObject(ParseObject value);
 

@@ -20,7 +20,10 @@ namespace Parse
         /// You can add additional query conditions, but one of the above must appear as a top-level <c>AND</c>
         /// clause in the query.
         /// </remarks>
-        public static ParseQuery<ParseInstallation> GetInstallationQuery(this IServiceHub serviceHub) => new ParseQuery<ParseInstallation>(serviceHub);
+        public static ParseQuery<ParseInstallation> GetInstallationQuery(this IServiceHub serviceHub)
+        {
+            return new ParseQuery<ParseInstallation>(serviceHub);
+        }
 
 #pragma warning disable CS1030 // #warning directive
 #warning Consider making the following method asynchronous.
@@ -38,6 +41,9 @@ namespace Parse
             return task.Result;
         }
 
-        internal static void ClearInMemoryInstallation(this IServiceHub serviceHub) => serviceHub.CurrentInstallationController.ClearFromMemory();
+        internal static void ClearInMemoryInstallation(this IServiceHub serviceHub)
+        {
+            serviceHub.CurrentInstallationController.ClearFromMemory();
+        }
     }
 }

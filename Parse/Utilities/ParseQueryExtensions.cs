@@ -66,31 +66,46 @@ namespace Parse.Abstractions.Internal
         /// <summary>
         /// Gets a MethodInfo for a top-level method call.
         /// </summary>
-        static MethodInfo GetMethod<T>(Expression<Action<T>> expression) => (expression.Body as MethodCallExpression).Method;
+        static MethodInfo GetMethod<T>(Expression<Action<T>> expression)
+        {
+            return (expression.Body as MethodCallExpression).Method;
+        }
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate we should
         /// add a WhereContainedIn() clause.
         /// </summary>
-        static bool ContainsStub<T>(object collection, T value) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        static bool ContainsStub<T>(object collection, T value)
+        {
+            throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        }
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate we should
         /// add a WhereNotContainedIn() clause.
         /// </summary>
-        static bool NotContainsStub<T>(object collection, T value) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        static bool NotContainsStub<T>(object collection, T value)
+        {
+            throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        }
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate that we should
         /// add a WhereExists() clause.
         /// </summary>
-        static bool ContainsKeyStub(ParseObject obj, string key) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        static bool ContainsKeyStub(ParseObject obj, string key)
+        {
+            throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        }
 
         /// <summary>
         /// When a query is normalized, this is a placeholder to indicate that we should
         /// add a WhereDoesNotExist() clause.
         /// </summary>
-        static bool NotContainsKeyStub(ParseObject obj, string key) => throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        static bool NotContainsKeyStub(ParseObject obj, string key)
+        {
+            throw new NotImplementedException("Exists only for expression translation as a placeholder.");
+        }
 
         /// <summary>
         /// Evaluates an expression and throws if the expression has components that can't be
@@ -112,7 +127,10 @@ namespace Parse.Abstractions.Internal
         /// Checks whether the MethodCallExpression is a call to ParseObject.Get(),
         /// which is the call we normalize all indexing into the ParseObject to.
         /// </summary>
-        static bool IsParseObjectGet(MethodCallExpression node) => node is { Object: { } } && typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Object.Type.GetTypeInfo()) && node.Method.IsGenericMethod && node.Method.GetGenericMethodDefinition() == ParseObjectGetMethod;
+        static bool IsParseObjectGet(MethodCallExpression node)
+        {
+            return node is { Object: { } } && typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Object.Type.GetTypeInfo()) && node.Method.IsGenericMethod && node.Method.GetGenericMethodDefinition() == ParseObjectGetMethod;
+        }
 
         /// <summary>
         /// Visits an Expression, converting ParseObject.Get/ParseObject[]/ParseObject.Property,
@@ -143,7 +161,10 @@ namespace Parse.Abstractions.Internal
             /// Check for a ParseFieldName attribute and use that as the path component, turning
             /// properties like foo.ObjectId into foo.Get("objectId")
             /// </summary>
-            protected override Expression VisitMember(MemberExpression node) => node.Member.GetCustomAttribute<ParseFieldNameAttribute>() is { } fieldName && typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Expression.Type.GetTypeInfo()) ? Expression.Call(node.Expression, ParseObjectGetMethod.MakeGenericMethod(node.Type), Expression.Constant(fieldName.FieldName, typeof(string))) : base.VisitMember(node);
+            protected override Expression VisitMember(MemberExpression node)
+            {
+                return node.Member.GetCustomAttribute<ParseFieldNameAttribute>() is { } fieldName && typeof(ParseObject).GetTypeInfo().IsAssignableFrom(node.Expression.Type.GetTypeInfo()) ? Expression.Call(node.Expression, ParseObjectGetMethod.MakeGenericMethod(node.Type), Expression.Constant(fieldName.FieldName, typeof(string))) : base.VisitMember(node);
+            }
 
             /// <summary>
             /// If a ParseObject.Get() call has been cast, just change the generic parameter.
@@ -575,7 +596,10 @@ namespace Parse.Abstractions.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> OrderBy<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.OrderBy(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> OrderBy<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject
+        {
+            return source.OrderBy(GetOrderByPath(keySelector));
+        }
 
         /// <summary>
         /// Orders a query based upon the key selector provided.
@@ -586,7 +610,10 @@ namespace Parse.Abstractions.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> OrderByDescending<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.OrderByDescending(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> OrderByDescending<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject
+        {
+            return source.OrderByDescending(GetOrderByPath(keySelector));
+        }
 
         /// <summary>
         /// Performs a subsequent ordering of a query based upon the key selector provided.
@@ -597,7 +624,10 @@ namespace Parse.Abstractions.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> ThenBy<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.ThenBy(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> ThenBy<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject
+        {
+            return source.ThenBy(GetOrderByPath(keySelector));
+        }
 
         /// <summary>
         /// Performs a subsequent ordering of a query based upon the key selector provided.
@@ -608,7 +638,10 @@ namespace Parse.Abstractions.Internal
         /// <param name="keySelector">A function to extract a key from the ParseObject.</param>
         /// <returns>A new ParseQuery based on source whose results will be ordered by
         /// the key specified in the keySelector.</returns>
-        public static ParseQuery<TSource> ThenByDescending<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject => source.ThenByDescending(GetOrderByPath(keySelector));
+        public static ParseQuery<TSource> ThenByDescending<TSource, TSelector>(this ParseQuery<TSource> source, Expression<Func<TSource, TSelector>> keySelector) where TSource : ParseObject
+        {
+            return source.ThenByDescending(GetOrderByPath(keySelector));
+        }
 
         /// <summary>
         /// Correlates the elements of two queries based on matching keys.
@@ -677,12 +710,20 @@ namespace Parse.Abstractions.Internal
             throw new InvalidOperationException("The key for the selected object must be a field access on the ParseObject.");
         }
 
-        public static string GetClassName<T>(this ParseQuery<T> query) where T : ParseObject => query.ClassName;
+        public static string GetClassName<T>(this ParseQuery<T> query) where T : ParseObject
+        {
+            return query.ClassName;
+        }
 
-        public static IDictionary<string, object> BuildParameters<T>(this ParseQuery<T> query) where T : ParseObject => query.BuildParameters(false);
+        public static IDictionary<string, object> BuildParameters<T>(this ParseQuery<T> query) where T : ParseObject
+        {
+            return query.BuildParameters(false);
+        }
 
-        public static object GetConstraint<T>(this ParseQuery<T> query, string key) where T : ParseObject => query.GetConstraint(key);
-
+        public static object GetConstraint<T>(this ParseQuery<T> query, string key) where T : ParseObject
+        {
+            return query.GetConstraint(key);
+        }
     }
 
 

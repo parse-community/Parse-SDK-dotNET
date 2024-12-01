@@ -32,7 +32,10 @@ namespace Parse.Infrastructure.Control
     {
         private static ParseObjectIdComparer comparer;
 
-        public static IParseFieldOperation Decode(IDictionary<string, object> json) => throw new NotImplementedException();
+        public static IParseFieldOperation Decode(IDictionary<string, object> json)
+        {
+            throw new NotImplementedException();
+        }
 
         public static IEqualityComparer<object> ParseObjectComparer
         {

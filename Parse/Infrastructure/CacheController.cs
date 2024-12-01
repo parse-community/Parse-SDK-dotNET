@@ -21,9 +21,14 @@ namespace Parse.Infrastructure
         {
             public FileBackedCache(FileInfo file) => File = file;
 
-            internal Task SaveAsync() => Lock(() => File.WriteContentAsync(JsonUtilities.Encode(Storage)));
+            internal Task SaveAsync()
+            {
+                return Lock(() => File.WriteContentAsync(JsonUtilities.Encode(Storage)));
+            }
 
-            internal Task LoadAsync() => File.ReadAllTextAsync().ContinueWith(task =>
+            internal Task LoadAsync()
+            {
+                return File.ReadAllTextAsync().ContinueWith(task =>
             {
                 lock (Mutex)
                 {
@@ -37,10 +42,14 @@ namespace Parse.Infrastructure
                     }
                 }
             });
+            }
 
             // TODO: Check if the call to ToDictionary is necessary here considering contents is IDictionary<string object>.
 
-            internal void Update(IDictionary<string, object> contents) => Lock(() => Storage = contents.ToDictionary(element => element.Key, element => element.Value));
+            internal void Update(IDictionary<string, object> contents)
+            {
+                Lock(() => Storage = contents.ToDictionary(element => element.Key, element => element.Value));
+            }
 
             public Task AddAsync(string key, object value)
             {
@@ -60,15 +69,30 @@ namespace Parse.Infrastructure
                 }
             }
 
-            public void Add(string key, object value) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            public void Add(string key, object value)
+            {
+                throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            }
 
-            public bool Remove(string key) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            public bool Remove(string key)
+            {
+                throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            }
 
-            public void Add(KeyValuePair<string, object> item) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            public void Add(KeyValuePair<string, object> item)
+            {
+                throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            }
 
-            public bool Remove(KeyValuePair<string, object> item) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            public bool Remove(KeyValuePair<string, object> item)
+            {
+                throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+            }
 
-            public bool ContainsKey(string key) => Lock(() => Storage.ContainsKey(key));
+            public bool ContainsKey(string key)
+            {
+                return Lock(() => Storage.ContainsKey(key));
+            }
 
             public bool TryGetValue(string key, out object value)
             {
@@ -78,15 +102,30 @@ namespace Parse.Infrastructure
                 }
             }
 
-            public void Clear() => Lock(() => Storage.Clear());
+            public void Clear()
+            {
+                Lock(() => Storage.Clear());
+            }
 
-            public bool Contains(KeyValuePair<string, object> item) => Lock(() => Elements.Contains(item));
+            public bool Contains(KeyValuePair<string, object> item)
+            {
+                return Lock(() => Elements.Contains(item));
+            }
 
-            public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) => Lock(() => Elements.CopyTo(array, arrayIndex));
+            public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
+            {
+                Lock(() => Elements.CopyTo(array, arrayIndex));
+            }
 
-            public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => Storage.GetEnumerator();
+            public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+            {
+                return Storage.GetEnumerator();
+            }
 
-            IEnumerator IEnumerable.GetEnumerator() => Storage.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return Storage.GetEnumerator();
+            }
 
             public FileInfo File { get; set; }
 
@@ -144,7 +183,10 @@ namespace Parse.Infrastructure
         /// <param name="file">The file wrapper that the storage controller instance should target</param>
         public CacheController(FileInfo file) => EnsureCacheExists(file);
 
-        FileBackedCache EnsureCacheExists(FileInfo file = default) => Cache ??= new FileBackedCache(file ?? (File ??= PersistentCacheFile));
+        FileBackedCache EnsureCacheExists(FileInfo file = default)
+        {
+            return Cache ??= new FileBackedCache(file ?? (File ??= PersistentCacheFile));
+        }
 
         /// <summary>
         /// Loads a settings dictionary from the file wrapped by <see cref="File"/>.
@@ -164,16 +206,22 @@ namespace Parse.Infrastructure
         /// </summary>
         /// <param name="contents">The data to be saved.</param>
         /// <returns>A data cache containing the saved data.</returns>
-        public Task<IDataCache<string, object>> SaveAsync(IDictionary<string, object> contents) => Queue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
+        public Task<IDataCache<string, object>> SaveAsync(IDictionary<string, object> contents)
+        {
+            return Queue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
         {
             EnsureCacheExists().Update(contents);
             return Cache.SaveAsync().OnSuccess(__ => Cache as IDataCache<string, object>);
         }).Unwrap());
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void RefreshPaths() => Cache = new FileBackedCache(File = PersistentCacheFile);
+        public void RefreshPaths()
+        {
+            Cache = new FileBackedCache(File = PersistentCacheFile);
+        }
 
         // TODO: Attach the following method to AppDomain.CurrentDomain.ProcessExit if that actually ever made sense for anything except randomly generated file names, otherwise attach the delegate when it is known the file name is a randomly generated string.
 

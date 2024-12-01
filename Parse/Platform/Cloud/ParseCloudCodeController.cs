@@ -20,10 +20,13 @@ namespace Parse.Platform.Cloud
 
         public ParseCloudCodeController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
 
-        public Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken, data: NoObjectsEncoder.Instance.Encode(parameters, serviceHub) as IDictionary<string, object>), cancellationToken: cancellationToken).OnSuccess(task =>
+        public Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CommandRunner.RunCommandAsync(new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken, data: NoObjectsEncoder.Instance.Encode(parameters, serviceHub) as IDictionary<string, object>), cancellationToken: cancellationToken).OnSuccess(task =>
         {
             IDictionary<string, object> decoded = Decoder.Decode(task.Result.Item2, serviceHub) as IDictionary<string, object>;
             return !decoded.ContainsKey("result") ? default : Conversion.To<T>(decoded["result"]);
         });
+        }
     }
 }

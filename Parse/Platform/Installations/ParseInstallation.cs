@@ -185,7 +185,10 @@ namespace Parse
             set => SetProperty(value, nameof(Channels));
         }
 
-        protected override bool CheckKeyMutable(string key) => !ImmutableKeys.Contains(key);
+        protected override bool CheckKeyMutable(string key)
+        {
+            return !ImmutableKeys.Contains(key);
+        }
 
         protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
         {

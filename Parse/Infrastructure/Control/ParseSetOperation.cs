@@ -8,11 +8,20 @@ namespace Parse.Infrastructure.Control
     {
         public ParseSetOperation(object value) => Value = value;
 
-        public object Encode(IServiceHub serviceHub) => PointerOrLocalIdEncoder.Instance.Encode(Value, serviceHub);
+        public object Encode(IServiceHub serviceHub)
+        {
+            return PointerOrLocalIdEncoder.Instance.Encode(Value, serviceHub);
+        }
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => this;
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+        {
+            return this;
+        }
 
-        public object Apply(object oldValue, string key) => Value;
+        public object Apply(object oldValue, string key)
+        {
+            return Value;
+        }
 
         public object Value { get; private set; }
     }

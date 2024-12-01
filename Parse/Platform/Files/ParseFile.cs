@@ -15,14 +15,20 @@ namespace Parse
         /// Saves the file to the Parse cloud.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SaveFileAsync(this IServiceHub serviceHub, ParseFile file, CancellationToken cancellationToken = default) => serviceHub.SaveFileAsync(file, default, cancellationToken);
+        public static Task SaveFileAsync(this IServiceHub serviceHub, ParseFile file, CancellationToken cancellationToken = default)
+        {
+            return serviceHub.SaveFileAsync(file, default, cancellationToken);
+        }
 
         /// <summary>
         /// Saves the file to the Parse cloud.
         /// </summary>
         /// <param name="progress">The progress callback.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SaveFileAsync(this IServiceHub serviceHub, ParseFile file, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default) => file.TaskQueue.Enqueue(toAwait => serviceHub.FileController.SaveAsync(file.State, file.DataStream, serviceHub.GetCurrentSessionToken(), progress, cancellationToken), cancellationToken).OnSuccess(task => file.State = task.Result);
+        public static Task SaveFileAsync(this IServiceHub serviceHub, ParseFile file, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default)
+        {
+            return file.TaskQueue.Enqueue(toAwait => serviceHub.FileController.SaveAsync(file.State, file.DataStream, serviceHub.GetCurrentSessionToken(), progress, cancellationToken), cancellationToken).OnSuccess(task => file.State = task.Result);
+        }
 
 #pragma warning disable CS1030 // #warning directive
 #warning Make serviceHub null by default once dependents properly inject it when needed.
@@ -31,7 +37,10 @@ namespace Parse
         /// Saves the file to the Parse cloud.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SaveAsync(this ParseFile file, IServiceHub serviceHub, CancellationToken cancellationToken = default) => serviceHub.SaveFileAsync(file, cancellationToken);
+        public static Task SaveAsync(this ParseFile file, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return serviceHub.SaveFileAsync(file, cancellationToken);
+        }
 #pragma warning restore CS1030 // #warning directive
 
         /// <summary>
@@ -39,7 +48,10 @@ namespace Parse
         /// </summary>
         /// <param name="progress">The progress callback.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task SaveAsync(this ParseFile file, IServiceHub serviceHub, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default) => serviceHub.SaveFileAsync(file, progress, cancellationToken);
+        public static Task SaveAsync(this ParseFile file, IServiceHub serviceHub, IProgress<IDataTransferLevel> progress, CancellationToken cancellationToken = default)
+        {
+            return serviceHub.SaveFileAsync(file, progress, cancellationToken);
+        }
     }
 
     /// <summary>

@@ -138,28 +138,40 @@ namespace Parse
         /// </summary>
         /// <param name="userId">The objectId of the user.</param>
         /// <param name="allowed">Whether the user has permission.</param>
-        public void SetReadAccess(string userId, bool allowed) => SetAccess(AccessKind.Read, userId, allowed);
+        public void SetReadAccess(string userId, bool allowed)
+        {
+            SetAccess(AccessKind.Read, userId, allowed);
+        }
 
         /// <summary>
         /// Sets whether the given user is allowed to read this object.
         /// </summary>
         /// <param name="user">The user.</param>
         /// <param name="allowed">Whether the user has permission.</param>
-        public void SetReadAccess(ParseUser user, bool allowed) => SetReadAccess(user.ObjectId, allowed);
+        public void SetReadAccess(ParseUser user, bool allowed)
+        {
+            SetReadAccess(user.ObjectId, allowed);
+        }
 
         /// <summary>
         /// Sets whether the given user id is allowed to write this object.
         /// </summary>
         /// <param name="userId">The objectId of the user.</param>
         /// <param name="allowed">Whether the user has permission.</param>
-        public void SetWriteAccess(string userId, bool allowed) => SetAccess(AccessKind.Write, userId, allowed);
+        public void SetWriteAccess(string userId, bool allowed)
+        {
+            SetAccess(AccessKind.Write, userId, allowed);
+        }
 
         /// <summary>
         /// Sets whether the given user is allowed to write this object.
         /// </summary>
         /// <param name="user">The user.</param>
         /// <param name="allowed">Whether the user has permission.</param>
-        public void SetWriteAccess(ParseUser user, bool allowed) => SetWriteAccess(user.ObjectId, allowed);
+        public void SetWriteAccess(ParseUser user, bool allowed)
+        {
+            SetWriteAccess(user.ObjectId, allowed);
+        }
 
         /// <summary>
         /// Gets whether the given user id is *explicitly* allowed to read this object.
@@ -168,7 +180,10 @@ namespace Parse
         /// </summary>
         /// <param name="userId">The user objectId to check.</param>
         /// <returns>Whether the user has access.</returns>
-        public bool GetReadAccess(string userId) => GetAccess(AccessKind.Read, userId);
+        public bool GetReadAccess(string userId)
+        {
+            return GetAccess(AccessKind.Read, userId);
+        }
 
         /// <summary>
         /// Gets whether the given user is *explicitly* allowed to read this object.
@@ -177,7 +192,10 @@ namespace Parse
         /// </summary>
         /// <param name="user">The user to check.</param>
         /// <returns>Whether the user has access.</returns>
-        public bool GetReadAccess(ParseUser user) => GetReadAccess(user.ObjectId);
+        public bool GetReadAccess(ParseUser user)
+        {
+            return GetReadAccess(user.ObjectId);
+        }
 
         /// <summary>
         /// Gets whether the given user id is *explicitly* allowed to write this object.
@@ -186,7 +204,10 @@ namespace Parse
         /// </summary>
         /// <param name="userId">The user objectId to check.</param>
         /// <returns>Whether the user has access.</returns>
-        public bool GetWriteAccess(string userId) => GetAccess(AccessKind.Write, userId);
+        public bool GetWriteAccess(string userId)
+        {
+            return GetAccess(AccessKind.Write, userId);
+        }
 
         /// <summary>
         /// Gets whether the given user is *explicitly* allowed to write this object.
@@ -195,7 +216,10 @@ namespace Parse
         /// </summary>
         /// <param name="user">The user to check.</param>
         /// <returns>Whether the user has access.</returns>
-        public bool GetWriteAccess(ParseUser user) => GetWriteAccess(user.ObjectId);
+        public bool GetWriteAccess(ParseUser user)
+        {
+            return GetWriteAccess(user.ObjectId);
+        }
 
         /// <summary>
         /// Sets whether users belonging to the role with the given <paramref name="roleName"/>
@@ -203,14 +227,20 @@ namespace Parse
         /// </summary>
         /// <param name="roleName">The name of the role.</param>
         /// <param name="allowed">Whether the role has access.</param>
-        public void SetRoleReadAccess(string roleName, bool allowed) => SetAccess(AccessKind.Read, "role:" + roleName, allowed);
+        public void SetRoleReadAccess(string roleName, bool allowed)
+        {
+            SetAccess(AccessKind.Read, "role:" + roleName, allowed);
+        }
 
         /// <summary>
         /// Sets whether users belonging to the given role are allowed to read this object.
         /// </summary>
         /// <param name="role">The role.</param>
         /// <param name="allowed">Whether the role has access.</param>
-        public void SetRoleReadAccess(ParseRole role, bool allowed) => SetRoleReadAccess(role.Name, allowed);
+        public void SetRoleReadAccess(ParseRole role, bool allowed)
+        {
+            SetRoleReadAccess(role.Name, allowed);
+        }
 
         /// <summary>
         /// Gets whether users belonging to the role with the given <paramref name="roleName"/>
@@ -219,7 +249,10 @@ namespace Parse
         /// </summary>
         /// <param name="roleName">The name of the role.</param>
         /// <returns>Whether the role has access.</returns>
-        public bool GetRoleReadAccess(string roleName) => GetAccess(AccessKind.Read, "role:" + roleName);
+        public bool GetRoleReadAccess(string roleName)
+        {
+            return GetAccess(AccessKind.Read, "role:" + roleName);
+        }
 
         /// <summary>
         /// Gets whether users belonging to the role are allowed to read this object.
@@ -228,7 +261,10 @@ namespace Parse
         /// </summary>
         /// <param name="role">The name of the role.</param>
         /// <returns>Whether the role has access.</returns>
-        public bool GetRoleReadAccess(ParseRole role) => GetRoleReadAccess(role.Name);
+        public bool GetRoleReadAccess(ParseRole role)
+        {
+            return GetRoleReadAccess(role.Name);
+        }
 
         /// <summary>
         /// Sets whether users belonging to the role with the given <paramref name="roleName"/>
@@ -236,14 +272,20 @@ namespace Parse
         /// </summary>
         /// <param name="roleName">The name of the role.</param>
         /// <param name="allowed">Whether the role has access.</param>
-        public void SetRoleWriteAccess(string roleName, bool allowed) => SetAccess(AccessKind.Write, "role:" + roleName, allowed);
+        public void SetRoleWriteAccess(string roleName, bool allowed)
+        {
+            SetAccess(AccessKind.Write, "role:" + roleName, allowed);
+        }
 
         /// <summary>
         /// Sets whether users belonging to the given role are allowed to write this object.
         /// </summary>
         /// <param name="role">The role.</param>
         /// <param name="allowed">Whether the role has access.</param>
-        public void SetRoleWriteAccess(ParseRole role, bool allowed) => SetRoleWriteAccess(role.Name, allowed);
+        public void SetRoleWriteAccess(ParseRole role, bool allowed)
+        {
+            SetRoleWriteAccess(role.Name, allowed);
+        }
 
         /// <summary>
         /// Gets whether users belonging to the role with the given <paramref name="roleName"/>
@@ -252,7 +294,10 @@ namespace Parse
         /// </summary>
         /// <param name="roleName">The name of the role.</param>
         /// <returns>Whether the role has access.</returns>
-        public bool GetRoleWriteAccess(string roleName) => GetAccess(AccessKind.Write, "role:" + roleName);
+        public bool GetRoleWriteAccess(string roleName)
+        {
+            return GetAccess(AccessKind.Write, "role:" + roleName);
+        }
 
         /// <summary>
         /// Gets whether users belonging to the role are allowed to write this object.
@@ -261,6 +306,9 @@ namespace Parse
         /// </summary>
         /// <param name="role">The name of the role.</param>
         /// <returns>Whether the role has access.</returns>
-        public bool GetRoleWriteAccess(ParseRole role) => GetRoleWriteAccess(role.Name);
+        public bool GetRoleWriteAccess(ParseRole role)
+        {
+            return GetRoleWriteAccess(role.Name);
+        }
     }
 }

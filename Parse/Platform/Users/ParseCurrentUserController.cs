@@ -45,7 +45,9 @@ namespace Parse.Platform.Users
             }
         }
 
-        public Task SetAsync(ParseUser user, CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
+        public Task SetAsync(ParseUser user, CancellationToken cancellationToken)
+        {
+            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
         {
             Task saveTask = default;
 
@@ -69,6 +71,7 @@ namespace Parse.Platform.Users
             CurrentUser = user;
             return saveTask;
         }).Unwrap(), cancellationToken);
+        }
 
         public Task<ParseUser> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
         {
@@ -77,19 +80,26 @@ namespace Parse.Platform.Users
             lock (Mutex)
                 cachedCurrent = CurrentUser;
 
-            return cachedCurrent is { } ? Task.FromResult(cachedCurrent) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(task =>
+            if (cachedCurrent is { } && (!string.IsNullOrEmpty(cachedCurrent.Email)) && !string.IsNullOrEmpty(cachedCurrent.ObjectId))
+                return  Task.FromResult(cachedCurrent);
+            else
+                return  TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(task =>
             {
                 task.Result.TryGetValue(nameof(CurrentUser), out object data);
                 ParseUser user = default;
 
                 if (data is string { } serialization)
+                {
                     user = ClassController.GenerateObjectFromState<ParseUser>(ParseObjectCoder.Instance.Decode(JsonUtilities.Parse(serialization) as IDictionary<string, object>, Decoder, serviceHub), "_User", serviceHub);
-
+                }
                 return CurrentUser = user;
             })).Unwrap(), cancellationToken);
         }
 
-        public Task<bool> ExistsAsync(CancellationToken cancellationToken) => CurrentUser is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(t => t.Result.ContainsKey(nameof(CurrentUser)))).Unwrap(), cancellationToken);
+        public Task<bool> ExistsAsync(CancellationToken cancellationToken)
+        {
+            return CurrentUser is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(t => t.Result.ContainsKey(nameof(CurrentUser)))).Unwrap(), cancellationToken);
+        }
 
         public bool IsCurrent(ParseUser user)
         {
@@ -97,7 +107,10 @@ namespace Parse.Platform.Users
                 return CurrentUser == user;
         }
 
-        public void ClearFromMemory() => CurrentUser = default;
+        public void ClearFromMemory()
+        {
+            CurrentUser = default;
+        }
 
         public void ClearFromDisk()
         {
@@ -109,8 +122,14 @@ namespace Parse.Platform.Users
             }
         }
 
-        public Task<string> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default) => GetAsync(serviceHub, cancellationToken).OnSuccess(task => task.Result?.SessionToken);
+        public Task<string> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return GetAsync(serviceHub, cancellationToken).OnSuccess(task => task.Result?.SessionToken);
+        }
 
-        public Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(serviceHub, cancellationToken)).Unwrap().OnSuccess(task => ClearFromDisk()), cancellationToken);
+        public Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(serviceHub, cancellationToken)).Unwrap().OnSuccess(task => ClearFromDisk()), cancellationToken);
+        }
     }
 }

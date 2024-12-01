@@ -57,6 +57,9 @@ namespace Parse.Platform.Installations
             .Unwrap();
         }
 
-        public Task ClearAsync() => SetAsync(null);
+        public Task ClearAsync()
+        {
+            return SetAsync(null);
+        }
     }
 }

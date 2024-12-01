@@ -40,10 +40,38 @@ namespace Parse.Infrastructure.Data
             string email = Extract(mutableData, "email", (obj) => obj as string);
             string username = Extract(mutableData, "username", (obj) => obj as string);
             string sessionToken = Extract(mutableData, "sessionToken", (obj) => obj as string);
+            string error = Extract(mutableData, "error", (obj) => obj as string);
+            int code = Extract(mutableData, "code", obj => Convert.ToInt32(obj));
             bool emailVerified = Extract(mutableData, "emailVerified", (obj) => (bool) obj);    
             DateTime? createdAt = Extract<DateTime?>(mutableData, "createdAt", (obj) => ParseDataDecoder.ParseDate(obj as string)), updatedAt = Extract<DateTime?>(mutableData, "updatedAt", (obj) => ParseDataDecoder.ParseDate(obj as string));
 
-            if (mutableData.ContainsKey("ACL"))
+
+
+            if (!mutableData.ContainsKey("username"))
+            {
+                serverData["username"] = username;
+            }
+            if (!mutableData.ContainsKey("email"))
+            {
+                serverData["email"] = email;
+            }
+            if (!mutableData.ContainsKey("sessionToken"))
+            {
+                serverData["sessionToken"] = sessionToken;
+            }
+            if (!mutableData.ContainsKey("error"))
+            {
+                serverData["error"] = error;
+            }
+            if (!mutableData.ContainsKey("code"))
+            {
+                serverData["code"] = code;
+            }            
+            if (!mutableData.ContainsKey("emailVerified"))
+            {
+                serverData["emailVerified"] = emailVerified;
+            }
+            if (!mutableData.ContainsKey("ACL"))
             {
                 serverData["ACL"] = Extract(mutableData, "ACL", (obj) => new ParseACL(obj as IDictionary<string, object>));
             }
@@ -71,10 +99,10 @@ namespace Parse.Infrastructure.Data
                 CreatedAt = createdAt,
                 UpdatedAt = updatedAt,
                 ServerData = serverData,
-                Email = email,
-                Username = username,
-                EmailVerified = emailVerified,
-                SessionToken = sessionToken 
+                //Email = email,
+                //Username = username,
+                //EmailVerified = emailVerified,
+                //SessionToken = sessionToken 
             };
         }
 

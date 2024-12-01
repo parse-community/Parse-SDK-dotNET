@@ -38,11 +38,20 @@ namespace Parse.Platform.Objects
             return CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result.Item2, Decoder, serviceHub).MutatedClone(mutableClone => mutableClone.IsNew = task.Result.Item1 == System.Net.HttpStatusCode.Created));
         }
 
-        public IList<Task<IObjectState>> SaveAllAsync(IList<IObjectState> states, IList<IDictionary<string, IParseFieldOperation>> operationsList, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default) => ExecuteBatchRequests(states.Zip(operationsList, (item, operations) => new ParseCommand(item.ObjectId is null ? $"classes/{Uri.EscapeDataString(item.ClassName)}" : $"classes/{Uri.EscapeDataString(item.ClassName)}/{Uri.EscapeDataString(item.ObjectId)}", method: item.ObjectId is null ? "POST" : "PUT", data: serviceHub.GenerateJSONObjectForSaving(operations))).ToList(), sessionToken, cancellationToken).Select(task => task.OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result, Decoder, serviceHub))).ToList();
+        public IList<Task<IObjectState>> SaveAllAsync(IList<IObjectState> states, IList<IDictionary<string, IParseFieldOperation>> operationsList, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return ExecuteBatchRequests(states.Zip(operationsList, (item, operations) => new ParseCommand(item.ObjectId is null ? $"classes/{Uri.EscapeDataString(item.ClassName)}" : $"classes/{Uri.EscapeDataString(item.ClassName)}/{Uri.EscapeDataString(item.ObjectId)}", method: item.ObjectId is null ? "POST" : "PUT", data: serviceHub.GenerateJSONObjectForSaving(operations))).ToList(), sessionToken, cancellationToken).Select(task => task.OnSuccess(task => ParseObjectCoder.Instance.Decode(task.Result, Decoder, serviceHub))).ToList();
+        }
 
-        public Task DeleteAsync(IObjectState state, string sessionToken, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand($"classes/{state.ClassName}/{state.ObjectId}", method: "DELETE", sessionToken: sessionToken, data: null), cancellationToken: cancellationToken);
+        public Task DeleteAsync(IObjectState state, string sessionToken, CancellationToken cancellationToken = default)
+        {
+            return CommandRunner.RunCommandAsync(new ParseCommand($"classes/{state.ClassName}/{state.ObjectId}", method: "DELETE", sessionToken: sessionToken, data: null), cancellationToken: cancellationToken);
+        }
 
-        public IList<Task> DeleteAllAsync(IList<IObjectState> states, string sessionToken, CancellationToken cancellationToken = default) => ExecuteBatchRequests(states.Where(item => item.ObjectId is { }).Select(item => new ParseCommand($"classes/{Uri.EscapeDataString(item.ClassName)}/{Uri.EscapeDataString(item.ObjectId)}", method: "DELETE", data: default)).ToList(), sessionToken, cancellationToken).Cast<Task>().ToList();
+        public IList<Task> DeleteAllAsync(IList<IObjectState> states, string sessionToken, CancellationToken cancellationToken = default)
+        {
+            return ExecuteBatchRequests(states.Where(item => item.ObjectId is { }).Select(item => new ParseCommand($"classes/{Uri.EscapeDataString(item.ClassName)}/{Uri.EscapeDataString(item.ObjectId)}", method: "DELETE", data: default)).ToList(), sessionToken, cancellationToken).Cast<Task>().ToList();
+        }
 
         int MaximumBatchSize { get; } = 50;
 

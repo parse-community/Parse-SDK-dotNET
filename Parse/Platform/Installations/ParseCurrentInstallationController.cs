@@ -52,20 +52,26 @@ namespace Parse.Platform.Installations
             }
         }
 
-        public Task SetAsync(ParseInstallation installation, CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
+        public Task SetAsync(ParseInstallation installation, CancellationToken cancellationToken)
+        {
+            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
         {
             Task saveTask = StorageController.LoadAsync().OnSuccess(storage => installation is { } ? storage.Result.AddAsync(ParseInstallationKey, JsonUtilities.Encode(InstallationCoder.Encode(installation))) : storage.Result.RemoveAsync(ParseInstallationKey)).Unwrap();
             CurrentInstallation = installation;
 
             return saveTask;
         }).Unwrap(), cancellationToken);
+        }
 
         public Task<ParseInstallation> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
         {
             ParseInstallation cachedCurrent;
             cachedCurrent = CurrentInstallation;
 
-            return cachedCurrent is { } ? Task.FromResult(cachedCurrent) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(stroage =>
+            if (cachedCurrent is { })
+                return  Task.FromResult(cachedCurrent);
+            else
+                return  TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(stroage =>
             {
                 Task fetchTask;
                 stroage.Result.TryGetValue(ParseInstallationKey, out object temp);
@@ -89,11 +95,20 @@ namespace Parse.Platform.Installations
             })).Unwrap().Unwrap(), cancellationToken);
         }
 
-        public Task<bool> ExistsAsync(CancellationToken cancellationToken) => CurrentInstallation is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(storageTask => storageTask.Result.ContainsKey(ParseInstallationKey))).Unwrap(), cancellationToken);
+        public Task<bool> ExistsAsync(CancellationToken cancellationToken)
+        {
+            return CurrentInstallation is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(storageTask => storageTask.Result.ContainsKey(ParseInstallationKey))).Unwrap(), cancellationToken);
+        }
 
-        public bool IsCurrent(ParseInstallation installation) => CurrentInstallation == installation;
+        public bool IsCurrent(ParseInstallation installation)
+        {
+            return CurrentInstallation == installation;
+        }
 
-        public void ClearFromMemory() => CurrentInstallation = default;
+        public void ClearFromMemory()
+        {
+            CurrentInstallation = default;
+        }
 
         public void ClearFromDisk()
         {

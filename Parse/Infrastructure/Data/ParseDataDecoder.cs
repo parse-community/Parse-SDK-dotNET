@@ -73,10 +73,10 @@ public class ParseDataDecoder : IParseDataDecoder
                     CreatedAt = dictionary.ContainsKey("createdAt") ? DecodeDateTime(dictionary["createdAt"]) : null,
                     UpdatedAt = dictionary.ContainsKey("updatedAt") ? DecodeDateTime(dictionary["updatedAt"]) : null,
                     IsNew = dictionary.ContainsKey("isNew") && Convert.ToBoolean(dictionary["isNew"]),
-                    EmailVerified = dictionary.ContainsKey("emailVerified") && Convert.ToBoolean(dictionary["emailVerified"]),
-                    Username = dictionary.ContainsKey("username") ? dictionary["username"]?.ToString() : null,
-                    Email = dictionary.ContainsKey("email") ? dictionary["email"]?.ToString() : null,
-                    SessionToken = dictionary.ContainsKey("sessionToken") ? dictionary["sessionToken"]?.ToString() : null,
+                    //EmailVerified = dictionary.ContainsKey("emailVerified") && Convert.ToBoolean(dictionary["emailVerified"]),
+                    //Username = dictionary.ContainsKey("username") ? dictionary["username"]?.ToString() : null,
+                    //Email = dictionary.ContainsKey("email") ? dictionary["email"]?.ToString() : null,
+                    //SessionToken = dictionary.ContainsKey("sessionToken") ? dictionary["sessionToken"]?.ToString() : null,
                     ServerData = dictionary
                 };
 

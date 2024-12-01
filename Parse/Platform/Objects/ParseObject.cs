@@ -117,7 +117,10 @@ namespace Parse
         /// </summary>
         /// <param name="serviceHub">The serviceHub to use for all operations.</param>
         /// <returns>The instance which was mutated.</returns>
-        public ParseObject Bind(IServiceHub serviceHub) => (Instance: this, Services = serviceHub).Instance;
+        public ParseObject Bind(IServiceHub serviceHub)
+        {
+            return (Instance: this, Services = serviceHub).Instance;
+        }
 
         /// <summary>
         /// Occurs when a property value changes.
@@ -408,7 +411,10 @@ namespace Parse
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The object to add.</param>
-        public void AddToList(string key, object value) => AddRangeToList(key, new[] { value });
+        public void AddToList(string key, object value)
+        {
+            AddRangeToList(key, new[] { value });
+        }
 
         /// <summary>
         /// Atomically adds an object to the end of the list associated with the given key,
@@ -417,7 +423,10 @@ namespace Parse
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="value">The object to add.</param>
-        public void AddUniqueToList(string key, object value) => AddRangeUniqueToList(key, new object[] { value });
+        public void AddUniqueToList(string key, object value)
+        {
+            AddRangeUniqueToList(key, new object[] { value });
+        }
 
         /// <summary>
         /// Returns whether this object has a particular key.
@@ -435,7 +444,10 @@ namespace Parse
         /// Deletes this object on the server.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public Task DeleteAsync(CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => DeleteAsync(toAwait, cancellationToken), cancellationToken);
+        public Task DeleteAsync(CancellationToken cancellationToken = default)
+        {
+            return TaskQueue.Enqueue(toAwait => DeleteAsync(toAwait, cancellationToken), cancellationToken);
+        }
 
         /// <summary>
         /// Gets a value for the key of a particular type.
@@ -446,7 +458,10 @@ namespace Parse
         /// <exception cref="KeyNotFoundException">The property is
         /// retrieved and <paramref name="key"/> is not found.</exception>
         /// </summary>
-        public T Get<T>(string key) => Conversion.To<T>(this[key]);
+        public T Get<T>(string key)
+        {
+            return Conversion.To<T>(this[key]);
+        }
 
         /// <summary>
         /// Access or create a Relation value for a key.
@@ -480,7 +495,10 @@ namespace Parse
         /// Atomically increments the given key by 1.
         /// </summary>
         /// <param name="key">The key to increment.</param>
-        public void Increment(string key) => Increment(key, 1);
+        public void Increment(string key)
+        {
+            Increment(key, 1);
+        }
 
         /// <summary>
         /// Atomically increments the given key by the given number.
@@ -572,7 +590,10 @@ namespace Parse
         /// Saves this object to the server.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        public Task SaveAsync(CancellationToken cancellationToken = default) => TaskQueue.Enqueue(toAwait => SaveAsync(toAwait, cancellationToken), cancellationToken);
+        public Task SaveAsync(CancellationToken cancellationToken = default)
+        {
+            return TaskQueue.Enqueue(toAwait => SaveAsync(toAwait, cancellationToken), cancellationToken);
+        }
 
         /// <summary>
         /// Populates result with the value for the key, if possible.
@@ -623,11 +644,14 @@ namespace Parse
             return toAwait.OnSuccess(_ => Services.ObjectController.DeleteAsync(State, sessionToken, cancellationToken)).Unwrap().OnSuccess(_ => IsDirty = true);
         }
 
-        internal virtual Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken) => toAwait.OnSuccess(_ => ObjectId == null ? throw new InvalidOperationException("Cannot refresh an object that hasn't been saved to the server.") : Services.ObjectController.FetchAsync(State, Services.GetCurrentSessionToken(), Services, cancellationToken)).Unwrap().OnSuccess(task =>
+        internal virtual Task<ParseObject> FetchAsyncInternal(Task toAwait, CancellationToken cancellationToken)
+        {
+            return toAwait.OnSuccess(_ => ObjectId == null ? throw new InvalidOperationException("Cannot refresh an object that hasn't been saved to the server.") : Services.ObjectController.FetchAsync(State, Services.GetCurrentSessionToken(), Services, cancellationToken)).Unwrap().OnSuccess(task =>
         {
             HandleFetchResult(task.Result);
             return this;
         });
+        }
 
         #endregion
 
@@ -637,16 +661,25 @@ namespace Parse
         /// Fetches this object with the data from the server.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        internal Task<ParseObject> FetchAsyncInternal(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => FetchAsyncInternal(toAwait, cancellationToken), cancellationToken);
+        internal Task<ParseObject> FetchAsyncInternal(CancellationToken cancellationToken)
+        {
+            return TaskQueue.Enqueue(toAwait => FetchAsyncInternal(toAwait, cancellationToken), cancellationToken);
+        }
 
-        internal Task<ParseObject> FetchIfNeededAsyncInternal(Task toAwait, CancellationToken cancellationToken) => !IsDataAvailable ? FetchAsyncInternal(toAwait, cancellationToken) : Task.FromResult(this);
+        internal Task<ParseObject> FetchIfNeededAsyncInternal(Task toAwait, CancellationToken cancellationToken)
+        {
+            return !IsDataAvailable ? FetchAsyncInternal(toAwait, cancellationToken) : Task.FromResult(this);
+        }
 
         /// <summary>
         /// If this ParseObject has not been fetched (i.e. <see cref="IsDataAvailable"/> returns
         /// false), fetches this object with the data from the server.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
-        internal Task<ParseObject> FetchIfNeededAsyncInternal(CancellationToken cancellationToken) => TaskQueue.Enqueue(toAwait => FetchIfNeededAsyncInternal(toAwait, cancellationToken), cancellationToken);
+        internal Task<ParseObject> FetchIfNeededAsyncInternal(CancellationToken cancellationToken)
+        {
+            return TaskQueue.Enqueue(toAwait => FetchIfNeededAsyncInternal(toAwait, cancellationToken), cancellationToken);
+        }
 
         internal void HandleFailedSave(IDictionary<string, IParseFieldOperation> operationsBeforeSave)
         {
@@ -869,7 +902,10 @@ namespace Parse
             }
         }
 
-        public IDictionary<string, object> ServerDataToJSONObjectForSerialization() => PointerOrLocalIdEncoder.Instance.Encode(State.ToDictionary(pair => pair.Key, pair => pair.Value), Services) as IDictionary<string, object>;
+        public IDictionary<string, object> ServerDataToJSONObjectForSerialization()
+        {
+            return PointerOrLocalIdEncoder.Instance.Encode(State.ToDictionary(pair => pair.Key, pair => pair.Value), Services) as IDictionary<string, object>;
+        }
 
         /// <summary>
         /// Perform Set internally which is not gated by mutability check.
@@ -941,7 +977,10 @@ namespace Parse
         /// <returns>The value of the property.</returns>
         /// <param name="propertyName">The name of the property.</param>
         /// <typeparam name="T">The return type of the property.</typeparam>
-        protected T GetProperty<T>([CallerMemberName] string propertyName = null) => GetProperty(default(T), propertyName);
+        protected T GetProperty<T>([CallerMemberName] string propertyName = null)
+        {
+            return GetProperty(default(T), propertyName);
+        }
 
         /// <summary>
         /// Gets the value of a property based upon its associated ParseFieldName attribute.
@@ -950,7 +989,10 @@ namespace Parse
         /// <param name="defaultValue">The value to return if the property is not present on the ParseObject.</param>
         /// <param name="propertyName">The name of the property.</param>
         /// <typeparam name="T">The return type of the property.</typeparam>
-        protected T GetProperty<T>(T defaultValue, [CallerMemberName] string propertyName = null) => TryGetValue(Services.GetFieldForPropertyName(ClassName, propertyName), out T result) ? result : defaultValue;
+        protected T GetProperty<T>(T defaultValue, [CallerMemberName] string propertyName = null)
+        {
+            return TryGetValue(Services.GetFieldForPropertyName(ClassName, propertyName), out T result) ? result : defaultValue;
+        }
 
         /// <summary>
         /// Gets a relation for a property based upon its associated ParseFieldName attribute.
@@ -958,9 +1000,15 @@ namespace Parse
         /// <returns>The ParseRelation for the property.</returns>
         /// <param name="propertyName">The name of the property.</param>
         /// <typeparam name="T">The ParseObject subclass type of the ParseRelation.</typeparam>
-        protected ParseRelation<T> GetRelationProperty<T>([CallerMemberName] string propertyName = null) where T : ParseObject => GetRelation<T>(Services.GetFieldForPropertyName(ClassName, propertyName));
+        protected ParseRelation<T> GetRelationProperty<T>([CallerMemberName] string propertyName = null) where T : ParseObject
+        {
+            return GetRelation<T>(Services.GetFieldForPropertyName(ClassName, propertyName));
+        }
 
-        protected virtual bool CheckKeyMutable(string key) => true;
+        protected virtual bool CheckKeyMutable(string key)
+        {
+            return true;
+        }
 
         /// <summary>
         /// Raises change notifications for all properties associated with the given
@@ -985,7 +1033,10 @@ namespace Parse
         /// Passing "Item[]" tells the binding framework that all indexed values
         /// have changed (but not all properties)
         /// </summary>
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChangedHandler.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChangedHandler.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         protected virtual Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
         {
@@ -1029,7 +1080,10 @@ namespace Parse
         /// <param name="value">The new value.</param>
         /// <param name="propertyName">The name of the property.</param>
         /// <typeparam name="T">The type for the property.</typeparam>
-        protected void SetProperty<T>(T value, [CallerMemberName] string propertyName = null) => this[Services.GetFieldForPropertyName(ClassName, propertyName)] = value;
+        protected void SetProperty<T>(T value, [CallerMemberName] string propertyName = null)
+        {
+            this[Services.GetFieldForPropertyName(ClassName, propertyName)] = value;
+        }
 
         void ApplyOperations(IDictionary<string, IParseFieldOperation> operations, IDictionary<string, object> map)
         {
@@ -1095,9 +1149,15 @@ namespace Parse
         /// refreshing or saving.
         /// </summary>
         /// <returns>Map of objectId to ParseObject which have been fetched.</returns>
-        IDictionary<string, ParseObject> CollectFetchedObjects() => Services.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.ObjectId != null && o.IsDataAvailable).GroupBy(o => o.ObjectId).ToDictionary(group => group.Key, group => group.Last());
+        IDictionary<string, ParseObject> CollectFetchedObjects()
+        {
+            return Services.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.ObjectId != null && o.IsDataAvailable).GroupBy(o => o.ObjectId).ToDictionary(group => group.Key, group => group.Last());
+        }
 
-        IEnumerable<ParseObject> FindUnsavedChildren() => Services.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.IsDirty);
+        IEnumerable<ParseObject> FindUnsavedChildren()
+        {
+            return Services.TraverseObjectDeep(EstimatedData).OfType<ParseObject>().Where(o => o.IsDirty);
+        }
 
         IEnumerator<KeyValuePair<string, object>> IEnumerable<KeyValuePair<string, object>>.GetEnumerator()
         {

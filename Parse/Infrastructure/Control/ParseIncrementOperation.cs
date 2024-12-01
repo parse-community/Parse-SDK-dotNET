@@ -96,28 +96,40 @@ namespace Parse.Infrastructure.Control
 
         public ParseIncrementOperation(object amount) => Amount = amount;
 
-        public object Encode(IServiceHub serviceHub) => new Dictionary<string, object>
+        public object Encode(IServiceHub serviceHub)
         {
-            ["__op"] = "Increment",
-            ["amount"] = Amount
-        };
+            return new Dictionary<string, object>
+            {
+                ["__op"] = "Increment",
+                ["amount"] = Amount
+            };
+        }
 
-        static object Add(object first, object second) => Adders.TryGetValue(new Tuple<Type, Type>(first.GetType(), second.GetType()), out Func<object, object, object> adder) ? adder(first, second) : throw new InvalidCastException($"Could not add objects of type {first.GetType()} and {second.GetType()} to each other.");
-
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
+        static object Add(object first, object second)
         {
-            null => this,
-            ParseDeleteOperation _ => new ParseSetOperation(Amount),
+            return Adders.TryGetValue(new Tuple<Type, Type>(first.GetType(), second.GetType()), out Func<object, object, object> adder) ? adder(first, second) : throw new InvalidCastException($"Could not add objects of type {first.GetType()} and {second.GetType()} to each other.");
+        }
 
-            // This may be a bug, but it was in the original logic.
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+        {
+            return previous switch
+            {
+                null => this,
+                ParseDeleteOperation _ => new ParseSetOperation(Amount),
 
-            ParseSetOperation { Value: string { } } => throw new InvalidOperationException("Cannot increment a non-number type."),
-            ParseSetOperation { Value: var value } => new ParseSetOperation(Add(value, Amount)),
-            ParseIncrementOperation { Amount: var amount } => new ParseIncrementOperation(Add(amount, Amount)),
-            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
-        };
+                // This may be a bug, but it was in the original logic.
 
-        public object Apply(object oldValue, string key) => oldValue is string ? throw new InvalidOperationException("Cannot increment a non-number type.") : Add(oldValue ?? 0, Amount);
+                ParseSetOperation { Value: string { } } => throw new InvalidOperationException("Cannot increment a non-number type."),
+                ParseSetOperation { Value: var value } => new ParseSetOperation(Add(value, Amount)),
+                ParseIncrementOperation { Amount: var amount } => new ParseIncrementOperation(Add(amount, Amount)),
+                _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+            };
+        }
+
+        public object Apply(object oldValue, string key)
+        {
+            return oldValue is string ? throw new InvalidOperationException("Cannot increment a non-number type.") : Add(oldValue ?? 0, Amount);
+        }
 
         public object Amount { get; }
     }

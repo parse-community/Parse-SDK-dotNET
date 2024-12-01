@@ -15,10 +15,19 @@ namespace Parse.Infrastructure.Control
 
         private ParseDeleteOperation() { }
 
-        public object Encode(IServiceHub serviceHub) => new Dictionary<string, object> { ["__op"] = "Delete" };
+        public object Encode(IServiceHub serviceHub)
+        {
+            return new Dictionary<string, object> { ["__op"] = "Delete" };
+        }
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => this;
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+        {
+            return this;
+        }
 
-        public object Apply(object oldValue, string key) => Token;
+        public object Apply(object oldValue, string key)
+        {
+            return Token;
+        }
     }
 }

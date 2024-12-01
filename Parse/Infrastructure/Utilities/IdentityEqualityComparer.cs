@@ -10,8 +10,14 @@ namespace Parse.Infrastructure.Utilities
     /// </summary>
     public class IdentityEqualityComparer<T> : IEqualityComparer<T>
     {
-        public bool Equals(T x, T y) => ReferenceEquals(x, y);
+        public bool Equals(T x, T y)
+        {
+            return ReferenceEquals(x, y);
+        }
 
-        public int GetHashCode(T obj) => RuntimeHelpers.GetHashCode(obj);
+        public int GetHashCode(T obj)
+        {
+            return RuntimeHelpers.GetHashCode(obj);
+        }
     }
 }

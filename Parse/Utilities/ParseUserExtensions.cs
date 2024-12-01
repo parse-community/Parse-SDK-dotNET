@@ -16,12 +16,24 @@ namespace Parse.Abstractions.Internal
     /// </summary>
     public static class ParseUserExtensions
     {
-        public static Task UnlinkFromAsync(this ParseUser user, string authType, CancellationToken cancellationToken) => user.UnlinkFromAsync(authType, cancellationToken);
+        public static Task UnlinkFromAsync(this ParseUser user, string authType, CancellationToken cancellationToken)
+        {
+            return user.UnlinkFromAsync(authType, cancellationToken);
+        }
 
-        public static Task LinkWithAsync(this ParseUser user, string authType, CancellationToken cancellationToken) => user.LinkWithAsync(authType, cancellationToken);
+        public static Task LinkWithAsync(this ParseUser user, string authType, CancellationToken cancellationToken)
+        {
+            return user.LinkWithAsync(authType, cancellationToken);
+        }
 
-        public static Task LinkWithAsync(this ParseUser user, string authType, IDictionary<string, object> data, CancellationToken cancellationToken) => user.LinkWithAsync(authType, data, cancellationToken);
+        public static Task LinkWithAsync(this ParseUser user, string authType, IDictionary<string, object> data, CancellationToken cancellationToken)
+        {
+            return user.LinkWithAsync(authType, data, cancellationToken);
+        }
 
-        public static Task UpgradeToRevocableSessionAsync(this ParseUser user, CancellationToken cancellationToken) => user.UpgradeToRevocableSessionAsync(cancellationToken);
+        public static Task UpgradeToRevocableSessionAsync(this ParseUser user, CancellationToken cancellationToken)
+        {
+            return user.UpgradeToRevocableSessionAsync(cancellationToken);
+        }
     }
 }

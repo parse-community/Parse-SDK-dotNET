@@ -15,16 +15,22 @@ namespace Parse.Platform.Push
 
         public ParsePushChannelsController(IParseCurrentInstallationController currentInstallationController) => CurrentInstallationController = currentInstallationController;
 
-        public Task SubscribeAsync(IEnumerable<string> channels, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CurrentInstallationController.GetAsync(serviceHub, cancellationToken).OnSuccess(task =>
+        public Task SubscribeAsync(IEnumerable<string> channels, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CurrentInstallationController.GetAsync(serviceHub, cancellationToken).OnSuccess(task =>
         {
             task.Result.AddRangeUniqueToList(nameof(channels), channels);
             return task.Result.SaveAsync(cancellationToken);
         }).Unwrap();
+        }
 
-        public Task UnsubscribeAsync(IEnumerable<string> channels, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CurrentInstallationController.GetAsync(serviceHub, cancellationToken).OnSuccess(task =>
+        public Task UnsubscribeAsync(IEnumerable<string> channels, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        {
+            return CurrentInstallationController.GetAsync(serviceHub, cancellationToken).OnSuccess(task =>
         {
             task.Result.RemoveAllFromList(nameof(channels), channels);
             return task.Result.SaveAsync(cancellationToken);
         }).Unwrap();
+        }
     }
 }

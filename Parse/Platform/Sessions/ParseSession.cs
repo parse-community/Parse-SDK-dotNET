@@ -10,7 +10,10 @@ namespace Parse
     {
         static HashSet<string> ImmutableKeys { get; } = new HashSet<string> { "sessionToken", "createdWith", "restricted", "user", "expiresAt", "installationId" };
 
-        protected override bool CheckKeyMutable(string key) => !ImmutableKeys.Contains(key);
+        protected override bool CheckKeyMutable(string key)
+        {
+            return !ImmutableKeys.Contains(key);
+        }
 
         /// <summary>
         /// Gets the session token for a user, if they are logged in.

@@ -21,7 +21,10 @@ namespace Parse.Platform.Objects
 
         public ParseObjectClassController() => AddValid(typeof(ParseObject));
 
-        public string GetClassName(Type type) => type == typeof(ParseObject) ? ReservedParseObjectClassName : type.GetParseClassName();
+        public string GetClassName(Type type)
+        {
+            return type == typeof(ParseObject) ? ReservedParseObjectClassName : type.GetParseClassName();
+        }
 
         public Type GetType(string className)
         {
@@ -115,9 +118,17 @@ namespace Parse.Platform.Objects
             Mutex.ExitReadLock();
 
             if (info is { })
-                return  info.Instantiate().Bind(serviceHub);
+            {
+                var obj = info.Instantiate().Bind(serviceHub);
+                return obj;
+
+            }
             else
+            {
+
                 return  new ParseObject(className, serviceHub);
+
+            }
         }
 
         public IDictionary<string, string> GetPropertyMappings(string className)

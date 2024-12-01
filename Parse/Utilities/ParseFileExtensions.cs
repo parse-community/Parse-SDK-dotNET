@@ -14,6 +14,9 @@ namespace Parse.Abstractions.Internal
     /// </summary>
     public static class ParseFileExtensions
     {
-        public static ParseFile Create(string name, Uri uri, string mimeType = null) => new ParseFile(name, uri, mimeType);
+        public static ParseFile Create(string name, Uri uri, string mimeType = null)
+        {
+            return new ParseFile(name, uri, mimeType);
+        }
     }
 }

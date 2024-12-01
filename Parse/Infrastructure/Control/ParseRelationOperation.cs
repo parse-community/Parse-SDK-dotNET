@@ -63,23 +63,29 @@ namespace Parse.Infrastructure.Control
             return addition ?? removal;
         }
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
+        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
         {
-            null => this,
-            ParseDeleteOperation { } => throw new InvalidOperationException("You can't modify a relation after deleting it."),
-            ParseRelationOperation { } other when other.TargetClassName != TargetClassName => throw new InvalidOperationException($"Related object must be of class {other.TargetClassName}, but {TargetClassName} was passed in."),
-            ParseRelationOperation { ClassController: var classController } other => new ParseRelationOperation(classController, Additions.Union(other.Additions.Except(Removals)).ToList(), Removals.Union(other.Removals.Except(Additions)).ToList(), TargetClassName),
-            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
-        };
+            return previous switch
+            {
+                null => this,
+                ParseDeleteOperation { } => throw new InvalidOperationException("You can't modify a relation after deleting it."),
+                ParseRelationOperation { } other when other.TargetClassName != TargetClassName => throw new InvalidOperationException($"Related object must be of class {other.TargetClassName}, but {TargetClassName} was passed in."),
+                ParseRelationOperation { ClassController: var classController } other => new ParseRelationOperation(classController, Additions.Union(other.Additions.Except(Removals)).ToList(), Removals.Union(other.Removals.Except(Additions)).ToList(), TargetClassName),
+                _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+            };
+        }
 
-        public object Apply(object oldValue, string key) => oldValue switch
+        public object Apply(object oldValue, string key)
         {
-            _ when Additions.Count == 0 && Removals.Count == 0 => default,
-            null => ClassController.CreateRelation(null, key, TargetClassName),
-            ParseRelationBase { TargetClassName: { } oldClassname } when oldClassname != TargetClassName => throw new InvalidOperationException($"Related object must be a {oldClassname}, but a {TargetClassName} was passed in."),
-            ParseRelationBase { } oldRelation => (Relation: oldRelation, oldRelation.TargetClassName = TargetClassName).Relation,
-            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
-        };
+            return oldValue switch
+            {
+                _ when Additions.Count == 0 && Removals.Count == 0 => default,
+                null => ClassController.CreateRelation(null, key, TargetClassName),
+                ParseRelationBase { TargetClassName: { } oldClassname } when oldClassname != TargetClassName => throw new InvalidOperationException($"Related object must be a {oldClassname}, but a {TargetClassName} was passed in."),
+                ParseRelationBase { } oldRelation => (Relation: oldRelation, oldRelation.TargetClassName = TargetClassName).Relation,
+                _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+            };
+        }
 
         public string TargetClassName { get; }
 
