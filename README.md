@@ -1,4 +1,4 @@
-# Parse SDK for .NET
+# Parse SDK for .NET - MAUI - UNOFFICIAL
 
 ---
 
@@ -35,12 +35,9 @@ A library that gives you access to the powerful Parse Server backend from any pl
 
 
 ## Getting Started
-The previous stable release version 1.7.0 is available as [a NuGet package][nuget-link].
+The previous stable release version 1.7.0 is available as 
 
-The latest development release is also available as [a NuGet package (Prerelease)][nuget-link-prerelease].
-
-Note that the previous stable package currently available on the official distribution channel is quite old.
-To use the most up-to-date code, either build this project and reference the generated NuGet package, download the pre-built assembly from [releases][releases-link] or check the [NuGet package (Prerelease)][nuget-link-prerelease] on NuGet.
+The latest development release is also available as 
 
 ## Using the Code
 Make sure you are using the project's root namespace.
