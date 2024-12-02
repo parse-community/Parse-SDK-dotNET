@@ -50,28 +50,30 @@ namespace Parse
         }
 
         /// <summary>
-        /// Logs in a user with a username and password. On success, this saves the session to disk or to memory so you can retrieve the currently logged in user using <see cref="GetCurrentUser(IServiceHub)"/>.
+        /// Logs in a user with a username and password. On success, this saves the session to disk or to memory so you can retrieve the currently logged-in user using <see cref="GetCurrentUser(IServiceHub)"/>.
         /// </summary>
         /// <param name="serviceHub">The <see cref="IServiceHub"/> instance to target when logging in.</param>
         /// <param name="username">The username to log in with.</param>
         /// <param name="password">The password to log in with.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The newly logged-in user.</returns>
-        public static Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
+        public static async Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
         {
-            return serviceHub.UserController.LogInAsync(username, password, serviceHub, cancellationToken).OnSuccess(task =>
-        {
-            ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(task.Result, "_User");
+            // Log in the user and get the user state
+            var userState = await serviceHub.UserController
+                .LogInAsync(username, password, serviceHub, cancellationToken)
+                .ConfigureAwait(false);
+
+            // Generate the ParseUser object from the returned state
+            var user = serviceHub.GenerateObjectFromState<ParseUser>(userState, "_User");
+
+            // Save the user locally
+            await SaveCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
+
+            // Set the authenticated user as the current instance
             InstanceUser = user;
-            var s = user.IsAuthenticated;
-            //user.IsAuthenticated
-            return SaveCurrentUserAsync(serviceHub, user)
-            .OnSuccess(_ =>
-            {
-                InstanceUser = user;
-                return user;
-            });
-        }).Unwrap();
+
+            return user;
         }
 
         public static ParseUser InstanceUser { get; set; }
@@ -79,30 +81,28 @@ namespace Parse
 
         /// <summary>
         /// Logs in a user with a username and password. On success, this saves the session to disk so you
-        /// can retrieve the currently logged in user using <see cref="GetCurrentUser()"/>.
+        /// can retrieve the currently logged-in user using <see cref="GetCurrentUser()"/>.
         /// </summary>
         /// <param name="sessionToken">The session token to authorize with</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The user if authorization was successful</returns>
-        public static Task<ParseUser> BecomeAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken = default)
+        public static async Task<ParseUser> BecomeAsync(this IServiceHub serviceHub, string sessionToken, CancellationToken cancellationToken = default)
         {
-            return serviceHub.UserController.GetUserAsync(sessionToken, serviceHub, cancellationToken)
-                .OnSuccess(t =>
-                {
-                    // Generate the ParseUser object from the returned state
-                    ParseUser user = serviceHub.GenerateObjectFromState<ParseUser>(t.Result, "_User");
+            // Fetch the user state using the session token
+            var userState = await serviceHub.UserController.GetUserAsync(sessionToken, serviceHub, cancellationToken).ConfigureAwait(false);
 
-                    // Save the user locally
-                    return SaveCurrentUserAsync(serviceHub, user)
-                        .OnSuccess(_ =>
-                        {
-                            // Set the authenticated user as the current instance only after successful save
-                            InstanceUser = user;
-                            return user;
-                        });
-                })
-                .Unwrap();
+            // Generate the ParseUser object from the returned state
+            var user = serviceHub.GenerateObjectFromState<ParseUser>(userState, "_User");
+
+            // Save the user locally
+            await SaveCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
+
+            // Set the authenticated user as the current instance only after successful save
+            InstanceUser = user;
+
+            return user;
         }
+
 
 
         /// <summary>
@@ -137,14 +137,21 @@ namespace Parse
         /// This is preferable to using <see cref="LogOut()"/>, unless your code is already running from a
         /// background thread.
         /// </summary>
-        public static Task LogOutAsync(this IServiceHub serviceHub, CancellationToken cancellationToken)
+        public static async Task LogOutAsync(this IServiceHub serviceHub, CancellationToken cancellationToken)
         {
-            return GetCurrentUserAsync(serviceHub).OnSuccess(task =>
-        {
+            // Fetch the current user
+            var user = await GetCurrentUserAsync(serviceHub).ConfigureAwait(false);
+
+            // Log out with providers
             LogOutWithProviders();
-            return task.Result is { } user ? user.TaskQueue.Enqueue(toAwait => user.LogOutAsync(toAwait, cancellationToken), cancellationToken) : Task.CompletedTask;
-        }).Unwrap();
+
+            // If a user is logged in, log them out and return the result, otherwise, complete immediately
+            if (user != null)
+            {
+                await user.TaskQueue.Enqueue(toAwait => user.LogOutAsync(cancellationToken), cancellationToken).ConfigureAwait(false);
+            }
         }
+
 
         static void LogOutWithProviders()
         {
@@ -203,31 +210,31 @@ namespace Parse
         /// migrate the sessionToken on disk to revocable session.
         /// </summary>
         /// <returns>The Task that upgrades the session.</returns>
-        public static Task EnableRevocableSessionAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
-        {
-            lock (serviceHub.UserController.RevocableSessionEnabledMutex)
-            {
-                serviceHub.UserController.RevocableSessionEnabled = true;
-            }
+        //public static Task EnableRevocableSessionAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
+        //{
+        //    lock (serviceHub.UserController.RevocableSessionEnabledMutex)
+        //    {
+        //        serviceHub.UserController.RevocableSessionEnabled = true;
+        //    }
 
-            return GetCurrentUserAsync(serviceHub, cancellationToken).OnSuccess(task => task.Result.UpgradeToRevocableSessionAsync(cancellationToken));
-        }
+        //    return GetCurrentUserAsync(serviceHub, cancellationToken).OnSuccess(task => task.Result.UpgradeToRevocableSessionAsync(cancellationToken));
+        //}
 
-        internal static void DisableRevocableSession(this IServiceHub serviceHub)
-        {
-            lock (serviceHub.UserController.RevocableSessionEnabledMutex)
-            {
-                serviceHub.UserController.RevocableSessionEnabled = false;
-            }
-        }
+        //internal static void DisableRevocableSession(this IServiceHub serviceHub)
+        //{
+        //    lock (serviceHub.UserController.RevocableSessionEnabledMutex)
+        //    {
+        //        serviceHub.UserController.RevocableSessionEnabled = false;
+        //    }
+        //}
 
-        internal static bool GetIsRevocableSessionEnabled(this IServiceHub serviceHub)
-        {
-            lock (serviceHub.UserController.RevocableSessionEnabledMutex)
-            {
-                return serviceHub.UserController.RevocableSessionEnabled;
-            }
-        }
+        //internal static bool GetIsRevocableSessionEnabled(this IServiceHub serviceHub)
+        //{
+        //    lock (serviceHub.UserController.RevocableSessionEnabledMutex)
+        //    {
+        //        return serviceHub.UserController.RevocableSessionEnabled;
+        //    }
+        //}
 
         #endregion
 
@@ -252,39 +259,45 @@ namespace Parse
             return serviceHub.UserController.RequestPasswordResetAsync(email, cancellationToken);
         }
 
-        public static Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string authType, IDictionary<string, object> data, CancellationToken cancellationToken)
+        public static async Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string authType, IDictionary<string, object> data, CancellationToken cancellationToken)
         {
-            ParseUser user = null;
+            // Log in the user with the provided authType and data
+            var userState = await serviceHub.UserController
+                .LogInAsync(authType, data, serviceHub, cancellationToken)
+                .ConfigureAwait(false);
 
-            return serviceHub.UserController.LogInAsync(authType, data, serviceHub, cancellationToken).OnSuccess(task =>
+            // Generate the ParseUser object from the user state
+            var user = serviceHub.GenerateObjectFromState<ParseUser>(userState, "_User");
+
+            // Synchronize the user data in a thread-safe way
+            lock (user.Mutex)
             {
-                user = serviceHub.GenerateObjectFromState<ParseUser>(task.Result, "_User");
+                user.AuthData ??= new Dictionary<string, IDictionary<string, object>>();
 
-                lock (user.Mutex)
-                {
-                    if (user.AuthData == null)
-                    {
-                        user.AuthData = new Dictionary<string, IDictionary<string, object>>();
-                    }
+                user.AuthData[authType] = data;
 
-                    user.AuthData[authType] = data;
+                // Synchronize authentication data for all providers
+                user.SynchronizeAllAuthData();
+            }
 
-#pragma warning disable CS1030 // #warning directive
-#warning Check if SynchronizeAllAuthData should accept an IServiceHub for consistency on which actions take place on which IServiceHub implementation instance.
+            // Save the current user locally
+            await SaveCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
 
-                    user.SynchronizeAllAuthData();
-#pragma warning restore CS1030 // #warning directive
-                }
-
-                return SaveCurrentUserAsync(serviceHub, user);
-            }).Unwrap().OnSuccess(t => user);
+            return user;
         }
 
-        public static Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string authType, CancellationToken cancellationToken)
+        public static async Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string authType, CancellationToken cancellationToken)
         {
+            // Get the authentication provider based on the provided authType
             IParseAuthenticationProvider provider = ParseUser.GetProvider(authType);
-            return provider.AuthenticateAsync(cancellationToken).OnSuccess(authData => LogInWithAsync(serviceHub, authType, authData.Result, cancellationToken)).Unwrap();
+
+            // Authenticate using the provider
+            var authData = await provider.AuthenticateAsync(cancellationToken).ConfigureAwait(false);
+
+            // Log in using the authenticated data
+            return await LogInWithAsync(serviceHub, authType, authData, cancellationToken).ConfigureAwait(false);
         }
+
 
         internal static void RegisterProvider(this IServiceHub serviceHub, IParseAuthenticationProvider provider)
         {

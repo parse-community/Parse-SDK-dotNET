@@ -20,7 +20,7 @@ public class MutableObjectState : IObjectState
     public DateTime? CreatedAt { get; set; }
     //public string Username { get; set; } // Added
     //public string Email { get; set; } // Added
-    //public string SessionToken { get; set; } // Added
+    public string SessionToken { get; set; } // Added
 
     public IDictionary<string, object> ServerData { get; set; } = new Dictionary<string, object>();
 

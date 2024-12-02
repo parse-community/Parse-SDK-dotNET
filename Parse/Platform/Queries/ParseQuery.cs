@@ -716,16 +716,16 @@ namespace Parse
         {
             return FindAsync(CancellationToken.None);
         }
-
         /// <summary>
         /// Retrieves a list of ParseObjects that satisfy this query from Parse.
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The list of ParseObjects that match this query.</returns>
-        public Task<IEnumerable<T>> FindAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<T>> FindAsync(CancellationToken cancellationToken)
         {
             EnsureNotInstallationQuery();
-            return Services.QueryController.FindAsync(this, Services.GetCurrentUser(), cancellationToken).OnSuccess(task => from state in task.Result select Services.GenerateObjectFromState<T>(state, ClassName));
+            var result = await Services.QueryController.FindAsync(this, Services.GetCurrentUser(), cancellationToken).ConfigureAwait(false);
+            return result.Select(state => Services.GenerateObjectFromState<T>(state, ClassName));
         }
 
         /// <summary>
@@ -742,11 +742,16 @@ namespace Parse
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A single ParseObject that satisfies this query, or else null.</returns>
-        public Task<T> FirstOrDefaultAsync(CancellationToken cancellationToken)
+        public async Task<T> FirstOrDefaultAsync(CancellationToken cancellationToken)
         {
             EnsureNotInstallationQuery();
-            return Services.QueryController.FirstAsync(this, Services.GetCurrentUser(), cancellationToken).OnSuccess(task => task.Result is IObjectState state && state is { } ? Services.GenerateObjectFromState<T>(state, ClassName) : default);
+            var result = await Services.QueryController.FirstAsync(this, Services.GetCurrentUser(), cancellationToken).ConfigureAwait(false);
+
+            return result != null
+                ? Services.GenerateObjectFromState<T>(result, ClassName)
+                : default; // Return default value (null for reference types) if result is null
         }
+
 
         /// <summary>
         /// Retrieves at most one ParseObject that satisfies this query.
@@ -764,9 +769,14 @@ namespace Parse
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A single ParseObject that satisfies this query.</returns>
         /// <exception cref="ParseFailureException">If no results match the query.</exception>
-        public Task<T> FirstAsync(CancellationToken cancellationToken)
+        public async Task<T> FirstAsync(CancellationToken cancellationToken)
         {
-            return FirstOrDefaultAsync(cancellationToken).OnSuccess(task => task.Result ?? throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, "No results matched the query."));
+            var result = await FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+            if (result == null)
+            {
+                throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, "No results matched the query.");
+            }
+            return result;
         }
 
         /// <summary>
@@ -807,11 +817,14 @@ namespace Parse
         /// <param name="objectId">ObjectId of the ParseObject to fetch.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The ParseObject for the given objectId.</returns>
-        public Task<T> GetAsync(string objectId, CancellationToken cancellationToken)
+        public async Task<T> GetAsync(string objectId, CancellationToken cancellationToken)
         {
-            ParseQuery<T> singleItemQuery = new ParseQuery<T>(Services, ClassName).WhereEqualTo(nameof(objectId), objectId);
-            singleItemQuery = new ParseQuery<T>(singleItemQuery, includes: Includes, selectedKeys: KeySelections, limit: 1);
-            return singleItemQuery.FindAsync(cancellationToken).OnSuccess(t => t.Result.FirstOrDefault() ?? throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, "Object with the given objectId not found."));
+            var query = new ParseQuery<T>(Services, ClassName)
+                .WhereEqualTo(nameof(objectId), objectId)
+                .Limit(1);
+
+            var result = await query.FindAsync(cancellationToken).ConfigureAwait(false);
+            return result.FirstOrDefault() ?? throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, "Object with the given objectId not found.");
         }
 
         internal object GetConstraint(string key)

@@ -192,13 +192,18 @@ namespace Parse.Infrastructure
         /// Loads a settings dictionary from the file wrapped by <see cref="File"/>.
         /// </summary>
         /// <returns>A storage dictionary containing the deserialized content of the storage file targeted by the <see cref="CacheController"/> instance</returns>
-        public Task<IDataCache<string, object>> LoadAsync()
+        public async Task<IDataCache<string, object>> LoadAsync()
         {
-            // Check if storage dictionary is already created from the controllers file (create if not)
+            // Ensure the cache is created before loading
             EnsureCacheExists();
 
-            // Load storage dictionary content async and return the resulting dictionary type
-            return Queue.Enqueue(toAwait => toAwait.ContinueWith(_ => Cache.LoadAsync().OnSuccess(__ => Cache as IDataCache<string, object>)).Unwrap(), CancellationToken.None);
+            // Load the cache content asynchronously
+            return await Queue.Enqueue(async (toAwait) =>
+            {
+                await toAwait.ConfigureAwait(false); // Wait for any prior tasks in the queue
+                await Cache.LoadAsync().ConfigureAwait(false); // Load the cache
+                return Cache as IDataCache<string, object>; // Return the cache as IDataCache
+            }, CancellationToken.None).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -206,14 +211,18 @@ namespace Parse.Infrastructure
         /// </summary>
         /// <param name="contents">The data to be saved.</param>
         /// <returns>A data cache containing the saved data.</returns>
-        public Task<IDataCache<string, object>> SaveAsync(IDictionary<string, object> contents)
+        public async Task<IDataCache<string, object>> SaveAsync(IDictionary<string, object> contents)
         {
-            return Queue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
-        {
+            // Ensure the cache exists and update it with the provided contents
             EnsureCacheExists().Update(contents);
-            return Cache.SaveAsync().OnSuccess(__ => Cache as IDataCache<string, object>);
-        }).Unwrap());
+
+            // Save the cache asynchronously
+            await Cache.SaveAsync().ConfigureAwait(false);
+
+            // Return the cache as IDataCache<string, object>
+            return Cache as IDataCache<string, object>;
         }
+
 
         /// <summary>
         /// <inheritdoc/>
