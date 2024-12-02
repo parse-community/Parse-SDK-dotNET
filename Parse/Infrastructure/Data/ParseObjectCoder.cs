@@ -73,7 +73,10 @@ namespace Parse.Infrastructure.Data
             }
             if (!mutableData.ContainsKey("ACL"))
             {
-                serverData["ACL"] = Extract(mutableData, "ACL", (obj) => new ParseACL(obj as IDictionary<string, object>));
+                var e = Extract(mutableData, "ACL", (obj) =>
+                {
+                    return new ParseACL(obj as IDictionary<string, object>);
+                });
             }
 
             if (createdAt != null && updatedAt == null)
@@ -102,7 +105,7 @@ namespace Parse.Infrastructure.Data
                 //Email = email,
                 //Username = username,
                 //EmailVerified = emailVerified,
-                //SessionToken = sessionToken 
+                SessionToken = sessionToken
             };
         }
 

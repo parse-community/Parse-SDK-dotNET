@@ -190,10 +190,8 @@ namespace Parse
             return !ImmutableKeys.Contains(key);
         }
 
-        protected override Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
+        protected override async Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
         {
-            Task platformHookTask = null;
-
             if (Services.CurrentInstallationController.IsCurrent(this))
 #pragma warning disable CS1030 // #warning directive
             {
@@ -210,8 +208,25 @@ namespace Parse
                 //platformHookTask = Client.InstallationDataFinalizer.FinalizeAsync(this);
             }
 #pragma warning restore CS1030 // #warning directive
+            Task platformHookTask = ParseClient.Instance.InstallationDataFinalizer.FinalizeAsync(this); 
 
-            return platformHookTask.Safe().OnSuccess(_ => base.SaveAsync(toAwait, cancellationToken)).Unwrap().OnSuccess(_ => Services.CurrentInstallationController.IsCurrent(this) ? Task.CompletedTask : Services.CurrentInstallationController.SetAsync(this, cancellationToken)).Unwrap();
+            // Wait for the platform task, then proceed with saving the main task.
+            try
+            {
+                _ = platformHookTask.Safe().ConfigureAwait(false);
+                _ = base.SaveAsync(toAwait, cancellationToken).ConfigureAwait(false);
+                if (!Services.CurrentInstallationController.IsCurrent(this))
+                {
+                    _ = Services.CurrentInstallationController.SetAsync(this, cancellationToken).ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception
+                // You can log it or rethrow if necessary
+                Console.Error.WriteLine(ex);
+            }
+
         }
 
         /// <summary>

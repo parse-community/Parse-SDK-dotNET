@@ -6,115 +6,122 @@ using Parse.Abstractions.Platform.Installations;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Utilities;
 
-namespace Parse.Platform.Installations
+namespace Parse.Platform.Installations;
+internal class ParseCurrentInstallationController : IParseCurrentInstallationController
 {
-    internal class ParseCurrentInstallationController : IParseCurrentInstallationController
+    private static readonly string ParseInstallationKey = nameof(CurrentInstallation);
+    private readonly object Mutex = new object();
+    private readonly TaskQueue TaskQueue = new TaskQueue();
+
+    private readonly IParseInstallationController InstallationController;
+    private readonly ICacheController StorageController;
+    private readonly IParseInstallationCoder InstallationCoder;
+    private readonly IParseObjectClassController ClassController;
+
+    private ParseInstallation CurrentInstallationValue { get; set; }
+
+    internal ParseInstallation CurrentInstallation
     {
-        static string ParseInstallationKey { get; } = nameof(CurrentInstallation);
-
-        object Mutex { get; } = new object { };
-
-        TaskQueue TaskQueue { get; } = new TaskQueue { };
-
-        IParseInstallationController InstallationController { get; }
-
-        ICacheController StorageController { get; }
-
-        IParseInstallationCoder InstallationCoder { get; }
-
-        IParseObjectClassController ClassController { get; }
-
-        public ParseCurrentInstallationController(IParseInstallationController installationIdController, ICacheController storageController, IParseInstallationCoder installationCoder, IParseObjectClassController classController)
+        get
         {
-            InstallationController = installationIdController;
-            StorageController = storageController;
-            InstallationCoder = installationCoder;
-            ClassController = classController;
-        }
-
-        ParseInstallation CurrentInstallationValue { get; set; }
-
-        internal ParseInstallation CurrentInstallation
-        {
-            get
+            lock (Mutex)
             {
-                lock (Mutex)
-                {
-                    return CurrentInstallationValue;
-                }
-            }
-            set
-            {
-                lock (Mutex)
-                {
-                    CurrentInstallationValue = value;
-                }
+                return CurrentInstallationValue;
             }
         }
-
-        public Task SetAsync(ParseInstallation installation, CancellationToken cancellationToken)
+        set
         {
-            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
-        {
-            Task saveTask = StorageController.LoadAsync().OnSuccess(storage => installation is { } ? storage.Result.AddAsync(ParseInstallationKey, JsonUtilities.Encode(InstallationCoder.Encode(installation))) : storage.Result.RemoveAsync(ParseInstallationKey)).Unwrap();
-            CurrentInstallation = installation;
-
-            return saveTask;
-        }).Unwrap(), cancellationToken);
+            lock (Mutex)
+            {
+                CurrentInstallationValue = value;
+            }
         }
+    }
 
-        public Task<ParseInstallation> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    public ParseCurrentInstallationController(
+        IParseInstallationController installationIdController,
+        ICacheController storageController,
+        IParseInstallationCoder installationCoder,
+        IParseObjectClassController classController)
+    {
+        InstallationController = installationIdController;
+        StorageController = storageController;
+        InstallationCoder = installationCoder;
+        ClassController = classController;
+    }
+
+    public async Task SetAsync(ParseInstallation installation, CancellationToken cancellationToken)
+    {
+        // Update the current installation in memory and disk asynchronously
+        await TaskQueue.Enqueue<Task>(async (toAwait) =>
         {
-            ParseInstallation cachedCurrent;
-            cachedCurrent = CurrentInstallation;
-
-            if (cachedCurrent is { })
-                return  Task.FromResult(cachedCurrent);
+            var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+            if (installation != null)
+            {
+                await storage.AddAsync(ParseInstallationKey, JsonUtilities.Encode(InstallationCoder.Encode(installation))).ConfigureAwait(false);
+            }
             else
-                return  TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(stroage =>
             {
-                Task fetchTask;
-                stroage.Result.TryGetValue(ParseInstallationKey, out object temp);
-                ParseInstallation installation = default;
+                await storage.RemoveAsync(ParseInstallationKey).ConfigureAwait(false);
+            }
+            CurrentInstallation = installation;
+        }, cancellationToken).ConfigureAwait(false);
+    }
 
-                if (temp is string installationDataString)
-                {
-                    IDictionary<string, object> installationData = JsonUtilities.Parse(installationDataString) as IDictionary<string, object>;
-                    installation = InstallationCoder.Decode(installationData, serviceHub);
 
-                    fetchTask = Task.FromResult<object>(null);
-                }
-                else
-                {
-                    installation = ClassController.CreateObject<ParseInstallation>(serviceHub);
-                    fetchTask = InstallationController.GetAsync().ContinueWith(t => installation.SetIfDifferent("installationId", t.Result.ToString()));
-                }
-
-                CurrentInstallation = installation;
-                return fetchTask.ContinueWith(task => installation);
-            })).Unwrap().Unwrap(), cancellationToken);
-        }
-
-        public Task<bool> ExistsAsync(CancellationToken cancellationToken)
+    public async Task<ParseInstallation> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    {
+        // Check if the installation is already cached
+        var cachedCurrent = CurrentInstallation;
+        if (cachedCurrent != null)
         {
-            return CurrentInstallation is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(storageTask => storageTask.Result.ContainsKey(ParseInstallationKey))).Unwrap(), cancellationToken);
+            return cachedCurrent;
         }
 
-        public bool IsCurrent(ParseInstallation installation)
+        var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+        if (storage.TryGetValue(ParseInstallationKey, out object temp) && temp is string installationDataString)
         {
-            return CurrentInstallation == installation;
+            var installationData = JsonUtilities.Parse(installationDataString) as IDictionary<string, object>;
+            var installation = InstallationCoder.Decode(installationData, serviceHub);
+            CurrentInstallation = installation;
+            return installation;
         }
-
-        public void ClearFromMemory()
+        else
         {
-            CurrentInstallation = default;
+            var installation = ClassController.CreateObject<ParseInstallation>(serviceHub);
+            var installationId = await InstallationController.GetAsync().ConfigureAwait(false);
+            installation.SetIfDifferent("installationId", installationId.ToString());
+            CurrentInstallation = installation;
+            return installation;
         }
+    }
 
-        public void ClearFromDisk()
+    public async Task<bool> ExistsAsync(CancellationToken cancellationToken)
+    {
+        // Check if the current installation exists in memory or storage
+        if (CurrentInstallation != null)
         {
-            ClearFromMemory();
-
-            TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(storage => storage.Result.RemoveAsync(ParseInstallationKey))).Unwrap().Unwrap(), CancellationToken.None);
+            return true;
         }
+
+        var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+        return storage.ContainsKey(ParseInstallationKey);
+    }
+
+    public bool IsCurrent(ParseInstallation installation)
+    {
+        return CurrentInstallation == installation;
+    }
+
+    public void ClearFromMemory()
+    {
+        CurrentInstallation = null;
+    }
+
+    public async Task ClearFromDiskAsync()
+    {
+        ClearFromMemory();
+        var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+        await storage.RemoveAsync(ParseInstallationKey).ConfigureAwait(false);
     }
 }

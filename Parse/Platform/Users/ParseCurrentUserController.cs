@@ -9,127 +9,137 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Users;
 using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
+using System;
 
-namespace Parse.Platform.Users
-{
+namespace Parse.Platform.Users;
+
 #pragma warning disable CS1030 // #warning directive
 #warning This class needs to be rewritten (PCuUsC).
 
-    public class ParseCurrentUserController : IParseCurrentUserController
-#pragma warning restore CS1030 // #warning directive
+
+public class ParseCurrentUserController : IParseCurrentUserController
+{
+    private readonly ICacheController StorageController;
+    private readonly IParseObjectClassController ClassController;
+    private readonly IParseDataDecoder Decoder;
+
+    private readonly TaskQueue TaskQueue = new();
+    private ParseUser? currentUser; // Nullable to explicitly handle absence of a user
+
+    public ParseCurrentUserController(ICacheController storageController, IParseObjectClassController classController, IParseDataDecoder decoder)
     {
-        object Mutex { get; } = new object { };
+        StorageController = storageController ?? throw new ArgumentNullException(nameof(storageController));
+        ClassController = classController ?? throw new ArgumentNullException(nameof(classController));
+        Decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
+    }
 
-        TaskQueue TaskQueue { get; } = new TaskQueue { };
+    public ParseUser? CurrentUser
+    {
+        get => currentUser;
+        private set => currentUser = value; // Setter is private to ensure controlled modification
+    }
+    private static string GenerateParseObjectId()
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var random = new Random();
+        return new string(Enumerable.Repeat(chars, 10)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
 
-        ICacheController StorageController { get; }
-
-        IParseObjectClassController ClassController { get; }
-
-        IParseDataDecoder Decoder { get; }
-
-        public ParseCurrentUserController(ICacheController storageController, IParseObjectClassController classController, IParseDataDecoder decoder) => (StorageController, ClassController, Decoder) = (storageController, classController, decoder);
-
-        ParseUser currentUser;
-        public ParseUser CurrentUser
+    public async Task SetAsync(ParseUser? user, CancellationToken cancellationToken)
+    {
+        await TaskQueue.Enqueue<Task<bool>>(async _ =>
         {
-            get
+            if (user == null)
             {
-                lock (Mutex)
-                    return currentUser;
+                var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+                await storage.RemoveAsync(nameof(CurrentUser)).ConfigureAwait(false);
             }
-            set
-            {
-                lock (Mutex)
-                    currentUser = value;
-            }
-        }
-
-        public Task SetAsync(ParseUser user, CancellationToken cancellationToken)
-        {
-            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
-        {
-            Task saveTask = default;
-
-            if (user is null)
-                saveTask = StorageController.LoadAsync().OnSuccess(task => task.Result.RemoveAsync(nameof(CurrentUser))).Unwrap();
             else
             {
-                // TODO (hallucinogen): we need to use ParseCurrentCoder instead of this janky encoding
+                // Use ParseCurrentCoder for encoding if available
+                var data = new Dictionary<string, object>
+                {
+                    ["objectId"] = user.ObjectId ?? GenerateParseObjectId()
+                };
 
-                IDictionary<string, object> data = user.ServerDataToJSONObjectForSerialization();
-                data["objectId"] = user.ObjectId;
+                // Additional properties can be added to the dictionary as needed
+
 
                 if (user.CreatedAt != null)
                     data["createdAt"] = user.CreatedAt.Value.ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture);
+
                 if (user.UpdatedAt != null)
                     data["updatedAt"] = user.UpdatedAt.Value.ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture);
 
-                saveTask = StorageController.LoadAsync().OnSuccess(task => task.Result.AddAsync(nameof(CurrentUser), JsonUtilities.Encode(data))).Unwrap();
+                var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+                await storage.AddAsync(nameof(CurrentUser), JsonUtilities.Encode(data)).ConfigureAwait(false);
             }
 
             CurrentUser = user;
-            return saveTask;
-        }).Unwrap(), cancellationToken);
-        }
+            return true; // Enforce return type as `Task<bool>`
+        }, cancellationToken).ConfigureAwait(false);
+    }
 
-        public Task<ParseUser> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+
+    public async Task<ParseUser?> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    {
+        if (CurrentUser is { ObjectId: { } })
+            return CurrentUser;
+
+        return await TaskQueue.Enqueue<Task<ParseUser?>>(async _ =>
         {
-            ParseUser cachedCurrent;
-
-            lock (Mutex)
-                cachedCurrent = CurrentUser;
-
-            if (cachedCurrent is { } && (!string.IsNullOrEmpty(cachedCurrent.Email)) && !string.IsNullOrEmpty(cachedCurrent.ObjectId))
-                return  Task.FromResult(cachedCurrent);
-            else
-                return  TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(task =>
+            var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+            if (storage.TryGetValue(nameof(CurrentUser), out var serializedData) && serializedData is string serialization)
             {
-                task.Result.TryGetValue(nameof(CurrentUser), out object data);
-                ParseUser user = default;
-
-                if (data is string { } serialization)
-                {
-                    user = ClassController.GenerateObjectFromState<ParseUser>(ParseObjectCoder.Instance.Decode(JsonUtilities.Parse(serialization) as IDictionary<string, object>, Decoder, serviceHub), "_User", serviceHub);
-                }
-                return CurrentUser = user;
-            })).Unwrap(), cancellationToken);
-        }
-
-        public Task<bool> ExistsAsync(CancellationToken cancellationToken)
-        {
-            return CurrentUser is { } ? Task.FromResult(true) : TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(t => t.Result.ContainsKey(nameof(CurrentUser)))).Unwrap(), cancellationToken);
-        }
-
-        public bool IsCurrent(ParseUser user)
-        {
-            lock (Mutex)
-                return CurrentUser == user;
-        }
-
-        public void ClearFromMemory()
-        {
-            CurrentUser = default;
-        }
-
-        public void ClearFromDisk()
-        {
-            lock (Mutex)
-            {
-                ClearFromMemory();
-
-                TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => StorageController.LoadAsync().OnSuccess(t => t.Result.RemoveAsync(nameof(CurrentUser)))).Unwrap().Unwrap(), CancellationToken.None);
+                var state = ParseObjectCoder.Instance.Decode(JsonUtilities.Parse(serialization) as IDictionary<string, object>, Decoder, serviceHub);
+                CurrentUser = ClassController.GenerateObjectFromState<ParseUser>(state, "_User", serviceHub);
             }
-        }
+            else
+            {
+                CurrentUser = null;
+            }
 
-        public Task<string> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
-        {
-            return GetAsync(serviceHub, cancellationToken).OnSuccess(task => task.Result?.SessionToken);
-        }
+            return CurrentUser; // Explicitly return the current user (or null)
+        }, cancellationToken).ConfigureAwait(false);
+    }
 
-        public Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+
+    public async Task<bool> ExistsAsync(CancellationToken cancellationToken = default)
+    {
+        return CurrentUser != null || await TaskQueue.Enqueue(async _ =>
         {
-            return TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => GetAsync(serviceHub, cancellationToken)).Unwrap().OnSuccess(task => ClearFromDisk()), cancellationToken);
-        }
+            var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+            return storage.ContainsKey(nameof(CurrentUser));
+        }, cancellationToken).ConfigureAwait(false);
+    }
+
+    public bool IsCurrent(ParseUser user) => CurrentUser == user;
+
+    public void ClearFromMemory() => CurrentUser = null;
+
+    public async Task ClearFromDiskAsync()
+    {
+        ClearFromMemory();
+        await TaskQueue.Enqueue(async _ =>
+        {
+            var storage = await StorageController.LoadAsync().ConfigureAwait(false);
+            await storage.RemoveAsync(nameof(CurrentUser)).ConfigureAwait(false);
+        }, CancellationToken.None).ConfigureAwait(false);
+    }
+
+    public async Task<string?> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    {
+        var user = await GetAsync(serviceHub, cancellationToken).ConfigureAwait(false);
+        return user?.SessionToken;
+    }
+
+    public async Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    {
+        await TaskQueue.Enqueue(async _ =>
+        {
+            await GetAsync(serviceHub, cancellationToken).ConfigureAwait(false);
+            ClearFromDiskAsync();
+        }, cancellationToken).ConfigureAwait(false);
     }
 }

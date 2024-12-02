@@ -10,23 +10,31 @@ using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Execution;
 
-namespace Parse.Platform.Cloud
+namespace Parse.Platform.Cloud;
+
+public class ParseCloudCodeController : IParseCloudCodeController
 {
-    public class ParseCloudCodeController : IParseCloudCodeController
+    IParseCommandRunner CommandRunner { get; }
+
+    IParseDataDecoder Decoder { get; }
+
+    public ParseCloudCodeController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
+
+    public async Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
     {
-        IParseCommandRunner CommandRunner { get; }
+        // Run the command asynchronously and await the result
+        var commandResult = await CommandRunner.RunCommandAsync(
+            new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken,
+            data: NoObjectsEncoder.Instance.Encode(parameters, serviceHub) as IDictionary<string, object>),
+            cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        IParseDataDecoder Decoder { get; }
+        // Decode the result and handle it
+        var decoded = Decoder.Decode(commandResult.Item2, serviceHub) as IDictionary<string, object>;
 
-        public ParseCloudCodeController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
-
-        public Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
-        {
-            return CommandRunner.RunCommandAsync(new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken, data: NoObjectsEncoder.Instance.Encode(parameters, serviceHub) as IDictionary<string, object>), cancellationToken: cancellationToken).OnSuccess(task =>
-        {
-            IDictionary<string, object> decoded = Decoder.Decode(task.Result.Item2, serviceHub) as IDictionary<string, object>;
-            return !decoded.ContainsKey("result") ? default : Conversion.To<T>(decoded["result"]);
-        });
-        }
+        // Return the decoded result or the default value if not found
+        return decoded?.ContainsKey("result") == true
+            ? Conversion.To<T>(decoded["result"])
+            : default;
     }
+
 }

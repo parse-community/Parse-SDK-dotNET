@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Parse.Platform.Objects;
 
 namespace Parse.Infrastructure.Utilities;
 
@@ -322,11 +323,11 @@ public class JsonUtilities
             return match;
         }
     }
-
     /// <summary>
     /// Parses a JSON-text as defined in http://tools.ietf.org/html/rfc4627, returning an
     /// IDictionary&lt;string, object&gt; or an IList&lt;object&gt; depending on whether
     /// the value was an array or dictionary. Nested objects also match these types.
+    /// Gracefully handles invalid JSON or HTML responses.
     /// </summary>
     public static object Parse(string input)
     {
@@ -338,16 +339,63 @@ public class JsonUtilities
         }
 
         input = input.Trim();
-        JsonStringParser parser = new JsonStringParser(input);
 
-        if ((parser.ParseObject(out object output) || parser.ParseArray(out output)) &&
-            parser.CurrentIndex == input.Length)
+        try
         {
-            return output;
+            JsonStringParser parser = new JsonStringParser(input);
+
+            if ((parser.ParseObject(out object output) || parser.ParseArray(out output)) &&
+                parser.CurrentIndex == input.Length)
+            {
+                return output;
+            }
+        }
+        catch
+        {
+            // Fallback handling for non-JSON input
         }
 
-        throw new ArgumentException("Input JSON was invalid.");
+        // Detect HTML responses
+        if (input.StartsWith("<!DOCTYPE html", StringComparison.OrdinalIgnoreCase) ||
+            input.StartsWith("<html", StringComparison.OrdinalIgnoreCase))
+        {
+            return new Dictionary<string, object>
+        {
+            { "error", "Non-JSON response" },
+            { "type", "HTML" },
+            { "content", ExtractTextFromHtml(input) }
+        };
+        }
+
+        // If input is not JSON or HTML, throw an exception
+        throw new ArgumentException("Input data is neither valid JSON nor recognizable HTML.");
     }
+
+    /// <summary>
+    /// Extracts meaningful text from an HTML response, such as the contents of <pre> tags.
+    /// </summary>
+    private static string ExtractTextFromHtml(string html)
+    {
+        try
+        {
+            int startIndex = html.IndexOf("<pre>", StringComparison.OrdinalIgnoreCase);
+            int endIndex = html.IndexOf("</pre>", StringComparison.OrdinalIgnoreCase);
+
+            if (startIndex != -1 && endIndex != -1)
+            {
+                startIndex += 5; // Skip "<pre>"
+                return html.Substring(startIndex, endIndex - startIndex).Trim();
+            }
+
+            // If no <pre> tags, return raw HTML as fallback
+            return html;
+        }
+        catch
+        {
+            return "Unable to extract meaningful content from HTML.";
+        }
+    }
+
 
 
     /// <summary>
@@ -435,10 +483,27 @@ public class JsonUtilities
             return (bool) obj ? "true" : "false";
         if (!obj.GetType().GetTypeInfo().IsPrimitive)
         {
+            if (obj is MutableObjectState state)
+            {
+                // Convert MutableObjectState to a dictionary
+                var stateDict = new Dictionary<string, object>
+            {
+                { "ObjectId", state.ObjectId },
+                { "ClassName", state.ClassName },
+                { "CreatedAt", state.CreatedAt },
+                { "UpdatedAt", state.UpdatedAt },
+                { "ServerData", state.ServerData }
+            };
+
+                // Encode the dictionary recursively
+                return Encode(stateDict);
+            }
+
             Debug.WriteLine("Unable to encode objects of type " + obj.GetType());
-            return string.Empty;
+            return "null"; // Return "null" for unsupported types
         }
-            
+
         return Convert.ToString(obj, CultureInfo.InvariantCulture);
     }
+
 }

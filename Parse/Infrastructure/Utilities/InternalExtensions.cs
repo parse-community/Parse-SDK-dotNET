@@ -4,116 +4,129 @@ using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
-namespace Parse.Infrastructure.Utilities
+namespace Parse.Infrastructure.Utilities;
+/// <summary>
+/// Provides helper methods that allow us to use terser code elsewhere.
+/// </summary>
+public static class InternalExtensions
 {
     /// <summary>
-    /// Provides helper methods that allow us to use terser code elsewhere.
+    /// Ensures a task (even null) is awaitable.
     /// </summary>
-    public static class InternalExtensions
+    public static Task<T> Safe<T>(this Task<T> task) =>
+        task ?? Task.FromResult(default(T));
+
+    /// <summary>
+    /// Ensures a task (even null) is awaitable.
+    /// </summary>
+    public static Task Safe(this Task task) =>
+        task ?? Task.CompletedTask;
+
+    public delegate void PartialAccessor<T>(ref T arg);
+
+    /// <summary>
+    /// Gets the value from a dictionary or returns the default value if the key is not found.
+    /// </summary>
+    public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> self, TKey key, TValue defaultValue) =>
+        self.TryGetValue(key, out var value) ? value : defaultValue;
+
+    /// <summary>
+    /// Compares two collections for equality.
+    /// </summary>
+    public static bool CollectionsEqual<T>(this IEnumerable<T> a, IEnumerable<T> b) =>
+        ReferenceEquals(a, b) || (a != null && b != null && a.SequenceEqual(b));
+
+    /// <summary>
+    /// Executes a continuation on a task that returns a result on success.
+    /// </summary>
+    public static async Task<TResult> OnSuccess<TResult>(this Task task, Func<Task, Task<TResult>> continuation)
     {
-        /// <summary>
-        /// Ensures a task (even null) is awaitable.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        public static Task<T> Safe<T>(this Task<T> task)
+        if (task.IsFaulted)
         {
-            return task ?? Task.FromResult(default(T));
+            var ex = task.Exception?.Flatten();
+            ExceptionDispatchInfo.Capture(ex?.InnerExceptions[0] ?? ex).Throw();
+        }
+        else if (task.IsCanceled)
+        {
+            var tcs = new TaskCompletionSource<TResult>();
+            tcs.SetCanceled();
+            return await tcs.Task.ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Ensures a task (even null) is awaitable.
-        /// </summary>
-        /// <param name="task"></param>
-        /// <returns></returns>
-        public static Task Safe(this Task task)
+        // Ensure continuation returns a Task<TResult>, then await with ConfigureAwait
+        var resultTask = continuation(task);
+        return await resultTask.ConfigureAwait(false);
+    }
+
+
+    /// <summary>
+    /// Executes a continuation on a task that has a result type.
+    /// </summary>
+    public static async Task<TResult> OnSuccess<TIn, TResult>(this Task<TIn> task, Func<Task<TIn>, Task<TResult>> continuation)
+    {
+        if (task.IsFaulted)
         {
-            return task ?? Task.FromResult<object>(null);
+            var ex = task.Exception?.Flatten();
+            ExceptionDispatchInfo.Capture(ex?.InnerExceptions[0] ?? ex).Throw();
+        }
+        else if (task.IsCanceled)
+        {
+            var tcs = new TaskCompletionSource<TResult>();
+            tcs.SetCanceled();
+            return await tcs.Task.ConfigureAwait(false);
         }
 
-        public delegate void PartialAccessor<T>(ref T arg);
+        // Ensure continuation returns a Task<TResult>, then await with ConfigureAwait
+        var resultTask = continuation(task);
+        return await resultTask.ConfigureAwait(false);
+    }
 
-        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> self,
-            TKey key,
-            TValue defaultValue)
+    /// <summary>
+    /// Executes a continuation on a task and returns void.
+    /// </summary>
+    public static async Task OnSuccess(this Task task, Action<Task> continuation)
+    {
+        if (task.IsFaulted)
         {
-            if (self.TryGetValue(key, out TValue value))
-                return value;
-            return defaultValue;
+            var ex = task.Exception?.Flatten();
+            ExceptionDispatchInfo.Capture(ex?.InnerExceptions[0] ?? ex).Throw();
+        }
+        else if (task.IsCanceled)
+        {
+            task = Task.CompletedTask;
         }
 
-        public static bool CollectionsEqual<T>(this IEnumerable<T> a, IEnumerable<T> b)
+        continuation(task);
+        await task.ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Executes a continuation on a task and returns void, for tasks with result.
+    /// </summary>
+    public static async Task OnSuccess<TIn>(this Task<TIn> task, Action<Task<TIn>> continuation)
+    {
+        if (task.IsFaulted)
         {
-            return Equals(a, b) ||
-                   a != null && b != null &&
-                   a.SequenceEqual(b);
+            var ex = task.Exception?.Flatten();
+            ExceptionDispatchInfo.Capture(ex?.InnerExceptions[0] ?? ex).Throw();
+        }
+        else if (task.IsCanceled)
+        {
+            task = Task.FromResult<TIn>(default); // Handle canceled task by returning a completed Task<TIn>
         }
 
-        public static Task<TResult> OnSuccess<TIn, TResult>(this Task<TIn> task, Func<Task<TIn>, TResult> continuation)
-        {
-            return ((Task) task).OnSuccess(t => continuation((Task<TIn>) t));
-        }
+        continuation(task);
+        await task.ConfigureAwait(false);
+    }
 
-        public static Task OnSuccess<TIn>(this Task<TIn> task, Action<Task<TIn>> continuation)
+    /// <summary>
+    /// Executes an asynchronous loop until the predicate evaluates to false.
+    /// </summary>
+    public static async Task WhileAsync(Func<Task<bool>> predicate, Func<Task> body)
+    {
+        while (await predicate().ConfigureAwait(false))
         {
-            return task.OnSuccess((Func<Task<TIn>, object>) (t =>
-                                                                                                             {
-                                                                                                                 continuation(t);
-                                                                                                                 return null;
-                                                                                                             }));
-        }
-
-        public static Task<TResult> OnSuccess<TResult>(this Task task, Func<Task, TResult> continuation)
-        {
-            return task.ContinueWith(t =>
-                                                           {
-                                                               if (t.IsFaulted)
-                                                               {
-                                                                   AggregateException ex = t.Exception.Flatten();
-                                                                   if (ex.InnerExceptions.Count == 1)
-                                                                       ExceptionDispatchInfo.Capture(ex.InnerExceptions[0]).Throw();
-                                                                   else
-                                                                       ExceptionDispatchInfo.Capture(ex).Throw();
-                                                                   // Unreachable
-                                                                   var q = Task.FromResult(default(TResult));
-                                                                   return q;
-                                                               }
-                                                               else if (t.IsCanceled)
-                                                               {
-                                                                   TaskCompletionSource<TResult> tcs = new TaskCompletionSource<TResult>();
-                                                                   tcs.SetCanceled();
-                                                                   var e = tcs.Task;
-                                                                   return e;
-                                                               }
-                                                               else
-                                                               {
-                                                                   var s = Task.FromResult(continuation(t));
-
-                                                                   return s;
-                                                               }
-                                                           }).Unwrap();
-        }
-
-        public static Task OnSuccess(this Task task, Action<Task> continuation)
-        {
-            return task.OnSuccess((Func<Task, object>) (t =>
-                                                                                              {
-                                                                                                  continuation(t);
-                                                                                                  return null;
-                                                                                              }));
-        }
-
-        public static Task WhileAsync(Func<Task<bool>> predicate, Func<Task> body)
-        {
-            Func<Task> iterate = null;
-            iterate = () => predicate().OnSuccess(t =>
-                {
-                    if (!t.Result)
-                        return Task.FromResult(0);
-                    return body().OnSuccess(_ => iterate()).Unwrap();
-                }).Unwrap();
-            return iterate();
+            await body().ConfigureAwait(false);
         }
     }
 }

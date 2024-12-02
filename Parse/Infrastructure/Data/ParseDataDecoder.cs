@@ -19,94 +19,225 @@ public class ParseDataDecoder : IParseDataDecoder
     IParseObjectClassController ClassController { get; }
 
     public ParseDataDecoder(IParseObjectClassController classController) => ClassController = classController;
-    private static DateTime? DecodeDateTime(object value)
+    
+
+    static string[] Types { get; } = { "Date", "Bytes", "Pointer", "File", "GeoPoint", "Object", "Relation" };
+
+    public object Decode(object data, IServiceHub serviceHub)
     {
         try
         {
-            // Handle cases where the value is already a DateTime
-            if (value is DateTime dateTime)
+            // Handle dictionary objects
+            if (data is IDictionary<string, object> dictionary)
             {
-                return dateTime;
+                return DecodeDictionary(dictionary, serviceHub);
             }
 
-            // Handle string representations of dates
-            if (value is string dateString)
+            // Handle list objects
+            if (data is IList<object> list)
             {
-                if (DateTime.TryParse(dateString, out var parsedDate))
-                {
-                    return parsedDate;
-                }
+                return DecodeList(list, serviceHub);
             }
 
-            // Handle Unix timestamp (milliseconds since epoch)
-            if (value is long unixTimestamp)
+            // Handle primitive types (strings, numbers, etc.)
+            if (data is string str)
             {
-                return DateTimeOffset.FromUnixTimeMilliseconds(unixTimestamp).UtcDateTime;
+                return DecodeString(str);
             }
 
-            // Handle Unix timestamp (seconds since epoch)
-            if (value is int unixTimestampSeconds)
+            if (data is long || data is int)
             {
-                return DateTimeOffset.FromUnixTimeSeconds(unixTimestampSeconds).UtcDateTime;
+                Debug.WriteLine($"Integer data processed: {data}");
+                return data;
             }
+            if (data is bool)
+            {
+                Debug.WriteLine($"Bool data processed: {data}");
+                return data;
+            }
+
+            // Fallback for unsupported types
+            Debug.WriteLine($"Unsupported data type encountered: {data.GetType()}");
+            return data;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Failed to decode DateTime value: {value}, Error: {ex.Message}");
+            Debug.WriteLine($"Decode failed: {ex.Message}");
+            return data; // Return raw data on failure
         }
-
-        // Return null if decoding fails
-        return null;
     }
 
-    static string[] Types { get; } = { "Date", "Bytes", "Pointer", "File", "GeoPoint", "Object", "Relation" };
-    public object Decode(object data, IServiceHub serviceHub)
+    private object DecodeDictionary(IDictionary<string, object> dictionary, IServiceHub serviceHub)
     {
-        if (data is IDictionary<string, object> dictionary)
+        // Handle "__op" operations
+        if (dictionary.ContainsKey("__op"))
+        {
+            Debug.WriteLine("Decoding operation field (__op).");
+            return ParseFieldOperations.Decode(dictionary);
+        }
+
+        // Handle "__type" objects
+        if (dictionary.TryGetValue("__type", out var type) && Types.Contains(type.ToString()))
+        {
+            Debug.WriteLine($"Decoding Parse type object: {type}");
+            return DecodeByType(dictionary, type.ToString(), serviceHub);
+        }
+
+        // Handle Parse object metadata (e.g., className, objectId)
+        if (dictionary.ContainsKey("className"))
+        {
+            return DecodeObjectState(dictionary);
+        }
+
+        // Recursively decode nested dictionaries
+        return dictionary.ToDictionary(pair => pair.Key, pair =>
         {
             try
             {
-                var state = new MutableObjectState
-                {
-                    ClassName = dictionary.ContainsKey("className") ? dictionary["className"]?.ToString() : null,
-                    ObjectId = dictionary.ContainsKey("objectId") ? dictionary["objectId"]?.ToString() : null,
-                    CreatedAt = dictionary.ContainsKey("createdAt") ? DecodeDateTime(dictionary["createdAt"]) : null,
-                    UpdatedAt = dictionary.ContainsKey("updatedAt") ? DecodeDateTime(dictionary["updatedAt"]) : null,
-                    IsNew = dictionary.ContainsKey("isNew") && Convert.ToBoolean(dictionary["isNew"]),
-                    //EmailVerified = dictionary.ContainsKey("emailVerified") && Convert.ToBoolean(dictionary["emailVerified"]),
-                    //Username = dictionary.ContainsKey("username") ? dictionary["username"]?.ToString() : null,
-                    //Email = dictionary.ContainsKey("email") ? dictionary["email"]?.ToString() : null,
-                    //SessionToken = dictionary.ContainsKey("sessionToken") ? dictionary["sessionToken"]?.ToString() : null,
-                    ServerData = dictionary
-                };
-
-                return state;
+                return Decode(pair.Value, serviceHub);
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"Failed to decode MutableObjectState: {ex.Message}");
-                throw; // Let the caller handle decoding errors
+                Debug.WriteLine($"Failed to decode nested field: {pair.Key}");
+                return pair.Value; // Return raw value if decoding fails
             }
-        }
-        Debug.WriteLine("Data is not a compatible object for decoding. " + data.GetType());
+        });
+    }
 
-        if (data.GetType() == typeof(string))
+    private object DecodeList(IList<object> list, IServiceHub serviceHub)
+    {
+        return list.Select(item =>
         {
-            Debug.WriteLine($"Data is not a compatible object for decoding. {data.GetType()} {data}");
+            try
+            {
+                return Decode(item, serviceHub);
+            }
+            catch
+            {
+                Debug.WriteLine("Failed to decode list item. Returning raw value.");
+                return item; // Return raw value on failure
+            }
+        }).ToList();
+    }
+
+    private object DecodeString(string str)
+    {
+        // Example: Identify session tokens or other meaningful strings
+        if (str.StartsWith("r:"))
+        {
+            Debug.WriteLine($"Valid session token detected: {str}");
+            return str;
         }
-        else if (data.GetType() == typeof(Int64))
+
+        Debug.WriteLine($"String data processed: {str}");
+        return str;
+    }
+
+    private object DecodeObjectState(IDictionary<string, object> dictionary)
+    {
+        try
         {
-            Debug.WriteLine($"Data is not a compatible object for decoding. {data.GetType()} Value: {data}");
-        }        
-        else
-        {
-            Debug.WriteLine("Data is not a compatible object for decoding. Unknown Type");
+            var state = new MutableObjectState
+            {
+                ClassName = dictionary.ContainsKey("className") ? dictionary["className"]?.ToString() : null,
+                ObjectId = dictionary.ContainsKey("objectId") ? dictionary["objectId"]?.ToString() : null,
+                CreatedAt = dictionary.ContainsKey("createdAt") ? DecodeDateTime(dictionary["createdAt"]) : null,
+                UpdatedAt = dictionary.ContainsKey("updatedAt") ? DecodeDateTime(dictionary["updatedAt"]) : null,
+                IsNew = dictionary.ContainsKey("isNew") && Convert.ToBoolean(dictionary["isNew"]),
+                ServerData = dictionary
+            };
+
+            Debug.WriteLine($"Successfully decoded MutableObjectState for {state.ClassName}, ObjectId: {state.ObjectId}");
+            return state;
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Failed to decode MutableObjectState: {ex.Message}");
+            throw; // Let the caller handle errors
+        }
+    }
+
+    private object DecodeByType(IDictionary<string, object> dictionary, string type, IServiceHub serviceHub)
+    {
+        switch (type)
+        {
+            case "Date":
+                return DecodeDateTime(dictionary["iso"]);
+            case "Pointer":
+                return DecodePointer(dictionary);
+            case "GeoPoint":
+                return DecodeGeoPoint(dictionary);
+            default:
+                Debug.WriteLine($"Unsupported Parse type: {type}");
+                return dictionary; // Return raw dictionary for unsupported types
+        }
+    }
+
+    private DateTime DecodeDateTime(object data)
+    {
+        return DateTime.Parse(data.ToString()); // Assumes ISO-8601 format
+    }
+
+    private object DecodePointer(IDictionary<string, object> dictionary)
+    {
+        return new { ClassName = dictionary["className"], ObjectId = dictionary["objectId"] };
+    }
+
+    private object DecodeGeoPoint(IDictionary<string, object> dictionary)
+    {
+        return new { Latitude = dictionary["latitude"], Longitude = dictionary["longitude"] };
+    }
+
+
+
+    //static string[] Types { get; } = { "Date", "Bytes", "Pointer", "File", "GeoPoint", "Object", "Relation" };
+    //public object Decode(object data, IServiceHub serviceHub)
+    //{
+    //    if (data is IDictionary<string, object> dictionary)
+    //    {
+    //        try
+    //        {
+    //            var state = new MutableObjectState
+    //            {
+    //                ClassName = dictionary.ContainsKey("className") ? dictionary["className"]?.ToString() : null,
+    //                ObjectId = dictionary.ContainsKey("objectId") ? dictionary["objectId"]?.ToString() : null,
+    //                CreatedAt = dictionary.ContainsKey("createdAt") ? DecodeDateTime(dictionary["createdAt"]) : null,
+    //                UpdatedAt = dictionary.ContainsKey("updatedAt") ? DecodeDateTime(dictionary["updatedAt"]) : null,
+    //                IsNew = dictionary.ContainsKey("isNew") && Convert.ToBoolean(dictionary["isNew"]),
+    //                //EmailVerified = dictionary.ContainsKey("emailVerified") && Convert.ToBoolean(dictionary["emailVerified"]),
+    //                //Username = dictionary.ContainsKey("username") ? dictionary["username"]?.ToString() : null,
+    //                //Email = dictionary.ContainsKey("email") ? dictionary["email"]?.ToString() : null,
+    //                SessionToken = dictionary.ContainsKey("sessionToken") ? dictionary["sessionToken"]?.ToString() : null,
+    //                ServerData = dictionary
+    //            };
+
+    //            return state;
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            Debug.WriteLine($"Failed to decode MutableObjectState: {ex.Message}");
+    //            throw; // Let the caller handle decoding errors
+    //        }
+    //    }
+    //    Debug.WriteLine("Data is not a compatible object for decoding. " + data.GetType());
+
+    //    if (data.GetType() == typeof(string))
+    //    {
+    //        Debug.WriteLine($"Data is not a compatible object for decoding. {data.GetType()} {data}");
+    //    }
+    //    else if (data.GetType() == typeof(Int64))
+    //    {
+    //        Debug.WriteLine($"Data is not a compatible object for decoding. {data.GetType()} Value: {data}");
+    //    }        
+    //    else
+    //    {
+    //        Debug.WriteLine("Data is not a compatible object for decoding. Unknown Type");
+    //    }
 
         
-        return null;
-        //throw new InvalidCastException("Input data cannot be cast to IObjectState.");
-    }
+    //    return null;
+    //    //throw new InvalidCastException("Input data cannot be cast to IObjectState.");
+    //}
 
     //public object Decode(object data, IServiceHub serviceHub)
     //{
@@ -177,92 +308,6 @@ public class ParseDataDecoder : IParseDataDecoder
     {
         return input.ToDictionary(pair => pair.Key, pair => pair.Value);
     }
-
-    private object DecodeByType(IDictionary<string, object> dictionary, string type, IServiceHub serviceHub)
-    {
-        try
-        {
-            dictionary = NormalizeDictionary(dictionary); // Normalize input dictionary
-
-            switch (type)
-            {
-                case "Date":
-                    if (dictionary.TryGetValue("iso", out var iso))
-                    {
-                        if (iso is string isoString)
-                        {
-                            return ParseDate(isoString);
-                        }
-                        else
-                        {
-                            Debug.WriteLine($"Unexpected type for 'iso': {iso.GetType()}");
-                            throw new ArgumentException($"Invalid type for 'iso' field. Expected string, got {iso.GetType()}.");
-                        }
-                    }
-                    Debug.WriteLine("Missing 'iso' field for Date.");
-                    throw new ArgumentException("Invalid or missing 'iso' field for Date.");
-
-                // Handle other cases similarly
-                case "Bytes":
-                    if (dictionary.TryGetValue("base64", out var base64) && base64 is string base64String)
-                    {
-                        return Convert.FromBase64String(base64String);
-                    }
-                    throw new ArgumentException("Invalid or missing 'base64' field for Bytes.");
-
-                case "Pointer":
-                    if (dictionary.TryGetValue("className", out var className) && className is string classNameString &&
-                        dictionary.TryGetValue("objectId", out var objectId) && objectId is string objectIdString)
-                    {
-                        return DecodePointer(classNameString, objectIdString, serviceHub);
-                    }
-                    throw new ArgumentException("Invalid or missing fields for Pointer.");
-
-                case "File":
-                    if (dictionary.TryGetValue("name", out var name) && name is string nameString &&
-                        dictionary.TryGetValue("url", out var url) && url is string urlString)
-                    {
-                        return new ParseFile(nameString, new Uri(urlString));
-                    }
-                    throw new ArgumentException("Invalid or missing fields for File.");
-
-                case "GeoPoint":
-                    if (dictionary.TryGetValue("latitude", out var latitude) &&
-                        dictionary.TryGetValue("longitude", out var longitude))
-                    {
-                        return new ParseGeoPoint(
-                            Conversion.To<double>(latitude),
-                            Conversion.To<double>(longitude)
-                        );
-                    }
-                    throw new ArgumentException("Invalid or missing fields for GeoPoint.");
-
-                case "Object":
-                    if (dictionary.TryGetValue("className", out var objectClassName) && objectClassName is string objectClassNameString)
-                    {
-                        var state = ParseObjectCoder.Instance.Decode(dictionary, this, serviceHub);
-                        return ClassController.GenerateObjectFromState<ParseObject>(state, objectClassNameString, serviceHub);
-                    }
-                    throw new ArgumentException("Invalid or missing fields for Object.");
-
-                case "Relation":
-                    if (dictionary.TryGetValue("className", out var relationClassName) && relationClassName is string relationClassNameString)
-                    {
-                        return serviceHub.CreateRelation(null, null, relationClassNameString);
-                    }
-                    throw new ArgumentException("Invalid or missing fields for Relation.");
-
-                default:
-                    throw new NotSupportedException($"Unsupported __type: {type}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"DecodeByType failed for type '{type}': {ex.Message}");
-            throw; // Re-throw to preserve stack trace
-        }
-    }
-
 
     protected virtual object DecodePointer(string className, string objectId, IServiceHub serviceHub)
     {
