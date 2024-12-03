@@ -2,11 +2,7 @@
 
 ---
 
-[![Build Status](https://github.com/parse-community/Parse-SDK-dotNET/workflows/ci/badge.svg?branch=master)](https://github.com/parse-community/Parse-SDK-dotNET/actions?query=workflow%3Aci+branch%3Amaster)
-[![Coverage](https://img.shields.io/codecov/c/github/parse-community/Parse-SDK-dotNET/master.svg)](https://codecov.io/github/parse-community/Parse-SDK-dotNET?branch=master)
-[![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/parse-community/Parse-SDK-dotNET/releases)
-
-[![Nuget](https://img.shields.io/nuget/v/parse.svg)](http://nuget.org/packages/parse)
+[![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/YBTopaz8/Parse-SDK-dotNET/releases)
 
 [![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)][open-collective-link]
 [![Sponsors on Open Collective](https://opencollective.com/parse-server/sponsors/badge.svg)][open-collective-link]
@@ -16,7 +12,7 @@
 
 ---
 
-A library that gives you access to the powerful Parse Server backend from any platform supporting .NET Standard 2.0. For more information about Parse and its features, visit [parseplatform.org](https://parseplatform.org/).
+A library that gives you access to the powerful Parse Server backend from any platform supporting .NET Standard 2.0 and .NET 9 / MAUI. For more information about Parse and its features, visit [parseplatform.org](https://parseplatform.org/).
 
 ---
 
@@ -35,9 +31,8 @@ A library that gives you access to the powerful Parse Server backend from any pl
 
 
 ## Getting Started
-The previous stable release version 1.7.0 is available as 
+I Plan to push a nuget soon and update here
 
-The latest development release is also available as 
 
 ## Using the Code
 Make sure you are using the project's root namespace.
@@ -220,7 +215,7 @@ await client.LogOutAsync();
 ```
 
 ## Local Builds
-You can build the SDK on any system with the MSBuild or .NET Core CLI installed. Results can be found under either the `Release/netstandard2.0` or `Debug/netstandard2.0` in the `bin` folder unless a non-standard build configuration is used.
+You can build the SDK on any system with the MSBuild or .NET Core CLI installed.
 
 ## .NET Core CLI
 
