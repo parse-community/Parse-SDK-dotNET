@@ -134,31 +134,27 @@ public class ParseCommandRunner : IParseCommandRunner
         return new Tuple<HttpStatusCode, IDictionary<string, object>>(statusCode, contentJson);
     }
 
-    Task<ParseCommand> PrepareCommand(ParseCommand command)
+    async Task<ParseCommand> PrepareCommand(ParseCommand command)
     {
         ParseCommand newCommand = new ParseCommand(command)
         {
             Resource = ServerConnectionData.ServerURI
         };
 
-        Task<ParseCommand> installationIdFetchTask = InstallationController.GetAsync().ContinueWith(task =>
+        // Fetch Installation ID and add it to the headers
+        var installationId = await InstallationController.GetAsync();
+        lock (newCommand.Headers)
         {
-            lock (newCommand.Headers)
-            {
-                newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Installation-Id", task.Result.ToString()));
-            }
+            newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Installation-Id", installationId.ToString()));
+        }
 
-            return newCommand;
-        });
-
-        // Locks needed due to installationFetchTask continuation newCommand.Headers.Add-call-related race condition (occurred once in Unity).
-        // TODO: Consider removal of installationFetchTask variable.
-
+        // Add application-specific headers
         lock (newCommand.Headers)
         {
             newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Application-Id", ServerConnectionData.ApplicationID));
             newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Client-Version", ParseClient.Version.ToString()));
 
+            // Add custom headers if available
             if (ServerConnectionData.Headers != null)
             {
                 foreach (KeyValuePair<string, string> header in ServerConnectionData.Headers)
@@ -167,22 +163,24 @@ public class ParseCommandRunner : IParseCommandRunner
                 }
             }
 
-            if (!String.IsNullOrEmpty(MetadataController.HostManifestData.Version))
+            // Add versioning headers if metadata is available
+            if (!string.IsNullOrEmpty(MetadataController.HostManifestData.Version))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Build-Version", MetadataController.HostManifestData.Version));
             }
 
-            if (!String.IsNullOrEmpty(MetadataController.HostManifestData.ShortVersion))
+            if (!string.IsNullOrEmpty(MetadataController.HostManifestData.ShortVersion))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-App-Display-Version", MetadataController.HostManifestData.ShortVersion));
             }
 
-            if (!String.IsNullOrEmpty(MetadataController.EnvironmentData.OSVersion))
+            if (!string.IsNullOrEmpty(MetadataController.EnvironmentData.OSVersion))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-OS-Version", MetadataController.EnvironmentData.OSVersion));
             }
 
-            if (!String.IsNullOrEmpty(ServerConnectionData.MasterKey))
+            // Add master key or windows key
+            if (!string.IsNullOrEmpty(ServerConnectionData.MasterKey))
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Master-Key", ServerConnectionData.MasterKey));
             }
@@ -191,12 +189,16 @@ public class ParseCommandRunner : IParseCommandRunner
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Windows-Key", ServerConnectionData.Key));
             }
 
+            // Add revocable session header if enabled
             if (UserController.Value.RevocableSessionEnabled)
             {
                 newCommand.Headers.Add(new KeyValuePair<string, string>("X-Parse-Revocable-Session", "1"));
             }
         }
 
-        return installationIdFetchTask;
+        return newCommand;
+
+        //by the way, The original installationFetchTask variable was removed, as the async/await pattern eliminates the need for it.
     }
+
 }

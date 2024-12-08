@@ -15,57 +15,68 @@ namespace Parse.Infrastructure.Data;
 /// <seealso cref="ParseDataDecoder"/>
 public abstract class ParseDataEncoder
 {
+    private static readonly string[] SupportedDateFormats = ParseClient.DateFormatStrings;
+
     public static bool Validate(object value)
     {
         return value is null || value.GetType().IsPrimitive || value is string || value is ParseObject || value is ParseACL || value is ParseFile || value is ParseGeoPoint || value is ParseRelationBase || value is DateTime || value is byte[] || Conversion.As<IDictionary<string, object>>(value) is { } || Conversion.As<IList<object>>(value) is { };
     }
 
     // If this object has a special encoding, encode it and return the encoded object. Otherwise, just return the original object.
-
     public object Encode(object value, IServiceHub serviceHub)
     {
         return value switch
         {
-            DateTime { } date => new Dictionary<string, object>
-            {
-                ["iso"] = date.ToString(ParseClient.DateFormatStrings.First(), CultureInfo.InvariantCulture),
-                ["__type"] = "Date"
-            },
-            byte[] { } bytes => new Dictionary<string, object>
-            {
-                ["__type"] = "Bytes",
-                ["base64"] = Convert.ToBase64String(bytes)
-            },
-            ParseObject { } entity => EncodeObject(entity),
-            IJsonConvertible { } jsonConvertible => jsonConvertible.ConvertToJSON(),
-            { } when Conversion.As<IDictionary<string, object>>(value) is { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Encode(pair.Value, serviceHub)),
-            { } when Conversion.As<IList<object>>(value) is { } list => EncodeList(list, serviceHub),
-
-            // TODO (hallucinogen): convert IParseFieldOperation to IJsonConvertible
-
-            IParseFieldOperation { } fieldOperation => fieldOperation.Encode(serviceHub),
+            DateTime date => EncodeDate(date),
+            byte[] bytes => EncodeBytes(bytes),
+            ParseObject entity => EncodeObject(entity),
+            IJsonConvertible jsonConvertible => jsonConvertible.ConvertToJSON(),
+            IDictionary<string, object> dictionary => EncodeDictionary(dictionary, serviceHub),
+            IList<object> list => EncodeList(list, serviceHub),
+            IParseFieldOperation fieldOperation => EncodeFieldOperation(fieldOperation, serviceHub),
             _ => value
         };
     }
 
     protected abstract IDictionary<string, object> EncodeObject(ParseObject value);
 
-    object EncodeList(IList<object> list, IServiceHub serviceHub)
+    private static IDictionary<string, object> EncodeDate(DateTime date)
     {
-        List<object> encoded = new List<object> { };
+        return new Dictionary<string, object>
+        {
+            ["iso"] = date.ToString(SupportedDateFormats.First(), CultureInfo.InvariantCulture),
+            ["__type"] = "Date"
+        };
+    }
 
-        // We need to explicitly cast `list` to `List<object>` rather than `IList<object>` because IL2CPP is stricter than the usual Unity AOT compiler pipeline.
+    private static IDictionary<string, object> EncodeBytes(byte[] bytes)
+    {
+        return new Dictionary<string, object>
+        {
+            ["__type"] = "Bytes",
+            ["base64"] = Convert.ToBase64String(bytes)
+        };
+    }
 
+    private object EncodeDictionary(IDictionary<string, object> dictionary, IServiceHub serviceHub)
+    {
+        return dictionary.ToDictionary(pair => pair.Key, pair => Encode(pair.Value, serviceHub));
+    }
+
+    private object EncodeList(IList<object> list, IServiceHub serviceHub)
+    {
         if (ParseClient.IL2CPPCompiled && list.GetType().IsArray)
         {
             list = new List<object>(list);
         }
 
+        List<object> encoded = new();
+
         foreach (object item in list)
         {
             if (!Validate(item))
             {
-                throw new ArgumentException("Invalid type for value in an array");
+                throw new ArgumentException($"Invalid type for value in list: {item?.GetType().FullName}");
             }
 
             encoded.Add(Encode(item, serviceHub));
@@ -73,4 +84,16 @@ public abstract class ParseDataEncoder
 
         return encoded;
     }
+
+    private object EncodeFieldOperation(IParseFieldOperation fieldOperation, IServiceHub serviceHub)
+    {
+        // Converting IParseFieldOperation to JSON (IJsonConvertible implementation Previous Todo - Done!)
+        if (fieldOperation is IJsonConvertible jsonConvertible)
+        {
+            return jsonConvertible.ConvertToJSON();
+        }
+
+        throw new InvalidOperationException($"Field operation {fieldOperation.GetType().Name} does not implement IJsonConvertible.");
+    }
 }
+

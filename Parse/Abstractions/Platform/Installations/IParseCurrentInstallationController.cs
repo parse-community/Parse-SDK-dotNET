@@ -1,8 +1,7 @@
 using Parse.Abstractions.Platform.Objects;
 
-namespace Parse.Abstractions.Platform.Installations
+namespace Parse.Abstractions.Platform.Installations;
+
+public interface IParseCurrentInstallationController : IParseObjectCurrentController<ParseInstallation>
 {
-    public interface IParseCurrentInstallationController : IParseObjectCurrentController<ParseInstallation>
-    {
-    }
 }

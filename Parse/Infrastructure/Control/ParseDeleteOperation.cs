@@ -2,32 +2,31 @@ using System.Collections.Generic;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Control;
 
-namespace Parse.Infrastructure.Control
+namespace Parse.Infrastructure.Control;
+
+/// <summary>
+/// An operation where a field is deleted from the object.
+/// </summary>
+public class ParseDeleteOperation : IParseFieldOperation
 {
-    /// <summary>
-    /// An operation where a field is deleted from the object.
-    /// </summary>
-    public class ParseDeleteOperation : IParseFieldOperation
+    internal static object Token { get; } = new object { };
+
+    public static ParseDeleteOperation Instance { get; } = new ParseDeleteOperation { };
+
+    private ParseDeleteOperation() { }
+
+    public object Encode(IServiceHub serviceHub)
     {
-        internal static object Token { get; } = new object { };
+        return new Dictionary<string, object> { ["__op"] = "Delete" };
+    }
 
-        public static ParseDeleteOperation Instance { get; } = new ParseDeleteOperation { };
+    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+    {
+        return this;
+    }
 
-        private ParseDeleteOperation() { }
-
-        public object Encode(IServiceHub serviceHub)
-        {
-            return new Dictionary<string, object> { ["__op"] = "Delete" };
-        }
-
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
-        {
-            return this;
-        }
-
-        public object Apply(object oldValue, string key)
-        {
-            return Token;
-        }
+    public object Apply(object oldValue, string key)
+    {
+        return Token;
     }
 }

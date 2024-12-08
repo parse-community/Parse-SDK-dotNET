@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Installations;
-using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.Installations;
 

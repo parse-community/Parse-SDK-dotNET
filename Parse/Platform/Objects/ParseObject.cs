@@ -313,19 +313,22 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
     /// <exception cref="KeyNotFoundException">The property is
     /// retrieved and <paramref name="key"/> is not found.</exception>
     /// <returns>The value for the key.</returns>
-    virtual public object this[string key]
+    public virtual object this[string key]
     {
         get
         {
             lock (Mutex)
             {
                 CheckGetAccess(key);
-                object value = EstimatedData[key];
-                //TODO THIS WILL THROW, MAKE IT END GRACEFULLY
-                // A relation may be deserialized without a parent or key. Either way,
-                // make sure it's consistent.
 
-                if (value is ParseRelationBase relation)
+                if (!EstimatedData.TryGetValue(key, out var value))
+                {
+                    // Gracefully handle missing keys
+                    return null; // Return null or throw a custom exception if necessary
+                }
+
+                // Ensure ParseRelationBase consistency
+                if (value is ParseRelationBase relation && (relation.Parent== null || relation.Key == null))
                 {
                     relation.EnsureParentAndKey(this, key);
                 }

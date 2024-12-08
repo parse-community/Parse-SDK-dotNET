@@ -1,7 +1,6 @@
-namespace Parse.Abstractions.Infrastructure
+namespace Parse.Abstractions.Infrastructure;
+
+public interface ICustomServiceHub : IServiceHub
 {
-    public interface ICustomServiceHub : IServiceHub
-    {
-        IServiceHub Services { get; }
-    }
+    IServiceHub Services { get; }
 }

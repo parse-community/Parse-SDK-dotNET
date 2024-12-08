@@ -9,32 +9,86 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Execution;
+using Parse.Infrastructure;
 
 namespace Parse.Platform.Cloud;
 
 public class ParseCloudCodeController : IParseCloudCodeController
 {
     IParseCommandRunner CommandRunner { get; }
-
     IParseDataDecoder Decoder { get; }
 
-    public ParseCloudCodeController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
-
-    public async Task<T> CallFunctionAsync<T>(string name, IDictionary<string, object> parameters, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    public ParseCloudCodeController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) =>
+        (CommandRunner, Decoder) = (commandRunner, decoder);
+    public async Task<T> CallFunctionAsync<T>(
+    string name,
+    IDictionary<string, object> parameters,
+    string sessionToken,
+    IServiceHub serviceHub,
+    CancellationToken cancellationToken = default,
+    IProgress<IDataTransferLevel> uploadProgress = null,
+    IProgress<IDataTransferLevel> downloadProgress = null)
     {
-        // Run the command asynchronously and await the result
-        var commandResult = await CommandRunner.RunCommandAsync(
-            new ParseCommand($"functions/{Uri.EscapeUriString(name)}", method: "POST", sessionToken: sessionToken,
-            data: NoObjectsEncoder.Instance.Encode(parameters, serviceHub) as IDictionary<string, object>),
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(name))
+            throw new ArgumentException("Function name cannot be null or empty.", nameof(name));
 
-        // Decode the result and handle it
-        var decoded = Decoder.Decode(commandResult.Item2, serviceHub) as IDictionary<string, object>;
+        try
+        {
+            // Prepare the command
+            var command = new ParseCommand(
+                $"functions/{Uri.EscapeUriString(name)}",
+                method: "POST",
+                sessionToken: sessionToken,
+                data: NoObjectsEncoder.Instance.Encode(parameters, serviceHub) as IDictionary<string, object>);
 
-        // Return the decoded result or the default value if not found
-        return decoded?.ContainsKey("result") == true
-            ? Conversion.To<T>(decoded["result"])
-            : default;
+            // Execute the command with progress tracking
+            var commandResult = await CommandRunner.RunCommandAsync(
+                command,
+                uploadProgress,
+                downloadProgress,
+                cancellationToken).ConfigureAwait(false);
+
+            // Ensure the command result is valid
+            if (commandResult.Item2 == null)
+            {
+                throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Cloud function returned no data.");
+            }
+
+            // Decode the result
+            var decoded = Decoder.Decode(commandResult.Item2, serviceHub) as IDictionary<string, object>;
+
+            if (decoded == null)
+            {
+                throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Failed to decode cloud function response.");
+            }
+
+            // Extract the result key
+            if (decoded.TryGetValue("result", out var result))
+            {
+                try
+                {
+                    return Conversion.To<T>(result);
+                }
+                catch (Exception ex)
+                {
+                    throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Failed to convert cloud function result to expected type.", ex);
+                }
+            }
+
+            // Handle missing result key
+            throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Cloud function did not return a result.");
+        }
+        catch (ParseFailureException)
+        {
+            // Rethrow known Parse exceptions
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Wrap unexpected exceptions
+            throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "An unexpected error occurred while calling the cloud function.", ex);
+        }
     }
 
 }
+

@@ -13,40 +13,39 @@ using Parse.Abstractions.Platform.Queries;
 using Parse.Abstractions.Platform.Sessions;
 using Parse.Abstractions.Platform.Users;
 
-namespace Parse.Abstractions.Infrastructure
+namespace Parse.Abstractions.Infrastructure;
+
+public interface IMutableServiceHub : IServiceHub
 {
-    public interface IMutableServiceHub : IServiceHub
-    {
-        IServerConnectionData ServerConnectionData { set; }
-        IMetadataController MetadataController { set; }
+    IServerConnectionData ServerConnectionData { set; }
+    IMetadataController MetadataController { set; }
 
-        IServiceHubCloner Cloner { set; }
+    IServiceHubCloner Cloner { set; }
 
-        IWebClient WebClient { set; }
-        ICacheController CacheController { set; }
-        IParseObjectClassController ClassController { set; }
+    IWebClient WebClient { set; }
+    ICacheController CacheController { set; }
+    IParseObjectClassController ClassController { set; }
 
-        IParseDataDecoder Decoder { set; }
+    IParseDataDecoder Decoder { set; }
 
-        IParseInstallationController InstallationController { set; }
-        IParseCommandRunner CommandRunner { set; }
+    IParseInstallationController InstallationController { set; }
+    IParseCommandRunner CommandRunner { set; }
 
-        IParseCloudCodeController CloudCodeController { set; }
-        IParseConfigurationController ConfigurationController { set; }
-        IParseFileController FileController { set; }
-        IParseObjectController ObjectController { set; }
-        IParseQueryController QueryController { set; }
-        IParseSessionController SessionController { set; }
-        IParseUserController UserController { set; }
-        IParseCurrentUserController CurrentUserController { set; }
+    IParseCloudCodeController CloudCodeController { set; }
+    IParseConfigurationController ConfigurationController { set; }
+    IParseFileController FileController { set; }
+    IParseObjectController ObjectController { set; }
+    IParseQueryController QueryController { set; }
+    IParseSessionController SessionController { set; }
+    IParseUserController UserController { set; }
+    IParseCurrentUserController CurrentUserController { set; }
 
-        IParseAnalyticsController AnalyticsController { set; }
+    IParseAnalyticsController AnalyticsController { set; }
 
-        IParseInstallationCoder InstallationCoder { set; }
+    IParseInstallationCoder InstallationCoder { set; }
 
-        IParsePushChannelsController PushChannelsController { set; }
-        IParsePushController PushController { set; }
-        IParseCurrentInstallationController CurrentInstallationController { set; }
-        IParseInstallationDataFinalizer InstallationDataFinalizer { set; }
-    }
+    IParsePushChannelsController PushChannelsController { set; }
+    IParsePushController PushController { set; }
+    IParseCurrentInstallationController CurrentInstallationController { set; }
+    IParseInstallationDataFinalizer InstallationDataFinalizer { set; }
 }

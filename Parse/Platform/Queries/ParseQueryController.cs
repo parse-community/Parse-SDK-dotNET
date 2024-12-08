@@ -9,7 +9,6 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Queries;
 using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Execution;
-using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.Queries;
 

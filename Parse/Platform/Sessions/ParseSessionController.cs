@@ -5,7 +5,6 @@ using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Sessions;
-using Parse.Infrastructure.Utilities;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Execution;
 using Parse.Infrastructure.Data;

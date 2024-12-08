@@ -5,7 +5,6 @@ using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Users;
 using Parse.Infrastructure.Execution;
-using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.Push;
 internal class ParsePushController : IParsePushController
