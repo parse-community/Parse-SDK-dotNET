@@ -99,12 +99,15 @@ public class ParseFile : IJsonConvertible
 #pragma warning disable CS1030 // #warning directive
 #warning Make IServiceHub optionally null once all dependents are injecting it if necessary.
 
-    internal ParseFile(string name, Uri uri, string mimeType = null) => State = new FileState
+    internal ParseFile(string name, Uri uri, string mimeType = null)
     {
-        Name = name,
-        Location = uri,
-        MediaType = mimeType
-    };
+        State = new FileState
+        {
+            Name = name,
+            Location = uri,
+            MediaType = mimeType
+        };
+    }
 #pragma warning restore CS1030 // #warning directive
 
     /// <summary>
@@ -170,7 +173,7 @@ public class ParseFile : IJsonConvertible
 
     #endregion
 
-    IDictionary<string, object> IJsonConvertible.ConvertToJSON()
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         if (IsDirty)
         {

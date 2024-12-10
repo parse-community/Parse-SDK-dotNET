@@ -132,7 +132,7 @@ public static class UserServiceExtensions
     /// Logs out the currently logged in user session. This will remove the session from disk, log out of
     /// linked services, and future calls to <see cref="GetCurrentUser(IServiceHub)"/> will return <c>null</c>.
     ///
-    /// This is preferable to using <see cref="LogOut()"/>, unless your code is already running from a
+    /// This is preferable to use <see cref="LogOut()"/>, unless your code is already running from a
     /// background thread.
     /// </summary>
     public static async Task LogOutAsync(this IServiceHub serviceHub, CancellationToken cancellationToken)

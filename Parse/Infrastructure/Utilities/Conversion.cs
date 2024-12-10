@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Parse.Infrastructure.Utilities;
 
@@ -60,12 +61,30 @@ public static class Conversion
                 if (typeof(T) == typeof(int) && int.TryParse(stringValue, out int intValue))
                     return intValue;
 
-                // Add other primitives if needed
+                if (typeof(T) == typeof(long) && long.TryParse(stringValue, out long longValue))
+                    return longValue;
+
+                if (typeof(T) == typeof(decimal) && decimal.TryParse(stringValue, out decimal decimalValue))
+                    return decimalValue;
+
+                if (typeof(T) == typeof(short) && short.TryParse(stringValue, out short shortValue))
+                    return shortValue;
+
+                if (typeof(T) == typeof(byte) && byte.TryParse(stringValue, out byte byteValue))
+                    return byteValue;
+
+                if (typeof(T) == typeof(sbyte) && SByte.TryParse(stringValue, out sbyte sbyteValue))
+                    return sbyteValue;
+
+                if (typeof(T) == typeof(bool) && Boolean.TryParse(stringValue, out bool boolValue))
+                    return boolValue;
+
+                if (typeof(T) == typeof(char) && stringValue.Length == 1)
+                    return stringValue[0]; // Returns the first character if the string length is 1
             }
-
-            return (T) Convert.ChangeType(value, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
+         
+                return (T) Convert.ChangeType(value, typeof(T), System.Globalization.CultureInfo.InvariantCulture);
         }
-
         if (typeof(T).IsConstructedGenericType)
         {
             if (typeof(T).CheckWrappedWithNullable() && typeof(T).GenericTypeArguments[0] is { IsPrimitive: true } innerType)

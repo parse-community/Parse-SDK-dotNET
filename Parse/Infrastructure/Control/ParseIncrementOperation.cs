@@ -96,18 +96,23 @@ public class ParseIncrementOperation : IParseFieldOperation
 
     public ParseIncrementOperation(object amount) => Amount = amount;
 
-    public object Encode(IServiceHub serviceHub)
+    // Updated Encode to ConvertToJSON
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
+        // Updated to produce a JSON-compatible structure
         return new Dictionary<string, object>
         {
-            ["__op"] = "Increment",
-            ["amount"] = Amount
+            ["__op"] = "Increment", // Parse operation type
+            ["amount"] = Amount     // Value to increment
         };
     }
 
     static object Add(object first, object second)
     {
-        return Adders.TryGetValue(new Tuple<Type, Type>(first.GetType(), second.GetType()), out Func<object, object, object> adder) ? adder(first, second) : throw new InvalidCastException($"Could not add objects of type {first.GetType()} and {second.GetType()} to each other.");
+        // Handles type-safe addition using Adders
+        return Adders.TryGetValue(new Tuple<Type, Type>(first.GetType(), second.GetType()), out Func<object, object, object> adder)
+            ? adder(first, second)
+            : throw new InvalidCastException($"Could not add objects of type {first.GetType()} and {second.GetType()} to each other.");
     }
 
     public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
@@ -115,21 +120,29 @@ public class ParseIncrementOperation : IParseFieldOperation
         return previous switch
         {
             null => this,
-            ParseDeleteOperation _ => new ParseSetOperation(Amount),
+            ParseDeleteOperation _ => new ParseSetOperation(Amount), // Handles merging with delete
 
-            // This may be a bug, but it was in the original logic.
+            // Corrected the condition to properly handle non-number types
+            ParseSetOperation { Value: not null and not string } => new ParseSetOperation(Add(previous.Value, Amount)),
+            ParseSetOperation { Value: string } => throw new InvalidOperationException("Cannot increment a non-number type."),
 
-            ParseSetOperation { Value: string { } } => throw new InvalidOperationException("Cannot increment a non-number type."),
-            ParseSetOperation { Value: var value } => new ParseSetOperation(Add(value, Amount)),
+            // Merging with another increment operation
             ParseIncrementOperation { Amount: var amount } => new ParseIncrementOperation(Add(amount, Amount)),
+
             _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
         };
     }
 
     public object Apply(object oldValue, string key)
     {
-        return oldValue is string ? throw new InvalidOperationException("Cannot increment a non-number type.") : Add(oldValue ?? 0, Amount);
+        // Corrected logic to handle nulls and ensure only numeric types are processed
+        return oldValue is string
+            ? throw new InvalidOperationException("Cannot increment a non-number type.")
+            : Add(oldValue ?? 0, Amount);
     }
 
     public object Amount { get; }
+
+    public object Value => Amount;
 }
+

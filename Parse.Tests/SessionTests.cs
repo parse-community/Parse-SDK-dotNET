@@ -1,34 +1,50 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Threading;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Sessions;
-using Parse.Abstractions.Platform.Users;
 using Parse.Infrastructure;
+using Parse;
 using Parse.Platform.Objects;
-
-namespace Parse.Tests;
+using Parse.Abstractions.Platform.Users;
 
 [TestClass]
 public class SessionTests
 {
-    private ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
+    private ParseClient Client { get; }
 
-    [TestInitialize]
-    public void SetUp()
+    public SessionTests()
     {
+        // Initialize the client
+        Client = new ParseClient(new ServerConnectionData { Test = true });
+        Client.Publicize();  // Ensure the client instance is globally available
+
+        // Register the valid classes
         Client.AddValidClass<ParseSession>();
         Client.AddValidClass<ParseUser>();
     }
 
+    [TestInitialize]
+    public void SetUp()
+    {
+        // Additional setup can go here
+    }
+
     [TestCleanup]
-    public void TearDown() => (Client.Services as ServiceHub).Reset();
+    public void TearDown()
+    {
+        // Reset any state if necessary
+        (Client.Services as ServiceHub)?.Reset();
+    }
 
     [TestMethod]
-    public void TestGetSessionQuery() =>
+    public void TestGetSessionQuery()
+    {
+        // Test that GetSessionQuery returns the correct type
         Assert.IsInstanceOfType(Client.GetSessionQuery(), typeof(ParseQuery<ParseSession>));
+    }
 
     [TestMethod]
     public void TestGetSessionToken()
@@ -48,6 +64,7 @@ public class SessionTests
     [TestMethod]
     public async Task TestGetCurrentSessionAsync()
     {
+        // Set up the service hub and mock controllers
         var hub = new MutableServiceHub();
         var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
 
@@ -56,11 +73,13 @@ public class SessionTests
             ServerData = new Dictionary<string, object> { ["sessionToken"] = "newllaKcolnu" }
         };
 
+        // Mock session controller
         var mockController = new Mock<IParseSessionController>();
         mockController
             .Setup(obj => obj.GetSessionAsync(It.IsAny<string>(), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(sessionState);
 
+        // Mock user controller
         var userState = new MutableObjectState
         {
             ServerData = new Dictionary<string, object> { ["sessionToken"] = "llaKcolnu" }
@@ -82,6 +101,7 @@ public class SessionTests
         Assert.IsNotNull(session);
         Assert.AreEqual("newllaKcolnu", session.SessionToken);
 
+        // Verify that the session controller was called with the correct session token
         mockController.Verify(
             obj => obj.GetSessionAsync("llaKcolnu", It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()),
             Times.Once

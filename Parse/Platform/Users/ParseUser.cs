@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Abstractions.Platform.Authentication;
@@ -75,6 +76,8 @@ public class ParseUser : ParseObject
 
     internal async Task SignUpAsync(CancellationToken cancellationToken = default)
     {
+        
+
         if (string.IsNullOrWhiteSpace(Username))
             throw new InvalidOperationException("Cannot sign up user with an empty name.");
 
@@ -84,20 +87,25 @@ public class ParseUser : ParseObject
         if (!string.IsNullOrWhiteSpace(ObjectId))
             throw new InvalidOperationException("Cannot sign up a user that already exists.");
 
+        
+
         var currentOperations = StartSave();
 
         try
         {
             var result = await Services.UserController.SignUpAsync(State, currentOperations, Services, cancellationToken).ConfigureAwait(false);
+            Debug.WriteLine($"SignUpAsync on UserController completed. ObjectId: {result.ObjectId}");
             HandleSave(result);
             await Services.SaveCurrentUserAsync(this, cancellationToken).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex)
         {
+            Debug.WriteLine($"SignUpAsync failed: {ex.Message}");
             HandleFailedSave(currentOperations);
             throw;
         }
     }
+
 
     protected override async Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
     {

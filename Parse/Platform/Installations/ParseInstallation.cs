@@ -32,24 +32,13 @@ public partial class ParseInstallation : ParseObject
         get
         {
             string installationIdString = GetProperty<string>(nameof(InstallationId));
-            Guid? installationId = null;
-
-            try
+            if (Guid.TryParse(installationIdString, out Guid installationId))
             {
-                installationId = new Guid(installationIdString);
+                return installationId;
             }
-            catch (Exception)
-            {
-                // Do nothing.
-            }
-
-            return installationId.Value;
+            return Guid.Empty; // Return a default value
         }
-        internal set
-        {
-            Guid installationId = value;
-            SetProperty(installationId.ToString(), nameof(InstallationId));
-        }
+        internal set => SetProperty(value.ToString(), nameof(InstallationId));
     }
 
     /// <summary>
@@ -155,23 +144,12 @@ public partial class ParseInstallation : ParseObject
         get
         {
             string versionString = GetProperty<string>(nameof(ParseVersion));
-            Version version = null;
-            try
-            {
-                version = new Version(versionString);
-            }
-            catch (Exception)
-            {
-                // Do nothing.
-            }
-
-            return version;
+            if (Version.TryParse(versionString, out var version))
+                return  version; // Return a default  version
+            else
+                return  new Version(0, 0); // Return a default version
         }
-        private set
-        {
-            Version version = value;
-            SetProperty(version.ToString(), nameof(ParseVersion));
-        }
+        private set => SetProperty(value.ToString(), nameof(ParseVersion));
     }
 
     /// <summary>
@@ -193,7 +171,7 @@ public partial class ParseInstallation : ParseObject
     protected override async Task SaveAsync(Task toAwait, CancellationToken cancellationToken)
     {
         if (Services.CurrentInstallationController.IsCurrent(this))
-#pragma warning disable CS1030 // #warning directive
+
         {
             SetIfDifferent("deviceType", Services.MetadataController.EnvironmentData.Platform);
             SetIfDifferent("timeZone", Services.MetadataController.EnvironmentData.TimeZone);
@@ -203,11 +181,8 @@ public partial class ParseInstallation : ParseObject
             SetIfDifferent("appIdentifier", Services.MetadataController.HostManifestData.Identifier);
             SetIfDifferent("appName", Services.MetadataController.HostManifestData.Name);
 
-#warning InstallationDataFinalizer needs to be injected here somehow or removed.
-
-            //platformHookTask = Client.InstallationDataFinalizer.FinalizeAsync(this);
         }
-#pragma warning restore CS1030 // #warning directive
+
         Task platformHookTask = ParseClient.Instance.InstallationDataFinalizer.FinalizeAsync(this); 
 
         // Wait for the platform task, then proceed with saving the main task.
@@ -243,7 +218,7 @@ public partial class ParseInstallation : ParseObject
         ["UTC-11"] = "Etc/GMT+11",
         ["Hawaiian Standard Time"] = "Pacific/Honolulu",
         ["Alaskan Standard Time"] = "America/Anchorage",
-        ["Pacific Standard Time (Mexico)"] = "America/Santa_Isabel",
+        ["Pacific Standard Time (Mexico)"] = "America/Tijuana",
         ["Pacific Standard Time"] = "America/Los_Angeles",
         ["US Mountain Standard Time"] = "America/Phoenix",
         ["Mountain Standard Time (Mexico)"] = "America/Chihuahua",
@@ -265,7 +240,7 @@ public partial class ParseInstallation : ParseObject
         ["E. South America Standard Time"] = "America/Sao_Paulo",
         ["Argentina Standard Time"] = "America/Buenos_Aires",
         ["SA Eastern Standard Time"] = "America/Cayenne",
-        ["Greenland Standard Time"] = "America/Godthab",
+        ["Greenland Standard Time"] = "America/Nuuk",
         ["Montevideo Standard Time"] = "America/Montevideo",
         ["Bahia Standard Time"] = "America/Bahia",
         ["UTC-02"] = "Etc/GMT+2",
@@ -285,7 +260,7 @@ public partial class ParseInstallation : ParseObject
         ["Middle East Standard Time"] = "Asia/Beirut",
         ["Egypt Standard Time"] = "Africa/Cairo",
         ["Syria Standard Time"] = "Asia/Damascus",
-        ["E. Europe Standard Time"] = "Asia/Nicosia",
+        ["E. Europe Standard Time"] = "Europe/Minsk",
         ["South Africa Standard Time"] = "Africa/Johannesburg",
         ["FLE Standard Time"] = "Europe/Kiev",
         ["Turkey Standard Time"] = "Europe/Istanbul",
@@ -305,13 +280,13 @@ public partial class ParseInstallation : ParseObject
         ["Afghanistan Standard Time"] = "Asia/Kabul",
         ["Pakistan Standard Time"] = "Asia/Karachi",
         ["West Asia Standard Time"] = "Asia/Tashkent",
-        ["India Standard Time"] = "Asia/Calcutta",
+        ["India Standard Time"] = "Asia/Kolkata",
         ["Sri Lanka Standard Time"] = "Asia/Colombo",
-        ["Nepal Standard Time"] = "Asia/Katmandu",
+        ["Nepal Standard Time"] = "Asia/Kathmandu",
         ["Central Asia Standard Time"] = "Asia/Almaty",
         ["Bangladesh Standard Time"] = "Asia/Dhaka",
         ["Ekaterinburg Standard Time"] = "Asia/Yekaterinburg",
-        ["Myanmar Standard Time"] = "Asia/Rangoon",
+        ["Myanmar Standard Time"] = "Asia/Yangon",
         ["SE Asia Standard Time"] = "Asia/Bangkok",
         ["N. Central Asia Standard Time"] = "Asia/Novosibirsk",
         ["China Standard Time"] = "Asia/Shanghai",
@@ -340,6 +315,7 @@ public partial class ParseInstallation : ParseObject
         ["Samoa Standard Time"] = "Pacific/Apia"
     };
 
+
     /// <summary>
     /// This is a mapping of odd TimeZone offsets to their respective IANA codes across the world.
     /// This list was compiled from painstakingly pouring over the information available at
@@ -347,18 +323,19 @@ public partial class ParseInstallation : ParseObject
     /// </summary>
     internal static Dictionary<TimeSpan, string> TimeZoneOffsetMap { get; } = new Dictionary<TimeSpan, string>
     {
-        [new TimeSpan(12, 45, 0)] = "Pacific/Chatham",
+        [new TimeSpan(12, 45, 0)] = "Pacific/Chatham",//new one
         [new TimeSpan(10, 30, 0)] = "Australia/Lord_Howe",
         [new TimeSpan(9, 30, 0)] = "Australia/Adelaide",
         [new TimeSpan(8, 45, 0)] = "Australia/Eucla",
-        [new TimeSpan(8, 30, 0)] = "Asia/Pyongyang", // Parse in North Korea confirmed.
-        [new TimeSpan(6, 30, 0)] = "Asia/Rangoon",
+        [new TimeSpan(8, 30, 0)] = "Asia/Pyongyang",
+        [new TimeSpan(6, 30, 0)] = "Asia/Yangon",
         [new TimeSpan(5, 45, 0)] = "Asia/Kathmandu",
         [new TimeSpan(5, 30, 0)] = "Asia/Colombo",
         [new TimeSpan(4, 30, 0)] = "Asia/Kabul",
         [new TimeSpan(3, 30, 0)] = "Asia/Tehran",
         [new TimeSpan(-3, 30, 0)] = "America/St_Johns",
         [new TimeSpan(-4, 30, 0)] = "America/Caracas",
-        [new TimeSpan(-9, 30, 0)] = "Pacific/Marquesas",
+        [new TimeSpan(-9, 30, 0)] = "Pacific/Marquesas"
     };
+
 }

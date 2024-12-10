@@ -60,12 +60,10 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         // Validate serviceHub
         if (serviceHub == null && ParseClient.Instance == null)
         {
-            Debug.WriteLine("Warning: Both serviceHub and ParseClient.Instance are null. ParseObject requires explicit initialization via Bind(IServiceHub).");
-
-            //throw new InvalidOperationException("A valid IServiceHub or ParseClient.Instance must be available to construct a ParseObject.");
+            throw new InvalidOperationException("A valid IServiceHub or ParseClient.Instance must be available to construct a ParseObject.");
         }
 
-        Services = serviceHub ?? ParseClient.Instance;
+        Services = serviceHub ?? ParseClient.Instance.Services;
 
         // Validate and set className
         if (string.IsNullOrWhiteSpace(className))
@@ -77,18 +75,22 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         {
             className = GetType().GetParseClassName() ?? throw new ArgumentException("Unable to determine class name for ParseObject.");
         }
+
         if (Services is not null)
         {
             // Validate against factory requirements
-            if (!Services.ClassController.GetClassMatch(className, GetType()) && GetType() != typeof(ParseObject))
+            if (!Services.ClassController.GetClassMatch(className, GetType()))
             {
-                throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
+                if (!typeof(ParseObject).IsAssignableFrom(GetType()))
+                {
+                    // Allow subclasses of ParseObject (like ParseUser, ParseSession, etc.)
+                    
+                    throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
+                }
             }
+
         }
 
-        // Initialize state
-        State = new MutableObjectState { ClassName = className };
-        OnPropertyChanged(nameof(ClassName));
         OperationSetQueue.AddLast(new Dictionary<string, IParseFieldOperation>());
 
         // Handle pointer creation
@@ -102,10 +104,36 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         {
             SetDefaultValues();
         }
+        // Initialize state
+        State = new MutableObjectState { ClassName = className };
+        OnPropertyChanged(nameof(ClassName));
+        
+    }
+
+    #region ParseObject Creation
+    public static T Create<T>() where T : ParseObject, new()
+    {
+        try
+        {
+            
+            if (ParseClient.Instance.Services == null)
+            {
+                throw new InvalidOperationException("ParseClient.Services must be initialized before creating objects.");
+            }
+
+            var instance = new T();
+            instance.Bind(ParseClient.Instance.Services); // Ensure the ServiceHub is attached
+            
+            return instance;
+        }
+        catch (Exception ex)
+        {
+
+            throw new Exception("Error when Creating parse Object..");
+        }
     }
 
 
-    #region ParseObject Creation
 
     /// <summary>
     /// Constructor for use in ParseObject subclasses. Subclasses must specify a ParseClassName attribute. Subclasses that do not implement a constructor accepting <see cref="IServiceHub"/> will need to be bond to an implementation instance via <see cref="Bind(IServiceHub)"/> after construction.
@@ -322,9 +350,8 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
                 CheckGetAccess(key);
 
                 if (!EstimatedData.TryGetValue(key, out var value))
-                {
-                    // Gracefully handle missing keys
-                    return null; // Return null or throw a custom exception if necessary
+                {   
+                    return null; // Return null, do NOT throw exception. Parse official doesn't.
                 }
 
                 // Ensure ParseRelationBase consistency
@@ -454,8 +481,34 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
     /// </summary>
     public T Get<T>(string key)
     {
-        return Conversion.To<T>(this[key]);
+        // Debugging to inspect the key and its value
+        Debug.WriteLine($"Key is {key}");
+
+        try
+        {
+            // Try to get the value
+            if (!ContainsKey(key))
+            {
+                // If the key doesn't exist, throw a KeyNotFoundException
+                throw new KeyNotFoundException($"The key '{key}' was not found in the object.");
+            }
+            // If the key exists, attempt to convert the value
+            return Conversion.To<T>(this[key]);
+        }
+        catch (KeyNotFoundException)
+        {
+            
+            // Handle missing key explicitly - better than a NullReferenceException
+            throw; // Rethrow the KeyNotFoundException
+        }
+        catch (Exception ex)
+        {
+            
+            // Optionally to catch other exceptions or rethrow a more specific exception
+            throw new InvalidCastException($"Error converting value for key '{key}'", ex);
+        }
     }
+
 
     /// <summary>
     /// Access or create a Relation value for a key.
@@ -757,6 +810,10 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
 
     internal virtual void HandleSave(IObjectState serverState)
     {
+        if (serverState == null)
+        {
+            throw new InvalidOperationException("Server state cannot be null in HandleSave.");
+        }
         lock (Mutex)
         {
             IDictionary<string, IParseFieldOperation> operationsBeforeSave = OperationSetQueue.First.Value;
@@ -965,6 +1022,8 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
             }
 
             PerformOperation(key, new ParseSetOperation(value));
+            OnPropertyChanged(key);
+
         }
     }
 
@@ -1046,8 +1105,11 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         return GetRelation<T>(Services.GetFieldForPropertyName(ClassName, propertyName));
     }
 
+    /// <summary>
+    /// Parse Objects are mutable by default.
+    /// </summary>  
     protected virtual bool CheckKeyMutable(string key)
-    {
+    {        
         return true;
     }
 
@@ -1097,11 +1159,14 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
             // Await the deep save operation
             await Services.DeepSaveAsync(EstimatedData, sessionToken, cancellationToken).ConfigureAwait(false);
 
-            // Proceed with the object save
-            await Services.ObjectController.SaveAsync(State, currentOperations, sessionToken, Services, cancellationToken).ConfigureAwait(false);
-
-            // Handle successful save
-            HandleSave(State);
+            // Proceed with the object save and update the state with the result
+            var newState = await Services.ObjectController.SaveAsync(State, currentOperations, sessionToken, Services, cancellationToken).ConfigureAwait(false);
+            if (newState == null)
+            {
+                throw new InvalidOperationException("SaveAsync returned a null state.");
+            }
+            // Handle successful save with the updated state
+            HandleSave(newState);
         }
         catch (OperationCanceledException)
         {

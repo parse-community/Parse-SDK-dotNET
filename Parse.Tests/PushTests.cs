@@ -29,15 +29,21 @@ public class PushTests
     private IParsePushChannelsController GetMockedPushChannelsController(IEnumerable<string> channels)
     {
         var mockedChannelsController = new Mock<IParsePushChannelsController>(MockBehavior.Strict);
+
+        // Setup for SubscribeAsync to accept any IServiceHub instance
         mockedChannelsController
             .Setup(obj => obj.SubscribeAsync(It.Is<IEnumerable<string>>(it => it.CollectionsEqual(channels)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(false));
+            .Returns(Task.CompletedTask); // Ensure it returns a completed task
+
+        // Setup for UnsubscribeAsync to accept any IServiceHub instance
         mockedChannelsController
             .Setup(obj => obj.UnsubscribeAsync(It.Is<IEnumerable<string>>(it => it.CollectionsEqual(channels)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.FromResult(false));
+            .Returns(Task.CompletedTask); // Ensure it returns a completed task
 
         return mockedChannelsController.Object;
     }
+
+
 
     [TestCleanup]
     public void TearDown() => (Client.Services as ServiceHub).Reset();
@@ -86,7 +92,7 @@ public class PushTests
         var hub = new MutableServiceHub();
         var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
 
-        var channels = new List<string>();
+        var channels = new List<string> { "test" };
         hub.PushChannelsController = GetMockedPushChannelsController(channels);
 
         // Act
@@ -107,7 +113,7 @@ public class PushTests
         var hub = new MutableServiceHub();
         var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
 
-        var channels = new List<string>();
+        var channels = new List<string> { "test" }; // Corrected to ensure we have the "test" channel
         hub.PushChannelsController = GetMockedPushChannelsController(channels);
 
         // Act
@@ -120,4 +126,6 @@ public class PushTests
         // Assert
         Assert.IsTrue(true); // Reaching here means no exceptions occurred
     }
+
+
 }

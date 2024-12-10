@@ -56,6 +56,7 @@ public class AnalyticsControllerTests
             Times.Exactly(1)
         );
     }
+
     [TestMethod]
     public async Task TestTrackEventWithNonEmptyDimensions()
     {
@@ -93,6 +94,7 @@ public class AnalyticsControllerTests
             Times.Exactly(1)
         );
     }
+
 
     /// <summary>
     /// Validates that the dimensions dictionary is correctly serialized into the command's Data stream.
@@ -136,6 +138,7 @@ public class AnalyticsControllerTests
 
         return false;
     }
+
 
 
     [TestMethod]
@@ -227,16 +230,18 @@ public class AnalyticsControllerTests
     }
 
 
-
     Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
     {
         var mockRunner = new Mock<IParseCommandRunner>();
+
+        // Setup the mock to return a Task with the expected Tuple
         mockRunner.Setup(obj => obj.RunCommandAsync(
             It.IsAny<ParseCommand>(),
             It.IsAny<IProgress<IDataTransferLevel>>(),
             It.IsAny<IProgress<IDataTransferLevel>>(),
             It.IsAny<CancellationToken>()
-        )).Returns(Task.FromResult(response));
+        ))
+        .Returns(Task.FromResult(response));  // Return the tuple as part of the Task
 
         return mockRunner;
     }

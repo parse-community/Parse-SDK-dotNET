@@ -10,6 +10,7 @@ using Parse.Abstractions.Platform.Users;
 using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
 using System;
+using System.Diagnostics;
 
 namespace Parse.Platform.Users;
 
@@ -84,6 +85,7 @@ public class ParseCurrentUserController : IParseCurrentUserController
 
     public async Task<ParseUser?> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
     {
+        
         if (CurrentUser is { ObjectId: { } })
             return CurrentUser;
 
@@ -93,6 +95,7 @@ public class ParseCurrentUserController : IParseCurrentUserController
             if (storage.TryGetValue(nameof(CurrentUser), out var serializedData) && serializedData is string serialization)
             {
                 var state = ParseObjectCoder.Instance.Decode(JsonUtilities.Parse(serialization) as IDictionary<string, object>, Decoder, serviceHub);
+                
                 CurrentUser = ClassController.GenerateObjectFromState<ParseUser>(state, "_User", serviceHub);
             }
             else
@@ -139,7 +142,7 @@ public class ParseCurrentUserController : IParseCurrentUserController
         await TaskQueue.Enqueue(async _ =>
         {
             await GetAsync(serviceHub, cancellationToken).ConfigureAwait(false);
-            ClearFromDiskAsync();
+            await ClearFromDiskAsync();
         }, cancellationToken).ConfigureAwait(false);
     }
 }

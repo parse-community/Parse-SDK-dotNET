@@ -107,11 +107,10 @@ public class CloudControllerTests
         Assert.AreEqual("ben", result["fosco"]);
         Assert.IsInstanceOfType(result["list"], typeof(IList<object>));
     }
-
     [TestMethod]
     public async Task TestCallFunctionWithWrongType()
     {
-        // Arrange: Create a mock runner with a response that doesn't match the expected type
+        // a mock runner with a response that doesn't match the expected type
         var wrongTypeResponse = new Dictionary<string, object>
     {
         { "result", "gogo" }
@@ -122,8 +121,9 @@ public class CloudControllerTests
 
         var cloudCodeController = new ParseCloudCodeController(mockRunner.Object, Client.Decoder);
 
-        // Act & Assert: Expect the call to fail due to a type mismatch
-        await Assert.ThrowsExceptionAsync<InvalidCastException>(async () =>
+        // Act & Assert: Expect the call to fail with a ParseFailureException || This is fun!
+
+        await Assert.ThrowsExceptionAsync<ParseFailureException>(async () =>
         {
             await cloudCodeController.CallFunctionAsync<int>(
                 "someFunction",
@@ -134,6 +134,7 @@ public class CloudControllerTests
             );
         });
     }
+
 
 
     private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)

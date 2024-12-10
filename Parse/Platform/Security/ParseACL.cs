@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Parse.Abstractions.Internal;
 using Parse.Abstractions.Infrastructure;
+using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace Parse;
 
@@ -26,19 +28,68 @@ public class ParseACL : IJsonConvertible
 
     internal ParseACL(IDictionary<string, object> jsonObject)
     {
-        readers = new HashSet<string>(from pair in jsonObject
-                                      where ((IDictionary<string, object>) pair.Value).ContainsKey("read")
-                                      select pair.Key);
-        writers = new HashSet<string>(from pair in jsonObject
-                                      where ((IDictionary<string, object>) pair.Value).ContainsKey("write")
-                                      select pair.Key);
+        // Recursive function to process ACL data
+        void ProcessAclData(IDictionary<string, object> aclData)
+        {
+            foreach (var pair in aclData)
+            {
+                if (pair.Key == publicName) // Special handling for public access
+                {
+                    if (pair.Value is IDictionary<string, object> permissions)
+                    {
+                        if (permissions.ContainsKey("read"))
+                        {
+                            readers.Add(publicName); // Grant read access to the public
+                        }
+                        if (permissions.ContainsKey("write"))
+                        {
+                            writers.Add(publicName); // Grant write access to the public
+                        }
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"Public access (ACL key: {publicName}) is not in the expected format.");
+                    }
+                }
+                else if (pair.Value is IDictionary<string, object> permissions)
+                {
+                    // Process user/role ACLs
+                    if (permissions.ContainsKey("read"))
+                    {
+                        readers.Add(pair.Key); // Add read access for the user/role
+                    }
+                    if (permissions.ContainsKey("write"))
+                    {
+                        writers.Add(pair.Key); // Add write access for the user/role
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine($"ACL entry for key '{pair.Key}' is not a valid permissions dictionary.");
+                }
+            }
+        }
+
+        // Check if the input is nested
+        if (jsonObject.ContainsKey("ACL") && jsonObject["ACL"] is IDictionary<string, object> nestedAcl)
+        {            
+            ProcessAclData(nestedAcl); // Process the nested ACL
+        }
+        else
+        {
+            
+            ProcessAclData(jsonObject); // Process the flat ACL
+        }
     }
+
+
 
     /// <summary>
     /// Creates an ACL with no permissions granted.
     /// </summary>
     public ParseACL()
     {
+        
     }
 
     /// <summary>
@@ -47,11 +98,15 @@ public class ParseACL : IJsonConvertible
     /// <param name="owner">The only user that can read or write objects governed by this ACL.</param>
     public ParseACL(ParseUser owner)
     {
+        if (owner?.ObjectId == null)
+        {
+            throw new ArgumentException("ParseUser must have a valid ObjectId.");
+        }
         SetReadAccess(owner, true);
         SetWriteAccess(owner, true);
     }
 
-    IDictionary<string, object> IJsonConvertible.ConvertToJSON()
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         Dictionary<string, object> result = new Dictionary<string, object>();
         foreach (string user in readers.Union(writers))

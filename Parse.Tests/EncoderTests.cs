@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -173,46 +174,62 @@ public class EncoderTests
     public void TestEncodeList()
     {
         IList<object> list = new List<object>
+    {
+        new ParseGeoPoint(0, 0),
+        "item",
+        new byte[] { 1, 2, 3, 4 },
+        new string[] { "hikaru", "hanatan", "ultimate" },
+        new Dictionary<string, object>
         {
-            new ParseGeoPoint(0, 0),
-            "item",
-            new byte[] { 1, 2, 3, 4 },
-            new string[] { "hikaru", "hanatan", "ultimate" },
-            new Dictionary<string, object>()
-            {
-                ["elements"] = new int[] { 1, 2, 3 },
-                ["mystic"] = "cage",
-                ["listAgain"] = new List<object> { "xilia", "zestiria", "symphonia" }
-            }
-        };
+            ["elements"] = new int[] { 1, 2, 3 },
+            ["mystic"] = "cage",
+            ["listAgain"] = new List<object> { "xilia", "zestiria", "symphonia" }
+        }
+    };
+
+        Debug.WriteLine($"Original list: {list}");
 
         IList<object> value = ParseEncoderTestClass.Instance.Encode(list, Client) as IList<object>;
 
+        Assert.IsNotNull(value);
+
+        // Validate ParseGeoPoint
         IDictionary<string, object> item0 = value[0] as IDictionary<string, object>;
+        Assert.IsNotNull(item0);
         Assert.AreEqual("GeoPoint", item0["__type"]);
         Assert.AreEqual(0.0, item0["latitude"]);
         Assert.AreEqual(0.0, item0["longitude"]);
 
+        // Validate string
         Assert.AreEqual("item", value[1]);
 
+        // Validate byte[]
         IDictionary<string, object> item2 = value[2] as IDictionary<string, object>;
+        Debug.WriteLine($"Encoded item2: {item2}, Type: {item2?.GetType()}");
+        Assert.IsNotNull(item2);
         Assert.AreEqual("Bytes", item2["__type"]);
+        Assert.AreEqual("AQIDBA==", item2["base64"]); // Base64 representation of {1,2,3,4}
 
+        // Validate string[]
         IList<object> item3 = value[3] as IList<object>;
+        Assert.IsNotNull(item3);
         Assert.AreEqual("hikaru", item3[0]);
         Assert.AreEqual("hanatan", item3[1]);
         Assert.AreEqual("ultimate", item3[2]);
 
+        // Validate nested dictionary
         IDictionary<string, object> item4 = value[4] as IDictionary<string, object>;
+        Assert.IsNotNull(item4);
         Assert.IsTrue(item4["elements"] is IList<object>);
         Assert.AreEqual("cage", item4["mystic"]);
         Assert.IsTrue(item4["listAgain"] is IList<object>);
     }
 
+
     [TestMethod]
     public void TestEncodeDictionary()
     {
-        IDictionary<string, object> dict = new Dictionary<string, object>()
+        IDictionary<string, object> dict = new Dictionary<string, object>
         {
             ["item"] = "random",
             ["list"] = new List<object> { "vesperia", "abyss", "legendia" },
@@ -223,14 +240,21 @@ public class EncoderTests
 
         IDictionary<string, object> value = ParseEncoderTestClass.Instance.Encode(dict, Client) as IDictionary<string, object>;
 
+        Assert.IsNotNull(value);
         Assert.AreEqual("random", value["item"]);
         Assert.IsTrue(value["list"] is IList<object>);
         Assert.IsTrue(value["array"] is IList<object>);
         Assert.IsTrue(value["geo"] is IDictionary<string, object>);
         Assert.IsTrue(value["validDict"] is IDictionary<string, object>);
 
-        Assert.ThrowsException<MissingMethodException>(() => ParseEncoderTestClass.Instance.Encode(new Dictionary<object, string> { }, Client));
+        Assert.ThrowsException<ArgumentException>(() =>
+            ParseEncoderTestClass.Instance.Encode(new Dictionary<object, string>(), Client));
 
-        Assert.ThrowsException<MissingMethodException>(() => ParseEncoderTestClass.Instance.Encode(new Dictionary<string, object> { ["validDict"] = new Dictionary<object, string> { [new ParseACL()] = "jbf" } }, Client));
+        Assert.ThrowsException<ArgumentException>(() =>
+            ParseEncoderTestClass.Instance.Encode(new Dictionary<string, object>
+            {
+                ["validDict"] = new Dictionary<object, string> { [new ParseACL()] = "jbf" }
+            }, Client));
     }
+
 }

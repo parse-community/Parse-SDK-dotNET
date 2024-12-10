@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Parse.Abstractions.Infrastructure;
+using Parse.Abstractions.Platform.Objects;
 
 namespace Parse.Abstractions.Platform.Installations;
 

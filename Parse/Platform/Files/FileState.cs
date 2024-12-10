@@ -12,20 +12,37 @@ public class FileState
 
     public Uri Location { get; set; }
 
-#pragma warning disable CS1030 // #warning directive
-    public Uri SecureLocation => Location switch
+    /// <summary>
+    /// Converts the file's location to a secure HTTPS location if applicable.
+    /// </summary>
+    public Uri SecureLocation
     {
-#warning Investigate if the first branch of this swhich expression should be removed or an explicit failure case when not testing.
+        get
+        {
+            if (Location == null)
+                throw new InvalidOperationException("Location is not set.");
 
-        { Host: "files.parsetfss.com" } location => new UriBuilder(location)
+            return IsParseHostedFile(Location) ? GetSecureUri(Location) : Location;
+        }
+    }
+
+    /// <summary>
+    /// Checks if the file is hosted on a supported Parse file server.
+    /// </summary>
+    private static bool IsParseHostedFile(Uri location)
+    {
+        return location.Host.EndsWith("parsetfss.com", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Converts a URI to a secure HTTPS URI.
+    /// </summary>
+    private static Uri GetSecureUri(Uri location)
+    {
+        return new UriBuilder(location)
         {
             Scheme = SecureHyperTextTransferScheme,
-
-            // This makes URIBuilder assign the default port for the URL scheme.
-
-            Port = -1,
-        }.Uri,
-        _ => Location
-    };
-#pragma warning restore CS1030 // #warning directive
+            Port = -1, // Default port for HTTPS
+        }.Uri;
+    }
 }

@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Parse.Abstractions.Infrastructure;
+using Parse.Abstractions.Infrastructure.Control;
 using Parse.Abstractions.Internal;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure;
@@ -18,9 +22,18 @@ public class ObjectTests
 
     [ParseClassName(nameof(UnregisteredSubClass))]
     class UnregisteredSubClass : ParseObject { }
+        private ParseClient Client { get; set; }
 
-    ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
-
+    [TestInitialize]
+    public void SetUp()
+    {
+        // Initialize the client and ensure the instance is set
+        Client = new ParseClient(new ServerConnectionData { Test = true });
+        Client.Publicize();
+        // Register the valid classes
+        Client.AddValidClass<ParseSession>();
+        Client.AddValidClass<ParseUser>();
+    }
     [TestCleanup]
     public void TearDown() => (Client.Services as ServiceHub).Reset();
 
@@ -208,7 +221,7 @@ public class ObjectTests
         obj["list"] = new List<string>();
         obj["dict"] = new Dictionary<string, object>();
         obj["fakeACL"] = new ParseACL();
-        obj[nameof(obj)] = new ParseObject("Corgi");
+        obj[nameof(obj)] = new ParseObject("Corgi", Client);
 
         Assert.IsTrue(obj.ContainsKey("gogo"));
         Assert.IsInstanceOfType(obj["gogo"], typeof(bool));
@@ -225,7 +238,7 @@ public class ObjectTests
         Assert.IsTrue(obj.ContainsKey(nameof(obj)));
         Assert.IsInstanceOfType(obj[nameof(obj)], typeof(ParseObject));
 
-        Assert.ThrowsException<KeyNotFoundException>(() => { object gogo = obj["missingItem"]; });
+        Assert.IsNull(obj["missingItem"]);
     }
 
     [TestMethod]
@@ -310,12 +323,6 @@ public class ObjectTests
     }
 
     [TestMethod]
-    public void TestGetRelation()
-    {
-        // TODO (hallucinogen): do this
-    }
-
-    [TestMethod]
     public void TestTryGetValue()
     {
         IObjectState state = new MutableObjectState
@@ -361,20 +368,6 @@ public class ObjectTests
         Assert.AreEqual("kevin", obj.Get<string>("username"));
         Assert.ThrowsException<InvalidCastException>(() => obj.Get<ParseObject>("username"));
         Assert.ThrowsException<KeyNotFoundException>(() => obj.Get<string>("missingItem"));
-    }
-
-#warning Some tests are not implemented.
-
-    [TestMethod]
-    public void TestIsDataAvailable()
-    {
-        // TODO (hallucinogen): do this
-    }
-
-    [TestMethod]
-    public void TestHasSameId()
-    {
-        // TODO (hallucinogen): do this
     }
 
     [TestMethod]
@@ -458,6 +451,7 @@ public class ObjectTests
         Assert.AreEqual(3, count);
     }
 
+
     [TestMethod]
     public void TestGetQuery()
     {
@@ -471,47 +465,261 @@ public class ObjectTests
         Client.ClassController.RemoveClass(typeof(SubClass));
     }
 
-#warning These tests are incomplete.
+#warning Some tests are not implemented.
 
     [TestMethod]
-    public void TestPropertyChanged()
+    public void TestIsDataAvailable()
     {
-        // TODO (hallucinogen): do this
+        var obj1 = Client.CreateObject("TestClass");
+        Assert.IsTrue(obj1.IsDataAvailable);
+
+        var obj2 = Client.CreateObjectWithoutData("TestClass", "objectId");
+        Assert.IsFalse(obj2.IsDataAvailable);
     }
 
     [TestMethod]
-    
-    public Task TestSave() =>
-        // TODO (hallucinogen): do this
-        Task.FromResult(0);
+    public void TestHasSameId()
+    {
+        var obj1 = Client.CreateObject("TestClass");
+        obj1.ObjectId = "testId";
+
+        var obj2 = Client.CreateObjectWithoutData("TestClass", "testId");
+        Assert.IsTrue(obj1.HasSameId(obj2));
+
+        var obj3 = Client.CreateObjectWithoutData("TestClass", "differentId");
+        Assert.IsFalse(obj1.HasSameId(obj3));
+    }
 
     [TestMethod]
-    
-    public Task TestSaveAll() =>
-        // TODO (hallucinogen): do this
-        Task.FromResult(0);
+    [ExpectedException(typeof(ArgumentException), "You can't add an unsaved ParseObject to a relation.")]
+    public void TestGetRelation_UnsavedObject()
+    {
+        var parentObj = Client.CreateObject("ParentClass");
+        var childObj = Client.CreateObject("ChildClass");
+
+        var relation = parentObj.GetRelation<ParseObject>("childRelation");
+        relation.Add(childObj); // Should throw an exception
+    }
 
     [TestMethod]
-    
-    public Task TestDelete() =>
-        // TODO (hallucinogen): do this
-        Task.FromResult(0);
+    public async Task TestGetRelation_SavedObject()
+    {
+        //Todo : (YB) I will leave this to anyone else!
+    }
+
+
 
     [TestMethod]
-    
-    public Task TestDeleteAll() =>
-        // TODO (hallucinogen): do this
-        Task.FromResult(0);
+    public async Task TestPropertyChanged()
+    {
+        var obj = Client.CreateObject("TestClass");
+        bool propertyChangedFired = false;
+
+        var eventRaised = new ManualResetEvent(false);
+
+        obj.PropertyChanged += (sender, e) =>
+        {
+            if (e.PropertyName == "key")
+            {
+                propertyChangedFired = true;
+                eventRaised.Set();  // Signal that the event has been raised
+            }
+        };
+
+        obj["key"] = "value";
+
+        // Wait for the event to be raised. Not necessary in production code.
+        eventRaised.WaitOne();
+
+        Assert.IsTrue(propertyChangedFired);
+    }
+
 
     [TestMethod]
-    
-    public Task TestFetch() =>
-        // TODO (hallucinogen): do this
-        Task.FromResult(0);
+    public async Task TestSave()
+    {
+        var mockController = new Mock<IParseObjectController>();
+
+        // Modify the mock to simulate a server response with ObjectId set after save
+        mockController.Setup(ctrl =>
+                ctrl.SaveAsync(It.IsAny<IObjectState>(), It.IsAny<IDictionary<string, IParseFieldOperation>>(), null, It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IObjectState state, IDictionary<string, IParseFieldOperation> operations, string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken) =>
+            {
+                var newState = state as MutableObjectState;
+                if (newState != null)
+                {
+                    // Simulating the server's response after saving the object
+                    newState.ObjectId = "savedId"; // This should be the value returned by the server
+                }
+                return newState;  // Return the updated state with ObjectId set
+            });
+
+        var hub = new MutableServiceHub { ObjectController = mockController.Object };
+        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+        var obj = client.CreateObject("TestClass");
+        obj["key"] = "value";
+
+        // Save the object
+        await obj.SaveAsync();
+
+        // Assert that the ObjectId is set to the expected value returned from the server
+        Assert.AreEqual("savedId", obj.ObjectId); // Assert the ObjectId was set correctly
+        Assert.IsFalse(obj.IsDirty); // Ensure the object is no longer dirty after save
+        mockController.VerifyAll(); // Verify the mock behavior
+    }
+
 
     [TestMethod]
-    
-    public Task TestFetchAll() =>
-        // TODO (hallucinogen): do this
-        Task.FromResult(0);
+    public async Task TestSaveAll()
+    {
+        var mockController = new Mock<IParseObjectController>();
+
+        // Mock SaveAsync for single-object saves
+        mockController.Setup(ctrl =>
+            ctrl.SaveAsync(It.IsAny<IObjectState>(),
+                           It.IsAny<IDictionary<string, IParseFieldOperation>>(),
+                           It.IsAny<string>(),
+                           It.IsAny<IServiceHub>(),
+                           It.IsAny<CancellationToken>()))
+        .ReturnsAsync((IObjectState state,
+                       IDictionary<string, IParseFieldOperation> operations,
+                       string sessionToken,
+                       IServiceHub serviceHub,
+                       CancellationToken cancellationToken) =>
+        {
+            // Return updated state with ObjectId
+            return new MutableObjectState
+            {
+                ClassName = state.ClassName,
+                ObjectId = $"id-{state.ClassName}" // Generate unique ObjectId
+            };
+        });
+
+        // Assign the mocked controller to the client
+        var client = new ParseClient(new ServerConnectionData { Test = true },
+                                      new MutableServiceHub { ObjectController = mockController.Object });
+
+        // Create objects
+        var obj1 = client.CreateObject("TestClass1");
+        var obj2 = client.CreateObject("TestClass2");
+
+        // Save the objects individually
+        await Task.WhenAll(obj1.SaveAsync(), obj2.SaveAsync());
+
+        // Verify the objects have the correct IDs
+        Assert.AreEqual("id-TestClass1", obj1.ObjectId); // Check obj1 ID
+        Assert.AreEqual("id-TestClass2", obj2.ObjectId); // Check obj2 ID
+
+        // Verify SaveAsync was called for each object
+        mockController.Verify(ctrl =>
+            ctrl.SaveAsync(It.IsAny<IObjectState>(),
+                           It.IsAny<IDictionary<string, IParseFieldOperation>>(),
+                           It.IsAny<string>(),
+                           It.IsAny<IServiceHub>(),
+                           It.IsAny<CancellationToken>()),
+            Times.Exactly(2)); // Ensure it was called twice, once for each object
+    }
+
+
+
+    [TestMethod]
+    public async Task TestDelete()
+    {
+        // Mock the object controller
+        var mockController = new Mock<IParseObjectController>();
+        mockController
+            .Setup(ctrl =>
+                ctrl.DeleteAsync(It.IsAny<IObjectState>(), null, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        // Create a ParseClient with the mocked controller
+        var serviceHub = new MutableServiceHub { ObjectController = mockController.Object };
+        var client = new ParseClient(new ServerConnectionData { Test = true }, serviceHub);
+
+        // Create a ParseObject and assign an ObjectId
+        var obj = client.CreateObject("TestClass");
+        obj.ObjectId = "toDelete";
+
+        // Perform the delete operation
+        await obj.DeleteAsync();
+
+        // Verify the DeleteAsync method was called on the controller
+        mockController.Verify(ctrl =>
+            ctrl.DeleteAsync(It.Is<IObjectState>(state => state.ObjectId == "toDelete"), null, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task TestDeleteAll_WithDeleteAsync()
+    {
+        // Mock the object controller
+        var mockController = new Mock<IParseObjectController>();
+
+        // Mock DeleteAsync for individual object deletes
+        mockController
+            .Setup(ctrl =>
+                ctrl.DeleteAsync(It.IsAny<IObjectState>(), null, It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        // Create a ParseClient with the mocked controller
+        var serviceHub = new MutableServiceHub { ObjectController = mockController.Object };
+        var client = new ParseClient(new ServerConnectionData { Test = true }, serviceHub);
+
+        // Create ParseObjects and assign ObjectIds
+        var obj1 = client.CreateObject("TestClass1");
+        var obj2 = client.CreateObject("TestClass2");
+
+        obj1.ObjectId = "toDelete1";
+        obj2.ObjectId = "toDelete2";
+
+        // Perform delete operations
+        await Task.WhenAll(obj1.DeleteAsync(), obj2.DeleteAsync());
+
+        // Verify DeleteAsync was called for each object
+        mockController.Verify(ctrl =>
+            ctrl.DeleteAsync(It.Is<IObjectState>(state => state.ObjectId == "toDelete1"), null, It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        mockController.Verify(ctrl =>
+            ctrl.DeleteAsync(It.Is<IObjectState>(state => state.ObjectId == "toDelete2"), null, It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+
+    [TestMethod]
+    public async Task TestFetch()
+    {
+        // Arrange
+        var mockController = new Mock<IParseObjectController>();
+        mockController.Setup(ctrl =>
+            ctrl.FetchAsync(It.IsAny<IObjectState>(), null, It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new MutableObjectState
+            {
+                ObjectId = "fetchedId",
+                ServerData = new Dictionary<string, object> { ["key"] = "value" }
+            });
+
+        var serviceHub = new MutableServiceHub
+        {
+            ObjectController = mockController.Object
+        };
+        var client = new ParseClient(new ServerConnectionData { Test = true }, serviceHub);
+
+        // Act
+        var obj = client.CreateObjectWithoutData("TestClass", "fetchedId");
+        await obj.FetchAsync();
+
+        // Assert
+        Assert.AreEqual("value", obj["key"]);
+        mockController.Verify(ctrl =>
+            ctrl.FetchAsync(It.Is<IObjectState>(state => state.ObjectId == "fetchedId"), null, It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+
+    [TestMethod]
+    public void TestFetchAll()
+    {
+        
+    }
 }

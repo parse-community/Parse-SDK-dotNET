@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using Parse.Abstractions.Infrastructure;
@@ -113,33 +114,35 @@ internal class ParseObjectClassController : IParseObjectClassController
 
     public ParseObject Instantiate(string className, IServiceHub serviceHub)
     {
+        
         Mutex.EnterReadLock();
+        
         Classes.TryGetValue(className, out ParseObjectClass info);
+        
         Mutex.ExitReadLock();
-
+        
         if (info is { })
         {
+        
             var obj = info.Instantiate().Bind(serviceHub);
+        
             return obj;
-
         }
         else
         {
-
+            
             return  new ParseObject(className, serviceHub);
 
         }
     }
 
     public IDictionary<string, string> GetPropertyMappings(string className)
-    {
+    {        
         Mutex.EnterReadLock();
-        Classes.TryGetValue(className, out ParseObjectClass info);
-
+        Classes.TryGetValue(className, out ParseObjectClass info);        
         if (info is null)
-            Classes.TryGetValue(ReservedParseObjectClassName, out info);
-
-        Mutex.ExitReadLock();
+            Classes.TryGetValue(ReservedParseObjectClassName, out info);        
+        Mutex.ExitReadLock();        
         return info.PropertyMappings;
     }
 

@@ -11,22 +11,32 @@ public class ParseDeleteOperation : IParseFieldOperation
 {
     internal static object Token { get; } = new object { };
 
-    public static ParseDeleteOperation Instance { get; } = new ParseDeleteOperation { };
+    public static ParseDeleteOperation Instance { get; } = new ParseDeleteOperation();
+
+    public object Value => null; // Updated to return null as the value for delete operations
 
     private ParseDeleteOperation() { }
 
-    public object Encode(IServiceHub serviceHub)
+    // Replaced Encode with ConvertToJSON
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
-        return new Dictionary<string, object> { ["__op"] = "Delete" };
+        return new Dictionary<string, object>
+        {
+            ["__op"] = "Delete"
+        };
     }
 
     public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
     {
+        // Merging with any previous operation results in this delete operation
         return this;
     }
 
     public object Apply(object oldValue, string key)
     {
+        // When applied, delete the field by returning the delete token
         return Token;
     }
+
+    
 }

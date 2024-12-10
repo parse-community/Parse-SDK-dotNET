@@ -6,14 +6,15 @@ namespace Parse.Abstractions.Infrastructure.Control;
 /// ParseFieldOperations. ParseFieldOperations themselves can be considered to be
 /// immutable.
 /// </summary>
-public interface IParseFieldOperation
+public interface IParseFieldOperation: IJsonConvertible
 {
     /// <summary>
     /// Converts the ParseFieldOperation to a data structure that can be converted to JSON and sent to
     /// Parse as part of a save operation.
     /// </summary>
     /// <returns>An object to be JSONified.</returns>
-    object Encode(IServiceHub serviceHub);
+    /// 
+    //object Encode(IServiceHub serviceHub);
 
     /// <summary>
     /// Returns a field operation that is composed of a previous operation followed by
@@ -40,4 +41,7 @@ public interface IParseFieldOperation
     /// <param name="key">The key that this value is for.</param>
     /// <returns>The new value for the field.</returns>
     object Apply(object oldValue, string key);
+
+    object Value { get; } // Added property to expose operation value
+
 }

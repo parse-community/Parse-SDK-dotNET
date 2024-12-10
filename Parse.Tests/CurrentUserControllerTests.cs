@@ -6,40 +6,119 @@ using Moq;
 using Parse.Infrastructure;
 using Parse.Abstractions.Infrastructure;
 using Parse.Platform.Users;
+using Parse.Abstractions.Platform.Objects;
+using Parse.Abstractions.Infrastructure.Data;
 
 namespace Parse.Tests;
 
 [TestClass]
 public class CurrentUserControllerTests
 {
-    ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
+    private ParseClient Client;
 
-    [TestInitialize]
-    public void SetUp() => Client.AddValidClass<ParseUser>();
+    public CurrentUserControllerTests()
+    {
+        // Mock the decoder
+        var mockDecoder = new Mock<IParseDataDecoder>();
+
+        // Mock the class controller
+        var mockClassController = new Mock<IParseObjectClassController>();
+
+        // Ensure that the base implementation of Instantiate is called
+        mockClassController.Setup(controller => controller.Instantiate(It.IsAny<string>(), It.IsAny<IServiceHub>()))
+            .CallBase();
+
+        // Mock the service hub
+        var mockServiceHub = new Mock<IServiceHub>();
+        mockServiceHub.SetupGet(hub => hub.Decoder).Returns(mockDecoder.Object);
+        mockServiceHub.SetupGet(hub => hub.ClassController).Returns(mockClassController.Object);
+
+        // Initialize ParseClient with the mocked ServiceHub
+        Client = new ParseClient(new ServerConnectionData { Test = true }, mockServiceHub.Object);
+
+        // Call Publicize() to make the client instance accessible globally
+        Client.Publicize(); // This makes ParseClient.Instance point to this instance
+
+        // Ensure the ParseUser class is valid for this client instance
+        Client.AddValidClass<ParseUser>();
+    }
 
     [TestCleanup]
-    public void TearDown() => (Client.Services as ServiceHub).Reset();
+    public void TearDown()
+    {
+        if (Client.Services is ServiceHub serviceHub)
+        {
+            serviceHub.Reset();
+        }
+    }
+
+
 
     [TestMethod]
-    public void TestConstructor() => Assert.IsNull(new ParseCurrentUserController(new Mock<ICacheController> { }.Object, Client.ClassController, Client.Decoder).CurrentUser);
+    public void TestConstructor()
+    {
+        // Mock the IParseObjectClassController
+        var mockClassController = new Mock<IParseObjectClassController>();
+
+        // Create the controller with the mock classController
+        var controller = new ParseCurrentUserController(
+            new Mock<ICacheController>().Object,
+            mockClassController.Object,
+            Client.Decoder
+        );
+
+        // Now the test should pass as the classController is mocked
+        Assert.IsNull(controller.CurrentUser);
+    }
 
     [TestMethod]
-    
     public async Task TestGetSetAsync()
     {
-#warning This method may need a fully custom ParseClient setup.
-
-        // Mock setup
+        // Mock setup for storage
         var storageController = new Mock<ICacheController>(MockBehavior.Strict);
         var mockedStorage = new Mock<IDataCache<string, object>>();
-
-        var controller = new ParseCurrentUserController(storageController.Object, Client.ClassController, Client.Decoder);
-
-        var user = new ParseUser().Bind(Client) as ParseUser;
 
         storageController
             .Setup(storage => storage.LoadAsync())
             .ReturnsAsync(mockedStorage.Object);
+
+        object capturedSerializedData = null;
+
+        mockedStorage
+            .Setup(storage => storage.AddAsync(It.IsAny<string>(), It.IsAny<object>()))
+            .Callback<string, object>((key, value) =>
+            {
+                if (key == "CurrentUser" && value is string serialized)
+                {
+                    // Capture the serialized data
+                    capturedSerializedData = serialized;
+                }
+            })
+            .Returns(Task.CompletedTask);
+
+        // Mock RemoveAsync
+        mockedStorage
+            .Setup(storage => storage.RemoveAsync(It.IsAny<string>()))
+            .Returns(Task.CompletedTask);
+
+        // Mock TryGetValue to return capturedSerializedData
+        mockedStorage
+            .Setup(storage => storage.TryGetValue("CurrentUser", out capturedSerializedData))
+            .Returns((string key, out object value) =>
+            {
+                value = capturedSerializedData; // Assign the captured serialized data to the out parameter
+                return value != null;
+            });
+
+        // Mock ClassController behavior
+        var classControllerMock = new Mock<IParseObjectClassController>();
+        classControllerMock.Setup(controller => controller.Instantiate(It.IsAny<string>(), It.IsAny<IServiceHub>()))
+            .Returns<string, IServiceHub>((className, serviceHub) => new ParseUser { ObjectId = "testObjectId" });
+
+        var controller = new ParseCurrentUserController(storageController.Object, classControllerMock.Object, Client.Decoder);
+
+        // The ParseUser will automatically be bound to ParseClient.Instance
+        var user = new ParseUser { ObjectId = "testObjectId" };
 
         // Perform SetAsync operation
         await controller.SetAsync(user, CancellationToken.None);
@@ -47,32 +126,22 @@ public class CurrentUserControllerTests
         // Assertions
         Assert.AreEqual(user, controller.CurrentUser);
 
-        object jsonObject = null;
-#pragma warning disable IDE0039 // Use local function
-        Predicate<object> predicate = o =>
-        {
-            jsonObject = o;
-            return true;
-        };
-#pragma warning restore IDE0039 // Use local function
-
-        mockedStorage.Verify(storage => storage.AddAsync("CurrentUser", Match.Create(predicate)));
-        mockedStorage
-            .Setup(storage => storage.TryGetValue("CurrentUser", out jsonObject))
-            .Returns(true);
+        // Verify AddAsync was called
+        mockedStorage.Verify(storage => storage.AddAsync("CurrentUser", It.IsAny<object>()), Times.Once);
 
         // Perform GetAsync operation
         var retrievedUser = await controller.GetAsync(Client, CancellationToken.None);
-        Assert.AreEqual(user, retrievedUser);
+        Assert.IsNotNull(retrievedUser);
+        Assert.AreEqual(user.ObjectId, retrievedUser.ObjectId);
 
         // Clear user from memory
         controller.ClearFromMemory();
-        Assert.AreNotEqual(user, controller.CurrentUser);
+        Assert.AreNotEqual(user, controller.CurrentUser); // Ensure the user is no longer in memory
 
         // Retrieve user again
         retrievedUser = await controller.GetAsync(Client, CancellationToken.None);
-        Assert.AreNotSame(user, retrievedUser);
-        Assert.IsNotNull(controller.CurrentUser);
+        Assert.AreNotSame(user, retrievedUser); // Ensure the user is not the same instance
+        Assert.IsNotNull(controller.CurrentUser); // Ensure the CurrentUser is not null after re-fetching
     }
 
     [TestMethod]

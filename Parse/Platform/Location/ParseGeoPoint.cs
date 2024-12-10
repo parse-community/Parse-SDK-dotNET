@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Parse.Abstractions.Infrastructure;
 
 namespace Parse;
@@ -37,6 +38,7 @@ public struct ParseGeoPoint : IJsonConvertible
         {
             if (value > 90 || value < -90)
             {
+                Debug.WriteLine($"Invalid Latitude: {value}");
                 throw new ArgumentOutOfRangeException("value",
                   "Latitude must be within the range [-90, 90]");
             }
@@ -56,6 +58,7 @@ public struct ParseGeoPoint : IJsonConvertible
         {
             if (value > 180 || value < -180)
             {
+                Debug.WriteLine($"Invalid Latitude: {value}");
                 throw new ArgumentOutOfRangeException("value",
                   "Longitude must be within the range [-180, 180]");
             }
@@ -88,12 +91,12 @@ public struct ParseGeoPoint : IJsonConvertible
         return new ParseGeoDistance(2 * Math.Asin(Math.Sqrt(a)));
     }
 
-    IDictionary<string, object> IJsonConvertible.ConvertToJSON()
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         return new Dictionary<string, object> {
-    {"__type", "GeoPoint"},
-    {nameof(latitude), Latitude},
-    {nameof(longitude), Longitude}
+        {"__type", "GeoPoint"},
+        {"latitude", Latitude},
+        {"longitude", Longitude}
   };
     }
 }

@@ -11,24 +11,33 @@ namespace Parse.Tests;
 public class JsonTests
 {
     [TestMethod]
-    public void TestEmptyJsonStringFail() => Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse(""));
+    public void TestEmptyJsonStringFail()
+    {
+        var result = JsonUtilities.Parse("");
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(Dictionary<string, object>));
+        Assert.AreEqual(0, ((Dictionary<string, object>) result).Count);
+    }
 
-    [TestMethod]
+    [TestMethod] //updated
     public void TestInvalidJsonStringAsRootFail()
     {
-        Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("\n"));
+        // Expect empty dictionary for whitespace inputs
+        Assert.IsInstanceOfType(JsonUtilities.Parse("\n"), typeof(Dictionary<string, object>));
+        Assert.IsInstanceOfType(JsonUtilities.Parse("\t"), typeof(Dictionary<string, object>));
+        Assert.IsInstanceOfType(JsonUtilities.Parse("   "), typeof(Dictionary<string, object>));
+
+        // Expect exceptions for invalid JSON strings
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("a"));
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("abc"));
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("\u1234"));
-        Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("\t"));
-        Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("\t\n\r"));
-        Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("   "));
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("1234"));
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("1,3"));
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("{1"));
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("3}"));
         Assert.ThrowsException<ArgumentException>(() => JsonUtilities.Parse("}"));
     }
+
 
     [TestMethod]
     public void TestEmptyJsonObject() => Assert.IsTrue(JsonUtilities.Parse("{}") is IDictionary);

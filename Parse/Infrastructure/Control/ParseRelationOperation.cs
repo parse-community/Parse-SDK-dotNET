@@ -89,6 +89,8 @@ public class ParseRelationOperation : IParseFieldOperation
 
     public string TargetClassName { get; }
 
+    public object Value => throw new NotImplementedException();
+
     IEnumerable<string> GetIdsFromObjects(IEnumerable<ParseObject> objects)
     {
         foreach (ParseObject entity in objects)
@@ -106,4 +108,6 @@ public class ParseRelationOperation : IParseFieldOperation
 
         return objects.Select(entity => entity.ObjectId).Distinct();
     }
+
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = null) => throw new NotImplementedException();
 }

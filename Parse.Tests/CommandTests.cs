@@ -110,13 +110,13 @@ public class CommandTests
     [TestMethod]
     public async Task TestRunCommandWithInvalidStringAsync()
     {
-        // Arrange
+        // Arrange: Mock an invalid response
         var mockHttpClient = new Mock<IWebClient>();
         var mockInstallationController = new Mock<IParseInstallationController>();
 
         mockHttpClient
             .Setup(obj => obj.ExecuteAsync(It.IsAny<WebRequest>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "invalid"));
+            .ReturnsAsync(new Tuple<HttpStatusCode, string>(HttpStatusCode.OK, "invalid")); // Mock an invalid response
 
         mockInstallationController
             .Setup(controller => controller.GetAsync())
@@ -130,11 +130,14 @@ public class CommandTests
             new Lazy<IParseUserController>(() => Client.UserController)
         );
 
-        // Act & Assert
-        await Assert.ThrowsExceptionAsync<ParseFailureException>(async () =>
-        {
-            await commandRunner.RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null));
-        });
+        // Act: Run the command
+        var result = await commandRunner.RunCommandAsync(new ParseCommand("endpoint", method: "GET", data: null));
+
+        // Assert: Check for BadRequest and appropriate error message
+        Assert.AreEqual(HttpStatusCode.BadRequest, result.Item1); // Response status should indicate BadRequest
+        Assert.IsNotNull(result.Item2); // Content should not be null
+        Assert.IsTrue(result.Item2.ContainsKey("error")); // Ensure the error key is present
+        Assert.AreEqual("Invalid or alternatively-formatted response received from server.", result.Item2["error"]); // Verify error message
     }
 
     [TestMethod]

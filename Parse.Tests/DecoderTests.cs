@@ -90,10 +90,10 @@ public class DecoderTests
     public void TestDecodeFile()
     {
 
-        ParseFile file1 = Client.Decoder.Decode(new Dictionary<string, object> { ["__type"] = "File", ["name"] = "Corgi.png", ["url"] = "http://corgi.xyz/gogo.png" }, Client) as ParseFile;
+        ParseFile file1 = Client.Decoder.Decode(new Dictionary<string, object> { ["__type"] = "File", ["name"] = "parsee.png", ["url"] = "https://user-images.githubusercontent.com/5673677/138278489-7d0cebc5-1e31-4d3c-8ffb-53efcda6f29d.png" }, Client) as ParseFile;
 
-        Assert.AreEqual("Corgi.png", file1.Name);
-        Assert.AreEqual("http://corgi.xyz/gogo.png", file1.Url.AbsoluteUri);
+        Assert.AreEqual("parsee.png", file1.Name);
+        Assert.AreEqual("https://user-images.githubusercontent.com/5673677/138278489-7d0cebc5-1e31-4d3c-8ffb-53efcda6f29d.png", file1.Url.AbsoluteUri);
         Assert.IsFalse(file1.IsDirty);
 
         Assert.ThrowsException<KeyNotFoundException>(() => Client.Decoder.Decode(new Dictionary<string, object> { ["__type"] = "File", ["name"] = "Corgi.png" }, Client));

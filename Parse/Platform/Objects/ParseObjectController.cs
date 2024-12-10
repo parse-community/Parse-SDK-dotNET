@@ -56,7 +56,7 @@ public class ParseObjectController : IParseObjectController
     }
 
 
-    public async Task<IList<Task<IObjectState>>> SaveAllAsync(IList<IObjectState> states,IList<IDictionary<string, IParseFieldOperation>> operationsList,string sessionToken,IServiceHub serviceHub,CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Task<IObjectState>>> SaveAllAsync(IEnumerable<IObjectState> states,IEnumerable<IDictionary<string, IParseFieldOperation>> operationsList,string sessionToken,IServiceHub serviceHub,CancellationToken cancellationToken = default)
     {
         // Create a list of tasks where each task represents a command to be executed
         var tasks =
@@ -82,7 +82,7 @@ public class ParseObjectController : IParseObjectController
         return CommandRunner.RunCommandAsync(new ParseCommand($"classes/{state.ClassName}/{state.ObjectId}", method: "DELETE", sessionToken: sessionToken, data: null), cancellationToken: cancellationToken);
     }
 
-    public IList<Task> DeleteAllAsync(IList<IObjectState> states, string sessionToken, CancellationToken cancellationToken = default)
+    public IEnumerable<Task> DeleteAllAsync(IEnumerable<IObjectState> states, string sessionToken, CancellationToken cancellationToken = default)
     {
         return ExecuteBatchRequests(states.Where(item => item.ObjectId is { }).Select(item => new ParseCommand($"classes/{Uri.EscapeDataString(item.ClassName)}/{Uri.EscapeDataString(item.ObjectId)}", method: "DELETE", data: default)).ToList(), sessionToken, cancellationToken).Cast<Task>().ToList();
     }

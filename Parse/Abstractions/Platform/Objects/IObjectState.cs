@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Parse.Platform.Objects;
 
 namespace Parse.Abstractions.Platform.Objects;
 
-public interface IObjectState : IEnumerable<KeyValuePair<string, object>>
+public interface IObjectState : IEnumerable<KeyValuePair<string, object>>, INotifyPropertyChanged
 {
     bool IsNew { get; }
     string ClassName { get; set; }

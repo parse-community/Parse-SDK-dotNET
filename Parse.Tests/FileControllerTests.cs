@@ -30,7 +30,7 @@ public class FileControllerTests
 
         var controller = new ParseFileController(mockRunner.Object);
 
-        await Assert.ThrowsExceptionAsync<Exception>(async () =>
+        await Assert.ThrowsExceptionAsync<NullReferenceException>(async () =>
         {
             await controller.SaveAsync(state, new MemoryStream(), null, null);
         });
@@ -50,7 +50,7 @@ public class FileControllerTests
 
         var controller = new ParseFileController(mockRunner.Object);
 
-        await Assert.ThrowsExceptionAsync<Exception>(async () =>
+        await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () =>
         {
             await controller.SaveAsync(state, new MemoryStream(), null, null);
         });
@@ -70,7 +70,7 @@ public class FileControllerTests
 
         var controller = new ParseFileController(mockRunner.Object);
 
-        await Assert.ThrowsExceptionAsync<Exception>(async () =>
+        await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () =>
         {
             await controller.SaveAsync(state, new MemoryStream(), null, null);
         });
