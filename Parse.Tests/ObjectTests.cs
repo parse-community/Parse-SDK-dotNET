@@ -502,7 +502,7 @@ public class ObjectTests
     }
 
     [TestMethod]
-    public async Task TestGetRelation_SavedObject()
+    public void TestGetRelation_SavedObject()
     {
         //Todo : (YB) I will leave this to anyone else!
     }
@@ -510,7 +510,7 @@ public class ObjectTests
 
 
     [TestMethod]
-    public async Task TestPropertyChanged()
+    public void TestPropertyChanged()
     {
         var obj = Client.CreateObject("TestClass");
         bool propertyChangedFired = false;
