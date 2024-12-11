@@ -302,7 +302,7 @@ public class CacheController : IDiskFileCacheController
     /// <returns>A task that completes once the file move operation form <paramref name="originFilePath"/> to <paramref name="targetFilePath"/> completes.</returns>
     public async Task TransferAsync(string originFilePath, string targetFilePath)
     {
-        if (!String.IsNullOrWhiteSpace(originFilePath) && !String.IsNullOrWhiteSpace(targetFilePath) && new FileInfo(originFilePath) is { Exists: true } originFile && new FileInfo(targetFilePath) is { } targetFile)
+        if (!string.IsNullOrWhiteSpace(originFilePath) && !string.IsNullOrWhiteSpace(targetFilePath) && new FileInfo(originFilePath) is { Exists: true } originFile && new FileInfo(targetFilePath) is { } targetFile)
         {
             using StreamWriter writer = new StreamWriter(targetFile.OpenWrite(), Encoding.Unicode);
             using StreamReader reader = new StreamReader(originFile.OpenRead(), Encoding.Unicode);
