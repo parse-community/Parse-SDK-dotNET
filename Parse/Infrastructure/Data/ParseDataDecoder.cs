@@ -18,43 +18,54 @@ namespace Parse.Infrastructure.Data
 
         static string[] Types { get; } = { "Date", "Bytes", "Pointer", "File", "GeoPoint", "Object", "Relation" };
 
-        public object Decode(object data, IServiceHub serviceHub) => data switch
+        public object Decode(object data, IServiceHub serviceHub)
         {
-            null => default,
-            IDictionary<string, object> { } dictionary when dictionary.ContainsKey("__op") => ParseFieldOperations.Decode(dictionary),
-
-            IDictionary<string, object> { } dictionary when dictionary.TryGetValue("__type", out var type) && Types.Contains(type) => type switch
+            try
             {
-                "Date" => ParseDate(dictionary.TryGetValue("iso", out var iso) ? iso as string : throw new KeyNotFoundException("Missing 'iso' for Date type")),
+                return data switch
+                {
+                    null => default,
+                    IDictionary<string, object> { } dictionary when dictionary.ContainsKey("__op") => ParseFieldOperations.Decode(dictionary),
 
-                "Bytes" => Convert.FromBase64String(dictionary.TryGetValue("base64", out var base64) ? base64 as string : throw new KeyNotFoundException("Missing 'base64' for Bytes type")),
+                    IDictionary<string, object> { } dictionary when dictionary.TryGetValue("__type", out var type) && Types.Contains(type) => type switch
+                    {
+                        "Date" => ParseDate(dictionary.TryGetValue("iso", out var iso) ? iso as string : throw new KeyNotFoundException("Missing 'iso' for Date type")),
 
-                "Pointer" => DecodePointer(
-                    dictionary.TryGetValue("className", out var className) ? className as string : throw new KeyNotFoundException("Missing 'className' for Pointer type"),
-                    dictionary.TryGetValue("objectId", out var objectId) ? objectId as string : throw new KeyNotFoundException("Missing 'objectId' for Pointer type"),
-                    serviceHub),
+                        "Bytes" => Convert.FromBase64String(dictionary.TryGetValue("base64", out var base64) ? base64 as string : throw new KeyNotFoundException("Missing 'base64' for Bytes type")),
 
-                "File" => new ParseFile(
-                    dictionary.TryGetValue("name", out var name) ? name as string : throw new KeyNotFoundException("Missing 'name' for File type"),
-                    new Uri(dictionary.TryGetValue("url", out var url) ? url as string : throw new KeyNotFoundException("Missing 'url' for File type"))),
+                        "Pointer" => DecodePointer(
+                            dictionary.TryGetValue("className", out var className) ? className as string : throw new KeyNotFoundException("Missing 'className' for Pointer type"),
+                            dictionary.TryGetValue("objectId", out var objectId) ? objectId as string : throw new KeyNotFoundException("Missing 'objectId' for Pointer type"),
+                            serviceHub),
 
-                "GeoPoint" => new ParseGeoPoint(
-                    Conversion.To<double>(dictionary.TryGetValue("latitude", out var latitude) ? latitude : throw new KeyNotFoundException("Missing 'latitude' for GeoPoint type")),
-                    Conversion.To<double>(dictionary.TryGetValue("longitude", out var longitude) ? longitude : throw new KeyNotFoundException("Missing 'longitude' for GeoPoint type"))),
+                        "File" => new ParseFile(
+                            dictionary.TryGetValue("name", out var name) ? name as string : throw new KeyNotFoundException("Missing 'name' for File type"),
+                            new Uri(dictionary.TryGetValue("url", out var url) ? url as string : throw new KeyNotFoundException("Missing 'url' for File type"))),
 
-                "Object" => ClassController.GenerateObjectFromState<ParseObject>(
-                    ParseObjectCoder.Instance.Decode(dictionary, this, serviceHub),
-                    dictionary.TryGetValue("className", out var objClassName) ? objClassName as string : throw new KeyNotFoundException("Missing 'className' for Object type"),
-                    serviceHub),
+                        "GeoPoint" => new ParseGeoPoint(
+                            Conversion.To<double>(dictionary.TryGetValue("latitude", out var latitude) ? latitude : throw new KeyNotFoundException("Missing 'latitude' for GeoPoint type")),
+                            Conversion.To<double>(dictionary.TryGetValue("longitude", out var longitude) ? longitude : throw new KeyNotFoundException("Missing 'longitude' for GeoPoint type"))),
 
-                "Relation" => serviceHub.CreateRelation(null, null, dictionary.TryGetValue("className", out var relClassName) ? relClassName as string : throw new KeyNotFoundException("Missing 'className' for Relation type")),
-                _ => throw new NotSupportedException($"Unsupported Parse type '{type}' encountered")
-            },
+                        "Object" => ClassController.GenerateObjectFromState<ParseObject>(
+                            ParseObjectCoder.Instance.Decode(dictionary, this, serviceHub),
+                            dictionary.TryGetValue("className", out var objClassName) ? objClassName as string : throw new KeyNotFoundException("Missing 'className' for Object type"),
+                            serviceHub),
 
-            IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value, serviceHub)),
-            IList<object> { } list => list.Select(item => Decode(item, serviceHub)).ToList(),
-            _ => data
-        };
+                        "Relation" => serviceHub.CreateRelation(null, null, dictionary.TryGetValue("className", out var relClassName) ? relClassName as string : throw new KeyNotFoundException("Missing 'className' for Relation type")),
+                        _ => throw new NotSupportedException($"Unsupported Parse type '{type}' encountered")
+                    },
+
+                    IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value, serviceHub)),
+                    IList<object> { } list => list.Select(item => Decode(item, serviceHub)).ToList(),
+                    _ => data
+                };
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("Exception When decoding from LQ "+ex.Message);
+            }
+        }
 
         protected virtual object DecodePointer(string className, string objectId, IServiceHub serviceHub) =>
             ClassController.CreateObjectWithoutData(className, objectId, serviceHub);

@@ -67,10 +67,10 @@ public class ParseCommandRunner : IParseCommandRunner
             .ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
-
+        
         // Extract response
         var statusCode = response.Item1;
-        var content = response.Item2;
+         var content = response.Item2;
         var responseCode = (int) statusCode;
 
         if (responseCode >= 500)

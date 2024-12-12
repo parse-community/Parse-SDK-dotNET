@@ -499,7 +499,6 @@ public class JsonUtilities
                 return Encode(stateDict);
             }
 
-            Debug.WriteLine("Unable to encode objects of type " + obj.GetType());
             return "null"; // Return "null" for unsupported types
         }
 

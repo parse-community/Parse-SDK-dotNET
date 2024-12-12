@@ -60,21 +60,18 @@ public class ParseCloudCodeController : IParseCloudCodeController
 
             if (decoded == null)
             {
-                Debug.WriteLine("Decoded response is null");
                 throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Failed to decode cloud function response.");
             }
 
             // Extract the result key
             if (decoded.TryGetValue("result", out var result))
             {
-                Debug.WriteLine("Result key found in response");
                 try
                 {
                     return Conversion.To<T>(result);
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Conversion failed: {ex.Message}");
                     throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Failed to convert cloud function result to expected type.", ex);
                 }
             }

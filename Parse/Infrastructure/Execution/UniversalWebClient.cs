@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -47,7 +48,7 @@ CancellationToken cancellationToken)
         uploadProgress ??= new Progress<IDataTransferLevel>();
         downloadProgress ??= new Progress<IDataTransferLevel>();
 
-        using var message = new HttpRequestMessage(new HttpMethod(httpRequest.Method), httpRequest.Target);
+        using HttpRequestMessage message = new (new HttpMethod(httpRequest.Method), httpRequest.Target);
 
         Stream data = httpRequest.Data;
         if (data != null || httpRequest.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
@@ -74,9 +75,11 @@ CancellationToken cancellationToken)
 
         // Avoid aggressive caching
         message.Headers.Add("Cache-Control", "no-cache");
+
         message.Headers.IfModifiedSince = DateTimeOffset.UtcNow;
 
         uploadProgress.Report(new DataTransferLevel { Amount = 0 });
+        Console.WriteLine($"Request: {message.Method} {message.RequestUri}");
 
         using var response = await Client.SendAsync(message, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         uploadProgress.Report(new DataTransferLevel { Amount = 1 });
@@ -106,7 +109,12 @@ CancellationToken cancellationToken)
         {
             downloadProgress.Report(new DataTransferLevel { Amount = 1.0 });
         }
-
+        var encoding = response.Content.Headers.ContentType?.CharSet switch
+        {
+            "utf-8" => Encoding.UTF8,
+            "ascii" => Encoding.ASCII,
+            _ => Encoding.Default
+        };
         // Convert response to string (assuming UTF-8 encoding)
         var resultAsArray = resultStream.ToArray();
         string responseContent = Encoding.UTF8.GetString(resultAsArray);

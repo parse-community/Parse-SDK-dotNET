@@ -71,7 +71,7 @@ public class ParseUserController : IParseUserController
             HttpMethod.Post.ToString(),
             data: new Dictionary<string, object> { ["username"] = username, ["password"] = password });
 
-        var result = await CommandRunner.RunCommandAsync(command).ConfigureAwait(false);
+        var result = await CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).ConfigureAwait(false);
         return ParseObjectCoder.Instance
             .Decode(result.Item2, Decoder, serviceHub)
             .MutatedClone(mutableClone => mutableClone.IsNew = result.Item1 == System.Net.HttpStatusCode.Created);

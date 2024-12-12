@@ -50,11 +50,6 @@ public abstract class ParseDataEncoder
         if (value == null)
             return null;
 
-        // Debug output for encoding, conditionally enabled
-        const bool enableDebug = false;
-        if (enableDebug)
-            Debug.WriteLine($"Encoding value: {value}, Type: {value?.GetType()}");
-
         return value switch
         {
             // DateTime encoding
@@ -67,7 +62,7 @@ public abstract class ParseDataEncoder
             ParseObject entity => EncodeObject(entity),
 
             // JSON-convertible types
-            IJsonConvertible jsonConvertible => jsonConvertible.ConvertToJSON(),
+            IJsonConvertible jsonConvertible => jsonConvertible.ConvertToJSON(serviceHub),
 
             // Dictionary encoding
             IDictionary<string, object> dictionary => EncodeDictionary(dictionary, serviceHub),
@@ -130,7 +125,10 @@ public abstract class ParseDataEncoder
     private object EncodeDictionary(IDictionary<string, object> dictionary, IServiceHub serviceHub)
     {
         var encodedDictionary = new Dictionary<string, object>();
-
+        if (dictionary.Count<1)
+        {
+            return encodedDictionary;
+        }
         foreach (var pair in dictionary)
         {
             // Check if the value is a Dictionary<string, string>

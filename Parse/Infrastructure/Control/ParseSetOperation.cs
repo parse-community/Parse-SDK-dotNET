@@ -8,7 +8,10 @@ namespace Parse.Infrastructure.Control;
 
 public class ParseSetOperation : IParseFieldOperation
 {
-    public ParseSetOperation(object value) => Value = value;
+    public ParseSetOperation(object value)
+    {
+        Value = value;
+    }
 
     // Replace Encode with ConvertToJSON
     public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
@@ -18,16 +21,24 @@ public class ParseSetOperation : IParseFieldOperation
             throw new InvalidOperationException("ServiceHub is required to encode the value.");
         }
 
-        return PointerOrLocalIdEncoder.Instance.Encode(Value, serviceHub) switch
+        var encodedValue = PointerOrLocalIdEncoder.Instance.Encode(Value, serviceHub);
+
+        // For simple values, return them directly (avoid unnecessary __op)
+        if (Value != null && (Value.GetType().IsPrimitive || Value is string))
         {
-            IDictionary<string, object> encodedValue => encodedValue,
-            _ => new Dictionary<string, object>
-            {
-                ["__op"] = "Set",
-                ["value"] = Value
-            }
-        };
+            return new Dictionary<string, object> { ["value"] = Value };
+        }
+
+        // If the encoded value is a dictionary, return it directly
+        if (encodedValue is IDictionary<string, object> dictionary)
+        {
+            return dictionary;
+        }
+
+        // Default behavior for unsupported types
+        throw new ArgumentException($"Unsupported type for encoding: {Value?.GetType()?.FullName}");
     }
+
 
 
     public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)

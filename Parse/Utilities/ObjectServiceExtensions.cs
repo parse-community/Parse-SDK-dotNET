@@ -73,8 +73,6 @@ public static class ObjectServiceExtensions
     /// <returns>A new ParseObject for the given class name.</returns>
     public static ParseObject CreateObject(this IServiceHub serviceHub, string className)
     {
-        Debug.WriteLine($"Creating object for class name: {className}");
-        Debug.WriteLine($"is service ok now?: {serviceHub is not null}");
         return serviceHub.ClassController.Instantiate(className, serviceHub);
     }
 
@@ -94,7 +92,6 @@ public static class ObjectServiceExtensions
     public static T CreateObject<T>(this IParseObjectClassController classController, IServiceHub serviceHub) where T : ParseObject
     {
         
-        Debug.WriteLine($"is service ok here?: {serviceHub is not null}");
         return (T) classController.Instantiate(classController.GetClassName(typeof(T)), serviceHub);
     }
 
@@ -371,7 +368,8 @@ public static class ObjectServiceExtensions
 
         foreach (KeyValuePair<string, IParseFieldOperation> pair in operations)
         {
-            result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value, serviceHub);
+            //result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value, serviceHub);
+            result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value.Value, serviceHub);
         }
 
         return result;
@@ -440,7 +438,7 @@ public static class ObjectServiceExtensions
     {
         CollectDirtyChildren(serviceHub, node, dirtyChildren, new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()), new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()));
     }
-
+    
     internal static async Task DeepSaveAsync(this IServiceHub serviceHub, object target, string sessionToken, CancellationToken cancellationToken)
     {
         // Collect dirty objects
@@ -659,7 +657,6 @@ public static class ObjectServiceExtensions
     {
         if (serviceHub == null)
         {
-            Debug.WriteLine("ServiceHub is null.");
             return null;
         }
 

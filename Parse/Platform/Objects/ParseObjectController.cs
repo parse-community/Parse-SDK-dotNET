@@ -40,11 +40,17 @@ public class ParseObjectController : IParseObjectController
         ParseCommand command;
         if (state.ObjectId == null)
         {
-            command = new ParseCommand($"classes/{Uri.EscapeDataString(state.ClassName)}", method: state.ObjectId == null ? "POST" : "PUT", sessionToken: sessionToken, data: serviceHub.GenerateJSONObjectForSaving(operations));
+            var method = "POST";
+            var relURI = $"classes/{Uri.EscapeDataString(state.ClassName)}";
+            var dataa = serviceHub.GenerateJSONObjectForSaving(operations);
+            command = new ParseCommand(relURI, method, sessionToken: sessionToken, data: dataa);
         }
         else
         {
-            command = new ParseCommand($"classes/{Uri.EscapeDataString(state.ClassName)}/{state.ObjectId}", method: state.ObjectId == null ? "POST" : "PUT", sessionToken: sessionToken, data: serviceHub.GenerateJSONObjectForSaving(operations));
+            var method = "PUT";
+            var relURI = $"classes/{Uri.EscapeDataString(state.ClassName)}/{state.ObjectId}";
+            var dataa = serviceHub.GenerateJSONObjectForSaving(operations);
+            command = new ParseCommand(relURI, method, sessionToken: sessionToken, data: dataa);
         }
         var result = await CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).ConfigureAwait(false);
         var decodedState = ParseObjectCoder.Instance.Decode(result.Item2, Decoder, serviceHub);

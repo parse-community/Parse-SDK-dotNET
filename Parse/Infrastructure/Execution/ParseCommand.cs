@@ -17,11 +17,22 @@ public class ParseCommand : WebRequest
 
     public override Stream Data
     {
-        get => base.Data ??= DataObject is { } ? new MemoryStream(Encoding.UTF8.GetBytes(JsonUtilities.Encode(DataObject))) : default;
+        get
+        {
+            if (DataObject is { })
+                return base.Data ??= (new MemoryStream(Encoding.UTF8.GetBytes(JsonUtilities.Encode(DataObject))));
+            else
+                return base.Data ??= default;
+        }
+
         set => base.Data = value;
     }
 
-    public ParseCommand(string relativeUri, string method, string sessionToken = null, IList<KeyValuePair<string, string>> headers = null, IDictionary<string, object> data = null) : this(relativeUri: relativeUri, method: method, sessionToken: sessionToken, headers: headers, stream: null, contentType: data != null ? "application/json" : null) => DataObject = data;
+    public ParseCommand(string relativeUri, string method, string sessionToken = null, IList<KeyValuePair<string, string>> headers = null, IDictionary<string, object> data = null) : this(
+        relativeUri: relativeUri, method: method, sessionToken: sessionToken, headers: headers, stream: null, contentType: data != null ? "application/json" : null)
+    {
+        DataObject = data;
+    }
 
     public ParseCommand(string relativeUri, string method, string sessionToken = null, IList<KeyValuePair<string, string>> headers = null, Stream stream = null, string contentType = null)
     {

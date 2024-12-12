@@ -52,25 +52,9 @@ public class ParseObjectCoder
     /// </summary>
     public IObjectState Decode(IDictionary<string, object> data, IParseDataDecoder decoder, IServiceHub serviceHub)
     {
-        foreach (var pair in data)
-        {
-            Debug.WriteLine($"Keys is {pair.Key}");
-            Debug.WriteLine($"Values is {pair.Value}");
-        }
 
         var serverData = new Dictionary<string, object>();
         var mutableData = new Dictionary<string, object>(data);
-
-        foreach (var pair in serverData)
-        {
-            Debug.WriteLine($"Keyw is {pair.Key}");
-            Debug.WriteLine($"Valuew is {pair.Value}");
-        }
-        foreach (var pair in mutableData)
-        {
-            Debug.WriteLine($"Key is {pair.Key}");
-            Debug.WriteLine($"Value is {pair.Value}");
-        }
 
         // Extract key properties (existing logic)
         var objectId = Extract(mutableData, "objectId", obj => obj as string);
@@ -89,15 +73,9 @@ public class ParseObjectCoder
         {
             if (obj is IDictionary<string, object> aclData)
             {
-                foreach (var pair in aclData)
-                {
-                    Debug.WriteLine($"Key isss {pair.Key}");
-                    Debug.WriteLine($"Value isss {pair.Value}");
-                }
                 return new ParseACL(aclData); // Return ParseACL if the format is correct
             }
 
-            Debug.WriteLine("No ACL found or ACL format is incorrect");
             return null; // If ACL is missing or in an incorrect format, return null
         });
 

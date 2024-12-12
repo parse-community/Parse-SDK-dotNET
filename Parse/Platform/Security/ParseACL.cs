@@ -76,8 +76,7 @@ public class ParseACL : IJsonConvertible
             ProcessAclData(nestedAcl); // Process the nested ACL
         }
         else
-        {
-            
+        {            
             ProcessAclData(jsonObject); // Process the flat ACL
         }
     }

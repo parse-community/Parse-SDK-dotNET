@@ -481,8 +481,6 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
     /// </summary>
     public T Get<T>(string key)
     {
-        // Debugging to inspect the key and its value
-        Debug.WriteLine($"Key is {key}");
 
         try
         {
@@ -1177,7 +1175,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         {
             // Log or handle unexpected errors
             HandleFailedSave(currentOperations);
-            Console.Error.WriteLine($"Error during save: {ex.Message}");
+            Console.WriteLine($"Error during save: {ex.Message}");
         }
     }
 
@@ -1220,6 +1218,8 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
             if (!CheckIsDataAvailable(key))
             {
                 Debug.WriteLine($"Warning: ParseObject has no data for key '{key}'. Ensure FetchIfNeededAsync() is called before accessing data.");
+                Console.WriteLine($"Warning: ParseObject has no data for key '{key}'. Ensure FetchIfNeededAsync() is called before accessing data.");
+                
                 // Optionally, set a flag or return early to signal the issue.
                 return;
             }

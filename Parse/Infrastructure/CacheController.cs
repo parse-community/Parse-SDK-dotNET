@@ -16,7 +16,7 @@ namespace Parse.Infrastructure
     {
         private class FileBackedCache : IDataCache<string, object>
         {
-            private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+            private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim();
             private Dictionary<string, object> Storage = new Dictionary<string, object>();
 
             public FileBackedCache(FileInfo file) => File = file;
@@ -27,8 +27,15 @@ namespace Parse.Infrastructure
             {
                 get
                 {
-                    using var semLock = SemaphoreLock.Create(_semaphore);
-                    return Storage.Keys.ToArray();
+                    _rwLock.EnterReadLock();
+                    try
+                    {
+                        return Storage.Keys.ToArray();
+                    }
+                    finally
+                    {
+                        _rwLock.ExitReadLock();
+                    }
                 }
             }
 
@@ -36,17 +43,32 @@ namespace Parse.Infrastructure
             {
                 get
                 {
-                    using var semLock = SemaphoreLock.Create(_semaphore);
-                    return Storage.Values.ToArray();
+                    _rwLock.EnterReadLock();
+                    try
+                    {
+                        return Storage.Values.ToArray();
+                    }
+                    finally
+                    {
+                        _rwLock.ExitReadLock();
+                    }
                 }
             }
+
 
             public int Count
             {
                 get
                 {
-                    using var semLock = SemaphoreLock.Create(_semaphore);
-                    return Storage.Count;
+                    _rwLock.EnterReadLock();
+                    try
+                    {
+                        return Storage.Count;
+                    }
+                    finally
+                    {
+                        _rwLock.ExitReadLock();
+                    }
                 }
             }
 
@@ -54,8 +76,15 @@ namespace Parse.Infrastructure
             {
                 get
                 {
-                    using var semLock = SemaphoreLock.Create(_semaphore);
-                    return ((ICollection<KeyValuePair<string, object>>) Storage).IsReadOnly;
+                    _rwLock.EnterReadLock();
+                    try
+                    {
+                        return ((ICollection<KeyValuePair<string, object>>) Storage).IsReadOnly;
+                    }
+                    finally
+                    {
+                        _rwLock.ExitReadLock();
+                    }
                 }
             }
 
@@ -63,119 +92,204 @@ namespace Parse.Infrastructure
             {
                 get
                 {
-                    using var semLock = SemaphoreLock.Create(_semaphore);
-                    if (Storage.TryGetValue(key, out var val))
-                        return val;
-                    throw new KeyNotFoundException(key);
+                    _rwLock.EnterReadLock();
+                    try
+                    {
+                        if (Storage.TryGetValue(key, out var val))
+                            return val;
+                        throw new KeyNotFoundException(key);
+                    }
+                    finally
+                    {
+                        _rwLock.ExitReadLock();
+                    }
                 }
                 set => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
             }
 
             public async Task LoadAsync()
             {
-                using var semLock = await SemaphoreLock.CreateAsync(_semaphore).ConfigureAwait(false);
                 try
                 {
                     string fileContent = await File.ReadAllTextAsync().ConfigureAwait(false);
-                    Storage = JsonUtilities.Parse(fileContent) as Dictionary<string, object> ?? new Dictionary<string, object>();
+                    var data = JsonUtilities.Parse(fileContent) as Dictionary<string, object>;
+                    _rwLock.EnterWriteLock();
+                    try
+                    {
+                        Storage = data ?? new Dictionary<string, object>();
+                    }
+                    finally
+                    {
+                        _rwLock.ExitWriteLock();
+                    }
                 }
                 catch (IOException ioEx)
                 {
                     Console.WriteLine($"IO error while loading cache: {ioEx.Message}");
-                    Storage = new Dictionary<string, object>();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Unexpected error while loading cache: {ex.Message}");
-                    Storage = new Dictionary<string, object>();
                 }
             }
 
             public async Task SaveAsync()
             {
-                using var semLock = await SemaphoreLock.CreateAsync(_semaphore).ConfigureAwait(false);
+                Dictionary<string, object> snapshot;
+                _rwLock.EnterReadLock();
                 try
                 {
-                    var content = JsonUtilities.Encode(Storage);
+                    snapshot = new Dictionary<string, object>(Storage); // Create a snapshot
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
+
+                try
+                {
+                    var content = JsonUtilities.Encode(snapshot);
                     await File.WriteContentAsync(content).ConfigureAwait(false);
                 }
                 catch (IOException ioEx)
                 {
                     Console.WriteLine($"IO error while saving cache: {ioEx.Message}");
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Unexpected error while saving cache: {ex.Message}");
-                }
             }
 
-
-            internal void Update(IDictionary<string, object> contents)
+            public void Update(IDictionary<string, object> contents)
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                Storage = contents.ToDictionary(e => e.Key, e => e.Value);
+                _rwLock.EnterWriteLock();
+                try
+                {
+                    Storage = new Dictionary<string, object>(contents);
+                }
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
 
             public async Task AddAsync(string key, object value)
             {
-                using var semLock = await SemaphoreLock.CreateAsync(_semaphore).ConfigureAwait(false);
-                Storage[key] = value;
+                _rwLock.EnterWriteLock();
+                try
+                {
+                    Storage[key] = value;
+                }
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
                 await SaveAsync().ConfigureAwait(false);
             }
 
             public async Task RemoveAsync(string key)
             {
-                using var semLock = await SemaphoreLock.CreateAsync(_semaphore).ConfigureAwait(false);
-                Storage.Remove(key);
+                _rwLock.EnterWriteLock();
+                try
+                {
+                    Storage.Remove(key);
+                }
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
                 await SaveAsync().ConfigureAwait(false);
             }
+        
 
-            // Unsupported synchronous modifications
-            public void Add(string key, object value) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
+        // Unsupported synchronous modifications
+        public void Add(string key, object value) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
             public bool Remove(string key) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
             public void Add(KeyValuePair<string, object> item) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
             public bool Remove(KeyValuePair<string, object> item) => throw new NotSupportedException(FileBackedCacheSynchronousMutationNotSupportedMessage);
 
             public bool ContainsKey(string key)
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                return Storage.ContainsKey(key);
+                _rwLock.EnterReadLock();
+                try
+                {
+                    return Storage.ContainsKey(key);
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
             }
 
             public bool TryGetValue(string key, out object value)
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                return Storage.TryGetValue(key, out value);
+                _rwLock.EnterReadLock();
+                try
+                {
+                    return Storage.TryGetValue(key, out value);
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
             }
 
             public void Clear()
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                Storage.Clear();
+                _rwLock.EnterWriteLock();
+                try
+                {
+                    Storage.Clear();
+                }
+                finally
+                {
+                    _rwLock.ExitWriteLock();
+                }
             }
 
             public bool Contains(KeyValuePair<string, object> item)
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                return ((ICollection<KeyValuePair<string, object>>) Storage).Contains(item);
+                _rwLock.EnterReadLock();
+                try
+                {
+                    return ((ICollection<KeyValuePair<string, object>>) Storage).Contains(item);
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
             }
 
             public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                ((ICollection<KeyValuePair<string, object>>) Storage).CopyTo(array, arrayIndex);
+                _rwLock.EnterReadLock();
+                try
+                {
+                    ((ICollection<KeyValuePair<string, object>>) Storage).CopyTo(array, arrayIndex);
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
             }
 
             public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                return Storage.ToList().GetEnumerator();
+                _rwLock.EnterReadLock();
+                try
+                {
+                    return Storage.ToList().GetEnumerator();
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                using var semLock = SemaphoreLock.Create(_semaphore);
-                return Storage.ToList().GetEnumerator();
+                _rwLock.EnterReadLock();
+                try
+                {
+                    return Storage.ToList().GetEnumerator();
+                }
+                finally
+                {
+                    _rwLock.ExitReadLock();
+                }
             }
         }
 
