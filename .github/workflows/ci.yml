@@ -27,6 +27,8 @@ jobs:
       with:
         dotnet-version: ${{ matrix.DOTNET_VERSION }}
         cache: true
+    - name: Restore dependencies
+      run: dotnet restore
     - name: Cache NuGet packages
       uses: actions/cache@v4
       with:
