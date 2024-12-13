@@ -6,6 +6,7 @@
 [![Coverage](https://img.shields.io/codecov/c/github/parse-community/Parse-SDK-dotNET/master.svg)](https://codecov.io/github/parse-community/Parse-SDK-dotNET?branch=master)
 [![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/parse-community/Parse-SDK-dotNET/releases)
 
+[![.NET Version](https://img.shields.io/badge/.NET-6,_7,_8,_9-5234CE.svg?logo=.net&style=flat)](https://dotnet.microsoft.com)
 [![Nuget](https://img.shields.io/nuget/v/parse.svg)](http://nuget.org/packages/parse)
 
 [![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)][open-collective-link]
