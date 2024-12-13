@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;</TargetFrameworks>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
-        <Version>3.0.2</Version>
+        <Version>4.0.0</Version>
         <LangVersion>latest</LangVersion>
 
-        <Authors>Parse</Authors>
+        <Authors>Yvan Brunel</Authors>
         <PackageProjectUrl>https://parseplatform.org/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/parse-community/Parse-SDK-dotNET/</RepositoryUrl>
         <PackageIconUrl></PackageIconUrl>
