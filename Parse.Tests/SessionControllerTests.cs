@@ -41,7 +41,7 @@ public class SessionControllerTests
             Client.Decoder
         );
 
-        await Assert.ThrowsExceptionAsync<NullReferenceException>(async () =>
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () =>
         {
             await controller.GetSessionAsync("S0m3Se551on", Client, CancellationToken.None);
         });

@@ -117,6 +117,17 @@ public class ParseCommandRunner : IParseCommandRunner
             );
         }
 
+        if (responseCode == 410)
+        {
+            return new Tuple<HttpStatusCode, IDictionary<string, object>>(
+                HttpStatusCode.Gone,
+                new Dictionary<string, object>
+                {
+                    { "error", "Page is no longer valid" }
+                }
+            );
+        }
+
         // Check if response status code is outside the success range
         if (responseCode < 200 || responseCode > 299)
         {

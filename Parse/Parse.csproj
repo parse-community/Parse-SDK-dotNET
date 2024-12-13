@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
-        <Version>4.0.0</Version>
+        <Version>3.0.2</Version>
         <LangVersion>latest</LangVersion>
-        
-        <Authors>Yvan from Parse</Authors>
+
+        <Authors>Parse</Authors>
         <PackageProjectUrl>https://parseplatform.org/</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/YBTopaz8/Parse-SDK-dotNET</RepositoryUrl>
+        <RepositoryUrl>https://github.com/parse-community/Parse-SDK-dotNET/</RepositoryUrl>
         <PackageIconUrl></PackageIconUrl>
         <RepositoryType>GitHub</RepositoryType>
         <Description>This is the official package for the Parse .NET Standard SDK. Add a cloud backend to any platform supporting .NET Standard 2.0.</Description>

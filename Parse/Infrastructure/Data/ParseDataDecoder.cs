@@ -20,8 +20,6 @@ namespace Parse.Infrastructure.Data
 
         public object Decode(object data, IServiceHub serviceHub)
         {
-            try
-            {
                 return data switch
                 {
                     null => default,
@@ -59,12 +57,7 @@ namespace Parse.Infrastructure.Data
                     IList<object> { } list => list.Select(item => Decode(item, serviceHub)).ToList(),
                     _ => data
                 };
-            }
-            catch (Exception ex)
-            {
-
-                throw new Exception("Exception When decoding from LQ "+ex.Message);
-            }
+            
         }
 
         protected virtual object DecodePointer(string className, string objectId, IServiceHub serviceHub) =>
