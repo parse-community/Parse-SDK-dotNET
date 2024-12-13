@@ -8,7 +8,16 @@ on:
     paths-ignore:
       - '**/**.md'
 jobs:
-  check-ci:
+  check-dotnet:
+    strategy:
+      matrix:
+        include:
+          - DOTNET_VERSION: 6.x
+          - DOTNET_VERSION: 7.x
+          - DOTNET_VERSION: 8.x
+          - DOTNET_VERSION: 9.x
+      fail-fast: false
+    name: .NET ${{ matrix.DOTNET_VERSION }}
     runs-on: windows-latest
     steps:
     - name: Checkout repository
@@ -16,9 +25,9 @@ jobs:
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.x'
+        dotnet-version: ${{ matrix.DOTNET_VERSION }}
     - name: Cache NuGet packages
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           ~/.nuget/packages
