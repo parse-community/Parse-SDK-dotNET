@@ -70,7 +70,7 @@ namespace Parse.Platform.Configuration
         /// <returns>The value for the key.</returns>
         virtual public object this[string key] => Properties[key];
 
-        IDictionary<string, object> IJsonConvertible.ConvertToJSON() => new Dictionary<string, object>
+        IDictionary<string, object> IJsonConvertible.ConvertToJson() => new Dictionary<string, object>
         {
             ["params"] = NoObjectsEncoder.Instance.Encode(Properties, Services)
         };

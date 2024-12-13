@@ -64,7 +64,7 @@ namespace Parse
             TargetClassName = change.TargetClassName;
         }
 
-        IDictionary<string, object> IJsonConvertible.ConvertToJSON() => new Dictionary<string, object>
+        IDictionary<string, object> IJsonConvertible.ConvertToJson() => new Dictionary<string, object>
         {
             ["__type"] = "Relation",
             ["className"] = TargetClassName

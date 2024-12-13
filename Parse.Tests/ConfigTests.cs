@@ -61,7 +61,7 @@ namespace Parse.Tests
         public void TestToJSON()
         {
             IDictionary<string, object> expectedJson = new Dictionary<string, object> { { "params", new Dictionary<string, object> { { "testKey", "testValue" } } } };
-            Assert.AreEqual(JsonConvert.SerializeObject((Client.GetCurrentConfiguration() as IJsonConvertible).ConvertToJSON()), JsonConvert.SerializeObject(expectedJson));
+            Assert.AreEqual(JsonConvert.SerializeObject((Client.GetCurrentConfiguration() as IJsonConvertible).ConvertToJson()), JsonConvert.SerializeObject(expectedJson));
         }
 
         [TestMethod]

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 using Parse.Abstractions.Infrastructure;
 
 namespace Parse.Infrastructure
@@ -12,17 +14,11 @@ namespace Parse.Infrastructure
         /// </summary>
         public string CustomAbsoluteCacheFilePath { get; set; }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
         public bool Valid => CustomAbsoluteCacheFilePath is { };
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <param name="target"><inheritdoc/></param>
-        /// <param name="composedHub"><inheritdoc/></param>
-        public void Mutate(ref IMutableServiceHub target, in IServiceHub composedHub)
+        public void Mutate(ref IMutableServiceHub target, in IServiceHub composedHub, Stack<IServiceHubMutator> futureMutators)
         {
             if ((target as IServiceHub).CacheController is IDiskFileCacheController { } diskFileCacheController)
             {

@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace Parse.Abstractions.Platform.Authentication
 {
+    /// <summary>
+    /// An authenticator service for the Parse SDK.
+    /// </summary>
     public interface IParseAuthenticationProvider
     {
         /// <summary>
@@ -33,6 +36,6 @@ namespace Parse.Abstractions.Platform.Authentication
         /// Provides a unique name for the type of authentication the provider does.
         /// For example, the FacebookAuthenticationProvider would return "facebook".
         /// </summary>
-        string AuthType { get; }
+        string Name { get; }
     }
 }
