@@ -11,7 +11,7 @@ jobs:
   check-dotnet:
     strategy:
       matrix:
-        DOTNET_VERSION: [6.0, 7.0, 8.0, 9.0]
+        DOTNET_VERSION: ['6.0', '7.0', '8.0', '9.0']
       fail-fast: false
     name: .NET ${{ matrix.DOTNET_VERSION }}
     runs-on: windows-latest
