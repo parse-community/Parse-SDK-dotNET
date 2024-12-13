@@ -23,6 +23,8 @@ A library that gives you access to the powerful Parse Server backend from any pl
 
 - [Parse SDK for .NET](#parse-sdk-for-net)
   - [Getting Started](#getting-started)
+  - [Compatibility](#compatibility)
+    - [.NET](#net)
   - [Using the Code](#using-the-code)
     - [Common Definitions](#common-definitions)
     - [Client-Side Use](#client-side-use)
@@ -42,6 +44,19 @@ The latest development release is also available as [a NuGet package (Prerelease
 
 Note that the previous stable package currently available on the official distribution channel is quite old.
 To use the most up-to-date code, either build this project and reference the generated NuGet package, download the pre-built assembly from [releases][releases-link] or check the [NuGet package (Prerelease)][nuget-link-prerelease] on NuGet.
+
+## Compatibility
+
+### .NET
+
+Parse .NET SDK is continuously tested with the most recent releases of .NET to ensure compatibility. We follow the [.NET Long Term Support plan](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core) and only test against versions that are officially supported and have not reached their end-of-life date.
+
+| .NET Version | End-of-Life   | Parse .NET SDK Version |
+|--------------|---------------|------------------------|
+| 6.0          | November 2024 | >= 1.0                 |
+| 7.0          | May 2024      | >= 1.0                 |
+| 8.0          | November 2026 | >= 1.0                 |
+| 9.0          | May 2026      | >= 1.0                 |
 
 ## Using the Code
 Make sure you are using the project's root namespace.
