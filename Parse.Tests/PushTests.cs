@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -10,143 +9,123 @@ using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure;
 using Parse.Platform.Push;
 
-namespace Parse.Tests
+namespace Parse.Tests;
+
+[TestClass]
+public class PushTests
 {
-    [TestClass]
-    public class PushTests
+    private ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
+
+    private IParsePushController GetMockedPushController(IPushState expectedPushState)
     {
-        ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
+        var mockedController = new Mock<IParsePushController>(MockBehavior.Strict);
+        mockedController
+            .Setup(obj => obj.SendPushNotificationAsync(It.Is<IPushState>(s => s.Equals(expectedPushState)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(false));
 
-        IParsePushController GetMockedPushController(IPushState expectedPushState)
-        {
-            Mock<IParsePushController> mockedController = new Mock<IParsePushController>(MockBehavior.Strict);
-            mockedController.Setup(obj => obj.SendPushNotificationAsync(It.Is<IPushState>(s => s.Equals(expectedPushState)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
-
-            return mockedController.Object;
-        }
-
-        IParsePushChannelsController GetMockedPushChannelsController(IEnumerable<string> channels)
-        {
-            Mock<IParsePushChannelsController> mockedChannelsController = new Mock<IParsePushChannelsController>(MockBehavior.Strict);
-            mockedChannelsController.Setup(obj => obj.SubscribeAsync(It.Is<IEnumerable<string>>(it => it.CollectionsEqual(channels)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
-            mockedChannelsController.Setup(obj => obj.UnsubscribeAsync(It.Is<IEnumerable<string>>(it => it.CollectionsEqual(channels)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
-
-            return mockedChannelsController.Object;
-        }
-
-        [TestCleanup]
-        public void TearDown() => (Client.Services as ServiceHub).Reset();
-
-        [TestMethod]
-        [AsyncStateMachine(typeof(PushTests))]
-        public Task TestSendPush()
-        {
-            MutableServiceHub hub = new MutableServiceHub { };
-            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
-
-            MutablePushState state = new MutablePushState
-            {
-                Query = Client.GetInstallationQuery()
-            };
-
-            ParsePush thePush = new ParsePush(client);
-
-            hub.PushController = GetMockedPushController(state);
-
-            thePush.Alert = "Alert";
-            state.Alert = "Alert";
-
-            return thePush.SendAsync().ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-
-                thePush.Channels = new List<string> { { "channel" } };
-                state.Channels = new List<string> { { "channel" } };
-
-                return thePush.SendAsync();
-            }).Unwrap().ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-
-                ParseQuery<ParseInstallation> query = new ParseQuery<ParseInstallation>(client, "aClass");
-
-                thePush.Query = query;
-                state.Query = query;
-
-                return thePush.SendAsync();
-            }).Unwrap().ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-            });
-        }
-
-        [TestMethod]
-        [AsyncStateMachine(typeof(PushTests))]
-        public Task TestSubscribe()
-        {
-            MutableServiceHub hub = new MutableServiceHub { };
-            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
-
-            List<string> channels = new List<string> { };
-
-            hub.PushChannelsController = GetMockedPushChannelsController(channels);
-
-            channels.Add("test");
-
-            return client.SubscribeToPushChannelAsync("test").ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-
-                return client.SubscribeToPushChannelsAsync(new List<string> { "test" });
-            }).Unwrap().ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource { };
-                return client.SubscribeToPushChannelsAsync(new List<string> { "test" }, cancellationTokenSource.Token);
-            }).Unwrap().ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-            });
-        }
-
-        [TestMethod]
-        [AsyncStateMachine(typeof(PushTests))]
-        public Task TestUnsubscribe()
-        {
-            MutableServiceHub hub = new MutableServiceHub { };
-            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
-
-            List<string> channels = new List<string> { };
-
-            hub.PushChannelsController = GetMockedPushChannelsController(channels);
-
-            channels.Add("test");
-
-            return client.UnsubscribeToPushChannelAsync("test").ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-
-                return client.UnsubscribeToPushChannelsAsync(new List<string> { { "test" } });
-            }).ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-
-                CancellationTokenSource cancellationTokenSource = new CancellationTokenSource { };
-                return client.UnsubscribeToPushChannelsAsync(new List<string> { { "test" } }, cancellationTokenSource.Token);
-            }).ContinueWith(task =>
-            {
-                Assert.IsTrue(task.IsCompleted);
-                Assert.IsFalse(task.IsFaulted);
-            });
-        }
+        return mockedController.Object;
     }
+
+    private IParsePushChannelsController GetMockedPushChannelsController(IEnumerable<string> channels)
+    {
+        var mockedChannelsController = new Mock<IParsePushChannelsController>(MockBehavior.Strict);
+
+        // Setup for SubscribeAsync to accept any IServiceHub instance
+        mockedChannelsController
+            .Setup(obj => obj.SubscribeAsync(It.Is<IEnumerable<string>>(it => it.CollectionsEqual(channels)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask); // Ensure it returns a completed task
+
+        // Setup for UnsubscribeAsync to accept any IServiceHub instance
+        mockedChannelsController
+            .Setup(obj => obj.UnsubscribeAsync(It.Is<IEnumerable<string>>(it => it.CollectionsEqual(channels)), It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask); // Ensure it returns a completed task
+
+        return mockedChannelsController.Object;
+    }
+
+
+
+    [TestCleanup]
+    public void TearDown() => (Client.Services as ServiceHub).Reset();
+
+    [TestMethod]
+    public async Task TestSendPushAsync()
+    {
+        // Arrange
+        var hub = new MutableServiceHub();
+        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+        var state = new MutablePushState
+        {
+            Query = Client.GetInstallationQuery()
+        };
+
+        var thePush = new ParsePush(client);
+
+        hub.PushController = GetMockedPushController(state);
+
+        // Act
+        thePush.Alert = "Alert";
+        state.Alert = "Alert";
+
+        await thePush.SendAsync();
+
+        thePush.Channels = new List<string> { "channel" };
+        state.Channels = new List<string> { "channel" };
+
+        await thePush.SendAsync();
+
+        var query = new ParseQuery<ParseInstallation>(client, "aClass");
+        thePush.Query = query;
+        state.Query = query;
+
+        await thePush.SendAsync();
+
+        // Assert
+        Assert.IsTrue(true); // Reaching here means no exceptions occurred
+    }
+
+    [TestMethod]
+    public async Task TestSubscribeAsync()
+    {
+        // Arrange
+        var hub = new MutableServiceHub();
+        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+        var channels = new List<string> { "test" };
+        hub.PushChannelsController = GetMockedPushChannelsController(channels);
+
+        // Act
+        await client.SubscribeToPushChannelAsync("test");
+        await client.SubscribeToPushChannelsAsync(new List<string> { "test" });
+
+        using var cancellationTokenSource = new CancellationTokenSource();
+        await client.SubscribeToPushChannelsAsync(new List<string> { "test" }, cancellationTokenSource.Token);
+
+        // Assert
+        Assert.IsTrue(true); // Reaching here means no exceptions occurred
+    }
+
+    [TestMethod]
+    public async Task TestUnsubscribeAsync()
+    {
+        // Arrange
+        var hub = new MutableServiceHub();
+        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+        var channels = new List<string> { "test" }; // Corrected to ensure we have the "test" channel
+        hub.PushChannelsController = GetMockedPushChannelsController(channels);
+
+        // Act
+        await client.UnsubscribeToPushChannelAsync("test");
+        await client.UnsubscribeToPushChannelsAsync(new List<string> { "test" });
+
+        using var cancellationTokenSource = new CancellationTokenSource();
+        await client.UnsubscribeToPushChannelsAsync(new List<string> { "test" }, cancellationTokenSource.Token);
+
+        // Assert
+        Assert.IsTrue(true); // Reaching here means no exceptions occurred
+    }
+
+
 }

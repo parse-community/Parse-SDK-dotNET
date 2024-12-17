@@ -13,48 +13,47 @@ using Parse.Abstractions.Platform.Queries;
 using Parse.Abstractions.Platform.Sessions;
 using Parse.Abstractions.Platform.Users;
 
-namespace Parse.Abstractions.Infrastructure
+namespace Parse.Abstractions.Infrastructure;
+
+// TODO: Consider splitting up IServiceHub into IResourceHub and IServiceHub, where the former would provide the current functionality of IServiceHub and the latter would be a public-facing sub-section containing formerly-static memebers from classes such as ParseObject which require the use of some broader resource.
+
+/// <summary>
+/// The dependency injection container for all internal .NET Parse SDK services.
+/// </summary>
+public interface IServiceHub
 {
-    // TODO: Consider splitting up IServiceHub into IResourceHub and IServiceHub, where the former would provide the current functionality of IServiceHub and the latter would be a public-facing sub-section containing formerly-static memebers from classes such as ParseObject which require the use of some broader resource.
-
     /// <summary>
-    /// The dependency injection container for all internal .NET Parse SDK services.
+    /// The current server connection data that the the Parse SDK has been initialized with.
     /// </summary>
-    public interface IServiceHub
-    {
-        /// <summary>
-        /// The current server connection data that the the Parse SDK has been initialized with.
-        /// </summary>
-        IServerConnectionData ServerConnectionData { get; }
-        IMetadataController MetadataController { get; }
+    IServerConnectionData ServerConnectionData { get; }
+    IMetadataController MetadataController { get; }
 
-        IServiceHubCloner Cloner { get; }
+    IServiceHubCloner Cloner { get; }
 
-        IWebClient WebClient { get; }
-        ICacheController CacheController { get; }
-        IParseObjectClassController ClassController { get; }
+    IWebClient WebClient { get; }
+    ICacheController CacheController { get; }
+    IParseObjectClassController ClassController { get; }
 
-        IParseDataDecoder Decoder { get; }
+    IParseDataDecoder Decoder { get; }
 
-        IParseInstallationController InstallationController { get; }
-        IParseCommandRunner CommandRunner { get; }
+    IParseInstallationController InstallationController { get; }
+    IParseCommandRunner CommandRunner { get; }
 
-        IParseCloudCodeController CloudCodeController { get; }
-        IParseConfigurationController ConfigurationController { get; }
-        IParseFileController FileController { get; }
-        IParseObjectController ObjectController { get; }
-        IParseQueryController QueryController { get; }
-        IParseSessionController SessionController { get; }
-        IParseUserController UserController { get; }
-        IParseCurrentUserController CurrentUserController { get; }
+    IParseCloudCodeController CloudCodeController { get; }
+    IParseConfigurationController ConfigurationController { get; }
+    IParseFileController FileController { get; }
+    IParseObjectController ObjectController { get; }
+    IParseQueryController QueryController { get; }
+    IParseSessionController SessionController { get; }
+    IParseUserController UserController { get; }
+    IParseCurrentUserController CurrentUserController { get; }
 
-        IParseAnalyticsController AnalyticsController { get; }
+    IParseAnalyticsController AnalyticsController { get; }
 
-        IParseInstallationCoder InstallationCoder { get; }
+    IParseInstallationCoder InstallationCoder { get; }
 
-        IParsePushChannelsController PushChannelsController { get; }
-        IParsePushController PushController { get; }
-        IParseCurrentInstallationController CurrentInstallationController { get; }
-        IParseInstallationDataFinalizer InstallationDataFinalizer { get; }
-    }
+    IParsePushChannelsController PushChannelsController { get; }
+    IParsePushController PushController { get; }
+    IParseCurrentInstallationController CurrentInstallationController { get; }
+    IParseInstallationDataFinalizer InstallationDataFinalizer { get; }
 }

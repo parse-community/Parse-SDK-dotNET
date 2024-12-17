@@ -4,53 +4,52 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Parse.Platform.Push;
 
-namespace Parse.Tests
+namespace Parse.Tests;
+
+[TestClass]
+public class PushEncoderTests
 {
-    [TestClass]
-    public class PushEncoderTests
+    [TestMethod]
+    public void TestEncodeEmpty()
     {
-        [TestMethod]
-        public void TestEncodeEmpty()
+        MutablePushState state = new MutablePushState();
+
+        Assert.ThrowsException<InvalidOperationException>(() => ParsePushEncoder.Instance.Encode(state));
+        state.Alert = "alert";
+
+        Assert.ThrowsException<InvalidOperationException>(() => ParsePushEncoder.Instance.Encode(state));
+        state.Channels = new List<string> { "channel" };
+
+        ParsePushEncoder.Instance.Encode(state);
+    }
+
+    [TestMethod]
+    public void TestEncode()
+    {
+        MutablePushState state = new MutablePushState
         {
-            MutablePushState state = new MutablePushState();
+            Data = new Dictionary<string, object>
+            {
+                ["alert"] = "Some Alert"
+            },
+            Channels = new List<string> { "channel" }
+        };
 
-            Assert.ThrowsException<InvalidOperationException>(() => ParsePushEncoder.Instance.Encode(state));
-            state.Alert = "alert";
-
-            Assert.ThrowsException<InvalidOperationException>(() => ParsePushEncoder.Instance.Encode(state));
-            state.Channels = new List<string> { "channel" };
-
-            ParsePushEncoder.Instance.Encode(state);
-        }
-
-        [TestMethod]
-        public void TestEncode()
+        IDictionary<string, object> expected = new Dictionary<string, object>
         {
-            MutablePushState state = new MutablePushState
+            ["data"] = new Dictionary<string, object>
             {
-                Data = new Dictionary<string, object>
-                {
-                    ["alert"] = "Some Alert"
-                },
-                Channels = new List<string> { "channel" }
-            };
-
-            IDictionary<string, object> expected = new Dictionary<string, object>
+                ["alert"] = "Some Alert"
+            },
+            ["where"] = new Dictionary<string, object>
             {
-                ["data"] = new Dictionary<string, object>
+                ["channels"] = new Dictionary<string, object>
                 {
-                    ["alert"] = "Some Alert"
-                },
-                ["where"] = new Dictionary<string, object>
-                {
-                    ["channels"] = new Dictionary<string, object>
-                    {
-                        ["$in"] = new List<string> { "channel" }
-                    }
+                    ["$in"] = new List<string> { "channel" }
                 }
-            };
+            }
+        };
 
-            Assert.AreEqual(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(ParsePushEncoder.Instance.Encode(state)));
-        }
+        Assert.AreEqual(JsonConvert.SerializeObject(expected), JsonConvert.SerializeObject(ParsePushEncoder.Instance.Encode(state)));
     }
 }

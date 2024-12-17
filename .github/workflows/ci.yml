@@ -8,7 +8,12 @@ on:
     paths-ignore:
       - '**/**.md'
 jobs:
-  check-ci:
+  check-dotnet:
+    strategy:
+      matrix:
+        DOTNET_VERSION: ['6.0', '7.0', '8.0', '9.0']
+      fail-fast: false
+    name: .NET ${{ matrix.DOTNET_VERSION }}
     runs-on: windows-latest
     steps:
     - name: Checkout repository
@@ -16,9 +21,9 @@ jobs:
     - name: Set up .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.x'
+        dotnet-version: ${{ matrix.DOTNET_VERSION }}
     - name: Cache NuGet packages
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           ~/.nuget/packages
@@ -36,7 +41,7 @@ jobs:
       run: dotnet build Parse.sln --configuration Debug --no-restore
     - name: Run tests with coverage
       run: |
-        OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --configuration Debug --test-adapter-path:. --logger:console /p:DebugType=full .\Parse.Tests\Parse.Tests.csproj" -filter:"+[Parse*]* -[Parse.Tests*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
+        OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --framework net${{ matrix.DOTNET_VERSION }} --configuration Debug --test-adapter-path:. --logger:console /p:DebugType=full .\Parse.Tests\Parse.Tests.csproj" -filter:"+[Parse*]* -[Parse.Tests*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
     - name: Upload code coverage
       uses: codecov/codecov-action@v4
       with:

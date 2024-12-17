@@ -1,7 +1,6 @@
-namespace Parse.Abstractions.Infrastructure
+namespace Parse.Abstractions.Infrastructure;
+
+public interface IDataTransferLevel
 {
-    public interface IDataTransferLevel
-    {
-        double Amount { get; set; }
-    }
+    double Amount { get; set; }
 }

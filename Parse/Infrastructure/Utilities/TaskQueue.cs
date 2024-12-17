@@ -2,71 +2,64 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parse.Infrastructure.Utilities
+namespace Parse.Infrastructure.Utilities;
+
+/// <summary>
+/// A helper class for enqueuing tasks
+/// </summary>
+public class TaskQueue
 {
     /// <summary>
-    /// A helper class for enqueuing tasks
+    /// We only need to keep the tail of the queue. Cancelled tasks will
+    /// just complete normally/immediately when their turn arrives.
     /// </summary>
-    public class TaskQueue
+    private Task? Tail { get; set; } = Task.CompletedTask; // Start with a completed task to simplify logic.
+
+    /// <summary>
+    /// Gets a task that can be awaited and is dependent on the current queue's tail.
+    /// </summary>
+    /// <param name="cancellationToken">A cancellation token to cancel waiting for the task.</param>
+    /// <returns>A task representing the tail of the queue.</returns>
+    private Task GetTaskToAwait(CancellationToken cancellationToken)
     {
-        /// <summary>
-        /// We only need to keep the tail of the queue. Cancelled tasks will
-        /// just complete normally/immediately when their turn arrives.
-        /// </summary>
-        Task Tail { get; set; }
-
-        /// <summary>
-        /// Gets a cancellable task that can be safely awaited and is dependent
-        /// on the current tail of the queue. This essentially gives us a proxy
-        /// for the tail end of the queue whose awaiting can be cancelled.
-        /// </summary>
-        /// <param name="cancellationToken">A cancellation token that cancels
-        /// the task even if the task is still in the queue. This allows the
-        /// running task to return immediately without breaking the dependency
-        /// chain. It also ensures that errors do not propagate.</param>
-        /// <returns>A new task that should be awaited by enqueued tasks.</returns>
-        private Task GetTaskToAwait(CancellationToken cancellationToken)
+        lock (Mutex)
         {
-            lock (Mutex)
-            {
-                return (Tail ?? Task.FromResult(true)).ContinueWith(task => { }, cancellationToken);
-            }
+            // Ensure the returned task is cancellable even if it's already completed.
+            return Tail?.ContinueWith(
+                _ => { },
+                cancellationToken,
+                TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Default) ?? Task.CompletedTask;
         }
-
-        /// <summary>
-        /// Enqueues a task created by <paramref name="taskStart"/>. If the task is
-        /// cancellable (or should be able to be cancelled while it is waiting in the
-        /// queue), pass a cancellationToken.
-        /// </summary>
-        /// <typeparam name="T">The type of task.</typeparam>
-        /// <param name="taskStart">A function given a task to await once state is
-        /// snapshotted (e.g. after capturing session tokens at the time of the save call).
-        /// Awaiting this task will wait for the created task's turn in the queue.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used to
-        /// cancel waiting in the queue.</param>
-        /// <returns>The task created by the taskStart function.</returns>
-        public T Enqueue<T>(Func<Task, T> taskStart, CancellationToken cancellationToken = default) where T : Task
-        {
-            Task oldTail;
-            T task;
-
-            lock (Mutex)
-            {
-                oldTail = Tail ?? Task.FromResult(true);
-
-                // The task created by taskStart is responsible for waiting the
-                // task passed to it before doing its work (this gives it an opportunity
-                // to do startup work or save state before waiting for its turn in the queue
-                task = taskStart(GetTaskToAwait(cancellationToken));
-
-                // The tail task should be dependent on the old tail as well as the newly-created
-                // task. This prevents cancellation of the new task from causing the queue to run
-                // out of order.
-                Tail = Task.WhenAll(oldTail, task);
-            }
-            return task;
-        }
-
-        public object Mutex { get; } = new object { };
     }
+
+    /// <summary>
+    /// Enqueues a task to be executed after the current tail of the queue.
+    /// </summary>
+    /// <typeparam name="T">The type of task.</typeparam>
+    /// <param name="taskStart">A function that creates a new task dependent on the current queue state.</param>
+    /// <param name="cancellationToken">A cancellation token to cancel the waiting task.</param>
+    /// <returns>The newly created task.</returns>
+    public T Enqueue<T>(Func<Task, T> taskStart, CancellationToken cancellationToken = default) where T : Task
+    {
+        T task;
+
+        lock (Mutex)
+        {
+            var oldTail = Tail ?? Task.CompletedTask;
+
+            // Create the new task using the tail task as a dependency.
+            task = taskStart(GetTaskToAwait(cancellationToken));
+
+            // Update the tail to include the newly created task.
+            Tail = Task.WhenAll(oldTail, task);
+        }
+
+        return task;
+    }
+    /// <summary>
+    /// Synchronization object to protect shared state.
+    /// </summary>
+    public readonly object Mutex = new();
+
 }

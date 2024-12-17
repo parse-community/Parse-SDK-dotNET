@@ -1,55 +1,57 @@
-using System.Threading;
 using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Configuration;
-using Parse.Infrastructure.Utilities;
 
-namespace Parse.Platform.Configuration
+namespace Parse.Platform.Configuration;
+
+/// <summary>
+/// Parse current config controller.
+/// </summary>
+internal class ParseCurrentConfigurationController : IParseCurrentConfigurationController
 {
-    /// <summary>
-    /// Parse current config controller.
-    /// </summary>
-    internal class ParseCurrentConfigurationController : IParseCurrentConfigurationController
+    private static readonly string CurrentConfigurationKey = "CurrentConfig";
+
+    private ParseConfiguration _currentConfiguration;
+    private readonly ICacheController _storageController;
+    private readonly IParseDataDecoder _decoder;
+
+    public ParseCurrentConfigurationController(ICacheController storageController, IParseDataDecoder decoder)
     {
-        static string CurrentConfigurationKey { get; } = "CurrentConfig";
-
-        TaskQueue TaskQueue { get; }
-
-        ParseConfiguration CurrentConfiguration { get; set; }
-
-        ICacheController StorageController { get; }
-
-        IParseDataDecoder Decoder { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParseCurrentConfigurationController"/> class.
-        /// </summary>
-        public ParseCurrentConfigurationController(ICacheController storageController, IParseDataDecoder decoder)
-        {
-            StorageController = storageController;
-            Decoder = decoder;
-            TaskQueue = new TaskQueue { };
-        }
-
-        public Task<ParseConfiguration> GetCurrentConfigAsync(IServiceHub serviceHub) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration is { } ? Task.FromResult(CurrentConfiguration) : StorageController.LoadAsync().OnSuccess(task =>
-        {
-            task.Result.TryGetValue(CurrentConfigurationKey, out object data);
-            return CurrentConfiguration = data is string { } configuration ? Decoder.BuildConfiguration(ParseClient.DeserializeJsonString(configuration), serviceHub) : new ParseConfiguration(serviceHub);
-        })), CancellationToken.None).Unwrap();
-
-        public Task SetCurrentConfigAsync(ParseConfiguration target) => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
-        {
-            CurrentConfiguration = target;
-            return StorageController.LoadAsync().OnSuccess(task => task.Result.AddAsync(CurrentConfigurationKey, ParseClient.SerializeJsonString(((IJsonConvertible) target).ConvertToJSON())));
-        }).Unwrap().Unwrap(), CancellationToken.None);
-
-        public Task ClearCurrentConfigAsync() => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ =>
-        {
-            CurrentConfiguration = null;
-            return StorageController.LoadAsync().OnSuccess(task => task.Result.RemoveAsync(CurrentConfigurationKey));
-        }).Unwrap().Unwrap(), CancellationToken.None);
-
-        public Task ClearCurrentConfigInMemoryAsync() => TaskQueue.Enqueue(toAwait => toAwait.ContinueWith(_ => CurrentConfiguration = null), CancellationToken.None);
+        _storageController = storageController;
+        _decoder = decoder;
     }
+
+    public async Task<ParseConfiguration> GetCurrentConfigAsync(IServiceHub serviceHub)
+    {
+        if (_currentConfiguration != null)
+            return _currentConfiguration;
+
+        var data = await _storageController.LoadAsync();
+        data.TryGetValue(CurrentConfigurationKey, out var storedData);
+
+        _currentConfiguration = storedData is string configString
+            ? _decoder.BuildConfiguration(ParseClient.DeserializeJsonString(configString), serviceHub)
+            : new ParseConfiguration(serviceHub);
+
+        return _currentConfiguration;
+    }
+
+    public async Task SetCurrentConfigAsync(ParseConfiguration target)
+    {
+        _currentConfiguration = target;
+
+        var data = await _storageController.LoadAsync();
+        await data.AddAsync(CurrentConfigurationKey, ParseClient.SerializeJsonString(((IJsonConvertible) target).ConvertToJSON()));
+    }
+
+    public async Task ClearCurrentConfigAsync()
+    {
+        _currentConfiguration = null;
+
+        var data = await _storageController.LoadAsync();
+        await data.RemoveAsync(CurrentConfigurationKey);
+    }
+
+    public Task ClearCurrentConfigInMemoryAsync() => Task.Run(() => _currentConfiguration = null);
 }

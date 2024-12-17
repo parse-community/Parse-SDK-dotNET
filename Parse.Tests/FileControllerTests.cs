@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,91 +11,108 @@ using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Infrastructure.Execution;
 using Parse.Platform.Files;
 
-namespace Parse.Tests
+namespace Parse.Tests;
+
+[TestClass]
+public class FileControllerTests
 {
-#warning Refactor this class.
-#warning Skipped initialization step may be needed.
-
-    [TestClass]
-    public class FileControllerTests
+    [TestMethod]
+    public async Task TestFileControllerSaveWithInvalidResultAsync()
     {
-        // public void SetUp() => Client = new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
+        var response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null);
+        var mockRunner = CreateMockRunner(response);
 
-        [TestMethod]
-        [AsyncStateMachine(typeof(FileControllerTests))]
-        public Task TestFileControllerSaveWithInvalidResult()
+        var state = new FileState
         {
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, null);
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
-            FileState state = new FileState
-            {
-                Name = "bekti.png",
-                MediaType = "image/png"
-            };
+            Name = "bekti.png",
+            MediaType = "image/png"
+        };
 
-            ParseFileController controller = new ParseFileController(mockRunner.Object);
-            return controller.SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t => Assert.IsTrue(t.IsFaulted));
-        }
+        var controller = new ParseFileController(mockRunner.Object);
 
-        [TestMethod]
-        [AsyncStateMachine(typeof(FileControllerTests))]
-        public Task TestFileControllerSaveWithEmptyResult()
+        await Assert.ThrowsExceptionAsync<NullReferenceException>(async () =>
         {
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>());
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
-            FileState state = new FileState
-            {
-                Name = "bekti.png",
-                MediaType = "image/png"
-            };
+            await controller.SaveAsync(state, new MemoryStream(), null, null);
+        });
+    }
 
-            ParseFileController controller = new ParseFileController(mockRunner.Object);
-            return controller.SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t => Assert.IsTrue(t.IsFaulted));
-        }
+    [TestMethod]
+    public async Task TestFileControllerSaveWithEmptyResultAsync()
+    {
+        var response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object>());
+        var mockRunner = CreateMockRunner(response);
 
-        [TestMethod]
-        [AsyncStateMachine(typeof(FileControllerTests))]
-        public Task TestFileControllerSaveWithIncompleteResult()
+        var state = new FileState
         {
-            Tuple<HttpStatusCode, IDictionary<string, object>> response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { ["name"] = "newBekti.png" });
-            Mock<IParseCommandRunner> mockRunner = CreateMockRunner(response);
-            FileState state = new FileState
-            {
-                Name = "bekti.png",
-                MediaType = "image/png"
-            };
+            Name = "bekti.png",
+            MediaType = "image/png"
+        };
 
-            ParseFileController controller = new ParseFileController(mockRunner.Object);
-            return controller.SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t => Assert.IsTrue(t.IsFaulted));
-        }
+        var controller = new ParseFileController(mockRunner.Object);
 
-        [TestMethod]
-        [AsyncStateMachine(typeof(FileControllerTests))]
-        public Task TestFileControllerSave()
+        await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () =>
         {
-            FileState state = new FileState
-            {
-                Name = "bekti.png",
-                MediaType = "image/png"
-            };
+            await controller.SaveAsync(state, new MemoryStream(), null, null);
+        });
+    }
 
-            return new ParseFileController(CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { ["name"] = "newBekti.png", ["url"] = "https://www.parse.com/newBekti.png" })).Object).SaveAsync(state, dataStream: new MemoryStream(), sessionToken: null, progress: null).ContinueWith(t =>
-            {
-                Assert.IsFalse(t.IsFaulted);
-                FileState newState = t.Result;
+    [TestMethod]
+    public async Task TestFileControllerSaveWithIncompleteResultAsync()
+    {
+        var response = new Tuple<HttpStatusCode, IDictionary<string, object>>(HttpStatusCode.Accepted, new Dictionary<string, object> { ["name"] = "newBekti.png" });
+        var mockRunner = CreateMockRunner(response);
 
-                Assert.AreEqual(state.MediaType, newState.MediaType);
-                Assert.AreEqual("newBekti.png", newState.Name);
-                Assert.AreEqual("https://www.parse.com/newBekti.png", newState.Location.AbsoluteUri);
-            });
-        }
-
-        private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
+        var state = new FileState
         {
-            Mock<IParseCommandRunner> mockRunner = new Mock<IParseCommandRunner>();
-            mockRunner.Setup(obj => obj.RunCommandAsync(It.IsAny<ParseCommand>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<IProgress<IDataTransferLevel>>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(response));
+            Name = "bekti.png",
+            MediaType = "image/png"
+        };
 
-            return mockRunner;
-        }
+        var controller = new ParseFileController(mockRunner.Object);
+
+        await Assert.ThrowsExceptionAsync<KeyNotFoundException>(async () =>
+        {
+            await controller.SaveAsync(state, new MemoryStream(), null, null);
+        });
+    }
+
+    [TestMethod]
+    public async Task TestFileControllerSaveAsync()
+    {
+        var state = new FileState
+        {
+            Name = "bekti.png",
+            MediaType = "image/png"
+        };
+
+        var mockRunner = CreateMockRunner(new Tuple<HttpStatusCode, IDictionary<string, object>>(
+            HttpStatusCode.Accepted,
+            new Dictionary<string, object>
+            {
+                ["name"] = "newBekti.png",
+                ["url"] = "https://www.parse.com/newBekti.png"
+            }));
+
+        var controller = new ParseFileController(mockRunner.Object);
+        var newState = await controller.SaveAsync(state, new MemoryStream(), null, null);
+
+        // Assertions
+        Assert.AreEqual(state.MediaType, newState.MediaType);
+        Assert.AreEqual("newBekti.png", newState.Name);
+        Assert.AreEqual("https://www.parse.com/newBekti.png", newState.Location.AbsoluteUri);
+    }
+
+    private Mock<IParseCommandRunner> CreateMockRunner(Tuple<HttpStatusCode, IDictionary<string, object>> response)
+    {
+        var mockRunner = new Mock<IParseCommandRunner>();
+        mockRunner
+            .Setup(obj => obj.RunCommandAsync(
+                It.IsAny<ParseCommand>(),
+                It.IsAny<IProgress<IDataTransferLevel>>(),
+                It.IsAny<IProgress<IDataTransferLevel>>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(response);
+
+        return mockRunner;
     }
 }
