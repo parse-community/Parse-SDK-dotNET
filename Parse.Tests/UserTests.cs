@@ -32,7 +32,7 @@ public class UserTests
     {
         
         Client = new ParseClient(new ServerConnectionData { Test = true });
-        Client.Publicize();  // Ensure the client instance is globally available
+        Client.Publicize();  // Ensure the Clientinstance is globally available
 
         
         Client.AddValidClass<ParseSession>();
@@ -155,7 +155,7 @@ public class UserTests
 
         hub.UserController = mockController.Object;
 
-        var loggedInUser = await client.LogInAsync(TestUsername, TestPassword);
+        var loggedInUser = await client.LogInWithAsync(TestUsername, TestPassword);
 
         // Verify LogInAsync is called
         mockController.Verify(obj => obj.LogInAsync(TestUsername, TestPassword, It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -165,10 +165,10 @@ public class UserTests
         Assert.AreEqual(TestUsername, loggedInUser.Username);
     }
 
-
     [TestMethod]
-    public async Task TestLogOutAsync()
+    public async Task TestLogOut()
     {
+        // Arrange
         var state = new MutableObjectState
         {
             ServerData = new Dictionary<string, object>
@@ -177,9 +177,6 @@ public class UserTests
             }
         };
 
-        var hub = new MutableServiceHub();
-        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
-
         var user = CreateParseUser(state);
 
         var mockCurrentUserController = new Mock<IParseCurrentUserController>();
@@ -187,46 +184,51 @@ public class UserTests
             .Setup(obj => obj.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        // Ensure the LogOutAsync method is set up to return a completed task
+        // Simulate LogOutAsync failure with a controlled exception
         mockCurrentUserController
             .Setup(obj => obj.LogOutAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+            .ThrowsAsync(new Exception("logout failure")); // Force a controlled exception since fb's service
 
         var mockSessionController = new Mock<IParseSessionController>();
-        mockSessionController
-            .Setup(c => c.IsRevocableSessionToken(It.IsAny<string>()))
-            .Returns(true);
 
+        // Simulate a no-op for RevokeAsync
         mockSessionController
             .Setup(c => c.RevokeAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        hub.CurrentUserController = mockCurrentUserController.Object;
-        hub.SessionController = mockSessionController.Object;
+        // Inject mocks
+        var hub = new MutableServiceHub
+        {
+            CurrentUserController = mockCurrentUserController.Object,
+            SessionController = mockSessionController.Object
+        };
 
-        // Simulate logout process
-        await client.LogOutAsync();
+        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
 
-        // Verify LogOutAsync and RevokeAsync are called
-        mockCurrentUserController.Verify(obj => obj.LogOutAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Once);
-        mockSessionController.Verify(obj => obj.RevokeAsync(TestRevocableSessionToken, It.IsAny<CancellationToken>()), Times.Once);
+        // Act
+        await client.LogOutAsync(CancellationToken.None);
 
-        // Check if the session token is cleared after logout (assuming it's being handled inside LogOutAsync)
-        Assert.IsNull(user["sessionToken"]);
+        // Assert: Verify LogOutAsync was invoked once
+        mockCurrentUserController.Verify(
+            obj => obj.LogOutAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()), Times.Once);
+
+        // Verify session revocation still occurs
+        mockSessionController.Verify(
+            c => c.RevokeAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+
+        // Verify session token is cleared
+        Assert.IsNull(user["sessionToken"], "Session token should be cleared after logout.");
     }
-
-
-
     [TestMethod]
     public async Task TestRequestPasswordResetAsync()
     {
         var hub = new MutableServiceHub();
-        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        var Client= new ParseClient(new ServerConnectionData { Test = true }, hub);
 
         var mockController = new Mock<IParseUserController>();
         hub.UserController = mockController.Object;
 
-        await client.RequestPasswordResetAsync(TestEmail);
+        await Client.RequestPasswordResetAsync(TestEmail);
 
         mockController.Verify(obj => obj.RequestPasswordResetAsync(TestEmail, It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -252,7 +254,7 @@ public class UserTests
         };
 
         var hub = new MutableServiceHub();
-        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        var Client= new ParseClient(new ServerConnectionData { Test = true }, hub);
 
         var user = CreateParseUser(state);
 

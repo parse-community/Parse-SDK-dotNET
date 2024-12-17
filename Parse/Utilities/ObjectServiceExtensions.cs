@@ -206,7 +206,7 @@ public static class ObjectServiceExtensions
             await Task.WhenAll(
                 serviceHub.ObjectController.DeleteAllAsync(
                     uniqueObjects.Select(obj => obj.State).ToList(),
-                    serviceHub.GetCurrentSessionToken(),
+                    await serviceHub.GetCurrentSessionToken(),
                     cancellationToken)
             ).ConfigureAwait(false);
 
@@ -301,9 +301,9 @@ public static class ObjectServiceExtensions
     /// </summary>
     /// <param name="objects">The objects to save.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public static Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject
+    public static async Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject
     {
-        return DeepSaveAsync(serviceHub, objects.ToList(), serviceHub.GetCurrentSessionToken(), cancellationToken);
+        _ = DeepSaveAsync(serviceHub, objects.ToList(),await serviceHub.GetCurrentSessionToken(), cancellationToken);
     }
 
     /// <summary>
@@ -458,14 +458,14 @@ public static class ObjectServiceExtensions
 
         // Save remaining objects in batches
         var remaining = new List<ParseObject>(uniqueObjects);
-        while (remaining.Any())
+        while (remaining.Count>0)
         {
             // Partition objects into those that can be saved immediately and those that cannot
             var current = remaining.Where(item => item.CanBeSerialized).ToList();
             var nextBatch = remaining.Where(item => !item.CanBeSerialized).ToList();
             remaining = nextBatch;
 
-            if (!current.Any())
+            if (current.Count<1)
             {
                 throw new InvalidOperationException("Unable to save a ParseObject with a relation to a cycle.");
             }

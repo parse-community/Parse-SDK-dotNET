@@ -723,7 +723,7 @@ public class ParseQuery<T> where T : ParseObject
     public async Task<IEnumerable<T>> FindAsync(CancellationToken cancellationToken)
     {
         EnsureNotInstallationQuery();
-        var result = await Services.QueryController.FindAsync(this, Services.GetCurrentUser(), cancellationToken).ConfigureAwait(false);
+        var result = await Services.QueryController.FindAsync(this, await Services.GetCurrentUser(), cancellationToken).ConfigureAwait(false);
         return result.Select(state => Services.GenerateObjectFromState<T>(state, ClassName));
     }
 
@@ -744,7 +744,7 @@ public class ParseQuery<T> where T : ParseObject
     public async Task<T> FirstOrDefaultAsync(CancellationToken cancellationToken)
     {
         EnsureNotInstallationQuery();
-        var result = await Services.QueryController.FirstAsync(this, Services.GetCurrentUser(), cancellationToken).ConfigureAwait(false);
+        var result = await Services.QueryController.FirstAsync(this, await Services.GetCurrentUser(), cancellationToken).ConfigureAwait(false);
 
         return result != null
             ? Services.GenerateObjectFromState<T>(result, ClassName)
@@ -792,10 +792,11 @@ public class ParseQuery<T> where T : ParseObject
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The number of objects that match this query.</returns>
-    public Task<int> CountAsync(CancellationToken cancellationToken)
+    public async Task<int> CountAsync(CancellationToken cancellationToken)
     {
         EnsureNotInstallationQuery();
-        return Services.QueryController.CountAsync(this, Services.GetCurrentUser(), cancellationToken);
+        var val = await Services.QueryController.CountAsync(this, await Services.GetCurrentUser(), cancellationToken);
+        return val;
     }
 
     /// <summary>

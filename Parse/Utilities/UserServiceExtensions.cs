@@ -8,21 +8,17 @@ namespace Parse;
 
 public static class UserServiceExtensions
 {
-    internal static string GetCurrentSessionToken(this IServiceHub serviceHub)
+    internal static async Task<string> GetCurrentSessionToken(this IServiceHub serviceHub)
     {
-        Task<string> sessionTokenTask = GetCurrentSessionTokenAsync(serviceHub);
-        sessionTokenTask.Wait();
-        return sessionTokenTask.Result;
+        string sessionToken = await serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub);
+
+        return sessionToken;
     }
 
-    internal static Task<string> GetCurrentSessionTokenAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
-    {
-        return serviceHub.CurrentUserController.GetCurrentSessionTokenAsync(serviceHub, cancellationToken);
-    }
 
-    // TODO: Consider renaming SignUpAsync and LogInAsync to SignUpWithAsync and LogInWithAsync, respectively.
-    // TODO: Consider returning the created user from the SignUpAsync overload that accepts a username and password.
-
+    // DONE: Consider renaming SignUpAsync and LogInAsync to SignUpWithAsync and LogInWithAsync, respectively.
+    // DONE: Consider returning the created user from the SignUpAsync overload that accepts a username and password.
+    
     /// <summary>
     /// Creates a new <see cref="ParseUser"/>, saves it with the target Parse Server instance, and then authenticates it on the target client.
     /// </summary>
@@ -30,9 +26,11 @@ public static class UserServiceExtensions
     /// <param name="username">The value that should be used for <see cref="ParseUser.Username"/>.</param>
     /// <param name="password">The value that should be used for <see cref="ParseUser.Password"/>.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public static Task SignUpAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
+    public static Task SignUpWithAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
     {
-        return new ParseUser { Services = serviceHub, Username = username, Password = password }.SignUpAsync(cancellationToken);
+        var ee = new ParseUser { Services = serviceHub, Username = username, Password = password };
+        return ee.SignUpAsync(cancellationToken);
+        
     }
 
     /// <summary>
@@ -41,7 +39,7 @@ public static class UserServiceExtensions
     /// <param name="serviceHub">The <see cref="IServiceHub"/> instance to target when creating the user and authenticating.</param>
     /// <param name="user">The <see cref="ParseUser"/> instance to save on the target Parse Server instance and authenticate.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public static Task SignUpAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default)
+    public static Task<ParseUser> SignUpWithAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default)
     {
         user.Bind(serviceHub);
         return user.SignUpAsync(cancellationToken);
@@ -55,7 +53,7 @@ public static class UserServiceExtensions
     /// <param name="password">The password to log in with.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The newly logged-in user.</returns>
-    public static async Task<ParseUser> LogInAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
+    public static async Task<ParseUser> LogInWithAsync(this IServiceHub serviceHub, string username, string password, CancellationToken cancellationToken = default)
     {
         // Log in the user and get the user state
         var userState = await serviceHub.UserController
@@ -66,7 +64,7 @@ public static class UserServiceExtensions
         var user = serviceHub.GenerateObjectFromState<ParseUser>(userState, "_User");
 
         // Save the user locally
-        await SaveCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
+        await SaveAndReturnCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
 
         // Set the authenticated user as the current instance
         InstanceUser = user;
@@ -93,26 +91,12 @@ public static class UserServiceExtensions
         var user = serviceHub.GenerateObjectFromState<ParseUser>(userState, "_User");
 
         // Save the user locally
-        await SaveCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
+        await SaveAndReturnCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
 
         // Set the authenticated user as the current instance only after successful save
         InstanceUser = user;
 
         return user;
-    }
-
-
-
-    /// <summary>
-    /// Logs out the currently logged in user session. This will remove the session from disk, log out of
-    /// linked services, and future calls to <see cref="GetCurrentUser()"/> will return <c>null</c>.
-    /// </summary>
-    /// <remarks>
-    /// Typically, you should use <see cref="LogOutAsync()"/>, unless you are managing your own threading.
-    /// </remarks>
-    public static void LogOut(this IServiceHub serviceHub)
-    {
-        LogOutAsync(serviceHub).Wait(); // TODO (hallucinogen): this will without a doubt fail in Unity. But what else can we do?
     }
 
     /// <summary>
@@ -123,9 +107,9 @@ public static class UserServiceExtensions
     /// This is preferable to using <see cref="LogOut()"/>, unless your code is already running from a
     /// background thread.
     /// </remarks>
-    public static Task LogOutAsync(this IServiceHub serviceHub)
-    {
-        return LogOutAsync(serviceHub, CancellationToken.None);
+    public static void LogOut(this IServiceHub serviceHub)
+    {        
+        _ = LogOutAsync(serviceHub, CancellationToken.None);
     }
 
     /// <summary>
@@ -138,7 +122,7 @@ public static class UserServiceExtensions
     public static async Task LogOutAsync(this IServiceHub serviceHub, CancellationToken cancellationToken)
     {
         // Fetch the current user
-        var user = await GetCurrentUserAsync(serviceHub).ConfigureAwait(false);
+        var user = await GetCurrentUserAsync(serviceHub, cancellationToken).ConfigureAwait(false);
 
         // Log out with providers
         LogOutWithProviders();
@@ -163,28 +147,33 @@ public static class UserServiceExtensions
     /// Gets the currently logged in ParseUser with a valid session, either from memory or disk
     /// if necessary.
     /// </summary>
-    public static ParseUser GetCurrentUser(this IServiceHub serviceHub)
+    public static async Task<ParseUser> GetCurrentUser(this IServiceHub serviceHub)
     {
-        Task<ParseUser> userTask = GetCurrentUserAsync(serviceHub);
+        ParseUser userTask = await GetCurrentUserAsync(serviceHub);
 
-        // TODO (hallucinogen): this will without a doubt fail in Unity. How should we fix it?
-
-        userTask.Wait();
-        return userTask.Result;
+        return userTask;
+        //  (hallucinogen): this will without a doubt fail in Unity. How should we fix it?
+        //Fixed
     }
 
     /// <summary>
     /// Gets the currently logged in ParseUser with a valid session, either from memory or disk
     /// if necessary, asynchronously.
     /// </summary>
-    internal static Task<ParseUser> GetCurrentUserAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    internal static async Task<ParseUser> GetCurrentUserAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
     {
-        return serviceHub.CurrentUserController.GetAsync(serviceHub, cancellationToken);
+        var user = await serviceHub.CurrentUserController.GetAsync(serviceHub, cancellationToken);
+        return user;
     }
 
     internal static Task SaveCurrentUserAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default)
     {
-        return serviceHub.CurrentUserController.SetAsync(user, cancellationToken);
+       return serviceHub.CurrentUserController.SetAsync(user, cancellationToken);
+    }
+    internal static async Task<ParseUser> SaveAndReturnCurrentUserAsync(this IServiceHub serviceHub, ParseUser user, CancellationToken cancellationToken = default)
+    {
+        var usr = await serviceHub.CurrentUserController.SetAsync(user,cancellationToken);
+        return usr;
     }
 
     internal static void ClearInMemoryUser(this IServiceHub serviceHub)
@@ -279,7 +268,7 @@ public static class UserServiceExtensions
         }
 
         // Save the current user locally
-        await SaveCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
+        await SaveAndReturnCurrentUserAsync(serviceHub, user).ConfigureAwait(false);
 
         return user;
     }
@@ -297,10 +286,10 @@ public static class UserServiceExtensions
     }
 
 
-    internal static void RegisterProvider(this IServiceHub serviceHub, IParseAuthenticationProvider provider)
+    internal static async void RegisterProvider(this IServiceHub serviceHub, IParseAuthenticationProvider provider)
     {
         ParseUser.Authenticators[provider.AuthType] = provider;
-        ParseUser curUser = GetCurrentUser(serviceHub);
+        ParseUser curUser = await GetCurrentUser(serviceHub);
 
         if (curUser != null)
         {

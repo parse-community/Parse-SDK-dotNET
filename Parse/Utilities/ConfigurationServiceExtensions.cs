@@ -26,23 +26,22 @@ public static class ConfigurationServiceExtensions
     /// Gets the latest fetched ParseConfig.
     /// </summary>
     /// <returns>ParseConfig object</returns>
-    public static ParseConfiguration GetCurrentConfiguration(this IServiceHub serviceHub)
+    public static async Task<ParseConfiguration> GetCurrentConfiguration(this IServiceHub serviceHub)
 #pragma warning restore CS1030 // #warning directive
     {
-        Task<ParseConfiguration> task = serviceHub.ConfigurationController.CurrentConfigurationController.GetCurrentConfigAsync(serviceHub);
+        ParseConfiguration parseConfig = await serviceHub.ConfigurationController.CurrentConfigurationController.GetCurrentConfigAsync(serviceHub);
 
-        task.Wait();
-        return task.Result;
+        return parseConfig;
     }
 
     internal static void ClearCurrentConfig(this IServiceHub serviceHub)
     {
-        serviceHub.ConfigurationController.CurrentConfigurationController.ClearCurrentConfigAsync().Wait();
+        _ = serviceHub.ConfigurationController.CurrentConfigurationController.ClearCurrentConfigAsync();
     }
 
     internal static void ClearCurrentConfigInMemory(this IServiceHub serviceHub)
     {
-        serviceHub.ConfigurationController.CurrentConfigurationController.ClearCurrentConfigInMemoryAsync().Wait();
+        _ =  serviceHub.ConfigurationController.CurrentConfigurationController.ClearCurrentConfigInMemoryAsync();
     }
 
     /// <summary>
@@ -50,8 +49,8 @@ public static class ConfigurationServiceExtensions
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>ParseConfig object that was fetched</returns>
-    public static Task<ParseConfiguration> GetConfigurationAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    public static async Task<ParseConfiguration> GetConfigurationAsync(this IServiceHub serviceHub, CancellationToken cancellationToken = default)
     {
-        return serviceHub.ConfigurationController.FetchConfigAsync(serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
+        return await serviceHub.ConfigurationController.FetchConfigAsync(await serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
     }
 }

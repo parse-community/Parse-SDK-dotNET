@@ -25,22 +25,14 @@ public static class FileServiceExtensions
     /// </summary>
     /// <param name="progress">The progress callback.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public static async Task SaveFileAsync(
-this IServiceHub serviceHub,
-ParseFile file,
-IProgress<IDataTransferLevel> progress,
-CancellationToken cancellationToken = default)
+    public static async Task SaveFileAsync(this IServiceHub serviceHub,ParseFile file,
+        IProgress<IDataTransferLevel> progress,CancellationToken cancellationToken = default)
     {
         var result = await file.TaskQueue.Enqueue(
-            async toAwait => await serviceHub.FileController.SaveAsync(
-                file.State,
-                file.DataStream,
-                serviceHub.GetCurrentSessionToken(),
-                progress,
-                cancellationToken
-            ).ConfigureAwait(false),
-            cancellationToken
-        ).ConfigureAwait(false);
+            async toAwait => await serviceHub.FileController.SaveAsync(file.State,file.DataStream,
+                await serviceHub.GetCurrentSessionToken(),progress,cancellationToken)
+            .ConfigureAwait(false),cancellationToken)
+            .ConfigureAwait(false);
 
         file.State = result; // Update the file state with the result
     }

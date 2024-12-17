@@ -48,8 +48,8 @@ public static class CloudCodeServiceExtensions
     /// ParseObjects themselves.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The result of the cloud call.</returns>
-    public static Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters, CancellationToken cancellationToken)
+    public static async Task<T> CallCloudCodeFunctionAsync<T>(this IServiceHub serviceHub, string name, IDictionary<string, object> parameters, CancellationToken cancellationToken)
     {
-        return serviceHub.CloudCodeController.CallFunctionAsync<T>(name, parameters, serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
+        return await serviceHub.CloudCodeController.CallFunctionAsync<T>(name, parameters, await serviceHub.GetCurrentSessionToken(), serviceHub, cancellationToken);
     }
 }

@@ -61,23 +61,23 @@ namespace Parse.Tests
         public void TearDown() => ((Client.Services as OrchestrationServiceHub).Default as ServiceHub).Reset();
 
         [TestMethod]
-        public void TestCurrentConfig()
+        public async void TestCurrentConfig()
         {
-            var config = Client.GetCurrentConfiguration();
+            var config = await Client.GetCurrentConfiguration();
 
             Assert.AreEqual("testValue", config["testKey"]);
             Assert.AreEqual("testValue", config.Get<string>("testKey"));
         }
 
         [TestMethod]
-        public void TestToJSON()
+        public async void TestToJSON()
         {
             var expectedJson = new Dictionary<string, object>
             {
                 ["params"] = new Dictionary<string, object> { ["testKey"] = "testValue" }
             };
 
-            var actualJson = (Client.GetCurrentConfiguration() as IJsonConvertible).ConvertToJSON();
+            var actualJson = (await Client.GetCurrentConfiguration() as IJsonConvertible).ConvertToJSON();
             Assert.AreEqual(JsonConvert.SerializeObject(expectedJson), JsonConvert.SerializeObject(actualJson));
         }
 

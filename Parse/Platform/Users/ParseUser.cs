@@ -11,18 +11,27 @@ namespace Parse;
 [ParseClassName("_User")]
 public class ParseUser : ParseObject
 {
-    public bool IsAuthenticated
+    public async Task<bool> IsAuthenticatedAsync()
     {
-        get
+        // Early exit if SessionToken is null
+        lock (Mutex)
         {
-            lock (Mutex)
-            {
-                if (SessionToken == null)
-                    return false;
+            if (SessionToken == null)
+                return false;
+        }
 
-                var currentUser = Services.GetCurrentUser();
-                return currentUser?.ObjectId == ObjectId;
-            }
+        try
+        {
+            // Await the asynchronous GetCurrentUserAsync method
+            var currentUser = await Services.GetCurrentUserAsync();
+
+            // Check if the current user's ObjectId matches
+            return currentUser?.ObjectId == ObjectId;
+        }
+        catch (Exception ex)
+        {
+            
+            return false;
         }
     }
 
@@ -74,7 +83,7 @@ public class ParseUser : ParseObject
         set => SetProperty(value, nameof(Email));
     }
 
-    internal async Task SignUpAsync(CancellationToken cancellationToken = default)
+    internal async Task<ParseUser> SignUpAsync(CancellationToken cancellationToken = default)
     {
         
 
@@ -96,7 +105,9 @@ public class ParseUser : ParseObject
             var result = await Services.UserController.SignUpAsync(State, currentOperations, Services, cancellationToken).ConfigureAwait(false);
             Debug.WriteLine($"SignUpAsync on UserController completed. ObjectId: {result.ObjectId}");
             HandleSave(result);
-            await Services.SaveCurrentUserAsync(this, cancellationToken).ConfigureAwait(false);
+            var usr= await Services.SaveAndReturnCurrentUserAsync(this).ConfigureAwait(false);
+            
+            return usr;
         }
         catch (Exception ex)
         {

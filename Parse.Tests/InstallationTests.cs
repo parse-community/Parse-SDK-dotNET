@@ -234,7 +234,7 @@ public class InstallationTests
     }
 
     [TestMethod]
-    public void TestGetCurrentInstallation()
+    public async void TestGetCurrentInstallation()
     {
         var guid = Guid.NewGuid();
         var expectedInstallation = new ParseInstallation();
@@ -243,7 +243,7 @@ public class InstallationTests
         CurrentInstallationControllerMock.Setup(controller => controller.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
             .Returns(Task.FromResult(expectedInstallation));
 
-        ParseInstallation currentInstallation = Client.GetCurrentInstallation();
+        ParseInstallation currentInstallation = await Client.GetCurrentInstallation();
 
         Assert.IsNotNull(currentInstallation);
         Assert.AreEqual(guid, currentInstallation.InstallationId);

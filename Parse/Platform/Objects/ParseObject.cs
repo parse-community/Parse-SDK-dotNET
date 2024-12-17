@@ -697,7 +697,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
             return; // No need to delete if the object doesn't have an ID
         }
 
-        var sessionToken = Services.GetCurrentSessionToken();
+        var sessionToken = await Services.GetCurrentSessionToken();
         await Services.ObjectController.DeleteAsync(State, sessionToken, cancellationToken).ConfigureAwait(false);
         IsDirty = true;
     }
@@ -756,7 +756,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
             throw new InvalidOperationException("Cannot refresh an object that hasn't been saved to the server.");
         }
 
-        var sessionToken = Services.GetCurrentSessionToken();
+        var sessionToken = await Services.GetCurrentSessionToken();
         var result = await Services.ObjectController.FetchAsync(State, sessionToken, Services, cancellationToken).ConfigureAwait(false);
         HandleFetchResult(result);
         return this;
@@ -1149,7 +1149,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
 
         // Get the session token and prepare the save operation
         var currentOperations = StartSave();
-        var sessionToken = Services.GetCurrentSessionToken();
+        var sessionToken = await Services.GetCurrentSessionToken();
 
         // Perform the deep save asynchronously
         try

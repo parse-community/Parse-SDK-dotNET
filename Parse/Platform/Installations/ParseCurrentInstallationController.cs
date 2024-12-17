@@ -50,10 +50,10 @@ internal class ParseCurrentInstallationController : IParseCurrentInstallationCon
         ClassController = classController;
     }
 
-    public async Task SetAsync(ParseInstallation installation, CancellationToken cancellationToken)
+    public async Task<ParseInstallation> SetAsync(ParseInstallation installation, CancellationToken cancellationToken)
     {
         // Update the current installation in memory and disk asynchronously
-        await TaskQueue.Enqueue<Task>(async (toAwait) =>
+        var inst = await TaskQueue.Enqueue<Task<ParseInstallation>>(async (toAwait) =>
         {
             var storage = await StorageController.LoadAsync().ConfigureAwait(false);
             if (installation != null)
@@ -64,10 +64,10 @@ internal class ParseCurrentInstallationController : IParseCurrentInstallationCon
             {
                 await storage.RemoveAsync(ParseInstallationKey).ConfigureAwait(false);
             }
-            CurrentInstallation = installation;
+            return installation;
         }, cancellationToken).ConfigureAwait(false);
+        return inst;
     }
-
 
     public async Task<ParseInstallation> GetAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default)
     {

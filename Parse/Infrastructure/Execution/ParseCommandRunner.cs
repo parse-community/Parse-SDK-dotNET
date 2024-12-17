@@ -67,32 +67,47 @@ public class ParseCommandRunner : IParseCommandRunner
             .ConfigureAwait(false);
 
         cancellationToken.ThrowIfCancellationRequested();
-        
+
+        IDictionary<string, object> contentJson = null;
         // Extract response
         var statusCode = response.Item1;
          var content = response.Item2;
         var responseCode = (int) statusCode;
 
+
+        if (responseCode == 200)
+        {
+            
+        }
+        else if (responseCode == 201)
+        {
+        }
+        else if (responseCode == 404)
+        {
+            throw new ParseFailureException(ParseFailureException.ErrorCode.ERROR404, "Error 404");
+        }
+        if (responseCode == 410)
+        {
+            return new Tuple<HttpStatusCode, IDictionary<string, object>>(
+                HttpStatusCode.Gone,
+                new Dictionary<string, object>
+                {
+                    { "error", "Page is no longer valid" }
+                }
+            );
+        }
         if (responseCode >= 500)
         {
             // Server error, return InternalServerError
             throw new ParseFailureException(ParseFailureException.ErrorCode.InternalServerError, content);
         }
-        else if(responseCode == 201)
-        {
-
-        }
-        else if(responseCode == 404)
-        {
-            throw new ParseFailureException(ParseFailureException.ErrorCode.ERROR404, "Error 404");
-        }
         if (string.IsNullOrEmpty(content))
         {
             return new Tuple<HttpStatusCode, IDictionary<string, object>>(statusCode, null);
         }
+        //else if(responseCode == )
 
         // Try to parse the content
-        IDictionary<string, object> contentJson = null;
         try
         {
             contentJson = content.StartsWith("[")
@@ -117,29 +132,6 @@ public class ParseCommandRunner : IParseCommandRunner
             );
         }
 
-        if (responseCode == 410)
-        {
-            return new Tuple<HttpStatusCode, IDictionary<string, object>>(
-                HttpStatusCode.Gone,
-                new Dictionary<string, object>
-                {
-                    { "error", "Page is no longer valid" }
-                }
-            );
-        }
-
-        // Check if response status code is outside the success range
-        if (responseCode < 200 || responseCode > 299)
-        {
-            return new Tuple<HttpStatusCode, IDictionary<string, object>>(
-                (HttpStatusCode) (contentJson?.ContainsKey("code") == true ? (int) (long) contentJson["code"] : 400),
-                new Dictionary<string, object>
-                {
-            { "error", contentJson?.ContainsKey("error") == true ? contentJson["error"] as string : content },
-            { "code", contentJson?.ContainsKey("code") == true ? contentJson["code"] : null }
-                }
-            );
-        }
 
         // Return successful response
         return new Tuple<HttpStatusCode, IDictionary<string, object>>(statusCode, contentJson);

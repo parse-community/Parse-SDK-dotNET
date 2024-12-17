@@ -31,14 +31,14 @@ public static class InstallationServiceExtensions
     /// <summary>
     /// Gets the ParseInstallation representing this app on this device.
     /// </summary>
-    public static ParseInstallation GetCurrentInstallation(this IServiceHub serviceHub)
+    public static async Task<ParseInstallation> GetCurrentInstallation(this IServiceHub serviceHub)
 #pragma warning restore CS1030 // #warning directive
     {
-        Task<ParseInstallation> task = serviceHub.CurrentInstallationController.GetAsync(serviceHub);
+        ParseInstallation parseInstallation = await serviceHub.CurrentInstallationController.GetAsync(serviceHub);
 
         // TODO (hallucinogen): this will absolutely break on Unity, but how should we resolve this?
-        task.Wait();
-        return task.Result;
+        
+        return parseInstallation;
     }
 
     internal static void ClearInMemoryInstallation(this IServiceHub serviceHub)
