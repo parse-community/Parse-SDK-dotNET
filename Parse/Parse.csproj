@@ -13,6 +13,7 @@
         <RepositoryType>GitHub</RepositoryType>
         <Description>The Parse .NET SDK for Parse Platform</Description>
         <Copyright>Copyright © Parse Platform</Copyright>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
 
         <PackageTags>Parse;parse-platform;parse-server;backend;sdk;app</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -47,6 +48,10 @@
         <Pack>True</Pack>
         <PackagePath></PackagePath>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
