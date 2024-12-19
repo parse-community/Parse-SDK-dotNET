@@ -1,40 +1,63 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Infrastructure.Utilities;
+using System.Linq;
+namespace Parse;
 
-namespace Parse
+/// <summary>
+/// Provides convenience extension methods for working with collections
+/// of ParseObjects so that you can easily save and fetch them in batches.
+/// </summary>
+/// <summary>
+/// Provides convenience extension methods for working with collections
+/// of ParseObjects so that you can easily save and fetch them in batches.
+/// </summary>
+public static class ParseExtensions
 {
     /// <summary>
-    /// Provides convenience extension methods for working with collections
-    /// of ParseObjects so that you can easily save and fetch them in batches.
+    /// Fetches this object with the data from the server.
     /// </summary>
-    public static class ParseExtensions
+    /// <param name="obj">The ParseObject to fetch.</param>
+    /// <param name="cancellationToken">The cancellation token (optional).</param>
+    public static async Task<T> FetchAsync<T>(this T obj, CancellationToken cancellationToken = default) where T : ParseObject
     {
-        /// <summary>
-        /// Fetches this object with the data from the server.
-        /// </summary>
-        public static Task<T> FetchAsync<T>(this T obj) where T : ParseObject => obj.FetchAsyncInternal(CancellationToken.None).OnSuccess(t => (T) t.Result);
-
-        /// <summary>
-        /// Fetches this object with the data from the server.
-        /// </summary>
-        /// <param name="target">The ParseObject to fetch.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task<T> FetchAsync<T>(this T target, CancellationToken cancellationToken) where T : ParseObject => target.FetchAsyncInternal(cancellationToken).OnSuccess(task => (T) task.Result);
-
-        /// <summary>
-        /// If this ParseObject has not been fetched (i.e. <see cref="ParseObject.IsDataAvailable"/> returns
-        /// false), fetches this object with the data from the server.
-        /// </summary>
-        /// <param name="obj">The ParseObject to fetch.</param>
-        public static Task<T> FetchIfNeededAsync<T>(this T obj) where T : ParseObject => obj.FetchIfNeededAsyncInternal(CancellationToken.None).OnSuccess(t => (T) t.Result);
-
-        /// <summary>
-        /// If this ParseObject has not been fetched (i.e. <see cref="ParseObject.IsDataAvailable"/> returns
-        /// false), fetches this object with the data from the server.
-        /// </summary>
-        /// <param name="obj">The ParseObject to fetch.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public static Task<T> FetchIfNeededAsync<T>(this T obj, CancellationToken cancellationToken) where T : ParseObject => obj.FetchIfNeededAsyncInternal(cancellationToken).OnSuccess(t => (T) t.Result);
+        var result = await obj.FetchAsyncInternal(cancellationToken).ConfigureAwait(false);
+        return (T) result;
     }
+    /// <summary>
+    /// Fetches all objects in the collection from the server.
+    /// </summary>
+    public static async Task<IEnumerable<T>> FetchAllAsync<T>(this IEnumerable<T> objects, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        if (objects == null || !objects.Any()) return objects;
+
+        var result = await Task.WhenAll(objects.Select(obj => obj.FetchAsyncInternal(cancellationToken))).ConfigureAwait(false);
+        return result.Cast<T>();
+    }
+
+    /// <summary>
+    /// If this ParseObject has not been fetched (i.e. <see cref="ParseObject.IsDataAvailable"/> returns
+    /// false), fetches this object with the data from the server.
+    /// </summary>
+    /// <param name="obj">The ParseObject to fetch.</param>
+    /// <param name="cancellationToken">The cancellation token (optional).</param>
+    public static async Task<T> FetchIfNeededAsync<T>(this T obj, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        var result = await obj.FetchIfNeededAsyncInternal(cancellationToken).ConfigureAwait(false);
+        return (T) result;
+    }
+
+    /// <summary>
+    /// Fetches all objects in the collection from the server only if their data is not available.
+    /// </summary>
+    public static async Task<IEnumerable<T>> FetchAllIfNeededAsync<T>(this IEnumerable<T> objects, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        if (objects == null || !objects.Any())
+            return objects;
+
+        var result = await Task.WhenAll(objects.Select(obj => obj.FetchIfNeededAsyncInternal(cancellationToken))).ConfigureAwait(false);
+        return result.Cast<T>();
+    }
+
 }

@@ -7,63 +7,65 @@ using Parse.Abstractions.Infrastructure.Control;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Data;
 
-namespace Parse.Infrastructure.Control
+namespace Parse.Infrastructure.Control;
+
+public class ParseRelationOperation : IParseFieldOperation
 {
-    public class ParseRelationOperation : IParseFieldOperation
+    IList<string> Additions { get; }
+
+    IList<string> Removals { get; }
+
+    IParseObjectClassController ClassController { get; }
+
+    ParseRelationOperation(IParseObjectClassController classController) => ClassController = classController;
+
+    ParseRelationOperation(IParseObjectClassController classController, IEnumerable<string> adds, IEnumerable<string> removes, string targetClassName) : this(classController)
     {
-        IList<string> Additions { get; }
+        TargetClassName = targetClassName;
+        Additions = new ReadOnlyCollection<string>(adds.ToList());
+        Removals = new ReadOnlyCollection<string>(removes.ToList());
+    }
 
-        IList<string> Removals { get; }
+    public ParseRelationOperation(IParseObjectClassController classController, IEnumerable<ParseObject> adds, IEnumerable<ParseObject> removes) : this(classController)
+    {
+        adds ??= new ParseObject[0];
+        removes ??= new ParseObject[0];
 
-        IParseObjectClassController ClassController { get; }
+        TargetClassName = adds.Concat(removes).Select(entity => entity.ClassName).FirstOrDefault();
+        Additions = new ReadOnlyCollection<string>(GetIdsFromObjects(adds).ToList());
+        Removals = new ReadOnlyCollection<string>(GetIdsFromObjects(removes).ToList());
+    }
 
-        ParseRelationOperation(IParseObjectClassController classController) => ClassController = classController;
+    public object Encode(IServiceHub serviceHub)
+    {
+        List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList();
 
-        ParseRelationOperation(IParseObjectClassController classController, IEnumerable<string> adds, IEnumerable<string> removes, string targetClassName) : this(classController)
+        Dictionary<string, object> addition = additions.Count == 0 ? default : new Dictionary<string, object>
         {
-            TargetClassName = targetClassName;
-            Additions = new ReadOnlyCollection<string>(adds.ToList());
-            Removals = new ReadOnlyCollection<string>(removes.ToList());
-        }
+            ["__op"] = "AddRelation",
+            ["objects"] = additions
+        };
 
-        public ParseRelationOperation(IParseObjectClassController classController, IEnumerable<ParseObject> adds, IEnumerable<ParseObject> removes) : this(classController)
+        Dictionary<string, object> removal = removals.Count == 0 ? default : new Dictionary<string, object>
         {
-            adds ??= new ParseObject[0];
-            removes ??= new ParseObject[0];
+            ["__op"] = "RemoveRelation",
+            ["objects"] = removals
+        };
 
-            TargetClassName = adds.Concat(removes).Select(entity => entity.ClassName).FirstOrDefault();
-            Additions = new ReadOnlyCollection<string>(GetIdsFromObjects(adds).ToList());
-            Removals = new ReadOnlyCollection<string>(GetIdsFromObjects(removes).ToList());
-        }
-
-        public object Encode(IServiceHub serviceHub)
+        if (addition is { } && removal is { })
         {
-            List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList();
-
-            Dictionary<string, object> addition = additions.Count == 0 ? default : new Dictionary<string, object>
+            return new Dictionary<string, object>
             {
-                ["__op"] = "AddRelation",
-                ["objects"] = additions
+                ["__op"] = "Batch",
+                ["ops"] = new[] { addition, removal }
             };
-
-            Dictionary<string, object> removal = removals.Count == 0 ? default : new Dictionary<string, object>
-            {
-                ["__op"] = "RemoveRelation",
-                ["objects"] = removals
-            };
-
-            if (addition is { } && removal is { })
-            {
-                return new Dictionary<string, object>
-                {
-                    ["__op"] = "Batch",
-                    ["ops"] = new[] { addition, removal }
-                };
-            }
-            return addition ?? removal;
         }
+        return addition ?? removal;
+    }
 
-        public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous) => previous switch
+    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
+    {
+        return previous switch
         {
             null => this,
             ParseDeleteOperation { } => throw new InvalidOperationException("You can't modify a relation after deleting it."),
@@ -71,8 +73,11 @@ namespace Parse.Infrastructure.Control
             ParseRelationOperation { ClassController: var classController } other => new ParseRelationOperation(classController, Additions.Union(other.Additions.Except(Removals)).ToList(), Removals.Union(other.Removals.Except(Additions)).ToList(), TargetClassName),
             _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
         };
+    }
 
-        public object Apply(object oldValue, string key) => oldValue switch
+    public object Apply(object oldValue, string key)
+    {
+        return oldValue switch
         {
             _ when Additions.Count == 0 && Removals.Count == 0 => default,
             null => ClassController.CreateRelation(null, key, TargetClassName),
@@ -80,25 +85,29 @@ namespace Parse.Infrastructure.Control
             ParseRelationBase { } oldRelation => (Relation: oldRelation, oldRelation.TargetClassName = TargetClassName).Relation,
             _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
         };
+    }
 
-        public string TargetClassName { get; }
+    public string TargetClassName { get; }
 
-        IEnumerable<string> GetIdsFromObjects(IEnumerable<ParseObject> objects)
+    public object Value => throw new NotImplementedException();
+
+    IEnumerable<string> GetIdsFromObjects(IEnumerable<ParseObject> objects)
+    {
+        foreach (ParseObject entity in objects)
         {
-            foreach (ParseObject entity in objects)
+            if (entity.ObjectId is null)
             {
-                if (entity.ObjectId is null)
-                {
-                    throw new ArgumentException("You can't add an unsaved ParseObject to a relation.");
-                }
-
-                if (entity.ClassName != TargetClassName)
-                {
-                    throw new ArgumentException($"Tried to create a ParseRelation with 2 different types: {TargetClassName} and {entity.ClassName}");
-                }
+                throw new ArgumentException("You can't add an unsaved ParseObject to a relation.");
             }
 
-            return objects.Select(entity => entity.ObjectId).Distinct();
+            if (entity.ClassName != TargetClassName)
+            {
+                throw new ArgumentException($"Tried to create a ParseRelation with 2 different types: {TargetClassName} and {entity.ClassName}");
+            }
         }
+
+        return objects.Select(entity => entity.ObjectId).Distinct();
     }
+
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = null) => throw new NotImplementedException();
 }

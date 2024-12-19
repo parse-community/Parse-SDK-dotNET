@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,40 +10,83 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Queries;
 using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Execution;
-using Parse.Infrastructure.Utilities;
 
-namespace Parse.Platform.Queries
+namespace Parse.Platform.Queries;
+
+/// <summary>
+/// A straightforward implementation of <see cref="IParseQueryController"/> that uses <see cref="ParseObject.Services"/> to decode raw server data when needed.
+/// </summary>
+
+internal class ParseQueryController : IParseQueryController
 {
-    /// <summary>
-    /// A straightforward implementation of <see cref="IParseQueryController"/> that uses <see cref="ParseObject.Services"/> to decode raw server data when needed.
-    /// </summary>
-    internal class ParseQueryController : IParseQueryController
+    private IParseCommandRunner CommandRunner { get; }
+    private IParseDataDecoder Decoder { get; }
+
+    public ParseQueryController(IParseCommandRunner commandRunner, IParseDataDecoder decoder)
     {
-        IParseCommandRunner CommandRunner { get; }
+        CommandRunner = commandRunner;
+        Decoder = decoder;
+    }
 
-        IParseDataDecoder Decoder { get; }
+    public async Task<IEnumerable<IObjectState>> FindAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        var result = await FindAsync(query.ClassName, query.BuildParameters(), user?.SessionToken, cancellationToken).ConfigureAwait(false);
 
-        public ParseQueryController(IParseCommandRunner commandRunner, IParseDataDecoder decoder) => (CommandRunner, Decoder) = (commandRunner, decoder);
-
-        public Task<IEnumerable<IObjectState>> FindAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject => FindAsync(query.ClassName, query.BuildParameters(), user?.SessionToken, cancellationToken).OnSuccess(t => (from item in t.Result["results"] as IList<object> select ParseObjectCoder.Instance.Decode(item as IDictionary<string, object>, Decoder, user?.Services)));
-
-        public Task<int> CountAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject
+        // Check if the result contains an error code
+        if (result.TryGetValue("code", out object codeValue) && codeValue is long errorCode)
         {
-            IDictionary<string, object> parameters = query.BuildParameters();
-            parameters["limit"] = 0;
-            parameters["count"] = 1;
+            if (errorCode == 102) // Specific handling for "Cannot query on ACL"
+            {
+                throw new InvalidOperationException("Cannot query on ACL. Ensure your query does not filter by ACL.");
+            }
 
-            return FindAsync(query.ClassName, parameters, user?.SessionToken, cancellationToken).OnSuccess(task => Convert.ToInt32(task.Result["count"]));
+            // Handle other error codes here if needed
         }
 
-        public Task<IObjectState> FirstAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject
+        // Process raw results
+        var rawResults = result.TryGetValue("results", out object results) ? results as IList<object> : new List<object>();
+        if (rawResults is null || rawResults.Count == 0)
         {
-            IDictionary<string, object> parameters = query.BuildParameters();
-            parameters["limit"] = 1;
-
-            return FindAsync(query.ClassName, parameters, user?.SessionToken, cancellationToken).OnSuccess(task => (task.Result["results"] as IList<object>).FirstOrDefault() as IDictionary<string, object> is Dictionary<string, object> item && item != null ? ParseObjectCoder.Instance.Decode(item, Decoder, user.Services) : null);
+            return Enumerable.Empty<IObjectState>();
         }
 
-        Task<IDictionary<string, object>> FindAsync(string className, IDictionary<string, object> parameters, string sessionToken, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand($"classes/{Uri.EscapeDataString(className)}?{ParseClient.BuildQueryString(parameters)}", method: "GET", sessionToken: sessionToken, data: null), cancellationToken: cancellationToken).OnSuccess(t => t.Result.Item2);
+        return rawResults
+            .Select(item => ParseObjectCoder.Instance.Decode(item as IDictionary<string, object>, Decoder, user?.Services));
+    }
+
+
+    public async Task<int> CountAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        var parameters = query.BuildParameters();
+        parameters["limit"] = 0;
+        parameters["count"] = 1;
+
+        var result = await FindAsync(query.ClassName, parameters, user?.SessionToken, cancellationToken).ConfigureAwait(false);
+        return Convert.ToInt32(result["count"]);
+    }
+
+    public async Task<IObjectState> FirstAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        var parameters = query.BuildParameters();
+        parameters["limit"] = 1;
+
+        var result = await FindAsync(query.ClassName, parameters, user?.SessionToken, cancellationToken).ConfigureAwait(false);
+        var rawResults = result["results"] as IList<object> ?? new List<object>();
+
+        var firstItem = rawResults.FirstOrDefault() as IDictionary<string, object>;
+        return firstItem != null ? ParseObjectCoder.Instance.Decode(firstItem, Decoder, user?.Services) : null;
+    }
+
+    private async Task<IDictionary<string, object>> FindAsync(string className, IDictionary<string, object> parameters, string sessionToken, CancellationToken cancellationToken = default)
+    {
+        var command = new ParseCommand(
+            $"classes/{Uri.EscapeDataString(className)}?{ParseClient.BuildQueryString(parameters)}",
+            method: "GET",
+            sessionToken: sessionToken,
+            data: null
+        );
+
+        var response = await CommandRunner.RunCommandAsync(command, null,null,cancellationToken).ConfigureAwait(false);
+        return response.Item2;
     }
 }

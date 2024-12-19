@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
         <Version>3.0.2</Version>
         <LangVersion>latest</LangVersion>
-        
+
         <Authors>Parse</Authors>
         <PackageProjectUrl>https://parseplatform.org/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/parse-community/Parse-SDK-dotNET/</RepositoryUrl>
@@ -19,10 +19,12 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageIcon>parse-logo.png</PackageIcon>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <PackageReference Include="OpenCover" Version="4.6.519" />
+        <PackageReference Include="OpenCover" Version="4.7.1221" />
     </ItemGroup>
 
     <ItemGroup>
@@ -31,14 +33,6 @@
         <Pack>True</Pack>
         <PackagePath></PackagePath>
       </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Update="Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -53,6 +47,14 @@
         <Pack>True</Pack>
         <PackagePath></PackagePath>
       </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>Resources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

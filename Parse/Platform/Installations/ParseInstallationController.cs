@@ -2,59 +2,77 @@ using System;
 using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Installations;
-using Parse.Infrastructure.Utilities;
 
-namespace Parse.Platform.Installations
+namespace Parse.Platform.Installations;
+
+public class ParseInstallationController : IParseInstallationController
 {
-    public class ParseInstallationController : IParseInstallationController
+    static string InstallationIdKey { get; } = "InstallationId";
+
+    object Mutex { get; } = new object { };
+
+    Guid? InstallationId { get; set; }
+
+    ICacheController StorageController { get; }
+
+    public ParseInstallationController(ICacheController storageController) => StorageController = storageController;
+
+    public async Task SetAsync(Guid? installationId)
     {
-        static string InstallationIdKey { get; } = "InstallationId";
+        // Directly handle the async calls without using locks
+        var storage = await StorageController.LoadAsync().ConfigureAwait(false);
 
-        object Mutex { get; } = new object { };
-
-        Guid? InstallationId { get; set; }
-
-        ICacheController StorageController { get; }
-
-        public ParseInstallationController(ICacheController storageController) => StorageController = storageController;
-
-        public Task SetAsync(Guid? installationId)
+        // Update the installationId and modify storage accordingly
+        if (installationId.HasValue)
         {
-            lock (Mutex)
+            await storage.AddAsync(InstallationIdKey, installationId.Value.ToString()).ConfigureAwait(false);
+        }
+        else
+        {
+            await storage.RemoveAsync(InstallationIdKey).ConfigureAwait(false);
+        }
+
+        // Set the current installationId
+        InstallationId = installationId;
+    }
+
+
+    public async Task<Guid?> GetAsync()
+    {
+        lock (Mutex)
+        {
+            if (InstallationId != null)
             {
-#warning Should refactor here if this operates correctly.
-
-                Task saveTask = installationId is { } ? StorageController.LoadAsync().OnSuccess(storage => storage.Result.AddAsync(InstallationIdKey, installationId.ToString())).Unwrap() : StorageController.LoadAsync().OnSuccess(storage => storage.Result.RemoveAsync(InstallationIdKey)).Unwrap();
-
-                InstallationId = installationId;
-                return saveTask;
+                return InstallationId;
             }
         }
 
-        public Task<Guid?> GetAsync()
+        // Await the asynchronous storage loading task
+        var storageResult = await StorageController.LoadAsync();
+
+        // Try to get the installation ID from the storage result
+        if (storageResult.TryGetValue(InstallationIdKey, out object id) && id is string idString && Guid.TryParse(idString, out Guid parsedId))
         {
             lock (Mutex)
-                if (InstallationId is { })
-                    return Task.FromResult(InstallationId);
-
-            return StorageController.LoadAsync().OnSuccess(storageTask =>
             {
-                storageTask.Result.TryGetValue(InstallationIdKey, out object id);
-
-                try
-                {
-                    lock (Mutex)
-                        return Task.FromResult(InstallationId = new Guid(id as string));
-                }
-                catch (Exception)
-                {
-                    Guid newInstallationId = Guid.NewGuid();
-                    return SetAsync(newInstallationId).OnSuccess<Guid?>(_ => newInstallationId);
-                }
-            })
-            .Unwrap();
+                InstallationId = parsedId; // Cache the parsed ID
+                return InstallationId;
+            }
         }
 
-        public Task ClearAsync() => SetAsync(null);
+        // If no valid ID is found, generate a new one
+        Guid newInstallationId = Guid.NewGuid();
+        await SetAsync(newInstallationId); // Save the new ID
+
+        lock (Mutex)
+        {
+            InstallationId = newInstallationId; // Cache the new ID
+            return InstallationId;
+        }
+    }
+
+    public Task ClearAsync()
+    {
+        return SetAsync(null);
     }
 }

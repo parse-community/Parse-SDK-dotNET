@@ -4,42 +4,43 @@ using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Configuration;
-using Parse.Infrastructure.Utilities;
-using Parse;
 using Parse.Infrastructure.Execution;
 
-namespace Parse.Platform.Configuration
+namespace Parse.Platform.Configuration;
+
+/// <summary>
+/// Config controller.
+/// </summary>
+internal class ParseConfigurationController : IParseConfigurationController
 {
+    private IParseCommandRunner CommandRunner { get; }
+    private IParseDataDecoder Decoder { get; }
+    public IParseCurrentConfigurationController CurrentConfigurationController { get; }
+
     /// <summary>
-    /// Config controller.
+    /// Initializes a new instance of the <see cref="ParseConfigurationController"/> class.
     /// </summary>
-    internal class ParseConfigurationController : IParseConfigurationController
+    public ParseConfigurationController(IParseCommandRunner commandRunner, ICacheController storageController, IParseDataDecoder decoder)
     {
-        IParseCommandRunner CommandRunner { get; }
-
-        IParseDataDecoder Decoder { get; }
-
-        public IParseCurrentConfigurationController CurrentConfigurationController { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParseConfigurationController"/> class.
-        /// </summary>
-        public ParseConfigurationController(IParseCommandRunner commandRunner, ICacheController storageController, IParseDataDecoder decoder)
-        {
-            CommandRunner = commandRunner;
-            CurrentConfigurationController = new ParseCurrentConfigurationController(storageController, decoder);
-            Decoder = decoder;
-        }
-
-        public Task<ParseConfiguration> FetchConfigAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default) => CommandRunner.RunCommandAsync(new ParseCommand("config", method: "GET", sessionToken: sessionToken, data: default), cancellationToken: cancellationToken).OnSuccess(task =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return Decoder.BuildConfiguration(task.Result.Item2, serviceHub);
-        }).OnSuccess(task =>
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            CurrentConfigurationController.SetCurrentConfigAsync(task.Result);
-            return task;
-        }).Unwrap();
+        CommandRunner = commandRunner;
+        CurrentConfigurationController = new ParseCurrentConfigurationController(storageController, decoder);
+        Decoder = decoder;
     }
+
+    public async Task<ParseConfiguration> FetchConfigAsync(string sessionToken, IServiceHub serviceHub, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        // Fetch configuration via the command runner (returns a Task)
+        var commandResult = await CommandRunner.RunCommandAsync(new ParseCommand("config", method: "GET", sessionToken: sessionToken, null, null),null, null).ConfigureAwait(false);
+
+        // Build the configuration using the decoder (assuming BuildConfiguration is async)
+        var config = Decoder.BuildConfiguration(commandResult.Item2, serviceHub);
+
+        // Set the current configuration (assuming SetCurrentConfigAsync is async)
+        await CurrentConfigurationController.SetCurrentConfigAsync(config).ConfigureAwait(false);
+
+        return config;
+    }
+
 }
