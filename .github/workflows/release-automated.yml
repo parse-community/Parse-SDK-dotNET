@@ -15,11 +15,11 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.x'
+          dotnet-version: '8.x'
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 18
+          node-version: 20
       - name: Install Node dependencies
         run: npm ci
       - name: Build and publish release
