@@ -1,4 +1,4 @@
-# Parse SDK for .NET
+![parse-repository-header-sdk-dotnet](https://github.com/user-attachments/assets/f4672e91-2b80-45a2-8619-7c9511e93d65)
 
 ---
 
@@ -17,33 +17,22 @@
 
 ---
 
-A library that gives you access to the powerful Parse Server backend from any platform supporting .NET Standard 2.0. For more information about Parse and its features, visit [parseplatform.org](https://parseplatform.org/).
+This library gives you access to the powerful Parse Server backend from your .NET app. For more information on Parse Platform and its features, visit [parseplatform.org](https://parseplatform.org).
 
 ---
 
-- [Parse SDK for .NET](#parse-sdk-for-net)
-  - [Getting Started](#getting-started)
-  - [Compatibility](#compatibility)
-    - [.NET](#net)
-  - [Using the Code](#using-the-code)
-    - [Common Definitions](#common-definitions)
-    - [Client-Side Use](#client-side-use)
-    - [Use In Unity Client](#use-in-unity-client)
-      - [Unity3D on iOS](#unity3d-on-ios)
-      - [Unity3D on Android](#unity3d-on-android)
-    - [Server-Side Use](#server-side-use)
-    - [Basic Demonstration](#basic-demonstration)
-  - [Local Builds](#local-builds)
-  - [.NET Core CLI](#net-core-cli)
-
-
-## Getting Started
-The previous stable release version 1.7.0 is available as [a NuGet package][nuget-link].
-
-The latest development release is also available as [a NuGet package (Prerelease)][nuget-link-prerelease].
-
-Note that the previous stable package currently available on the official distribution channel is quite old.
-To use the most up-to-date code, either build this project and reference the generated NuGet package, download the pre-built assembly from [releases][releases-link] or check the [NuGet package (Prerelease)][nuget-link-prerelease] on NuGet.
+- [Compatibility](#compatibility)
+  - [.NET](#net)
+- [Using the Code](#using-the-code)
+  - [Common Definitions](#common-definitions)
+  - [Client-Side Use](#client-side-use)
+  - [Use In Unity Client](#use-in-unity-client)
+    - [Unity3D on iOS](#unity3d-on-ios)
+    - [Unity3D on Android](#unity3d-on-android)
+  - [Server-Side Use](#server-side-use)
+  - [Basic Demonstration](#basic-demonstration)
+- [Local Builds](#local-builds)
+- [.NET Core CLI](#net-core-cli)
 
 ## Compatibility
 
@@ -53,10 +42,14 @@ Parse .NET SDK is continuously tested with the most recent releases of .NET to e
 
 | .NET Version | End-of-Life   | Parse .NET SDK Version |
 |--------------|---------------|------------------------|
-| 6.0          | November 2024 | >= 1.0                 |
-| 7.0          | May 2024      | >= 1.0                 |
-| 8.0          | November 2026 | >= 1.0                 |
-| 9.0          | May 2026      | >= 1.0                 |
+| Standard 2.0 | November 2024 | >=1.0.0 <4.0.0         |
+| 6.0          | November 2024 | >=1.0.0 <5.0.0         |
+| 7.0          | May 2024      | >=1.0.0 <5.0.0         |
+| 8.0          | November 2026 | >=1.0.0                |
+| 9.0          | May 2026      | >=1.0.0                |
+
+> [!NOTE]  
+> We have removed support for [NET Standard 2.0](https://devblogs.microsoft.com/dotnet/the-future-of-net-standard/) with Parse .NET SDK 4.0. Xamarin developers should migrate to .NET MAUI to use the latest version of the Parse .NET SDK. Unity developers should use Parse .NET SDK <4.0 until Unity supports .NET and then migrate to the latest version of the Parse .NET SDK.
 
 ## Using the Code
 Make sure you are using the project's root namespace.
