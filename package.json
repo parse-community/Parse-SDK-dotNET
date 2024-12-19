@@ -1,6 +1,6 @@
 {
   "name": "parse-sdk-dotnet",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "devDependencies": {
     "@droidsolutions-oss/semantic-release-nuget": "1.4.1",
     "@droidsolutions-oss/semantic-release-update-file": "1.4.0",
