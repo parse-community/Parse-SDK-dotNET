@@ -39,6 +39,8 @@ jobs:
         args: 'install opencover.portable codecov -y'
     - name: Build
       run: dotnet build Parse.sln --configuration Debug --no-restore
+    - name: 'Debug: List files'
+      run: dir /s
     - name: Run tests with coverage
       run: |
         OpenCover.Console.exe -target:dotnet.exe -targetargs:"test --framework net${{ matrix.DOTNET_VERSION }} --configuration Debug --test-adapter-path:. --logger:console /p:DebugType=full .\Parse.Tests\Parse.Tests.csproj" -filter:"+[Parse*]* -[Parse.Tests*]*" -oldstyle -output:parse_sdk_dotnet_coverage.xml -register:user
