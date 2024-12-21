@@ -17,10 +17,18 @@ namespace Parse.Tests;
 [TestClass]
 public class ObjectControllerTests
 {
-    private ParseClient Client { get; set; }
 
+    private ParseClient Client { get; set; }
     [TestInitialize]
-    public void SetUp() => Client = new ParseClient(new ServerConnectionData { ApplicationID = "", Key = "", Test = true });
+    public void SetUp()
+    {
+        // Initialize the client and ensure the instance is set
+        Client = new ParseClient(new ServerConnectionData { Test = true, ApplicationID = "", Key = "" });
+        Client.Publicize();
+    }
+    [TestCleanup]
+    public void TearDown() => (Client.Services as ServiceHub).Reset();
+
 
     [TestMethod]
     public async Task TestFetchAsync()
