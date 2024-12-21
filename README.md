@@ -1,4 +1,4 @@
-# Parse SDK for .NET
+# Parse SDK for .NET - MAUI - UNOFFICIAL
 
 ---
 
@@ -17,7 +17,7 @@
 
 ---
 
-A library that gives you access to the powerful Parse Server backend from any platform supporting .NET Standard 2.0. For more information about Parse and its features, visit [parseplatform.org](https://parseplatform.org/).
+A library that gives you access to the powerful Parse Server backend from any platform supporting .NET Standard 2.0 and .NET 9 / MAUI. For more information about Parse and its features, visit [parseplatform.org](https://parseplatform.org/).
 
 ---
 
@@ -38,12 +38,21 @@ A library that gives you access to the powerful Parse Server backend from any pl
 
 
 ## Getting Started
-The previous stable release version 1.7.0 is available as [a NuGet package][nuget-link].
+I Plan to push a nuget soon and update here
 
-The latest development release is also available as [a NuGet package (Prerelease)][nuget-link-prerelease].
 
-Note that the previous stable package currently available on the official distribution channel is quite old.
-To use the most up-to-date code, either build this project and reference the generated NuGet package, download the pre-built assembly from [releases][releases-link] or check the [NuGet package (Prerelease)][nuget-link-prerelease] on NuGet.
+## Compatibility
+
+### .NET
+
+Parse .NET SDK is continuously tested with the most recent releases of .NET to ensure compatibility. We follow the [.NET Long Term Support plan](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core) and only test against versions that are officially supported and have not reached their end-of-life date.
+
+| .NET Version | End-of-Life   | Parse .NET SDK Version |
+|--------------|---------------|------------------------|
+| 6.0          | November 2024 | >= 1.0                 |
+| 7.0          | May 2024      | >= 1.0                 |
+| 8.0          | November 2026 | >= 1.0                 |
+| 9.0          | May 2026      | >= 1.0                 |
 
 ## Compatibility
 
@@ -239,7 +248,7 @@ await client.LogOutAsync();
 ```
 
 ## Local Builds
-You can build the SDK on any system with the MSBuild or .NET Core CLI installed. Results can be found under either the `Release/netstandard2.0` or `Debug/netstandard2.0` in the `bin` folder unless a non-standard build configuration is used.
+You can build the SDK on any system with the MSBuild or .NET Core CLI installed.
 
 ## .NET Core CLI
 
