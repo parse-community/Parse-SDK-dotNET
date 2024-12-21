@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Installations;
 using Parse.Abstractions.Platform.Push;
-using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.Push;
 internal class ParsePushChannelsController : IParsePushChannelsController

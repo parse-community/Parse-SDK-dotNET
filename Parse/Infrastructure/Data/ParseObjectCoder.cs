@@ -1,125 +1,139 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Control;
 using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Platform.Objects;
 
-namespace Parse.Infrastructure.Data
+namespace Parse.Infrastructure.Data;
+
+// TODO: (richardross) refactor entire parse coder interfaces.
+// Done: (YB) though, I wonder why Encode is never used in the ParseObjectCoder class. Might update if I find a use case.
+//Got it now. The Encode method is used in ParseObjectController.cs
+
+
+/// <summary>
+/// Provides methods to encode and decode Parse objects.
+/// </summary>
+public class ParseObjectCoder
 {
-    // TODO: (richardross) refactor entire parse coder interfaces.
+    /// <summary>
+    /// Gets the singleton instance of the ParseObjectCoder.
+    /// </summary>
+    public static ParseObjectCoder Instance { get; } = new ParseObjectCoder();
 
-    public class ParseObjectCoder
+    // Private constructor to prevent external instantiation
+    private ParseObjectCoder() { }
+
+    /// <summary>
+    /// Encodes the object state and operations using the provided encoder.
+    /// </summary>
+    public IDictionary<string, object> Encode<T>(
+        T state,
+        IDictionary<string, IParseFieldOperation> operations,
+        ParseDataEncoder encoder,
+        IServiceHub serviceHub
+    ) where T : IObjectState
     {
-        public static ParseObjectCoder Instance { get; } = new ParseObjectCoder { };
+        var result = new Dictionary<string, object>();
 
-        // Prevent default constructor.
-
-        ParseObjectCoder() { }
-
-        public IDictionary<string, object> Encode<T>(T state, IDictionary<string, IParseFieldOperation> operations, ParseDataEncoder encoder, IServiceHub serviceHub) where T : IObjectState
+        foreach (var pair in operations)
         {
-            Dictionary<string, object> result = new Dictionary<string, object> { };
-            foreach (KeyValuePair<string, IParseFieldOperation> pair in operations)
-            {
-                // Serialize the data
-                IParseFieldOperation operation = pair.Value;
-
-                result[pair.Key] = encoder.Encode(operation, serviceHub);
-            }
-
-            return result;
+            var operation = pair.Value;
+            result[pair.Key] = encoder.Encode(operation, serviceHub);
         }
 
-        public IObjectState Decode(IDictionary<string, object> data, IParseDataDecoder decoder, IServiceHub serviceHub)
-        {
-            IDictionary<string, object> serverData = new Dictionary<string, object> { }, mutableData = new Dictionary<string, object>(data);
-
-            string objectId = Extract(mutableData, "objectId", (obj) => obj as string);
-            string email = Extract(mutableData, "email", (obj) => obj as string);
-            string username = Extract(mutableData, "username", (obj) => obj as string);
-            string sessionToken = Extract(mutableData, "sessionToken", (obj) => obj as string);
-            string error = Extract(mutableData, "error", (obj) => obj as string);
-            int code = Extract(mutableData, "code", obj => Convert.ToInt32(obj));
-            bool emailVerified = Extract(mutableData, "emailVerified", (obj) => (bool) obj);    
-            DateTime? createdAt = Extract<DateTime?>(mutableData, "createdAt", (obj) => ParseDataDecoder.ParseDate(obj as string)), updatedAt = Extract<DateTime?>(mutableData, "updatedAt", (obj) => ParseDataDecoder.ParseDate(obj as string));
-
-
-
-            if (!mutableData.ContainsKey("username"))
-            {
-                serverData["username"] = username;
-            }
-            if (!mutableData.ContainsKey("email"))
-            {
-                serverData["email"] = email;
-            }
-            if (!mutableData.ContainsKey("sessionToken"))
-            {
-                serverData["sessionToken"] = sessionToken;
-            }
-            if (!mutableData.ContainsKey("error"))
-            {
-                serverData["error"] = error;
-            }
-            if (!mutableData.ContainsKey("code"))
-            {
-                serverData["code"] = code;
-            }            
-            if (!mutableData.ContainsKey("emailVerified"))
-            {
-                serverData["emailVerified"] = emailVerified;
-            }
-            if (!mutableData.ContainsKey("ACL"))
-            {
-                var e = Extract(mutableData, "ACL", (obj) =>
-                {
-                    return new ParseACL(obj as IDictionary<string, object>);
-                });
-            }
-
-            if (createdAt != null && updatedAt == null)
-            {
-                updatedAt = createdAt;
-            }
-
-            // Bring in the new server data.
-
-            foreach (KeyValuePair<string, object> pair in mutableData)
-            {
-                if (pair.Key == "__type" || pair.Key == "className")
-                {
-                    continue;
-                }
-
-                serverData[pair.Key] = decoder.Decode(pair.Value, serviceHub);
-            }
-
-            return new MutableObjectState
-            {
-                ObjectId = objectId,
-                CreatedAt = createdAt,
-                UpdatedAt = updatedAt,
-                ServerData = serverData,
-                //Email = email,
-                //Username = username,
-                //EmailVerified = emailVerified,
-                SessionToken = sessionToken
-            };
-        }
-
-        T Extract<T>(IDictionary<string, object> data, string key, Func<object, T> action)
-        {
-            T result = default;
-
-            if (data.ContainsKey(key))
-            {
-                result = action(data[key]);
-                data.Remove(key);
-            }
-
-            return result;
-        }
+        return result;
     }
+    /// <summary>
+    /// Decodes raw server data into a mutable object state.
+    /// </summary>
+    public IObjectState Decode(IDictionary<string, object> data, IParseDataDecoder decoder, IServiceHub serviceHub)
+    {
+
+        var serverData = new Dictionary<string, object>();
+        var mutableData = new Dictionary<string, object>(data);
+
+        // Extract key properties (existing logic)
+        var objectId = Extract(mutableData, "objectId", obj => obj as string);
+        var email = Extract(mutableData, "email", obj => obj as string);
+        var username = Extract(mutableData, "username", obj => obj as string);
+        var sessionToken = Extract(mutableData, "sessionToken", obj => obj as string);
+        var error = Extract(mutableData, "error", obj => obj as string);
+        var code = Extract(mutableData, "code", obj => Convert.ToInt32(obj));
+        var emailVerified = Extract(mutableData, "emailVerified", obj => obj is bool value && value);
+
+        var createdAt = Extract(mutableData, "createdAt", obj => ParseDataDecoder.ParseDate(obj as string));
+        var updatedAt = Extract(mutableData, "updatedAt", obj => ParseDataDecoder.ParseDate(obj as string)) ?? createdAt;
+
+        // Handle ACL extraction
+        var acl = Extract(mutableData, "ACL", obj =>
+        {
+            if (obj is IDictionary<string, object> aclData)
+            {
+                return new ParseACL(aclData); // Return ParseACL if the format is correct
+            }
+
+            return null; // If ACL is missing or in an incorrect format, return null
+        });
+
+        if (acl != null)
+        {
+            serverData["ACL"] = acl; // Add the decoded ACL back to serverData
+        }
+
+
+        // Decode remaining fields
+        foreach (var pair in mutableData)
+        {
+            if (pair.Key == "__type" || pair.Key == "className")
+                continue;
+
+            serverData[pair.Key] = decoder.Decode(pair.Value, serviceHub);
+        }
+
+        // Populate server data with primary properties
+        PopulateServerData(serverData, "username", username);
+        PopulateServerData(serverData, "email", email);
+        PopulateServerData(serverData, "sessionToken", sessionToken);
+        PopulateServerData(serverData, "error", error);
+        PopulateServerData(serverData, "code", code);
+        PopulateServerData(serverData, "emailVerified", emailVerified);
+
+        return new MutableObjectState
+        {
+            ObjectId = objectId,
+            CreatedAt = createdAt,
+            UpdatedAt = updatedAt,
+            ServerData = serverData,
+            SessionToken = sessionToken
+        };
+    }
+
+    /// <summary>
+    /// Extracts a value from a dictionary and removes the key.
+    /// </summary>
+    private static T Extract<T>(IDictionary<string, object> data, string key, Func<object, T> action)
+{
+    if (data.TryGetValue(key, out var value))
+    {
+        data.Remove(key);
+        return action(value);
+    }
+
+    return default;
+}
+
+/// <summary>
+/// Populates server data with a value if not already present.
+/// </summary>
+private static void PopulateServerData(IDictionary<string, object> serverData, string key, object value)
+{
+    if (value != null && !serverData.ContainsKey(key))
+    {
+        serverData[key] = value;
+    }
+}
 }

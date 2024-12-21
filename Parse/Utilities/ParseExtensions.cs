@@ -1,7 +1,8 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Parse.Infrastructure.Utilities;
-
+using System.Linq;
 namespace Parse;
 
 /// <summary>
@@ -24,6 +25,16 @@ public static class ParseExtensions
         var result = await obj.FetchAsyncInternal(cancellationToken).ConfigureAwait(false);
         return (T) result;
     }
+    /// <summary>
+    /// Fetches all objects in the collection from the server.
+    /// </summary>
+    public static async Task<IEnumerable<T>> FetchAllAsync<T>(this IEnumerable<T> objects, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        if (objects == null || !objects.Any()) return objects;
+
+        var result = await Task.WhenAll(objects.Select(obj => obj.FetchAsyncInternal(cancellationToken))).ConfigureAwait(false);
+        return result.Cast<T>();
+    }
 
     /// <summary>
     /// If this ParseObject has not been fetched (i.e. <see cref="ParseObject.IsDataAvailable"/> returns
@@ -36,4 +47,17 @@ public static class ParseExtensions
         var result = await obj.FetchIfNeededAsyncInternal(cancellationToken).ConfigureAwait(false);
         return (T) result;
     }
+
+    /// <summary>
+    /// Fetches all objects in the collection from the server only if their data is not available.
+    /// </summary>
+    public static async Task<IEnumerable<T>> FetchAllIfNeededAsync<T>(this IEnumerable<T> objects, CancellationToken cancellationToken = default) where T : ParseObject
+    {
+        if (objects == null || !objects.Any())
+            return objects;
+
+        var result = await Task.WhenAll(objects.Select(obj => obj.FetchIfNeededAsyncInternal(cancellationToken))).ConfigureAwait(false);
+        return result.Cast<T>();
+    }
+
 }

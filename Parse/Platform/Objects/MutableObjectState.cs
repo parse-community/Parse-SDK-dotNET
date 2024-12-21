@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using Parse.Abstractions.Infrastructure;
@@ -13,23 +13,39 @@ namespace Parse.Platform.Objects;
 public class MutableObjectState : IObjectState
 {
     public bool IsNew { get; set; }
-    //public bool EmailVerified { get; set; }
     public string ClassName { get; set; }
     public string ObjectId { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public DateTime? CreatedAt { get; set; }
-    //public string Username { get; set; } // Added
-    //public string Email { get; set; } // Added
     public string SessionToken { get; set; } // Added
 
     public IDictionary<string, object> ServerData { get; set; } = new Dictionary<string, object>();
+    public object this[string key]
+    {
+        get => ServerData.ContainsKey(key) ? ServerData[key] : null;
+        set
+        {
+            if (!Equals(ServerData[key], value))
+            {
+                ServerData[key] = value;
+                OnPropertyChanged(key); // Raise PropertyChanged for the updated key
+            }
+        }
+    }
 
-    public object this[string key] => ServerData.ContainsKey(key) ? ServerData[key] : null;
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs( propertyName));
+    }
 
     public bool ContainsKey(string key)
     {
         return ServerData.ContainsKey(key);
     }
+
+
 
     public void Apply(IDictionary<string, IParseFieldOperation> operationSet)
     {
@@ -100,10 +116,6 @@ public class MutableObjectState : IObjectState
             ObjectId = ObjectId,
             CreatedAt = CreatedAt,
             UpdatedAt = UpdatedAt,
-            //Username= Username,
-            //Email = Email,
-            //EmailVerified = EmailVerified,
-            //SessionToken = SessionToken,
             
             ServerData = ServerData.ToDictionary(entry => entry.Key, entry => entry.Value)
         };
@@ -132,10 +144,6 @@ public class MutableObjectState : IObjectState
                     CreatedAt = dictionary.ContainsKey("createdAt") ? DecodeDateTime(dictionary["createdAt"]) : null,
                     UpdatedAt = dictionary.ContainsKey("updatedAt") ? DecodeDateTime(dictionary["updatedAt"]) : null,
                     IsNew = dictionary.ContainsKey("isNew") && Convert.ToBoolean(dictionary["isNew"]),
-                    //EmailVerified = dictionary.ContainsKey("emailVerified") && Convert.ToBoolean(dictionary["emailVerified"]),
-                    //Username = dictionary.ContainsKey("username") ? dictionary["username"]?.ToString() : null,
-                    //Email = dictionary.ContainsKey("email") ? dictionary["email"]?.ToString() : null,
-                    //SessionToken = dictionary.ContainsKey("sessionToken") ? dictionary["sessionToken"]?.ToString() : null,
                     ServerData = dictionary
                         .Where(pair => IsValidField(pair.Key, pair.Value))
                         .ToDictionary(pair => pair.Key, pair => pair.Value)
@@ -150,7 +158,6 @@ public class MutableObjectState : IObjectState
             }
         }
 
-        Debug.WriteLine("Data is not a compatible object for decoding.");
         return null;
     }
 

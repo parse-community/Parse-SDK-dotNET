@@ -6,149 +6,246 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.Objects;
+using Parse.Abstractions.Platform.Queries;
 using Parse.Infrastructure;
 using Parse.Platform.Objects;
 
-namespace Parse.Tests
+namespace Parse.Tests;
+
+[TestClass]
+public class InstallationTests
 {
-    [TestClass]
-    public class InstallationTests
+    private ParseClient Client { get; set; }
+    private Mock<IServiceHub> ServiceHubMock { get; set; }
+    private Mock<IParseObjectClassController> ClassControllerMock { get; set; }
+    private Mock<IParseCurrentInstallationController> CurrentInstallationControllerMock { get; set; }
+
+    [TestInitialize]
+    public void SetUp()
     {
-        ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
+        // Initialize mocks
+        ServiceHubMock = new Mock<IServiceHub>(MockBehavior.Strict);
+        ClassControllerMock = new Mock<IParseObjectClassController>(MockBehavior.Strict);
+        CurrentInstallationControllerMock = new Mock<IParseCurrentInstallationController>(MockBehavior.Strict);
 
-        [TestInitialize]
-        public void SetUp() => Client.AddValidClass<ParseInstallation>();
+        // Mock ClassController behavior
+        ClassControllerMock.Setup(controller => controller.Instantiate(It.IsAny<string>(), It.IsAny<IServiceHub>()))
+            .Returns<string, IServiceHub>((className, hub) => new ParseInstallation().Bind(hub) as ParseObject);
 
-        [TestCleanup]
-        public void TearDown() => (Client.Services as ServiceHub).Reset();
+        ClassControllerMock.Setup(controller => controller.GetClassMatch("_Installation", typeof(ParseInstallation)))
+            .Returns(true);
 
-        [TestMethod]
-        public void TestGetInstallationQuery() => Assert.IsInstanceOfType(Client.GetInstallationQuery(), typeof(ParseQuery<ParseInstallation>));
+        ClassControllerMock.Setup(controller => controller.GetPropertyMappings("_Installation"))
+            .Returns(new Dictionary<string, string>
+            {
+            { nameof(ParseInstallation.InstallationId), "installationId" },
+            { nameof(ParseInstallation.DeviceType), "deviceType" },
+            { nameof(ParseInstallation.AppName), "appName" },
+            { nameof(ParseInstallation.AppVersion), "appVersion" },
+            { nameof(ParseInstallation.AppIdentifier), "appIdentifier" },
+            { nameof(ParseInstallation.TimeZone), "timeZone" },
+            { nameof(ParseInstallation.LocaleIdentifier), "localeIdentifier" },
+            { nameof(ParseInstallation.Channels), "channels" }
+            });
 
-        [TestMethod]
-        public void TestInstallationIdGetterSetter()
+        // Mock GetClassName
+        ClassControllerMock.Setup(controller => controller.GetClassName(typeof(ParseInstallation)))
+            .Returns("_Installation");
+
+        ClassControllerMock.Setup(controller => controller.AddValid(It.IsAny<Type>()))
+            .Verifiable();
+
+        ServiceHubMock.Setup(hub => hub.ClassController).Returns(ClassControllerMock.Object);
+        ServiceHubMock.Setup(hub => hub.CurrentInstallationController).Returns(CurrentInstallationControllerMock.Object);
+
+        // Create ParseClient with mocked ServiceHub
+        Client = new ParseClient(new ServerConnectionData { Test = true })
         {
-            Guid guid = Guid.NewGuid();
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["installationId"] = guid.ToString() } }, "_Installation");
+            Services = ServiceHubMock.Object
+        };
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual(guid, installation.InstallationId);
+        // Publicize the client to set ParseClient.Instance
+        Client.Publicize();
 
-            Guid newGuid = Guid.NewGuid();
-            Assert.ThrowsException<InvalidOperationException>(() => installation["installationId"] = newGuid);
+        // Add valid classes to the client
+        Client.AddValidClass<ParseInstallation>();
+    }
 
-            installation.SetIfDifferent("installationId", newGuid.ToString());
-            Assert.AreEqual(newGuid, installation.InstallationId);
-        }
 
-        [TestMethod]
-        public void TestDeviceTypeGetterSetter()
-        {
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["deviceType"] = "parseOS" } }, "_Installation");
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual("parseOS", installation.DeviceType);
 
-            Assert.ThrowsException<InvalidOperationException>(() => installation["deviceType"] = "gogoOS");
 
-            installation.SetIfDifferent("deviceType", "gogoOS");
-            Assert.AreEqual("gogoOS", installation.DeviceType);
-        }
+    [TestCleanup]
+    public void TearDown()
+    {
+        (Client.Services as ServiceHub)?.Reset();
+    }
 
-        [TestMethod]
-        public void TestAppNameGetterSetter()
-        {
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["appName"] = "parseApp" } }, "_Installation");
+    [TestMethod]
+    public void TestInstallationPropertyMappings()
+    {
+        var mappings = Client.Services.ClassController.GetPropertyMappings("_Installation");
+        Assert.IsNotNull(mappings);
+        Assert.AreEqual("installationId", mappings[nameof(ParseInstallation.InstallationId)]);
+        Assert.AreEqual("appName", mappings[nameof(ParseInstallation.AppName)]);
+        Assert.AreEqual("appIdentifier", mappings[nameof(ParseInstallation.AppIdentifier)]);
+        Assert.AreEqual("channels", mappings[nameof(ParseInstallation.Channels)]);
+    }
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual("parseApp", installation.AppName);
+    [TestMethod]
+    public void TestGetInstallationQuery()
+    {
+        // Act: Get the query
+        var query = Client.GetInstallationQuery();
 
-            Assert.ThrowsException<InvalidOperationException>(() => installation["appName"] = "gogoApp");
+        // Assert: Verify the query type and class name
+        Assert.IsInstanceOfType(query, typeof(ParseQuery<ParseInstallation>));
+        Assert.AreEqual("_Installation", query.ClassName);
 
-            installation.SetIfDifferent("appName", "gogoApp");
-            Assert.AreEqual("gogoApp", installation.AppName);
-        }
+        // Verify that GetClassName was called to resolve the class name
+        ClassControllerMock.Verify(controller => controller.GetClassName(typeof(ParseInstallation)), Times.Once);
 
-        [TestMethod]
-        public void TestAppVersionGetterSetter()
-        {
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["appVersion"] = "1.2.3" } }, "_Installation");
+        // Verify AddValid was called for ParseInstallation
+        ClassControllerMock.Verify(controller => controller.AddValid(typeof(ParseInstallation)), Times.AtLeastOnce);
+    }
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual("1.2.3", installation.AppVersion);
 
-            Assert.ThrowsException<InvalidOperationException>(() => installation["appVersion"] = "1.2.4");
 
-            installation.SetIfDifferent("appVersion", "1.2.4");
-            Assert.AreEqual("1.2.4", installation.AppVersion);
-        }
+    [TestMethod]
+    public void TestInstallationIdGetterSetter()
+    {
+        Guid guid = Guid.NewGuid();
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["installationId"] = guid.ToString() } },
+            "_Installation");
 
-        [TestMethod]
-        public void TestAppIdentifierGetterSetter()
-        {
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["appIdentifier"] = "com.parse.app" } }, "_Installation");
+        Assert.IsNotNull(installation);
+        Assert.AreEqual(guid, installation.InstallationId);
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual("com.parse.app", installation.AppIdentifier);
+        Guid newGuid = Guid.NewGuid();
+        Assert.ThrowsException<InvalidOperationException>(() => installation["installationId"] = newGuid);
 
-            Assert.ThrowsException<InvalidOperationException>(() => installation["appIdentifier"] = "com.parse.newapp");
+        installation.SetIfDifferent("installationId", newGuid.ToString());
+        Assert.AreEqual(newGuid, installation.InstallationId);
+    }
 
-            installation.SetIfDifferent("appIdentifier", "com.parse.newapp");
-            Assert.AreEqual("com.parse.newapp", installation.AppIdentifier);
-        }
+    [TestMethod]
+    public void TestDeviceTypeGetterSetter()
+    {
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["deviceType"] = "parseOS" } },
+            "_Installation");
 
-        [TestMethod]
-        public void TestTimeZoneGetter()
-        {
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["timeZone"] = "America/Los_Angeles" } }, "_Installation");
+        Assert.IsNotNull(installation);
+        Assert.AreEqual("parseOS", installation.DeviceType);
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual("America/Los_Angeles", installation.TimeZone);
-        }
+        Assert.ThrowsException<InvalidOperationException>(() => installation["deviceType"] = "gogoOS");
 
-        [TestMethod]
-        public void TestLocaleIdentifierGetter()
-        {
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["localeIdentifier"] = "en-US" } }, "_Installation");
+        installation.SetIfDifferent("deviceType", "gogoOS");
+        Assert.AreEqual("gogoOS", installation.DeviceType);
+    }
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual("en-US", installation.LocaleIdentifier);
-        }
+    [TestMethod]
+    public void TestAppNameGetterSetter()
+    {
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["appName"] = "parseApp" } },
+            "_Installation");
 
-        [TestMethod]
-        public void TestChannelGetterSetter()
-        {
-            ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["channels"] = new List<string> { "the", "richard" } } }, "_Installation");
+        Assert.IsNotNull(installation);
+        Assert.AreEqual("parseApp", installation.AppName);
 
-            Assert.IsNotNull(installation);
-            Assert.AreEqual("the", installation.Channels[0]);
-            Assert.AreEqual("richard", installation.Channels[1]);
+        Assert.ThrowsException<InvalidOperationException>(() => installation["appName"] = "gogoApp");
 
-            installation.Channels = new List<string> { "mr", "kevin" };
+        installation.SetIfDifferent("appName", "gogoApp");
+        Assert.AreEqual("gogoApp", installation.AppName);
+    }
 
-            Assert.AreEqual("mr", installation.Channels[0]);
-            Assert.AreEqual("kevin", installation.Channels[1]);
-        }
+    [TestMethod]
+    public void TestAppVersionGetterSetter()
+    {
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["appVersion"] = "1.2.3" } },
+            "_Installation");
 
-        [TestMethod]
-        public void TestGetCurrentInstallation()
-        {
-            MutableServiceHub hub = new MutableServiceHub { };
-            ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        Assert.IsNotNull(installation);
+        Assert.AreEqual("1.2.3", installation.AppVersion);
 
-            Guid guid = Guid.NewGuid();
+        Assert.ThrowsException<InvalidOperationException>(() => installation["appVersion"] = "1.2.4");
 
-            ParseInstallation installation = client.GenerateObjectFromState<ParseInstallation>(new MutableObjectState { ServerData = new Dictionary<string, object> { ["installationId"] = guid.ToString() } }, "_Installation");
+        installation.SetIfDifferent("appVersion", "1.2.4");
+        Assert.AreEqual("1.2.4", installation.AppVersion);
+    }
 
-            Mock<IParseCurrentInstallationController> mockController = new Mock<IParseCurrentInstallationController>();
-            mockController.Setup(obj => obj.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(installation));
+    [TestMethod]
+    public void TestAppIdentifierGetterSetter()
+    {
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["appIdentifier"] = "com.parse.app" } },
+            "_Installation");
 
-            hub.CurrentInstallationController = mockController.Object;
+        Assert.IsNotNull(installation);
+        Assert.AreEqual("com.parse.app", installation.AppIdentifier);
 
-            ParseInstallation currentInstallation = client.GetCurrentInstallation();
+        Assert.ThrowsException<InvalidOperationException>(() => installation["appIdentifier"] = "com.parse.newapp");
 
-            Assert.IsNotNull(currentInstallation);
-            Assert.AreEqual(guid, currentInstallation.InstallationId);
-        }
+        installation.SetIfDifferent("appIdentifier", "com.parse.newapp");
+        Assert.AreEqual("com.parse.newapp", installation.AppIdentifier);
+    }
+
+    [TestMethod]
+    public void TestTimeZoneGetter()
+    {
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["timeZone"] = "America/Los_Angeles" } },
+            "_Installation");
+
+        Assert.IsNotNull(installation);
+        Assert.AreEqual("America/Los_Angeles", installation.TimeZone);
+    }
+
+    [TestMethod]
+    public void TestLocaleIdentifierGetter()
+    {
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["localeIdentifier"] = "en-US" } },
+            "_Installation");
+
+        Assert.IsNotNull(installation);
+        Assert.AreEqual("en-US", installation.LocaleIdentifier);
+    }
+
+    [TestMethod]
+    public void TestChannelGetterSetter()
+    {
+        ParseInstallation installation = Client.GenerateObjectFromState<ParseInstallation>(
+            new MutableObjectState { ServerData = new Dictionary<string, object> { ["channels"] = new List<string> { "the", "richard" } } },
+            "_Installation");
+
+        Assert.IsNotNull(installation);
+        Assert.AreEqual("the", installation.Channels[0]);
+        Assert.AreEqual("richard", installation.Channels[1]);
+
+        installation.Channels = new List<string> { "mr", "kevin" };
+
+        Assert.AreEqual("mr", installation.Channels[0]);
+        Assert.AreEqual("kevin", installation.Channels[1]);
+    }
+
+    [TestMethod]
+    public async Task TestGetCurrentInstallation()
+    {
+        var guid = Guid.NewGuid();
+        var expectedInstallation = new ParseInstallation();
+        expectedInstallation.SetIfDifferent("installationId", guid.ToString());
+
+        CurrentInstallationControllerMock.Setup(controller => controller.GetAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(expectedInstallation));
+
+        ParseInstallation currentInstallation = await Client.GetCurrentInstallation();
+
+        Assert.IsNotNull(currentInstallation);
+        Assert.AreEqual(guid, currentInstallation.InstallationId);
     }
 }

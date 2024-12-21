@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,6 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Queries;
 using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Execution;
-using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.Queries;
 
@@ -31,11 +31,29 @@ internal class ParseQueryController : IParseQueryController
     public async Task<IEnumerable<IObjectState>> FindAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject
     {
         var result = await FindAsync(query.ClassName, query.BuildParameters(), user?.SessionToken, cancellationToken).ConfigureAwait(false);
-        var rawResults = result["results"] as IList<object> ?? new List<object>();
+
+        // Check if the result contains an error code
+        if (result.TryGetValue("code", out object codeValue) && codeValue is long errorCode)
+        {
+            if (errorCode == 102) // Specific handling for "Cannot query on ACL"
+            {
+                throw new InvalidOperationException("Cannot query on ACL. Ensure your query does not filter by ACL.");
+            }
+
+            // Handle other error codes here if needed
+        }
+
+        // Process raw results
+        var rawResults = result.TryGetValue("results", out object results) ? results as IList<object> : new List<object>();
+        if (rawResults is null || rawResults.Count == 0)
+        {
+            return Enumerable.Empty<IObjectState>();
+        }
 
         return rawResults
             .Select(item => ParseObjectCoder.Instance.Decode(item as IDictionary<string, object>, Decoder, user?.Services));
     }
+
 
     public async Task<int> CountAsync<T>(ParseQuery<T> query, ParseUser user, CancellationToken cancellationToken = default) where T : ParseObject
     {

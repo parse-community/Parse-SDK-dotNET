@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Data;
 using Parse.Infrastructure.Data;
@@ -38,7 +40,27 @@ public class ParseConfiguration : IJsonConvertible
     /// key was found, but of a different type.</exception>
     public T Get<T>(string key)
     {
-        return Conversion.To<T>(Properties[key]);
+        try
+        {
+            // Check if the key exists in the Properties dictionary
+            if (!Properties.ContainsKey(key))
+            {
+                throw new KeyNotFoundException($"The key '{key}' was not found in the configuration.");
+            }
+
+            // Try to convert the value to the desired type
+            return Conversion.To<T>(Properties[key]);
+        }
+        catch (KeyNotFoundException)
+        {
+            // Handle case where the key is not found in the dictionary
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Handle any other exception, such as a FormatException when conversion fails
+            throw new FormatException($"Error converting value for key '{key}' to type '{typeof(T)}'.", ex);
+        }
     }
 
     /// <summary>
@@ -51,21 +73,29 @@ public class ParseConfiguration : IJsonConvertible
     /// <returns>true if the lookup and conversion succeeded, otherwise false.</returns>
     public bool TryGetValue<T>(string key, out T result)
     {
-        if (Properties.ContainsKey(key))
-            try
+        result = default;
+
+        try
+        {
+            // Check if the key exists in the Properties dictionary
+            if (Properties.ContainsKey(key))
             {
-                T temp = Conversion.To<T>(Properties[key]);
-                result = temp;
+                // Attempt to convert the value to the requested type
+                result = Conversion.To<T>(Properties[key]);
                 return true;
             }
-            catch
-            {
-                // Could not convert, do nothing.
-            }
 
-        result = default;
-        return false;
+            // If the key does not exist, return false
+            return false;
+        }
+        catch (Exception ex)
+        {
+            // Log the exception if needed or just return false
+            Debug.WriteLine($"Error converting value for key '{key}': {ex.Message}");
+            return false;
+        }
     }
+
 
     /// <summary>
     /// Gets a value on the config.
@@ -76,7 +106,7 @@ public class ParseConfiguration : IJsonConvertible
     /// <returns>The value for the key.</returns>
     virtual public object this[string key] => Properties[key];
 
-    IDictionary<string, object> IJsonConvertible.ConvertToJSON()
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         return new Dictionary<string, object>
         {

@@ -1,14 +1,12 @@
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Platform.Files;
 using Parse.Infrastructure.Execution;
-using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.Files;
 
@@ -43,6 +41,13 @@ public class ParseFileController : IParseFileController
             // Ensure the cancellation token hasn't been triggered during processing
             cancellationToken.ThrowIfCancellationRequested();
 
+            var name = jsonData["name"] as string;
+            var url = jsonData["url"] as string;
+
+            if (name == null || url == null)
+            {
+                throw new Exception("Incomplete result: missing 'name' or 'url'.");
+            }
             return new FileState
             {
                 Name = jsonData["name"] as string,
@@ -55,7 +60,7 @@ public class ParseFileController : IParseFileController
             // Handle the cancellation properly, resetting the stream if it can seek
             if (dataStream.CanSeek)
                 dataStream.Seek(oldPosition, SeekOrigin.Begin);
-
+            
             throw; // Re-throw to allow the caller to handle the cancellation
         }
         catch (Exception)
@@ -63,7 +68,7 @@ public class ParseFileController : IParseFileController
             // If an error occurs, reset the stream position and rethrow
             if (dataStream.CanSeek)
                 dataStream.Seek(oldPosition, SeekOrigin.Begin);
-
+            
             throw; // Re-throw to allow the caller to handle the error
         }
     }

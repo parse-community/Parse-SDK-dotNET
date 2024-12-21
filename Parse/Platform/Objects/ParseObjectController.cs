@@ -13,6 +13,7 @@ using Parse.Infrastructure;
 using Parse.Abstractions.Internal;
 using Parse.Infrastructure.Execution;
 using Parse.Infrastructure.Data;
+using System.Net.Http;
 
 namespace Parse.Platform.Objects;
 
@@ -40,15 +41,25 @@ public class ParseObjectController : IParseObjectController
         ParseCommand command;
         if (state.ObjectId == null)
         {
-            command = new ParseCommand($"classes/{Uri.EscapeDataString(state.ClassName)}", method: state.ObjectId == null ? "POST" : "PUT", sessionToken: sessionToken, data: serviceHub.GenerateJSONObjectForSaving(operations));
+            var method = "POST";
+            var relURI = $"classes/{Uri.EscapeDataString(state.ClassName)}";
+            var dataa = serviceHub.GenerateJSONObjectForSaving(operations);
+            command = new ParseCommand(relURI, method, sessionToken: sessionToken, data: dataa);
         }
         else
         {
-            command = new ParseCommand($"classes/{Uri.EscapeDataString(state.ClassName)}/{state.ObjectId}", method: state.ObjectId == null ? "POST" : "PUT", sessionToken: sessionToken, data: serviceHub.GenerateJSONObjectForSaving(operations));
+            var method = "PUT";
+            var relURI = $"classes/{Uri.EscapeDataString(state.ClassName)}/{state.ObjectId}";
+            var dataa = serviceHub.GenerateJSONObjectForSaving(operations);
+            command = new ParseCommand(relURI, method, sessionToken: sessionToken, data: dataa);
         }
         var result = await CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (result.Item1 == System.Net.HttpStatusCode.Gone)
+        {
+            throw new HttpRequestException("Page does not exist");
+        }
         var decodedState = ParseObjectCoder.Instance.Decode(result.Item2, Decoder, serviceHub);
-
+        
         // Mutating the state and marking it as new if the status code is Created
         decodedState.MutatedClone(mutableClone => mutableClone.IsNew = result.Item1 == System.Net.HttpStatusCode.Created);
 
@@ -56,7 +67,7 @@ public class ParseObjectController : IParseObjectController
     }
 
 
-    public async Task<IList<Task<IObjectState>>> SaveAllAsync(IList<IObjectState> states,IList<IDictionary<string, IParseFieldOperation>> operationsList,string sessionToken,IServiceHub serviceHub,CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Task<IObjectState>>> SaveAllAsync(IEnumerable<IObjectState> states,IEnumerable<IDictionary<string, IParseFieldOperation>> operationsList,string sessionToken,IServiceHub serviceHub,CancellationToken cancellationToken = default)
     {
         // Create a list of tasks where each task represents a command to be executed
         var tasks =
@@ -82,7 +93,7 @@ public class ParseObjectController : IParseObjectController
         return CommandRunner.RunCommandAsync(new ParseCommand($"classes/{state.ClassName}/{state.ObjectId}", method: "DELETE", sessionToken: sessionToken, data: null), cancellationToken: cancellationToken);
     }
 
-    public IList<Task> DeleteAllAsync(IList<IObjectState> states, string sessionToken, CancellationToken cancellationToken = default)
+    public IEnumerable<Task> DeleteAllAsync(IEnumerable<IObjectState> states, string sessionToken, CancellationToken cancellationToken = default)
     {
         return ExecuteBatchRequests(states.Where(item => item.ObjectId is { }).Select(item => new ParseCommand($"classes/{Uri.EscapeDataString(item.ClassName)}/{Uri.EscapeDataString(item.ObjectId)}", method: "DELETE", data: default)).ToList(), sessionToken, cancellationToken).Cast<Task>().ToList();
     }

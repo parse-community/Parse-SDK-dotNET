@@ -2,7 +2,12 @@
 
 ---
 
-[![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/YBTopaz8/Parse-SDK-dotNET/releases)
+[![Build Status](https://github.com/parse-community/Parse-SDK-dotNET/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/parse-community/Parse-SDK-dotNET/actions/workflows/ci.yml?query=workflow%3Aci+branch%3Amaster)
+[![Coverage](https://img.shields.io/codecov/c/github/parse-community/Parse-SDK-dotNET/master.svg)](https://codecov.io/github/parse-community/Parse-SDK-dotNET?branch=master)
+[![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/parse-community/Parse-SDK-dotNET/releases)
+
+[![.NET Version](https://img.shields.io/badge/.NET-6,_7,_8,_9-5234CE.svg?logo=.net&style=flat)](https://dotnet.microsoft.com)
+[![Nuget](https://img.shields.io/nuget/v/parse.svg)](http://nuget.org/packages/parse)
 
 [![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)][open-collective-link]
 [![Sponsors on Open Collective](https://opencollective.com/parse-server/sponsors/badge.svg)][open-collective-link]
@@ -18,6 +23,8 @@ A library that gives you access to the powerful Parse Server backend from any pl
 
 - [Parse SDK for .NET](#parse-sdk-for-net)
   - [Getting Started](#getting-started)
+  - [Compatibility](#compatibility)
+    - [.NET](#net)
   - [Using the Code](#using-the-code)
     - [Common Definitions](#common-definitions)
     - [Client-Side Use](#client-side-use)
@@ -33,6 +40,19 @@ A library that gives you access to the powerful Parse Server backend from any pl
 ## Getting Started
 I Plan to push a nuget soon and update here
 
+
+## Compatibility
+
+### .NET
+
+Parse .NET SDK is continuously tested with the most recent releases of .NET to ensure compatibility. We follow the [.NET Long Term Support plan](https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core) and only test against versions that are officially supported and have not reached their end-of-life date.
+
+| .NET Version | End-of-Life   | Parse .NET SDK Version |
+|--------------|---------------|------------------------|
+| 6.0          | November 2024 | >= 1.0                 |
+| 7.0          | May 2024      | >= 1.0                 |
+| 8.0          | November 2026 | >= 1.0                 |
+| 9.0          | May 2026      | >= 1.0                 |
 
 ## Using the Code
 Make sure you are using the project's root namespace.

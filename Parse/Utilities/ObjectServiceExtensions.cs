@@ -91,6 +91,7 @@ public static class ObjectServiceExtensions
     /// <returns>A new ParseObject for the given class name.</returns>
     public static T CreateObject<T>(this IParseObjectClassController classController, IServiceHub serviceHub) where T : ParseObject
     {
+
         return (T) classController.Instantiate(classController.GetClassName(typeof(T)), serviceHub);
     }
 
@@ -122,6 +123,8 @@ public static class ObjectServiceExtensions
         ParseObject.CreatingPointer.Value = true;
         try
         {
+
+
             ParseObject result = classController.Instantiate(className, serviceHub);
             result.ObjectId = objectId;
 
@@ -129,9 +132,18 @@ public static class ObjectServiceExtensions
 
             result.IsDirty = false;
             if (result.IsDirty)
+            {
                 throw new InvalidOperationException("A ParseObject subclass default constructor must not make changes to the object that cause it to be dirty.");
+            }
             else
-                return  result;
+                return result;
+
+        }
+        catch (Exception ex)
+        {
+
+            Debug.WriteLine("Exception " + ex.Message);
+            throw new Exception(ex.Message);
         }
         finally
         {
@@ -205,7 +217,7 @@ public static class ObjectServiceExtensions
             await Task.WhenAll(
                 serviceHub.ObjectController.DeleteAllAsync(
                     uniqueObjects.Select(obj => obj.State).ToList(),
-                    serviceHub.GetCurrentSessionToken(),
+                    await serviceHub.GetCurrentSessionToken(),
                     cancellationToken)
             ).ConfigureAwait(false);
 
@@ -300,9 +312,9 @@ public static class ObjectServiceExtensions
     /// </summary>
     /// <param name="objects">The objects to save.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public static Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject
+    public static async Task SaveObjectsAsync<T>(this IServiceHub serviceHub, IEnumerable<T> objects, CancellationToken cancellationToken) where T : ParseObject
     {
-        return DeepSaveAsync(serviceHub, objects.ToList(), serviceHub.GetCurrentSessionToken(), cancellationToken);
+        _ = DeepSaveAsync(serviceHub, objects.ToList(), await serviceHub.GetCurrentSessionToken(), cancellationToken);
     }
 
     /// <summary>
@@ -327,45 +339,54 @@ public static class ObjectServiceExtensions
     }
 
     internal static T GenerateObjectFromState<T>(
-this IParseObjectClassController classController,
-IObjectState state,
-string defaultClassName,
-IServiceHub serviceHub
-) where T : ParseObject
+     this IParseObjectClassController classController,
+     IObjectState state,
+     string defaultClassName,
+     IServiceHub serviceHub) where T : ParseObject
     {
         if (state == null)
         {
             throw new ArgumentNullException(nameof(state), "The state cannot be null.");
         }
 
-        if (string.IsNullOrEmpty(state.ClassName) && string.IsNullOrEmpty(defaultClassName))
+        // Ensure the class name is determined or throw an exception
+        string className = state.ClassName ?? defaultClassName;
+        if (string.IsNullOrEmpty(className))
         {
+
             throw new InvalidOperationException("Both state.ClassName and defaultClassName are null or empty. Unable to determine class name.");
         }
 
-        // Use the provided class name from the state, or fall back to the default class name
-        string className = state.ClassName ?? defaultClassName;
-        state.ClassName = className;    //to make it so that user cl
-        var obj = (T) ParseClient.Instance.CreateObject(className);
-        
-        
+        // Create the object using the class controller
+        T obj = classController.Instantiate(className, serviceHub) as T;
+
+        if (obj == null)
+        {
+
+            throw new InvalidOperationException($"Failed to instantiate object of type {typeof(T).Name} for class {className}.");
+        }
+
+        // Apply the state to the object
         obj.HandleFetchResult(state);
 
         return obj;
     }
 
-
-    internal static IDictionary<string, object> GenerateJSONObjectForSaving(this IServiceHub serviceHub, IDictionary<string, IParseFieldOperation> operations)
+    internal static IDictionary<string, object> GenerateJSONObjectForSaving(
+    this IServiceHub serviceHub, IDictionary<string, IParseFieldOperation> operations)
     {
         Dictionary<string, object> result = new Dictionary<string, object>();
 
         foreach (KeyValuePair<string, IParseFieldOperation> pair in operations)
         {
-            result[pair.Key] = PointerOrLocalIdEncoder.Instance.Encode(pair.Value, serviceHub);
+            var s = PointerOrLocalIdEncoder.Instance.Encode(pair.Value, serviceHub);
+            
+            result[pair.Key] = s;
         }
 
         return result;
     }
+
 
     /// <summary>
     /// Returns true if the given object can be serialized for saving as a value
@@ -450,14 +471,14 @@ IServiceHub serviceHub
 
         // Save remaining objects in batches
         var remaining = new List<ParseObject>(uniqueObjects);
-        while (remaining.Any())
+        while (remaining.Count > 0)
         {
             // Partition objects into those that can be saved immediately and those that cannot
             var current = remaining.Where(item => item.CanBeSerialized).ToList();
             var nextBatch = remaining.Where(item => !item.CanBeSerialized).ToList();
             remaining = nextBatch;
 
-            if (!current.Any())
+            if (current.Count < 1)
             {
                 throw new InvalidOperationException("Unable to save a ParseObject with a relation to a cycle.");
             }
@@ -649,7 +670,6 @@ IServiceHub serviceHub
     {
         if (serviceHub == null)
         {
-            Debug.WriteLine("ServiceHub is null.");
             return null;
         }
 
@@ -672,7 +692,7 @@ IServiceHub serviceHub
         var propertyMappings = classController.GetPropertyMappings(className);
         if (propertyMappings == null)
         {
-            throw new InvalidOperationException($"Property mappings for class '{className}' are null.");
+            throw new InvalidOperationException($"Property mappings for class '{className}' are null."); //throws here
         }
 
         if (!propertyMappings.TryGetValue(propertyName, out string fieldName))

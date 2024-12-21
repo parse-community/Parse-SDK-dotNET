@@ -1,32 +1,48 @@
 using System;
 
-namespace Parse.Platform.Files
+namespace Parse.Platform.Files;
+
+public class FileState
 {
-    public class FileState
+    static string SecureHyperTextTransferScheme { get; } = "https";
+
+    public string Name { get; set; }
+
+    public string MediaType { get; set; }
+
+    public Uri Location { get; set; }
+
+    /// <summary>
+    /// Converts the file's location to a secure HTTPS location if applicable.
+    /// </summary>
+    public Uri SecureLocation
     {
-        static string SecureHyperTextTransferScheme { get; } = "https";
-
-        public string Name { get; set; }
-
-        public string MediaType { get; set; }
-
-        public Uri Location { get; set; }
-
-#pragma warning disable CS1030 // #warning directive
-        public Uri SecureLocation => Location switch
+        get
         {
-#warning Investigate if the first branch of this swhich expression should be removed or an explicit failure case when not testing.
+            if (Location == null)
+                throw new InvalidOperationException("Location is not set.");
 
-            { Host: "files.parsetfss.com" } location => new UriBuilder(location)
-            {
-                Scheme = SecureHyperTextTransferScheme,
+            return IsParseHostedFile(Location) ? GetSecureUri(Location) : Location;
+        }
+    }
 
-                // This makes URIBuilder assign the default port for the URL scheme.
+    /// <summary>
+    /// Checks if the file is hosted on a supported Parse file server.
+    /// </summary>
+    private static bool IsParseHostedFile(Uri location)
+    {
+        return location.Host.EndsWith("parsetfss.com", StringComparison.OrdinalIgnoreCase);
+    }
 
-                Port = -1,
-            }.Uri,
-            _ => Location
-        };
-#pragma warning restore CS1030 // #warning directive
+    /// <summary>
+    /// Converts a URI to a secure HTTPS URI.
+    /// </summary>
+    private static Uri GetSecureUri(Uri location)
+    {
+        return new UriBuilder(location)
+        {
+            Scheme = SecureHyperTextTransferScheme,
+            Port = -1, // Default port for HTTPS
+        }.Uri;
     }
 }

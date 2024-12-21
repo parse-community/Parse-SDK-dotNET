@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
-
+        <TargetFramework>net6.0</TargetFramework>
         <DocumentationFile>bin\Release\netstandard2.0\Parse.xml</DocumentationFile>
         <Version>3.0.2</Version>
         <LangVersion>latest</LangVersion>
-        
+
         <Authors>Parse</Authors>
         <PackageProjectUrl>https://parseplatform.org/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/parse-community/Parse-SDK-dotNET/</RepositoryUrl>
@@ -21,6 +19,8 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageIcon>parse-logo.png</PackageIcon>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,33 +28,33 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="parse-logo.png" />
-      <None Include="parse-logo.png">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-      </None>
+        <None Remove="parse-logo.png" />
+        <None Include="parse-logo.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="..\LICENSE">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-      </None>
+        <None Include="..\LICENSE">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>Resources.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

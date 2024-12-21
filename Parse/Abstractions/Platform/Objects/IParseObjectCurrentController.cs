@@ -17,8 +17,8 @@ public interface IParseObjectCurrentController<T> where T : ParseObject
     /// </summary>
     /// <param name="obj"><see cref="ParseObject"/> to be persisted.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    Task SetAsync(T obj, CancellationToken cancellationToken = default);
-
+    Task<T> SetAsync(T obj, CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Gets the persisted current <see cref="ParseObject"/>.
     /// </summary>
