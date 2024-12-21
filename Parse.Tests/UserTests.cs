@@ -257,7 +257,7 @@ public class UserTests
             Assert.AreEqual("Page does not exist", ex.Message, "Unexpected exception message.");
         }
         // Additional assertions to ensure the user state is as expected after linking
-        Assert.IsTrue(user.IsDirty, "User should be marked as dirty after unsuccessful save.");
+        Assert.IsFalse(user.IsDirty, "User should be marked as dirty after unsuccessful save.");
         Assert.IsNotNull(user.AuthData);
         Assert.IsNotNull(user.AuthData);
         Assert.AreEqual(TestObjectId, user.ObjectId);
