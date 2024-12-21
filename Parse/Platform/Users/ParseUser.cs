@@ -30,7 +30,7 @@ public class ParseUser : ParseObject
         }
         catch (Exception ex)
         {
-            
+
             return false;
         }
     }
@@ -41,6 +41,7 @@ public class ParseUser : ParseObject
             throw new InvalidOperationException("Cannot remove the username key.");
 
         base.Remove(key);
+
     }
 
     protected override bool CheckKeyMutable(string key) => !ImmutableKeys.Contains(key);
@@ -85,7 +86,7 @@ public class ParseUser : ParseObject
 
     internal async Task<ParseUser> SignUpAsync(CancellationToken cancellationToken = default)
     {
-        
+
 
         if (string.IsNullOrWhiteSpace(Username))
             throw new InvalidOperationException("Cannot sign up user with an empty name.");
@@ -96,22 +97,22 @@ public class ParseUser : ParseObject
         if (!string.IsNullOrWhiteSpace(ObjectId))
             throw new InvalidOperationException("Cannot sign up a user that already exists.");
 
-        
+
 
         var currentOperations = StartSave();
 
         try
         {
             var result = await Services.UserController.SignUpAsync(State, currentOperations, Services, cancellationToken).ConfigureAwait(false);
-            Debug.WriteLine($"SignUpAsync on UserController completed. ObjectId: {result.ObjectId}");
+
             HandleSave(result);
-            var usr= await Services.SaveAndReturnCurrentUserAsync(this).ConfigureAwait(false);
-            
+            var usr = await Services.SaveAndReturnCurrentUserAsync(this).ConfigureAwait(false);
+
             return usr;
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"SignUpAsync failed: {ex.Message}");
+
             HandleFailedSave(currentOperations);
             throw;
         }
@@ -172,7 +173,16 @@ public class ParseUser : ParseObject
     public IDictionary<string, IDictionary<string, object>> AuthData
     {
 
-        get => ContainsKey("authData") ? AuthData["authData"] as IDictionary<string, IDictionary<string, object>> : null;
+        get
+        {
+            if (ContainsKey("authData"))
+            {
+                return this["authData"] as IDictionary<string, IDictionary<string, object>>;
+            }
+            else
+                return null;
+        }
+
         set => this["authData"] = value;
     }
 
@@ -268,3 +278,4 @@ public class ParseUser : ParseObject
         }
     }
 }
+
