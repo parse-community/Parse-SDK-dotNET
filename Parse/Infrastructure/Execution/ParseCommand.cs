@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,11 +21,12 @@ public class ParseCommand : WebRequest
         get
         {
             if (DataObject is { })
-                return base.Data ??= (new MemoryStream(Encoding.UTF8.GetBytes(JsonUtilities.Encode(DataObject))));
-            else
-                return base.Data ??= default;
+            {
+                // Dynamically generate the stream from DataObject on every access
+                return new MemoryStream(Encoding.UTF8.GetBytes(JsonUtilities.Encode(DataObject)));
+            }
+            return base.Data;
         }
-
         set => base.Data = value;
     }
 
@@ -41,12 +43,12 @@ public class ParseCommand : WebRequest
         Data = stream;
         Headers = new List<KeyValuePair<string, string>>(headers ?? Enumerable.Empty<KeyValuePair<string, string>>());
 
-        if (!String.IsNullOrEmpty(sessionToken))
+        if (!string.IsNullOrEmpty(sessionToken))
         {
             Headers.Add(new KeyValuePair<string, string>("X-Parse-Session-Token", sessionToken));
         }
 
-        if (!String.IsNullOrEmpty(contentType))
+        if (!string.IsNullOrEmpty(contentType))
         {
             Headers.Add(new KeyValuePair<string, string>("Content-Type", contentType));
         }

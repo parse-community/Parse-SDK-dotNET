@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Control;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Control;
@@ -160,4 +162,146 @@ public class ObjectStateTests
         Assert.IsNotNull(newState.CreatedAt);
         Assert.AreNotSame(state, newState);
     }
+
+
+
+    [TestMethod]
+    [Description("Tests that MutableClone clones null values correctly.")]
+    public void MutatedClone_WithNullValues() // Mock difficulty: 1
+    {
+        IObjectState state = new MutableObjectState
+        {
+            ObjectId = "testId"
+        };
+
+        IObjectState newState = state.MutatedClone(m =>
+        {
+            m.ObjectId = null;
+
+        });
+
+        Assert.IsNull(newState.ObjectId);
+    }
+
+
+    [TestMethod]
+    [Description("Tests that MutatedClone ignores exceptions")]
+    public void MutatedClone_IgnoresExceptions() // Mock difficulty: 1
+    {
+        IObjectState state = new MutableObjectState
+        {
+            ClassName = "Test"
+        };
+
+        IObjectState newState = state.MutatedClone(m =>
+        {
+            m.ClassName = "NewName";
+            throw new Exception();
+        });
+
+        Assert.AreEqual("NewName", newState.ClassName);
+    }
+    [TestMethod]
+    [Description("Tests that Decode correctly parses a Dictionary")]
+    public void Decode_ParsesDictionary() // Mock difficulty: 2
+    {
+        var dict = new Dictionary<string, object>
+            {
+                { "className", "TestClass" },
+                { "objectId", "testId" },
+                { "createdAt", DateTime.Now },
+                { "updatedAt", DateTime.Now },
+                 { "isNew", true },
+                { "test", 1}
+            };
+        IServiceHub mockHub = new Mock<IServiceHub>().Object;
+        var state = MutableObjectState.Decode(dict, mockHub);
+
+        Assert.IsNotNull(state);
+        Assert.AreEqual("TestClass", state.ClassName);
+        Assert.AreEqual("testId", state.ObjectId);
+        Assert.IsNotNull(state.CreatedAt);
+        Assert.IsNotNull(state.UpdatedAt);
+        Assert.IsTrue(state.IsNew);
+        Assert.AreEqual(1, state["test"]);
+    }
+    [TestMethod]
+    [Description("Tests that decode can gracefully handle invalid values.")]
+    public void Decode_HandlesInvalidValues() // Mock difficulty: 2
+    {
+        var dict = new Dictionary<string, object>
+            {
+                { "className", "TestClass" },
+                { "objectId", "testId" },
+                { "createdAt", "invalid date" },
+                { "updatedAt", 123 },
+            };
+        IServiceHub mockHub = new Mock<IServiceHub>().Object;
+
+        var state = MutableObjectState.Decode(dict, mockHub);
+
+        Assert.IsNotNull(state);
+        Assert.IsNull(state.CreatedAt);
+        Assert.IsNull(state.UpdatedAt);
+        Assert.AreEqual("TestClass", state.ClassName);
+        Assert.AreEqual("testId", state.ObjectId);
+    }
+    [TestMethod]
+    [Description("Tests that Decode Returns null if the data is not a Dictionary.")]
+    public void Decode_ReturnsNullForInvalidData() // Mock difficulty: 1
+    {
+        IServiceHub mockHub = new Mock<IServiceHub>().Object;
+        var state = MutableObjectState.Decode("invalidData", mockHub);
+        Assert.IsNull(state);
+    }
+   
+    [TestMethod]
+    [Description("Tests Apply method ignores exceptions on invalid keys")]
+    public void Apply_WithIncompatibleKey_SkipsKey() // Mock difficulty: 1
+    {
+        var mockOp = new Mock<IParseFieldOperation>();
+        mockOp.Setup(op => op.Apply(It.IsAny<object>(), It.IsAny<string>())).Throws(new InvalidCastException());
+        var operations = new Dictionary<string, IParseFieldOperation>
+            {
+                { "InvalidKey", mockOp.Object }
+            };
+
+        IObjectState state = new MutableObjectState
+        {
+            ServerData = new Dictionary<string, object>() {
+                     { "testKey", 1 }
+                }
+        };
+
+        state = state.MutatedClone(m => m.Apply(operations));
+
+        Assert.AreEqual(1, state["testKey"]);
+    }
+ 
+    [TestMethod]
+    [Description("Tests that when apply other state copies objectId, createdAt, updatedAt")]
+    public void Apply_OtherStateCopiesCorrectly() // Mock difficulty: 1
+    {
+        DateTime now = DateTime.Now;
+        IObjectState state = new MutableObjectState
+        {
+            ClassName = "test"
+        };
+
+        IObjectState appliedState = new MutableObjectState
+        {
+            ObjectId = "testId",
+            CreatedAt = now,
+            UpdatedAt = now,
+            IsNew = true,
+        };
+
+        state = state.MutatedClone(mutableClone => mutableClone.Apply(appliedState));
+
+        Assert.AreEqual("testId", state.ObjectId);
+        Assert.AreEqual(now, state.CreatedAt);
+        Assert.AreEqual(now, state.UpdatedAt);
+        Assert.IsTrue(state.IsNew);
+    }
+
 }

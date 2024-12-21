@@ -30,9 +30,6 @@ public class ParseCloudCodeController : IParseCloudCodeController
     IProgress<IDataTransferLevel> uploadProgress = null,
     IProgress<IDataTransferLevel> downloadProgress = null)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new ArgumentException("Function name cannot be null or empty.", nameof(name));
-
         try
         {
             // Prepare the command
@@ -58,11 +55,6 @@ public class ParseCloudCodeController : IParseCloudCodeController
             // Decode the result
             var decoded = Decoder.Decode(commandResult.Item2, serviceHub) as IDictionary<string, object>;
 
-            if (decoded == null)
-            {
-                throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "Failed to decode cloud function response.");
-            }
-
             // Extract the result key
             if (decoded.TryGetValue("result", out var result))
             {
@@ -84,11 +76,6 @@ public class ParseCloudCodeController : IParseCloudCodeController
         {
             // Rethrow known Parse exceptions
             throw;
-        }
-        catch (Exception ex)
-        {
-            // Wrap unexpected exceptions
-            throw new ParseFailureException(ParseFailureException.ErrorCode.OtherCause, "An unexpected error occurred while calling the cloud function.", ex);
         }
     }
 

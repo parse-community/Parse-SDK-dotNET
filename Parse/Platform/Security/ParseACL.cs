@@ -56,11 +56,20 @@ public class ParseACL : IJsonConvertible
                     // Process user/role ACLs
                     if (permissions.ContainsKey("read"))
                     {
-                        readers.Add(pair.Key); // Add read access for the user/role
+                        var hasPermission = permissions.TryGetValue("read", out object isAllowed);
+                        if (hasPermission)
+                        {
+                            readers.Add(pair.Key); // Add read access for the user/role
+                        }
                     }
                     if (permissions.ContainsKey("write"))
                     {
-                        writers.Add(pair.Key); // Add write access for the user/role
+                        var hasPermission = permissions.TryGetValue("write", out object isAllowed);
+                        if (hasPermission)
+                        {
+                            writers.Add(pair.Key); // Add read access for the user/role
+                        }
+
                     }
                 }
                 else

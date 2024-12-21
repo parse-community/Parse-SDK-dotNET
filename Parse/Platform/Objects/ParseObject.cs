@@ -35,7 +35,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
 {
     internal static string AutoClassName { get; } = "_Automatic";
 
-    internal static ThreadLocal<bool> CreatingPointer { get; } = new ThreadLocal<bool>(() => false);
+    internal static AsyncLocal<bool> CreatingPointer { get; } = new AsyncLocal<bool> { };
 
     internal TaskQueue TaskQueue { get; } = new TaskQueue { };
 
@@ -57,6 +57,11 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
     /// <param name="serviceHub">The <see cref="IServiceHub"/> implementation instance to target for any resources. This paramater can be effectively set after construction via <see cref="Bind(IServiceHub)"/>.</param>
     public ParseObject(string className, IServiceHub serviceHub = default)
     {
+        //Switched to AsyncLocal to avoid thread safety issues
+
+        bool isPointer = CreatingPointer.Value;
+        CreatingPointer.Value = false;
+
         // Validate serviceHub
         if (serviceHub == null && ParseClient.Instance == null)
         {
@@ -84,18 +89,19 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
                 if (!typeof(ParseObject).IsAssignableFrom(GetType()))
                 {
                     // Allow subclasses of ParseObject (like ParseUser, ParseSession, etc.)
-                    
+
                     throw new ArgumentException("You must create this type of ParseObject using ParseObject.Create() or the proper subclass.");
                 }
             }
 
         }
 
+        // Initialize state
+        State = new MutableObjectState { ClassName = className };
+        OnPropertyChanged(nameof(ClassName));
+
         OperationSetQueue.AddLast(new Dictionary<string, IParseFieldOperation>());
 
-        // Handle pointer creation
-        bool isPointer = CreatingPointer.Value;
-        CreatingPointer.Value = false;
 
         Fetched = !isPointer;
         IsDirty = !isPointer;
@@ -104,10 +110,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         {
             SetDefaultValues();
         }
-        // Initialize state
-        State = new MutableObjectState { ClassName = className };
-        OnPropertyChanged(nameof(ClassName));
-        
+
     }
 
     #region ParseObject Creation
@@ -115,7 +118,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
     {
         try
         {
-            
+
             if (ParseClient.Instance.Services == null)
             {
                 throw new InvalidOperationException("ParseClient.Services must be initialized before creating objects.");
@@ -123,7 +126,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
 
             var instance = new T();
             instance.Bind(ParseClient.Instance.Services); // Ensure the ServiceHub is attached
-            
+
             return instance;
         }
         catch (Exception ex)
@@ -350,12 +353,12 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
                 CheckGetAccess(key);
 
                 if (!EstimatedData.TryGetValue(key, out var value))
-                {   
+                {
                     return null; // Return null, do NOT throw exception. Parse official doesn't.
                 }
 
                 // Ensure ParseRelationBase consistency
-                if (value is ParseRelationBase relation && (relation.Parent== null || relation.Key == null))
+                if (value is ParseRelationBase relation && (relation.Parent == null || relation.Key == null))
                 {
                     relation.EnsureParentAndKey(this, key);
                 }
@@ -495,13 +498,13 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         }
         catch (KeyNotFoundException)
         {
-            
+
             // Handle missing key explicitly - better than a NullReferenceException
             throw; // Rethrow the KeyNotFoundException
         }
         catch (Exception ex)
         {
-            
+
             // Optionally to catch other exceptions or rethrow a more specific exception
             throw new InvalidCastException($"Error converting value for key '{key}'", ex);
         }
@@ -1107,7 +1110,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
     /// Parse Objects are mutable by default.
     /// </summary>  
     protected virtual bool CheckKeyMutable(string key)
-    {        
+    {
         return true;
     }
 
@@ -1175,7 +1178,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         {
             // Log or handle unexpected errors
             HandleFailedSave(currentOperations);
-            Console.WriteLine($"Error during save: {ex.Message}");
+            throw new Exception(ex.Message);
         }
     }
 
@@ -1219,7 +1222,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
             {
                 Debug.WriteLine($"Warning: ParseObject has no data for key '{key}'. Ensure FetchIfNeededAsync() is called before accessing data.");
                 Console.WriteLine($"Warning: ParseObject has no data for key '{key}'. Ensure FetchIfNeededAsync() is called before accessing data.");
-                
+
                 // Optionally, set a flag or return early to signal the issue.
                 return;
             }

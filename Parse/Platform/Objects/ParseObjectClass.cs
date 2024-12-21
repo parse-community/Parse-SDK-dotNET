@@ -32,7 +32,7 @@ internal class ParseObjectClass
         var parameters = Constructor.GetParameters();
         
         if (parameters.Length == 0)
-        {
+        {            
             
             // Parameterless constructor
             return Constructor.Invoke(null) as ParseObject;

@@ -234,7 +234,7 @@ public class InstallationTests
     }
 
     [TestMethod]
-    public async void TestGetCurrentInstallation()
+    public async Task TestGetCurrentInstallation()
     {
         var guid = Guid.NewGuid();
         var expectedInstallation = new ParseInstallation();

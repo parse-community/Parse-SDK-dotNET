@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Control;
 using Parse.Infrastructure.Data;
@@ -39,8 +41,6 @@ public class ParseSetOperation : IParseFieldOperation
         throw new ArgumentException($"Unsupported type for encoding: {Value?.GetType()?.FullName}");
     }
 
-
-
     public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
     {
         // Set operation always overrides previous operations
@@ -51,6 +51,23 @@ public class ParseSetOperation : IParseFieldOperation
     {
         // Set operation always sets the field to the specified value
         return Value;
+    }
+    public object ConvertValueToJSON(IServiceHub serviceHub = null)
+    {
+        // Get the values of the dictionary
+        var vals = ConvertToJSON(serviceHub).Values;
+
+
+
+        // Check if vals is a ValueCollection and contains exactly one element , that's how we get operations working! because they are dict<string,obj> of dict<string,obj>
+        if (vals.Count == 1)
+        {
+            // Return the first and only value
+            return vals.FirstOrDefault();
+        }
+
+        // Return vals if no single value is found
+        return vals;
     }
 
     public object Value { get; private set; }

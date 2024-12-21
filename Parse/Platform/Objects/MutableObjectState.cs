@@ -158,7 +158,6 @@ public class MutableObjectState : IObjectState
             }
         }
 
-        Debug.WriteLine("Data is not a compatible object for decoding.");
         return null;
     }
 

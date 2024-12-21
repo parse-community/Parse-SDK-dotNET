@@ -36,8 +36,72 @@ public class ParseRelationOperation : IParseFieldOperation
         Removals = new ReadOnlyCollection<string>(GetIdsFromObjects(removes).ToList());
     }
 
-    public object Encode(IServiceHub serviceHub)
+    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
     {
+        return previous switch
+        {
+            null => this,
+            ParseDeleteOperation { } => throw new InvalidOperationException("You can't modify a relation after deleting it."),
+            ParseRelationOperation { } other when other.TargetClassName != TargetClassName => throw new InvalidOperationException($"Related object must be of class {other.TargetClassName}, but {TargetClassName} was passed in."),
+            ParseRelationOperation { ClassController: var classController } other => new ParseRelationOperation(classController, Additions.Union(other.Additions.Except(Removals)).ToList(), Removals.Union(other.Removals.Except(Additions)).ToList(), TargetClassName),
+            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
+        };
+    }
+    public object Apply(object oldValue, string key)
+    {
+        if (Additions.Count == 0 && Removals.Count == 0)
+        {
+            return default;
+        }
+
+        if (oldValue == null)
+        {
+
+            var val = ClassController.CreateRelation(null, key, TargetClassName);
+            Value = val;
+            return val;
+        }
+
+        if (oldValue is ParseRelationBase oldRelation)
+        {
+            if (oldRelation.TargetClassName != null && oldRelation.TargetClassName != TargetClassName)
+            {
+                throw new InvalidOperationException($"Related object must be a {oldRelation.TargetClassName}, but a {TargetClassName} was passed in.");
+            }
+            Value = oldRelation;
+            oldRelation.TargetClassName = TargetClassName;
+            return oldRelation;
+        }
+
+        throw new InvalidOperationException("Operation is invalid after previous operation.");
+    }
+
+    public object Value { get; private set; }
+
+    public string TargetClassName { get; }
+
+
+    IEnumerable<string> GetIdsFromObjects(IEnumerable<ParseObject> objects)
+    {
+        foreach (ParseObject entity in objects)
+        {
+            if (entity.ObjectId is null)
+            {
+                throw new ArgumentException("You can't add an unsaved ParseObject to a relation.");
+            }
+
+            if (entity.ClassName != TargetClassName)
+            {
+                throw new ArgumentException($"Tried to create a ParseRelation with 2 different types: {TargetClassName} and {entity.ClassName}");
+            }
+        }
+
+        return objects.Select(entity => entity.ObjectId).Distinct();
+    }
+
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = null)
+    {
+
         List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList();
 
         Dictionary<string, object> addition = additions.Count == 0 ? default : new Dictionary<string, object>
@@ -62,52 +126,4 @@ public class ParseRelationOperation : IParseFieldOperation
         }
         return addition ?? removal;
     }
-
-    public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
-    {
-        return previous switch
-        {
-            null => this,
-            ParseDeleteOperation { } => throw new InvalidOperationException("You can't modify a relation after deleting it."),
-            ParseRelationOperation { } other when other.TargetClassName != TargetClassName => throw new InvalidOperationException($"Related object must be of class {other.TargetClassName}, but {TargetClassName} was passed in."),
-            ParseRelationOperation { ClassController: var classController } other => new ParseRelationOperation(classController, Additions.Union(other.Additions.Except(Removals)).ToList(), Removals.Union(other.Removals.Except(Additions)).ToList(), TargetClassName),
-            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
-        };
-    }
-
-    public object Apply(object oldValue, string key)
-    {
-        return oldValue switch
-        {
-            _ when Additions.Count == 0 && Removals.Count == 0 => default,
-            null => ClassController.CreateRelation(null, key, TargetClassName),
-            ParseRelationBase { TargetClassName: { } oldClassname } when oldClassname != TargetClassName => throw new InvalidOperationException($"Related object must be a {oldClassname}, but a {TargetClassName} was passed in."),
-            ParseRelationBase { } oldRelation => (Relation: oldRelation, oldRelation.TargetClassName = TargetClassName).Relation,
-            _ => throw new InvalidOperationException("Operation is invalid after previous operation.")
-        };
-    }
-
-    public string TargetClassName { get; }
-
-    public object Value => throw new NotImplementedException();
-
-    IEnumerable<string> GetIdsFromObjects(IEnumerable<ParseObject> objects)
-    {
-        foreach (ParseObject entity in objects)
-        {
-            if (entity.ObjectId is null)
-            {
-                throw new ArgumentException("You can't add an unsaved ParseObject to a relation.");
-            }
-
-            if (entity.ClassName != TargetClassName)
-            {
-                throw new ArgumentException($"Tried to create a ParseRelation with 2 different types: {TargetClassName} and {entity.ClassName}");
-            }
-        }
-
-        return objects.Select(entity => entity.ObjectId).Distinct();
-    }
-
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = null) => throw new NotImplementedException();
 }
