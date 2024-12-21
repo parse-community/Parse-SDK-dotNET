@@ -13,6 +13,7 @@ using Parse.Infrastructure;
 using Parse.Abstractions.Internal;
 using Parse.Infrastructure.Execution;
 using Parse.Infrastructure.Data;
+using System.Net.Http;
 
 namespace Parse.Platform.Objects;
 
@@ -53,8 +54,12 @@ public class ParseObjectController : IParseObjectController
             command = new ParseCommand(relURI, method, sessionToken: sessionToken, data: dataa);
         }
         var result = await CommandRunner.RunCommandAsync(command, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (result.Item1 == System.Net.HttpStatusCode.Gone)
+        {
+            throw new HttpRequestException("Page does not exist");
+        }
         var decodedState = ParseObjectCoder.Instance.Decode(result.Item2, Decoder, serviceHub);
-
+        
         // Mutating the state and marking it as new if the status code is Created
         decodedState.MutatedClone(mutableClone => mutableClone.IsNew = result.Item1 == System.Net.HttpStatusCode.Created);
 
