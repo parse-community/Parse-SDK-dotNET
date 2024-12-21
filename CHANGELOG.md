@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/parse-community/Parse-SDK-dotNET/compare/3.0.2...4.0.0) (2024-12-19)
+
+
+### Features
+
+* Upgrade target framework from NET Standard 2.0 to .NET 6.0 ([#393](https://github.com/parse-community/Parse-SDK-dotNET/issues/393)) ([1d4ab13](https://github.com/parse-community/Parse-SDK-dotNET/commit/1d4ab1339a8b49a6ac406c66bb697fe17c6726b5))
+
+
+### BREAKING CHANGES
+
+* This release requires .NET 6.0 or later and removes compatibility with NET Standard 2.0; Xamarin developers should migrate to .NET MAUI to use this version of the Parse SDK; Unity developers should use the previous SDK version until Unity supports .NET. ([1d4ab13](1d4ab13))
+
 ## [3.0.2](https://github.com/parse-community/Parse-SDK-dotNET/compare/3.0.1...3.0.2) (2024-05-24)
 
 
