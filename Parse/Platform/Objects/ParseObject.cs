@@ -150,7 +150,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
     /// <returns>The instance which was mutated.</returns>
     public ParseObject Bind(IServiceHub serviceHub)
     {
-        return (Instance: this, Services = serviceHub).Instance;
+        return (Instance: this, Services = ParseClient.Instance).Instance;
     }
 
     /// <summary>

@@ -32,6 +32,7 @@ public partial class ParseInstallation : ParseObject
         get
         {
             string installationIdString = GetProperty<string>(nameof(InstallationId));
+
             if (Guid.TryParse(installationIdString, out Guid installationId))
             {
                 return installationId;
@@ -97,7 +98,6 @@ public partial class ParseInstallation : ParseObject
         private set => SetProperty(value, nameof(TimeZone));
     }
 
-    /// <summary>
     /// The users locale. This field gets automatically populated by the SDK.
     /// Can be null (Parse Push uses default language in this case).
     /// </summary>
@@ -118,6 +118,7 @@ public partial class ParseInstallation : ParseObject
         string countryCode = null;
 
         if (CultureInfo.CurrentCulture != null)
+
         {
             languageCode = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
         }
@@ -183,7 +184,9 @@ public partial class ParseInstallation : ParseObject
 
         }
 
+
         Task platformHookTask = ParseClient.Instance.InstallationDataFinalizer.FinalizeAsync(this); 
+
 
         // Wait for the platform task, then proceed with saving the main task.
         try
@@ -218,7 +221,9 @@ public partial class ParseInstallation : ParseObject
         ["UTC-11"] = "Etc/GMT+11",
         ["Hawaiian Standard Time"] = "Pacific/Honolulu",
         ["Alaskan Standard Time"] = "America/Anchorage",
+
         ["Pacific Standard Time (Mexico)"] = "America/Tijuana",
+
         ["Pacific Standard Time"] = "America/Los_Angeles",
         ["US Mountain Standard Time"] = "America/Phoenix",
         ["Mountain Standard Time (Mexico)"] = "America/Chihuahua",
@@ -240,7 +245,9 @@ public partial class ParseInstallation : ParseObject
         ["E. South America Standard Time"] = "America/Sao_Paulo",
         ["Argentina Standard Time"] = "America/Buenos_Aires",
         ["SA Eastern Standard Time"] = "America/Cayenne",
+
         ["Greenland Standard Time"] = "America/Nuuk",
+
         ["Montevideo Standard Time"] = "America/Montevideo",
         ["Bahia Standard Time"] = "America/Bahia",
         ["UTC-02"] = "Etc/GMT+2",
@@ -260,7 +267,9 @@ public partial class ParseInstallation : ParseObject
         ["Middle East Standard Time"] = "Asia/Beirut",
         ["Egypt Standard Time"] = "Africa/Cairo",
         ["Syria Standard Time"] = "Asia/Damascus",
+
         ["E. Europe Standard Time"] = "Europe/Minsk",
+
         ["South Africa Standard Time"] = "Africa/Johannesburg",
         ["FLE Standard Time"] = "Europe/Kiev",
         ["Turkey Standard Time"] = "Europe/Istanbul",
@@ -314,7 +323,6 @@ public partial class ParseInstallation : ParseObject
         ["Tonga Standard Time"] = "Pacific/Tongatapu",
         ["Samoa Standard Time"] = "Pacific/Apia"
     };
-
 
     /// <summary>
     /// This is a mapping of odd TimeZone offsets to their respective IANA codes across the world.
