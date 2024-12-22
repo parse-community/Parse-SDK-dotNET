@@ -32,17 +32,14 @@ public class UserTests
     [TestInitialize]
     public void SetUp()
     {
-
         Client = new ParseClient(new ServerConnectionData { Test = true });
-        Client.Publicize();  // Ensure the Clientinstance is globally available
-
+        Client.Publicize();  // Ensure the Client instance is globally available
 
         Client.AddValidClass<ParseSession>();
         Client.AddValidClass<ParseUser>();
 
         // Ensure TLS 1.2 (or appropriate) is enabled if needed
-        System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-
+        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
     }
     [TestCleanup]
     public void CleanUp()
