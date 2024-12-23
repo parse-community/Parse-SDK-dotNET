@@ -17,10 +17,6 @@ public partial class ParseInstallation : ParseObject
 {
     static HashSet<string> ImmutableKeys { get; } = new HashSet<string> { "deviceType", "deviceUris", "installationId", "timeZone", "localeIdentifier", "parseVersion", "appName", "appIdentifier", "appVersion", "pushType" };
 
-    /// <summary>
-    /// Constructs a new ParseInstallation. Generally, you should not need to construct
-    /// ParseInstallations yourself. Instead use <see cref="CurrentInstallation"/>.
-    /// </summary>
     public ParseInstallation() : base() { }
 
     /// <summary>
@@ -101,6 +97,8 @@ public partial class ParseInstallation : ParseObject
     /// The users locale. This field gets automatically populated by the SDK.
     /// Can be null (Parse Push uses default language in this case).
     /// </summary>
+    ///
+
     [ParseFieldName("localeIdentifier")]
     public string LocaleIdentifier
     {

@@ -371,9 +371,6 @@ public class JsonUtilities
         throw new ArgumentException("Input data is neither valid JSON nor recognizable HTML.");
     }
 
-    /// <summary>
-    /// Extracts meaningful text from an HTML response, such as the contents of <pre> tags.
-    /// </summary>
     private static string ExtractTextFromHtml(string html)
     {
         try

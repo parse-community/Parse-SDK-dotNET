@@ -132,7 +132,7 @@ public class ParseObject : IEnumerable<KeyValuePair<string, object>>, INotifyPro
         catch (Exception ex)
         {
 
-            throw new Exception("Error when Creating parse Object..");
+            throw new Exception("Error when Creating parse Object.."+ex.Message);
         }
     }
 
