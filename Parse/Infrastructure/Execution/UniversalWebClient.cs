@@ -49,11 +49,10 @@ public class UniversalWebClient : IWebClient
 
         HttpRequestMessage message = new HttpRequestMessage(new HttpMethod(httpRequest.Method), httpRequest.Target);
 
-        if ((httpRequest.Data is null && httpRequest.Method.ToLower().Equals("post")
-             ? new MemoryStream(new byte[0])
-             : httpRequest.Data) is Stream { } data)
+        Stream data = httpRequest.Data;
+        if (data != null || httpRequest.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))             
         {
-            message.Content = new StreamContent(data);
+            message.Content = new StreamContent(data ?? new MemoryStream(new byte[0]));
         }
 
         if (httpRequest.Headers != null)
