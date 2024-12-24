@@ -32,15 +32,14 @@ public class UserTests
     [TestInitialize]
     public void SetUp()
     {
-
         Client = new ParseClient(new ServerConnectionData { Test = true });
-        Client.Publicize();  // Ensure the Clientinstance is globally available
-
+        Client.Publicize();  // Ensure the Client instance is globally available
 
         Client.AddValidClass<ParseSession>();
         Client.AddValidClass<ParseUser>();
 
         // Ensure TLS 1.2 (or appropriate) is enabled if needed
+
         System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
 
     }
@@ -257,7 +256,9 @@ public class UserTests
             Assert.AreEqual("Page does not exist", ex.Message, "Unexpected exception message.");
         }
         // Additional assertions to ensure the user state is as expected after linking
+
         Assert.IsFalse(user.IsDirty, "User should be marked as dirty after unsuccessful save.");
+
         Assert.IsNotNull(user.AuthData);
         Assert.IsNotNull(user.AuthData);
         Assert.AreEqual(TestObjectId, user.ObjectId);
@@ -267,6 +268,19 @@ public class UserTests
     public async Task TestUserSave()
     {
         IObjectState state = new MutableObjectState
+
+        {
+            ObjectId = "some0neTol4v4",
+            ServerData = new Dictionary<string, object>
+            {
+                ["sessionToken"] = "llaKcolnu",
+                ["username"] = "ihave",
+                ["password"] = "adream"
+            }
+        };
+
+        IObjectState newState = new MutableObjectState
+
         {
             ObjectId = "some0neTol4v4",
             ServerData = new Dictionary<string, object>

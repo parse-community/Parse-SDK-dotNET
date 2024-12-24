@@ -51,7 +51,7 @@ public class UniversalWebClient : IWebClient
 
         if ((httpRequest.Data is null && httpRequest.Method.ToLower().Equals("post")
              ? new MemoryStream(new byte[0])
-             : httpRequest.Data) is Stream { } data)
+             : httpRequest.Data) is Stream { } data) 
         {
             message.Content = new StreamContent(data);
         }
