@@ -280,18 +280,6 @@ public class UserTests
         };
 
         IObjectState newState = new MutableObjectState
-
-        {
-            ObjectId = "some0neTol4v4",
-            ServerData = new Dictionary<string, object>
-            {
-                ["sessionToken"] = "llaKcolnu",
-                ["username"] = "ihave",
-                ["password"] = "adream"
-            }
-        };
-
-        IObjectState newState = new MutableObjectState
         {
             ServerData = new Dictionary<string, object>
             {
