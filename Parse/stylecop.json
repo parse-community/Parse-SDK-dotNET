@@ -1,10 +1,18 @@
 {
-  "settings": {
-    "documentationRules": {
-        "documentPublicElements": false
-    },
-    "layoutRules": {
-        "ignoreSpacesAroundParentheses": true
+    "settings": {
+        "documentationRules": {
+            "documentPublicElements": false
+        },
+        "layoutRules": {
+            "ignoreSpacesAroundParentheses": true
+        },
+        "orderingRules": {
+            "elementOrder": [
+                "kind",
+                "accessibility",
+                "static"
+            ],
+            "ignoreAccessModifiers": true
+        }
     }
-  }
 }
