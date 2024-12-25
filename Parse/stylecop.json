@@ -1,7 +1,10 @@
 {
   "settings": {
-      "documentationRules": {
-          "documentPublicElements": false
-      }
+    "documentationRules": {
+        "documentPublicElements": false
+    },
+    "layoutRules": {
+        "ignoreSpacesAroundParentheses": true
+    }
   }
 }
