@@ -71,16 +71,13 @@ public class ParseCommandRunner : IParseCommandRunner
         IDictionary<string, object> contentJson = null;
         // Extract response
         var statusCode = response.Item1;
-         var content = response.Item2;
+        var content = response.Item2;
         var responseCode = (int) statusCode;
 
 
         if (responseCode == 200)
         {
-            
-        }
-        else if (responseCode == 201)
-        {
+
         }
         else if (responseCode == 404)
         {

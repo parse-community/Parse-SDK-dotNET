@@ -66,7 +66,9 @@ namespace Parse.Tests
 
         [TestMethod]
         [Description("Tests TestCurrentConfig Returns the right config")]
-        public async Task TestCurrentConfig()// Mock difficulty: 1
+
+         public async Task TestCurrentConfig()// Mock difficulty: 1
+
         {
             var config = await Client.GetCurrentConfiguration();
 
@@ -114,17 +116,6 @@ namespace Parse.Tests
     [TestClass]
     public class ParseConfigurationTests
     {
-
-        //[TestMethod]
-        //[Description("Tests that Get method throws an exception if key is not found")]
-        //public void Get_ThrowsExceptionNotFound() // Mock difficulty: 1
-        //{
-        //    var services = new Mock<IServiceHub>().Object;
-        //    ParseConfiguration configuration = new(services);
-        //    Assert.ThrowsException<KeyNotFoundException>(() => configuration.Get<string>("doesNotExist"));
-        //}
-
-
         [TestMethod]
         [Description("Tests that create function creates correct configuration object")]
         public void Create_BuildsConfigurationFromDictionary() // Mock difficulty: 3

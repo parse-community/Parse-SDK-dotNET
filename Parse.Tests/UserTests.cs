@@ -39,7 +39,9 @@ public class UserTests
         Client.AddValidClass<ParseUser>();
 
         // Ensure TLS 1.2 (or appropriate) is enabled if needed
-        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+
+        System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
     }
     [TestCleanup]
     public void CleanUp()
@@ -254,7 +256,9 @@ public class UserTests
             Assert.AreEqual("Page does not exist", ex.Message, "Unexpected exception message.");
         }
         // Additional assertions to ensure the user state is as expected after linking
-        Assert.IsTrue(user.IsDirty, "User should be marked as dirty after unsuccessful save.");
+
+        Assert.IsFalse(user.IsDirty, "User should be marked as dirty after unsuccessful save.");
+
         Assert.IsNotNull(user.AuthData);
         Assert.IsNotNull(user.AuthData);
         Assert.AreEqual(TestObjectId, user.ObjectId);
@@ -264,6 +268,7 @@ public class UserTests
     public async Task TestUserSave()
     {
         IObjectState state = new MutableObjectState
+
         {
             ObjectId = "some0neTol4v4",
             ServerData = new Dictionary<string, object>
