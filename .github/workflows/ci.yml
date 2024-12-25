@@ -12,7 +12,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
@@ -42,7 +42,7 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: Set up .NET SDK
+    - name: Set up .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ matrix.DOTNET_VERSION }}
