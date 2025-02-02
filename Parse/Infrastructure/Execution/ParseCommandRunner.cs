@@ -75,12 +75,16 @@ public class ParseCommandRunner : IParseCommandRunner
         var responseCode = (int) statusCode;
 
 
-        if (responseCode == 200)
+        if (responseCode == 200) //action successfully done
         {
             
         }
         else if (responseCode == 201)
         {
+        }
+        else if(responseCode == 400) // Bad Request
+        {
+            //throw new ParseFailureException(ParseFailureException.ErrorCode., content);
         }
         else if (responseCode == 404)
         {

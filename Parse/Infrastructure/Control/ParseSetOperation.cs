@@ -14,7 +14,7 @@ public class ParseSetOperation : IParseFieldOperation
     }
 
     // Replace Encode with ConvertToJSON
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
+    public object ConvertToJSON(IServiceHub serviceHub = default)
     {
         if (serviceHub == null)
         {
@@ -26,7 +26,7 @@ public class ParseSetOperation : IParseFieldOperation
         // For simple values, return them directly (avoid unnecessary __op)
         if (Value != null && (Value.GetType().IsPrimitive || Value is string))
         {
-            return new Dictionary<string, object> { ["value"] = Value };
+            return Value ;
         }
 
         // If the encoded value is a dictionary, return it directly

@@ -49,7 +49,7 @@ public class ParseAddOperation : IParseFieldOperation
         return result;
     }
 
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
+    public object ConvertToJSON(IServiceHub serviceHub = default)
     {
         // Convert the data into JSON-compatible structures
         var encodedObjects = Data.Select(EncodeForParse).ToList();
