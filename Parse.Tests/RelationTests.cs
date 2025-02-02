@@ -73,7 +73,6 @@ public class RelationTests
         // **Inject Mocks into ServiceHub:**
         hub.UserController = mockUserController.Object;
         hub.ObjectController = mockObjectController.Object;
-        //(Client.Services as ServiceHub)..ReplaceWith(hub); // Replace the Client's ServiceHub with the MutableServiceHub
 
     }
     
@@ -349,8 +348,6 @@ public static class UserManagement
 
         await UpdateUserRelationAsync(user, relationField, newObjectsToAdd, relatedObjectsToRemove);
 
-        // Delete the relation
-        // await DeleteUserRelationAsync(user, relationField);
     }
     public static async Task<IList<ParseObject>> GetUserRelationsAsync(ParseUser user, string relationField)
     {
