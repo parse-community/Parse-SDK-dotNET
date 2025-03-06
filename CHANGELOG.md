@@ -1,3 +1,17 @@
+## [4.0.2](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.1...4.0.2) (2025-02-02)
+
+
+### Bug Fixes
+
+* `ParseObject` Relations not working ([#407](https://github.com/parse-community/Parse-SDK-dotNET/issues/407)) ([9af640a](https://github.com/parse-community/Parse-SDK-dotNET/commit/9af640adc69ea400f8f281e1134fcda776e641a2))
+
+## [4.0.1](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.0...4.0.1) (2024-12-24)
+
+
+### Bug Fixes
+
+* `Parse.ParseUser.LogOutAsync` optimization ([#403](https://github.com/parse-community/Parse-SDK-dotNET/issues/403)) ([a0daac7](https://github.com/parse-community/Parse-SDK-dotNET/commit/a0daac7722311735ccbe59b33e0a8c3195d42433))
+
 # [4.0.0](https://github.com/parse-community/Parse-SDK-dotNET/compare/3.0.2...4.0.0) (2024-12-19)
 
 

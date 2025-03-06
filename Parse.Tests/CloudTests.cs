@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,80 +20,78 @@ namespace Parse.Tests;
 [TestClass]
 public class CloudTests
 {
-#warning Skipped post-test-evaluation cleaning method may be needed.
+    private Mock<IParseCommandRunner> _commandRunnerMock;
+    private Mock<IParseDataDecoder> _decoderMock;
+    private MutableServiceHub _hub;
+    private ParseClient _client;
 
-    // [TestCleanup]
-    // public void TearDown() => ParseCorePlugins.Instance.Reset();
-    [TestMethod]
-    public async Task TestCloudFunctionsMissingResultAsync()
+    [TestInitialize]
+    public void Initialize()
     {
-        // Arrange
-        var commandRunnerMock = new Mock<IParseCommandRunner>();
-        var decoderMock = new Mock<IParseDataDecoder>();
+        _commandRunnerMock = new Mock<IParseCommandRunner>();
+        _decoderMock = new Mock<IParseDataDecoder>();
+    }
 
-        // Mock CommandRunner
-        commandRunnerMock
+    [TestCleanup]
+    public void Cleanup()
+    {
+        _commandRunnerMock = null;
+        _decoderMock = null;
+        _hub = null;
+        _client = null;
+
+    }
+
+
+
+    private void SetupMocksForMissingResult()
+    {
+        _commandRunnerMock
             .Setup(runner => runner.RunCommandAsync(
                 It.IsAny<ParseCommand>(),
                 It.IsAny<IProgress<IDataTransferLevel>>(),
                 It.IsAny<IProgress<IDataTransferLevel>>(),
                 It.IsAny<CancellationToken>()
             ))
-            .ReturnsAsync(new Tuple<System.Net.HttpStatusCode, IDictionary<string, object>>(
-                System.Net.HttpStatusCode.OK,
+            .ReturnsAsync(new Tuple<HttpStatusCode, IDictionary<string, object>>(
+                HttpStatusCode.OK,
                 new Dictionary<string, object>
                 {
                     ["unexpectedKey"] = "unexpectedValue" // Missing "result" key
                 }));
 
-        // Mock Decoder
-        decoderMock
+        _decoderMock
             .Setup(decoder => decoder.Decode(It.IsAny<object>(), It.IsAny<IServiceHub>()))
             .Returns(new Dictionary<string, object> { ["unexpectedKey"] = "unexpectedValue" });
+    }
 
-        // Set up service hub
-        var hub = new MutableServiceHub
+
+
+    [TestMethod]
+    public async Task TestCloudFunctionsMissingResultAsync()
+    {
+        // Arrange
+        SetupMocksForMissingResult();
+
+        _hub = new MutableServiceHub
         {
-            CommandRunner = commandRunnerMock.Object,
-            CloudCodeController = new ParseCloudCodeController(commandRunnerMock.Object, decoderMock.Object)
+            CommandRunner = _commandRunnerMock.Object,
+            CloudCodeController = new ParseCloudCodeController(_commandRunnerMock.Object, _decoderMock.Object)
         };
 
-        var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        _client = new ParseClient(new ServerConnectionData { Test = true }, _hub);
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<ParseFailureException>(async () =>
-            await client.CallCloudCodeFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None));
+            await _client.CallCloudCodeFunctionAsync<IDictionary<string, object>>("someFunction", null, CancellationToken.None));
     }
 
     [TestMethod]
     public async Task TestParseCloudCodeControllerMissingResult()
     {
-        // Arrange
-        var commandRunnerMock = new Mock<IParseCommandRunner>();
-        var decoderMock = new Mock<IParseDataDecoder>();
-
-        // Mock the CommandRunner response
-        commandRunnerMock
-            .Setup(runner => runner.RunCommandAsync(
-                It.IsAny<ParseCommand>(),
-                It.IsAny<IProgress<IDataTransferLevel>>(),
-                It.IsAny<IProgress<IDataTransferLevel>>(),
-                It.IsAny<CancellationToken>()
-            ))
-            .ReturnsAsync(new Tuple<System.Net.HttpStatusCode, IDictionary<string, object>>(
-                System.Net.HttpStatusCode.OK, // Simulated HTTP status code
-                new Dictionary<string, object>
-                {
-                    ["unexpectedKey"] = "unexpectedValue" // Missing "result" key
-                }));
-
-        // Mock the Decoder response
-        decoderMock
-            .Setup(decoder => decoder.Decode(It.IsAny<object>(), It.IsAny<IServiceHub>()))
-            .Returns(new Dictionary<string, object> { ["unexpectedKey"] = "unexpectedValue" });
-
-        // Initialize the controller
-        var controller = new ParseCloudCodeController(commandRunnerMock.Object, decoderMock.Object);
+        //Arrange
+        SetupMocksForMissingResult();
+        var controller = new ParseCloudCodeController(_commandRunnerMock.Object, _decoderMock.Object);
 
         // Act & Assert
         await Assert.ThrowsExceptionAsync<ParseFailureException>(async () =>
@@ -103,7 +102,4 @@ public class CloudTests
                 null,
                 CancellationToken.None));
     }
-
-
-
 }

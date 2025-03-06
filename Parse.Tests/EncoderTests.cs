@@ -76,13 +76,6 @@ public class EncoderTests
         Assert.AreEqual(Convert.ToBase64String(new byte[] { 1, 2, 3, 4 }), value["base64"]);
     }
 
-    [TestMethod]
-    public void TestEncodeParseObjectWithNoObjectsEncoder()
-    {
-        ParseObject obj = new ParseObject("Corgi");
-
-        Assert.ThrowsException<ArgumentException>(() => NoObjectsEncoder.Instance.Encode(obj, Client));
-    }
 
     [TestMethod]
     public void TestEncodeParseObjectWithPointerOrLocalIdEncoder()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -5,9 +6,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Newtonsoft.Json;
 using Parse.Abstractions.Infrastructure;
+using Parse.Abstractions.Infrastructure.Data;
+using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Users;
 using Parse.Infrastructure;
+using Parse.Infrastructure.Execution;
 using Parse.Platform.Configuration;
 
 namespace Parse.Tests
@@ -61,7 +65,8 @@ namespace Parse.Tests
         public void TearDown() => ((Client.Services as OrchestrationServiceHub).Default as ServiceHub).Reset();
 
         [TestMethod]
-        public async void TestCurrentConfig()
+        [Description("Tests TestCurrentConfig Returns the right config")]
+        public async Task TestCurrentConfig()// Mock difficulty: 1
         {
             var config = await Client.GetCurrentConfiguration();
 
@@ -70,7 +75,8 @@ namespace Parse.Tests
         }
 
         [TestMethod]
-        public async void TestToJSON()
+        [Description("Tests the conversion of properties to json objects")]
+        public async Task TestToJSON() // Mock difficulty: 1
         {
             var expectedJson = new Dictionary<string, object>
             {
@@ -81,8 +87,10 @@ namespace Parse.Tests
             Assert.AreEqual(JsonConvert.SerializeObject(expectedJson), JsonConvert.SerializeObject(actualJson));
         }
 
+
         [TestMethod]
-        public async Task TestGetConfigAsync()
+        [Description("Tests the fetching of a new config with an IServiceHub instance.")]
+        public async Task TestGetConfigAsync()// Mock difficulty: 1
         {
             var config = await Client.GetConfigurationAsync();
 
@@ -91,7 +99,8 @@ namespace Parse.Tests
         }
 
         [TestMethod]
-        public async Task TestGetConfigCancelAsync()
+        [Description("Tests fetching of config is cancelled when requested via a cancellation token.")]
+        public async Task TestGetConfigCancelAsync() // Mock difficulty: 1
         {
             var tokenSource = new CancellationTokenSource();
             tokenSource.Cancel();
@@ -102,4 +111,37 @@ namespace Parse.Tests
             });
         }
     }
+    [TestClass]
+    public class ParseConfigurationTests
+    {
+
+        //[TestMethod]
+        //[Description("Tests that Get method throws an exception if key is not found")]
+        //public void Get_ThrowsExceptionNotFound() // Mock difficulty: 1
+        //{
+        //    var services = new Mock<IServiceHub>().Object;
+        //    ParseConfiguration configuration = new(services);
+        //    Assert.ThrowsException<KeyNotFoundException>(() => configuration.Get<string>("doesNotExist"));
+        //}
+
+
+        [TestMethod]
+        [Description("Tests that create function creates correct configuration object")]
+        public void Create_BuildsConfigurationFromDictionary() // Mock difficulty: 3
+        {
+            var mockDecoder = new Mock<IParseDataDecoder>();
+            var mockServices = new Mock<IServiceHub>();
+            var dict = new Dictionary<string, object>
+            {
+                ["params"] = new Dictionary<string, object> { { "test", 1 } },
+            };
+            mockDecoder.Setup(d => d.Decode(It.IsAny<object>(), It.IsAny<IServiceHub>())).Returns(new Dictionary<string, object> { { "test", 1 } });
+
+            var config = ParseConfiguration.Create(dict, mockDecoder.Object, mockServices.Object);
+            Assert.AreEqual(1, config["test"]);
+            Assert.IsInstanceOfType(config, typeof(ParseConfiguration));
+        }
+    }
+
+
 }
