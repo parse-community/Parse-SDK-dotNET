@@ -1,3 +1,15 @@
+# [5.0.0](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.2...5.0.0) (2025-03-07)
+
+
+### Features
+
+* Remove support for .NET 6.0, 7.0 ([#396](https://github.com/parse-community/Parse-SDK-dotNET/issues/396)) ([8fa9be9](https://github.com/parse-community/Parse-SDK-dotNET/commit/8fa9be925ee8db6b7a66afd8bde93eefbf8fcfa8))
+
+
+### BREAKING CHANGES
+
+* Removes support for .NET 6.0, 7.0 as they have reached their end-of-life date. ([8fa9be9](8fa9be9))
+
 ## [4.0.2](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.1...4.0.2) (2025-02-02)
 
 
