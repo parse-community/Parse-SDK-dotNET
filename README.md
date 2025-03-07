@@ -40,8 +40,8 @@ Parse .NET SDK is continuously tested with the most recent releases of .NET to e
 | .NET Version | End-of-Life   | Parse .NET SDK Version |
 |--------------|---------------|------------------------|
 | Standard 2.0 | November 2024 | >=1.0.0 <4.0.0         |
-| 6.0          | November 2024 | >=1.0.0                |
-| 7.0          | May 2024      | >=1.0.0                |
+| 6.0          | November 2024 | >=1.0.0 <5.0.0         |
+| 7.0          | May 2024      | >=1.0.0 <5.0.0         |
 | 8.0          | November 2026 | >=1.0.0                |
 | 9.0          | May 2026      | >=1.0.0                |
 
