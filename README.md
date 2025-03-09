@@ -123,25 +123,25 @@ The following code shows how to use the Parse .NET SDK to create a new user, sav
 ParseClient client = new ParseClient(/* Parameters */);
 
 // Create a user, save it, and authenticate with it.
-await client.SignUpAsync(username: "Test", password: "Test");
+await ParseClient.Instance.SignUpWithAsync(username: "Test", password: "Test");
 
 // Get the authenticated user. This is can also be done with a variable that stores the ParseUser instance before the SignUp overload that accepts a ParseUser is called.
-Console.WriteLine(client.GetCurrentUser().SessionToken);
+Console.WriteLine( await ParseClient.Instance.GetCurrentUser().SessionToken);
 
 // Deauthenticate the user.
 await client.LogOutAsync();
 
 // Authenticate the user.
-ParseUser user = await client.LogInAsync(username: "Test", password: "Test");
+ParseUser? user = await ParseClient.Instance.LogInWithAsync(username: "Test", password: "Test");
 
 // Create a new object with permessions that allow only the user to modify it.
 ParseObject testObject = new ParseObject("TestClass") { ACL = new ParseACL(user) };
 
 // Bind the ParseObject to the target ParseClient instance. This is unnecessary if Publicize is called on the client.
-testObject.Bind(client);
+testObject.Bind(ParseClient.Instance);
 
 // Set some value on the object.
-testObject.Set("someValue", "This is a value.");
+testObject.Set("someKey", "This is a value.");
 
 // See that the ObjectId of an unsaved object is null;
 Console.WriteLine(testObject.ObjectId);
@@ -153,16 +153,24 @@ await testObject.SaveAsync();
 Console.WriteLine(testObject.ObjectId);
 
 // Query the object back down from the server to check that it was actually saved.
-Console.WriteLine((await client.GetQuery("TestClass").WhereEqualTo("objectId", testObject.ObjectId).FirstAsync()).Get<string>("someValue"));
+ParseObject? objectFetched = await ParseClient.Instance.GetQuery("TestClass")
+    .WhereEqualTo("objectId", testObject.ObjectId)
+    .FirstAsync();
+string? someValue = objectFetched.Get<string>("someKey");
+Console.WriteLine(someValue);
 
 // Mutate some value on the object.
-testObject.Set("someValue", "This is another value.");
+testObject.Set("someKey", "This is another value.");
 
 // Save the object again.
 await testObject.SaveAsync();
 
 // Query the object again to see that the change was made.
-Console.WriteLine((await client.GetQuery("TestClass").WhereEqualTo("objectId", testObject.ObjectId).FirstAsync()).Get<string>("someValue"));
+ParseObject? objectFetched = await ParseClient.Instance.GetQuery("TestClass")
+    .WhereEqualTo("objectId", testObject.ObjectId)
+    .FirstAsync();
+string? someValue = objectFetched.Get<string>("someKey");
+Console.WriteLine(someValue);
 
 // Store the object's objectId so it can be verified that it was deleted later.
 var testObjectId = testObject.ObjectId;
@@ -171,10 +179,10 @@ var testObjectId = testObject.ObjectId;
 await testObject.DeleteAsync();
 
 // Check that the object was deleted from the server.
-Console.WriteLine(await client.GetQuery("TestClass").WhereEqualTo("objectId", testObjectId).FirstOrDefaultAsync() == null);
+Console.WriteLine();
 
 // Deauthenticate the user again.
-await client.LogOutAsync();
+await ParseClient.Instance.LogOutAsync();
 ```
 
 ## Local Builds
