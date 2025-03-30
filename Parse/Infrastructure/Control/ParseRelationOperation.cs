@@ -36,33 +36,6 @@ public class ParseRelationOperation : IParseFieldOperation
         Removals = new ReadOnlyCollection<string>(GetIdsFromObjects(removes).ToList());
     }
 
-    public object Encode(IServiceHub serviceHub)
-    {
-        List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList();
-
-        Dictionary<string, object> addition = additions.Count == 0 ? default : new Dictionary<string, object>
-        {
-            ["__op"] = "AddRelation",
-            ["objects"] = additions
-        };
-
-        Dictionary<string, object> removal = removals.Count == 0 ? default : new Dictionary<string, object>
-        {
-            ["__op"] = "RemoveRelation",
-            ["objects"] = removals
-        };
-
-        if (addition is { } && removal is { })
-        {
-            return new Dictionary<string, object>
-            {
-                ["__op"] = "Batch",
-                ["ops"] = new[] { addition, removal }
-            };
-        }
-        return addition ?? removal;
-    }
-
     public IParseFieldOperation MergeWithPrevious(IParseFieldOperation previous)
     {
         return previous switch
@@ -88,8 +61,8 @@ public class ParseRelationOperation : IParseFieldOperation
     }
 
     public string TargetClassName { get; }
-
-    public object Value => throw new NotImplementedException();
+    
+    public object Value => Additions.ToList();
 
     IEnumerable<string> GetIdsFromObjects(IEnumerable<ParseObject> objects)
     {
@@ -109,5 +82,30 @@ public class ParseRelationOperation : IParseFieldOperation
         return objects.Select(entity => entity.ObjectId).Distinct();
     }
 
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = null) => throw new NotImplementedException();
+    public object ConvertToJSON(IServiceHub serviceHub = null)
+    {
+        List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList();
+
+        Dictionary<string, object> addition = additions.Count == 0 ? default : new Dictionary<string, object>
+        {
+            ["__op"] = "AddRelation",
+            ["objects"] = additions
+        };
+
+        Dictionary<string, object> removal = removals.Count == 0 ? default : new Dictionary<string, object>
+        {
+            ["__op"] = "RemoveRelation",
+            ["objects"] = removals
+        };
+
+        if (addition is { } && removal is { })
+        {
+            return new Dictionary<string, object>
+            {
+                ["__op"] = "Batch",
+                ["ops"] = new[] { addition, removal }
+            };
+        }
+        return addition ?? removal;
+    }
 }

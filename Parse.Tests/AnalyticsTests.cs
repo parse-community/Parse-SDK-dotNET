@@ -13,14 +13,46 @@ namespace Parse.Tests;
 [TestClass]
 public class AnalyticsTests
 {
-#warning Skipped post-test-evaluation cleaning method may be needed.
 
-    // [TestCleanup]
-    // public void TearDown() => (Client.Services as ServiceHub).Reset();
+    private Mock<IParseAnalyticsController> _mockAnalyticsController;
+    private Mock<IParseCurrentUserController> _mockCurrentUserController;
+    private MutableServiceHub _hub;
+    private ParseClient _client;
+
+
+    [TestInitialize]
+    public void Initialize()
+    {
+        _mockAnalyticsController = new Mock<IParseAnalyticsController>();
+        _mockCurrentUserController = new Mock<IParseCurrentUserController>();
+
+        _mockCurrentUserController
+            .Setup(controller => controller.GetCurrentSessionTokenAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("sessionToken");
+
+
+        _hub = new MutableServiceHub
+        {
+            AnalyticsController = _mockAnalyticsController.Object,
+            CurrentUserController = _mockCurrentUserController.Object
+        };
+        _client = new ParseClient(new ServerConnectionData { Test = true }, _hub);
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+        _mockAnalyticsController = null;
+        _mockCurrentUserController = null;
+        _hub = null;
+        _client = null;
+    }
+
 
     [TestMethod]
     public async Task TestTrackEvent()
     {
+
         // Arrange
         var hub = new MutableServiceHub();
         var client = new ParseClient(new ServerConnectionData { Test = true }, hub);

@@ -165,7 +165,7 @@ public class ParseFile : IJsonConvertible
 
     #endregion
 
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
+    public object ConvertToJSON(IServiceHub serviceHub = default)
     {
         if (IsDirty)
         {
