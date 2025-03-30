@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/parse-community/Parse-SDK-dotNET/compare/5.0.0...5.0.1) (2025-03-30)
+
+
+### Bug Fixes
+
+* Security upgrade braces from 3.0.2 to 3.0.3 ([#395](https://github.com/parse-community/Parse-SDK-dotNET/issues/395)) ([2e81163](https://github.com/parse-community/Parse-SDK-dotNET/commit/2e81163d29488cf089f2540712e81c1e59dcb01f))
+
 # [5.0.0](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.2...5.0.0) (2025-03-07)
 
 
