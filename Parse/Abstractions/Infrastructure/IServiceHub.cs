@@ -7,6 +7,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -23,9 +24,10 @@ namespace Parse.Abstractions.Infrastructure;
 public interface IServiceHub
 {
     /// <summary>
-    /// The current server connection data that the the Parse SDK has been initialized with.
+    /// The current server connection data that the Parse SDK has been initialized with.
     /// </summary>
     IServerConnectionData ServerConnectionData { get; }
+    IServerConnectionData LiveQueryServerConnectionData { get; }
     IMetadataController MetadataController { get; }
 
     IServiceHubCloner Cloner { get; }
@@ -44,6 +46,7 @@ public interface IServiceHub
     IParseFileController FileController { get; }
     IParseObjectController ObjectController { get; }
     IParseQueryController QueryController { get; }
+    IParseLiveQueryController LiveQueryController { get; }
     IParseSessionController SessionController { get; }
     IParseUserController UserController { get; }
     IParseCurrentUserController CurrentUserController { get; }

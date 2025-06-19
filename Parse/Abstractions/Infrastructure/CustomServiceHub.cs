@@ -5,6 +5,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -41,6 +42,8 @@ public abstract class CustomServiceHub : ICustomServiceHub
 
     public virtual IParseQueryController QueryController => Services.QueryController;
 
+    public virtual IParseLiveQueryController LiveQueryController => Services.LiveQueryController;
+
     public virtual IParseSessionController SessionController => Services.SessionController;
 
     public virtual IParseUserController UserController => Services.UserController;
@@ -58,6 +61,8 @@ public abstract class CustomServiceHub : ICustomServiceHub
     public virtual IParseCurrentInstallationController CurrentInstallationController => Services.CurrentInstallationController;
 
     public virtual IServerConnectionData ServerConnectionData => Services.ServerConnectionData;
+
+    public virtual IServerConnectionData LiveQueryServerConnectionData => Services.ServerConnectionData;
 
     public virtual IParseDataDecoder Decoder => Services.Decoder;
 

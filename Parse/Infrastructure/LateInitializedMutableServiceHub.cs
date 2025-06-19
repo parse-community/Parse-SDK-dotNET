@@ -12,6 +12,7 @@ using Parse.Abstractions.Platform.Queries;
 using Parse.Abstractions.Platform.Sessions;
 using Parse.Abstractions.Platform.Users;
 using Parse.Abstractions.Platform.Analytics;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Infrastructure.Execution;
 using Parse.Platform.Objects;
 using Parse.Platform.Installations;
@@ -25,6 +26,7 @@ using Parse.Platform.Analytics;
 using Parse.Platform.Push;
 using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Utilities;
+using Parse.Platform.LiveQueries;
 
 namespace Parse.Infrastructure;
 
@@ -43,6 +45,12 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
     public IWebClient WebClient
     {
         get => LateInitializer.GetValue<IWebClient>(() => new UniversalWebClient { });
+        set => LateInitializer.SetValue(value);
+    }
+
+    public IWebSocketClient WebSocketClient
+    {
+        get => LateInitializer.GetValue<IWebSocketClient>(() => new TextWebSocketClient { });
         set => LateInitializer.SetValue(value);
     }
 
@@ -97,6 +105,12 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
     public IParseQueryController QueryController
     {
         get => LateInitializer.GetValue<IParseQueryController>(() => new ParseQueryController(CommandRunner, Decoder));
+        set => LateInitializer.SetValue(value);
+    }
+
+    public IParseLiveQueryController LiveQueryController
+    {
+        get => LateInitializer.GetValue<IParseLiveQueryController>(() => new ParseLiveQueryController(WebSocketClient));
         set => LateInitializer.SetValue(value);
     }
 
@@ -161,4 +175,5 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
     }
 
     public IServerConnectionData ServerConnectionData { get; set; }
+    public IServerConnectionData LiveQueryServerConnectionData { get; set; }
 }

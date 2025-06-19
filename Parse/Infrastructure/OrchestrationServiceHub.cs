@@ -6,6 +6,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -44,6 +45,8 @@ public class OrchestrationServiceHub : IServiceHub
 
     public IParseQueryController QueryController => Custom.QueryController ?? Default.QueryController;
 
+    public IParseLiveQueryController LiveQueryController => Custom.LiveQueryController ?? Default.LiveQueryController;
+
     public IParseSessionController SessionController => Custom.SessionController ?? Default.SessionController;
 
     public IParseUserController UserController => Custom.UserController ?? Default.UserController;
@@ -61,6 +64,7 @@ public class OrchestrationServiceHub : IServiceHub
     public IParseCurrentInstallationController CurrentInstallationController => Custom.CurrentInstallationController ?? Default.CurrentInstallationController;
 
     public IServerConnectionData ServerConnectionData => Custom.ServerConnectionData ?? Default.ServerConnectionData;
+    public IServerConnectionData LiveQueryServerConnectionData => Custom.LiveQueryServerConnectionData ?? Default.LiveQueryServerConnectionData;
 
     public IParseDataDecoder Decoder => Custom.Decoder ?? Default.Decoder;
 

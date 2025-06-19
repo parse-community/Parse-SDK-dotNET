@@ -7,6 +7,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -34,6 +35,7 @@ namespace Parse.Infrastructure;
 public class MutableServiceHub : IMutableServiceHub
 {
     public IServerConnectionData ServerConnectionData { get; set; }
+    public IServerConnectionData LiveQueryServerConnectionData { get; set; }
     public IMetadataController MetadataController { get; set; }
 
     public IServiceHubCloner Cloner { get; set; }
@@ -52,6 +54,7 @@ public class MutableServiceHub : IMutableServiceHub
     public IParseFileController FileController { get; set; }
     public IParseObjectController ObjectController { get; set; }
     public IParseQueryController QueryController { get; set; }
+    public IParseLiveQueryController LiveQueryController { get; set; }
     public IParseSessionController SessionController { get; set; }
     public IParseUserController UserController { get; set; }
     public IParseCurrentUserController CurrentUserController { get; set; }
