@@ -1,17 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Net.WebSockets;
-using System.Numerics;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic.CompilerServices;
 using Parse.Abstractions.Infrastructure;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Infrastructure.Data;
-using Parse.Infrastructure.Utilities;
 
 namespace Parse;
 
@@ -35,7 +30,7 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// <summary>
     /// Serialized keys watched.
     /// </summary>
-    ReadOnlyCollection<string> KeyWatch { get; }
+    ReadOnlyCollection<string> KeyWatchers { get; }
 
     internal string ClassName { get; }
 
@@ -61,7 +56,7 @@ public class ParseLiveQuery<T> where T : ParseObject
 
         if (watchedKeys is not null)
         {
-            KeyWatch = new ReadOnlyCollection<string>(watchedKeys.ToList());
+            KeyWatchers = new ReadOnlyCollection<string>(watchedKeys.ToList());
         }
     }
 
@@ -70,7 +65,7 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// but the remaining values can be null if they aren't changed in this
     /// composition.
     /// </summary>
-    internal ParseLiveQuery(ParseLiveQuery<T> source, IEnumerable<string> watchedKeys = null)
+    internal ParseLiveQuery(ParseLiveQuery<T> source, IEnumerable<string> watchedKeys = null, Func<IDictionary<string, object>> onCreate = null)
     {
         if (source == null)
         {
@@ -81,14 +76,15 @@ public class ParseLiveQuery<T> where T : ParseObject
         ClassName = source.ClassName;
         Filters = source.Filters;
         KeySelections = source.KeySelections;
+        KeyWatchers = source.KeyWatchers;
 
         if (watchedKeys is { })
         {
-            KeyWatch = new ReadOnlyCollection<string>(MergeKeys(watchedKeys).ToList());
+            KeyWatchers = new ReadOnlyCollection<string>(MergeWatchers(watchedKeys).ToList());
         }
     }
 
-    HashSet<string> MergeKeys(IEnumerable<string> selectedKeys) => new((KeySelections ?? Enumerable.Empty<string>()).Concat(selectedKeys));
+    HashSet<string> MergeWatchers(IEnumerable<string> keys) => new((KeyWatchers ?? Enumerable.Empty<string>()).Concat(keys));
 
     /// <summary>
     /// Add the provided key to the watched fields of returned ParseObjects.
@@ -106,21 +102,11 @@ public class ParseLiveQuery<T> where T : ParseObject
             result["where"] = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services);
         if (KeySelections != null)
             result["keys"] = String.Join(",", KeySelections.ToArray());
-        if (KeyWatch != null)
-            result["watch"] = String.Join(",", KeyWatch.ToArray());
+        if (KeyWatchers != null)
+            result["watch"] = String.Join(",", KeyWatchers.ToArray());
         if (includeClassName)
             result["className"] = ClassName;
         return result;
-    }
-
-    /// <summary>
-    /// Establishes a connection to the Parse Live Query server using the ClientWebSocket instance.
-    /// Prepares and sends a connection message containing required identifiers such as application ID, client key, and session token.
-    /// </summary>
-    /// <returns>A Task representing the asynchronous operation, returning true if the connection attempt is initialized successfully, false otherwise.</returns>
-    public async Task ConnectAsync()
-    {
-        await Services.LiveQueryController.ConnectAsync(CancellationToken.None);
     }
 
     /// <summary>
@@ -131,30 +117,8 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// A task representing the asynchronous subscription operation. Upon completion
     /// of the task, the subscription is successfully registered.
     /// </returns>
-    public async Task SubscribeAsync()
+    public async Task<IParseLiveQuerySubscription> SubscribeAsync()
     {
-        RequestId = await Services.LiveQueryController.SubscribeAsync(this, CancellationToken.None);
+        return await Services.LiveQueryController.SubscribeAsync(this, CancellationToken.None);
     }
-
-    /// <summary>
-    /// Unsubscribes from the live query, stopping the client from receiving further updates related to the subscription.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation of unsubscribing from the live query.</returns>
-    public async Task UnsubscribeAsync()
-    {
-        if (RequestId > 0)
-            await Services.LiveQueryController.UnsubscribeAsync(RequestId, CancellationToken.None);
-    }
-
-    /// <summary>
-    /// Closes the connection to the live query server asynchronously.
-    /// </summary>
-    /// <returns>
-    /// A task representing the asynchronous operation of closing the live query connection.
-    /// </returns>
-    public async Task CloseAsync()
-    {
-        await Services.LiveQueryController.CloseAsync(CancellationToken.None);
-    }
-
 }

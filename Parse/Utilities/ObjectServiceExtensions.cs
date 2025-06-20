@@ -288,6 +288,27 @@ public static class ObjectServiceExtensions
     }
 
     /// <summary>
+    /// Establishes a connection to the Live Query server using the provided <see cref="IServiceHub"/> instance.
+    /// This method ensures that the Live Query controller initiates and maintains a persistent connection.
+    /// </summary>
+    /// <param name="serviceHub">The service hub instance containing the Live Query controller to manage the connection.</param>
+    /// <returns>A task that represents the asynchronous operation of connecting to the Live Query server.</returns>
+    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub)
+    {
+        await serviceHub.LiveQueryController.ConnectAsync();
+    }
+
+    /// <summary>
+    /// Disconnects from the live query server by closing the connection established through the LiveQueryController.
+    /// </summary>
+    /// <param name="serviceHub">The <see cref="IServiceHub"/> instance managing the service resources.</param>
+    /// <returns>A task representing the asynchronous operation of disconnecting from the live query server.</returns>
+    public static async Task DisconnectLiveQueryServerAsync(this IServiceHub serviceHub)
+    {
+        await serviceHub.LiveQueryController.CloseAsync();
+    }
+
+    /// <summary>
     /// Saves each object in the provided list.
     /// </summary>
     /// <param name="objects">The objects to save.</param>

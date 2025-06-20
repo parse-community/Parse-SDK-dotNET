@@ -11,24 +11,41 @@ using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.LiveQueries;
 
+/// <summary>
+/// The ParseLiveQueryController is responsible for managing live query subscriptions, maintaining a connection
+/// to the Parse LiveQuery server, and handling real-time updates from the server.
+/// </summary>
 public class ParseLiveQueryController : IParseLiveQueryController
 {
-    IWebSocketClient WebSocketClient { get; }
+    private IWebSocketClient WebSocketClient { get; }
 
     private int LastRequestId { get; set; } = 0;
 
+    /// <summary>
+    /// Gets or sets the timeout duration, in milliseconds, used by the ParseLiveQueryController
+    /// for various operations, such as establishing a connection or completing a subscription.
+    /// </summary>
+    /// <remarks>
+    /// This property determines the maximum amount of time the controller will wait for an operation
+    /// to complete before throwing a <see cref="TimeoutException"/>. It is used in operations such as:
+    /// - Connecting to the LiveQuery server.
+    /// - Subscribing to a query.
+    /// - Unsubscribing from a query.
+    /// Ensure that the value is configured appropriately to avoid premature timeout errors in network-dependent processes.
+    /// </remarks>
     public int TimeOut { get; set; } = 5000;
 
-    // public event EventHandler Connected;
-    // public event EventHandler<int> Subscribed;
-    // public event EventHandler<int> Unsubscribed;
-    // public event EventHandler<int> SubscribtionUpdated;
+    /// <summary>
+    /// Event triggered when an error occurs during Parse Live Query operations.
+    /// </summary>
+    /// <remarks>
+    /// This event provides detailed information about the encountered error through the event arguments,
+    /// which consist of a dictionary containing key-value pairs describing the error context and specifics.
+    /// It can be used to log, handle, or analyze the errors that arise during subscription, connection,
+    /// or message processing operations. Common scenarios triggering this event include protocol issues,
+    /// connectivity problems, or invalid message formats.
+    /// </remarks>
     public event EventHandler<IDictionary<string, object>> Error;
-    public event EventHandler<IDictionary<string, object>> Create;
-    public event EventHandler<IDictionary<string, object>> Enter;
-    public event EventHandler<IDictionary<string, object>> Update;
-    public event EventHandler<IDictionary<string, object>> Leave;
-    public event EventHandler<IDictionary<string, object>> Delete;
 
     public enum ParseLiveQueryState
     {
@@ -42,13 +59,26 @@ public class ParseLiveQueryController : IParseLiveQueryController
         Connected
     }
 
+    /// <summary>
+    /// Gets the current state of the ParseLiveQueryController. This property indicates
+    /// whether the controller is in a Closed, Connecting, or Connected state.
+    /// </summary>
+    /// <remarks>
+    /// - `Closed`: Indicates that the controller is not connected.
+    /// - `Connecting`: Indicates that a connection attempt is in progress.
+    /// - `Connected`: Indicates that the controller is actively connected.
+    /// This property is updated based on the controller's connection lifecycle events,
+    /// such as when a connection is established or closed, or when an error occurs.
+    /// </remarks>
     public ParseLiveQueryState State { get; private set; }
-    public ArrayList SubscriptionIds { get; }
+    ArrayList SubscriptionIds { get; }
 
     CancellationTokenSource ConnectionSignal { get; set; }
     private IDictionary<int, CancellationTokenSource> SubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
     private IDictionary<int, CancellationTokenSource> UnsubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
     private IDictionary<int, CancellationTokenSource> SubscriptionUpdateSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
+
+    private IDictionary<int, ParseLiveQuerySubscription> Subscriptions { get; set; } = new Dictionary<int, ParseLiveQuerySubscription> { };
 
     public ParseLiveQueryController(IWebSocketClient webSocketClient)
     {
@@ -57,17 +87,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
         State = ParseLiveQueryState.Closed;
     }
 
-    /// <summary>
-    /// Processes an incoming message by determining its operation type and triggering
-    /// the corresponding events or handling the operation accordingly.
-    /// </summary>
-    /// <param name="message">
-    /// A dictionary representing the message received, where the key-value pairs
-    /// contain the details of the message including the operation type ("op") and
-    /// any associated data.
-    /// </param>
     private void ProcessMessage(IDictionary<string, object> message)
     {
+        int requestId;
         switch (message["op"])
         {
             case "connected":
@@ -77,7 +99,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 break;
 
             case "subscribed":
-                int requestId = Convert.ToInt32(message["requestId"]);
+                requestId = Convert.ToInt32(message["requestId"]);
                 SubscriptionIds.Add(requestId);
                 if (SubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource subscriptionSignal))
                 {
@@ -85,6 +107,8 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 }
                 // Subscribed?.Invoke(this, requestId);
                 break;
+
+            // TODO subscription update case
 
             case "unsubscribed":
                 requestId = Convert.ToInt32(message["requestId"]);
@@ -106,23 +130,43 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 break;
 
             case "create":
-                Create?.Invoke(this, message);
+                requestId = Convert.ToInt32(message["requestId"]);
+                if (Subscriptions.TryGetValue(requestId, out ParseLiveQuerySubscription subscription))
+                {
+                    subscription.OnCreate(message);
+                }
                 break;
 
             case "enter":
-                Enter?.Invoke(this, message);
+                requestId = Convert.ToInt32(message["requestId"]);
+                if (Subscriptions.TryGetValue(requestId, out subscription))
+                {
+                    subscription.OnEnter(message);
+                }
                 break;
 
             case "update":
-                Update?.Invoke(this, message);
+                requestId = Convert.ToInt32(message["requestId"]);
+                if (Subscriptions.TryGetValue(requestId, out subscription))
+                {
+                    subscription.OnUpdate(message);
+                }
                 break;
 
             case "leave":
-                Leave?.Invoke(this, message);
+                requestId = Convert.ToInt32(message["requestId"]);
+                if (Subscriptions.TryGetValue(requestId, out subscription))
+                {
+                    subscription.OnLeave(message);
+                }
                 break;
 
             case "delete":
-                Delete?.Invoke(this, message);
+                requestId = Convert.ToInt32(message["requestId"]);
+                if (Subscriptions.TryGetValue(requestId, out subscription))
+                {
+                    subscription.OnDelete(message);
+                }
                 break;
 
             default:
@@ -138,34 +182,11 @@ public class ParseLiveQueryController : IParseLiveQueryController
         }).ToDictionary();
     }
 
-    /// <summary>
-    /// Sends a message to the server over a WebSocket connection.
-    /// This method processes the message data and ensures it's transmitted asynchronously.
-    /// </summary>
-    /// <param name="message">
-    /// A dictionary containing the message data to be sent.
-    /// </param>
-    /// <param name="cancellationToken">
-    /// A token to observe while waiting for the task to complete, allowing the operation to be canceled.
-    /// </param>
-    /// <returns>
-    /// A task that represents the asynchronous operation of sending the message.
-    /// </returns>
     private async Task SendMessage(IDictionary<string, object> message, CancellationToken cancellationToken)
     {
         await WebSocketClient.SendAsync(JsonUtilities.Encode(AppendSessionToken(message)), cancellationToken);
     }
 
-    /// <summary>
-    /// Opens a WebSocket connection and initiates listening for updates.
-    /// This method establishes the connection to the Live Query server and transitions the state to Open.
-    /// </summary>
-    /// <param name="cancellationToken">
-    /// A token to observe while waiting for the task to complete. It allows canceling the connection process.
-    /// </param>
-    /// <returns>
-    /// A task that represents the asynchronous operation of opening the WebSocket connection.
-    /// </returns>
     private async Task OpenAsync(CancellationToken cancellationToken = default)
     {
         if (ParseClient.Instance.Services == null)
@@ -181,32 +202,21 @@ public class ParseLiveQueryController : IParseLiveQueryController
         await WebSocketClient.OpenAsync(ParseClient.Instance.Services.LiveQueryServerConnectionData.ServerURI, cancellationToken);
     }
 
-    /// <summary>
-    /// Handles a message received event from the WebSocket client by parsing the incoming message
-    /// and processing it as a dictionary of key-value pairs.
-    /// </summary>
-    /// <param name="sender">
-    /// The source of the event, typically the WebSocket client that triggered the message received event.
-    /// </param>
-    /// <param name="e">
-    /// The raw string message received from the WebSocket client, representing JSON data
-    /// that can be parsed and processed.
-    /// </param>
-    void WebSocketClientOnMessageReceived(object sender, string e)
+    private void WebSocketClientOnMessageReceived(object sender, string e)
         => ProcessMessage(JsonUtilities.Parse(e) as IDictionary<string, object>);
 
     /// <summary>
-    /// Establishes a live query connection using the specified user credentials.
-    /// This method initializes the connection and sends the required configuration message.
+    /// Establishes a connection to the live query server asynchronously. This method initiates the connection process,
+    /// manages connection states, and handles any timeout scenarios if the connection cannot be established within the specified duration.
     /// </summary>
-    /// <param name="user">
-    /// The authenticated Parse user initiating the live query connection.
-    /// </param>
     /// <param name="cancellationToken">
-    /// A token to monitor for cancellation requests during the connection process.
+    /// A cancellation token that can be used to cancel the connection process. If the token is triggered,
+    /// the connection process will be terminated.
     /// </param>
     /// <returns>
-    /// A task that represents the asynchronous operation of connecting to the live query service.
+    /// A task that represents the asynchronous connection operation. If the connection is successful,
+    /// the task will complete when the connection is established. In the event of a timeout or error,
+    /// it will throw the appropriate exception.
     /// </returns>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
@@ -231,29 +241,88 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 throw new TimeoutException();
             }
         }
+        else if (State == ParseLiveQueryState.Connecting)
+        {
+            if (ConnectionSignal is not null)
+            {
+                if (!ConnectionSignal.Token.WaitHandle.WaitOne(TimeOut))
+                {
+                    throw new TimeoutException();
+                }
+            }
+        }
     }
 
-    public async Task<int> SubscribeAsync<T>(ParseLiveQuery<T> liveQuery, CancellationToken cancellationToken = default) where T : ParseObject
+    /// <summary>
+    /// Subscribes to a live query, enabling real-time updates for the specified query object.
+    /// This method sends a subscription request to the live query server and manages the lifecycle of the subscription.
+    /// </summary>
+    /// <typeparam name="T">
+    /// The type of the ParseObject associated with the live query.
+    /// </typeparam>
+    /// <param name="liveQuery">
+    /// The live query instance to subscribe to. It contains details about the query and its parameters.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A token to monitor for cancellation requests. It allows the operation to be canceled if requested.
+    /// </param>
+    /// <returns>
+    /// An object representing the active subscription for the specified query, enabling interaction with the subscribed events and updates.
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when attempting to subscribe while the live query connection is in a closed state.
+    /// </exception>
+    /// <exception cref="TimeoutException">
+    /// Thrown when the subscription request times out before receiving confirmation from the server.
+    /// </exception>
+    public async Task<IParseLiveQuerySubscription> SubscribeAsync<T>(ParseLiveQuery<T> liveQuery, CancellationToken cancellationToken = default) where T : ParseObject
     {
+        if (State == ParseLiveQueryState.Closed)
+        {
+            throw new InvalidOperationException("Cannot subscribe to a live query when the connection is closed.");
+        }
+
+        int requestId = ++LastRequestId;
         Dictionary<string, object> message = new Dictionary<string, object>
         {
             { "op", "subscribe" },
-            { "requestId", ++LastRequestId },
+            { "requestId", requestId },
             { "query", liveQuery.BuildParameters(true) }
         };
         await SendMessage(message, cancellationToken);
         CancellationTokenSource completionSignal = new CancellationTokenSource();
-        SubscriptionSignals.Add(LastRequestId, completionSignal);
+        SubscriptionSignals.Add(requestId, completionSignal);
         bool signalReceived = completionSignal.Token.WaitHandle.WaitOne(TimeOut);
-        SubscriptionSignals.Remove(LastRequestId);
+        SubscriptionSignals.Remove(requestId);
         completionSignal.Dispose();
         if (signalReceived)
         {
-            return LastRequestId;
+            ParseLiveQuerySubscription subscription = new ParseLiveQuerySubscription(liveQuery.Services, requestId);
+            Subscriptions.Add(requestId, subscription);
+            return subscription;
         }
         throw new TimeoutException();
     }
 
+    /// <summary>
+    /// Updates an active subscription by sending an "update" operation to the live query server.
+    /// This method modifies the parameters of an existing subscription for a specific query.
+    /// </summary>
+    /// <param name="liveQuery">
+    /// The live query object that holds the query parameters to be updated.
+    /// </param>
+    /// <param name="requestId">
+    /// The unique identifier of the subscription to update.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A token to monitor for cancellation requests, allowing the operation to be cancelled before completion.
+    /// </param>
+    /// <typeparam name="T">
+    /// The type of the ParseObject that the query targets.
+    /// </typeparam>
+    /// <returns>
+    /// A task that represents the asynchronous operation of updating the subscription.
+    /// </returns>
     public async Task UpdateSubscriptionAsync<T>(ParseLiveQuery<T> liveQuery, int requestId, CancellationToken cancellationToken = default) where T : ParseObject
     {
         Dictionary<string, object> message = new Dictionary<string, object>
@@ -265,6 +334,21 @@ public class ParseLiveQueryController : IParseLiveQueryController
         await SendMessage(message, cancellationToken);
     }
 
+    /// <summary>
+    /// Unsubscribes from a live query subscription associated with the given request identifier.
+    /// </summary>
+    /// <param name="requestId">
+    /// The unique identifier of the subscription to unsubscribe from.
+    /// </param>
+    /// <param name="cancellationToken">
+    /// A cancellation token that can be used to cancel the unsubscription operation before completion.
+    /// </param>
+    /// <returns>
+    /// A task that represents the asynchronous unsubscription operation.
+    /// </returns>
+    /// <exception cref="TimeoutException">
+    /// Thrown if the unsubscription process does not complete within the specified timeout period.
+    /// </exception>
     public async Task UnsubscribeAsync(int requestId, CancellationToken cancellationToken = default)
     {
         Dictionary<string, object> message = new Dictionary<string, object>
@@ -285,20 +369,21 @@ public class ParseLiveQueryController : IParseLiveQueryController
     }
 
     /// <summary>
-    /// Closes the WebSocket connection asynchronously and updates the state to reflect that the connection has been closed.
+    /// Closes the live query connection, resets the state to closed, and clears all active subscriptions and signals.
     /// </summary>
     /// <param name="cancellationToken">
-    /// A token that can be used to propagate notification that the operation should be canceled.
+    /// A token to monitor for cancellation requests while closing the connection.
     /// </param>
     /// <returns>
-    /// A task that represents the asynchronous operation of closing the WebSocket connection.
+    /// A task that represents the asynchronous operation for closing the live query connection.
     /// </returns>
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
-        if (SubscriptionIds.Count == 0)
-        {
-            await WebSocketClient.CloseAsync(cancellationToken);
-            State = ParseLiveQueryState.Closed;
-        }
+        await WebSocketClient.CloseAsync(cancellationToken);
+        State = ParseLiveQueryState.Closed;
+        SubscriptionSignals.Clear();
+        UnsubscriptionSignals.Clear();
+        SubscriptionUpdateSignals.Clear();
+        Subscriptions.Clear();
     }
 }
