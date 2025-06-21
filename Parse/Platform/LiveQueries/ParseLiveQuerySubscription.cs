@@ -13,7 +13,6 @@ namespace Parse.Platform.LiveQueries;
 /// </summary>
 public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
 {
-
     internal IServiceHub Services { get; }
 
     private int RequestId { get; set; }
@@ -22,33 +21,33 @@ public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
     /// Represents the Create event for a live query subscription.
     /// This event is triggered when a new object matching the subscription's query is created.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Create;
+    public event EventHandler<ParseLiveQueryEventArgs> Create;
 
     /// <summary>
     /// Represents the Enter event for a live query subscription.
     /// This event is triggered when an object that did not previously match the query (and was thus not part of the subscription)
     /// starts matching the query, typically due to an update.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Enter;
+    public event EventHandler<ParseLiveQueryEventArgs> Enter;
 
     /// <summary>
     /// Represents the Update event for a live query subscription.
     /// This event is triggered when an existing object matching the subscription's query is updated.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Update;
+    public event EventHandler<ParseLiveQueryEventArgs> Update;
 
     /// <summary>
     /// Represents the Leave event for a live query subscription.
     /// This event is triggered when an object that previously matched the subscription's query
     /// no longer matches the criteria and is removed.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Leave;
+    public event EventHandler<ParseLiveQueryEventArgs> Leave;
 
     /// <summary>
     /// Represents the Delete event for a live query subscription.
     /// This event is triggered when an object matching the subscription's query is deleted.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Delete;
+    public event EventHandler<ParseLiveQueryEventArgs> Delete;
 
     /// <summary>
     /// Represents a subscription to a live query, allowing the client to receive real-time event notifications
@@ -98,14 +97,14 @@ public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
     /// </summary>
     /// <param name="data">A dictionary containing the data associated with the created object, typically including
     /// information such as object attributes and metadata.</param>
-    public void OnCreate(IDictionary<string, object> data) => Create?.Invoke(this, data);
+    public void OnCreate(ParseLiveQueryEventArgs data) => Create?.Invoke(this, data);
 
     /// <summary>
     /// Triggers the Enter event, indicating that an object has entered the result set of the live query.
     /// This generally occurs when a Parse Object that did not previously match the query conditions now does.
     /// </summary>
     /// <param name="data">A dictionary containing the details of the object that triggered the event.</param>
-    public void OnEnter(IDictionary<string, object> data) => Enter?.Invoke(this, data);
+    public void OnEnter(ParseLiveQueryEventArgs data) => Enter?.Invoke(this, data);
 
     /// <summary>
     /// Handles the event triggered when an object in the subscribed live query is updated. This method
@@ -113,7 +112,7 @@ public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
     /// </summary>
     /// <param name="data">A dictionary containing the data associated with the update event.
     /// The data typically includes updated fields and their new values.</param>
-    public void OnUpdate(IDictionary<string, object> data) => Update?.Invoke(this, data);
+    public void OnUpdate(ParseLiveQueryEventArgs data) => Update?.Invoke(this, data);
 
     /// <summary>
     /// Triggers the Leave event when an object leaves the query's result set.
@@ -121,12 +120,12 @@ public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
     /// with the event.
     /// </summary>
     /// <param name="data">A dictionary that contains information about the object leaving the query's result set.</param>
-    public void OnLeave(IDictionary<string, object> data) => Leave?.Invoke(this, data);
+    public void OnLeave(ParseLiveQueryEventArgs data) => Leave?.Invoke(this, data);
 
     /// <summary>
     /// Handles the deletion event triggered by the Parse Live Query server. This method is invoked when an object
     /// that matches the current query result set is deleted, notifying all subscribers of this event.
     /// </summary>
     /// <param name="data">A dictionary containing information about the deleted object and any additional context provided by the server.</param>
-    public void OnDelete(IDictionary<string, object> data) => Delete?.Invoke(this, data);
+    public void OnDelete(ParseLiveQueryEventArgs data) => Delete?.Invoke(this, data);
 }

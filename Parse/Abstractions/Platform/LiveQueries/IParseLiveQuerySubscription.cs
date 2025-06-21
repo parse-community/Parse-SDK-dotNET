@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Platform.LiveQueries;
 
 namespace Parse.Abstractions.Platform.LiveQueries;
 
@@ -16,33 +17,33 @@ public interface IParseLiveQuerySubscription
     /// Represents the Create event for a live query subscription.
     /// This event is triggered when a new object matching the subscription's query is created.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Create;
+    public event EventHandler<ParseLiveQueryEventArgs> Create;
 
     /// <summary>
     /// Represents the Enter event for a live query subscription.
     /// This event is triggered when an object that did not previously match the query (and was thus not part of the subscription)
     /// starts matching the query, typically due to an update.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Enter;
+    public event EventHandler<ParseLiveQueryEventArgs> Enter;
 
     /// <summary>
     /// Represents the Update event for a live query subscription.
     /// This event is triggered when an existing object matching the subscription's query is updated.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Update;
+    public event EventHandler<ParseLiveQueryEventArgs> Update;
 
     /// <summary>
     /// Represents the Leave event for a live query subscription.
     /// This event is triggered when an object that previously matched the subscription's query
     /// no longer matches the criteria and is removed.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Leave;
+    public event EventHandler<ParseLiveQueryEventArgs> Leave;
 
     /// <summary>
     /// Represents the Delete event for a live query subscription.
     /// This event is triggered when an object matching the subscription's query is deleted.
     /// </summary>
-    public event EventHandler<IDictionary<string, object>> Delete;
+    public event EventHandler<ParseLiveQueryEventArgs> Delete;
 
     /// <summary>
     /// Updates the current live query subscription with new query parameters,

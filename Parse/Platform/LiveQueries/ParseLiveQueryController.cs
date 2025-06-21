@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -21,13 +20,15 @@ public class ParseLiveQueryController : IParseLiveQueryController
 
     private int LastRequestId { get; set; } = 0;
 
+    private string ClientId { get; set; }
+
     /// <summary>
     /// Gets or sets the timeout duration, in milliseconds, used by the ParseLiveQueryController
     /// for various operations, such as establishing a connection or completing a subscription.
     /// </summary>
     /// <remarks>
     /// This property determines the maximum amount of time the controller will wait for an operation
-    /// to complete before throwing a <see cref="TimeoutException"/>. It is used in operations such as:
+    /// to complete before throwing a <see cref="TimeoutException"/>. It is used in operations such as
     /// - Connecting to the LiveQuery server.
     /// - Subscribing to a query.
     /// - Unsubscribing from a query.
@@ -36,17 +37,23 @@ public class ParseLiveQueryController : IParseLiveQueryController
     public int TimeOut { get; set; } = 5000;
 
     /// <summary>
-    /// Event triggered when an error occurs during Parse Live Query operations.
+    /// Event triggered when an error occurs during the operation of the ParseLiveQueryController.
     /// </summary>
     /// <remarks>
-    /// This event provides detailed information about the encountered error through the event arguments,
-    /// which consist of a dictionary containing key-value pairs describing the error context and specifics.
-    /// It can be used to log, handle, or analyze the errors that arise during subscription, connection,
-    /// or message processing operations. Common scenarios triggering this event include protocol issues,
-    /// connectivity problems, or invalid message formats.
+    /// This event provides details about a live query operation failure, such as specific error messages,
+    /// error codes, and whether automatic reconnection is recommended.
+    /// It is raised in scenarios like:
+    /// - Receiving an error response from the LiveQuery server.
+    /// - Issues with subscriptions, unsubscriptions, or query updates.
+    /// Subscribers to this event can use the provided <see cref="ParseLiveQueryErrorEventArgs"/> to
+    /// understand the error and implement appropriate handling mechanisms.
     /// </remarks>
-    public event EventHandler<IDictionary<string, object>> Error;
+    public event EventHandler<ParseLiveQueryErrorEventArgs> Error;
 
+    /// <summary>
+    /// Represents the state of a connection to the Parse LiveQuery server, indicating whether the connection is closed,
+    /// in the process of connecting, or fully established.
+    /// </summary>
     public enum ParseLiveQueryState
     {
         /// <summary>
@@ -71,7 +78,8 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// such as when a connection is established or closed, or when an error occurs.
     /// </remarks>
     public ParseLiveQueryState State { get; private set; }
-    ArrayList SubscriptionIds { get; }
+
+    HashSet<int> SubscriptionIds { get; } = new HashSet<int> { };
 
     CancellationTokenSource ConnectionSignal { get; set; }
     private IDictionary<int, CancellationTokenSource> SubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
@@ -83,89 +91,143 @@ public class ParseLiveQueryController : IParseLiveQueryController
     public ParseLiveQueryController(IWebSocketClient webSocketClient)
     {
         WebSocketClient = webSocketClient;
-        SubscriptionIds = new ArrayList();
         State = ParseLiveQueryState.Closed;
     }
 
     private void ProcessMessage(IDictionary<string, object> message)
     {
         int requestId;
+        string clientId;
+        ParseLiveQuerySubscription subscription;
         switch (message["op"])
         {
             case "connected":
                 State = ParseLiveQueryState.Connected;
+                ClientId = message["clientId"] as string;
                 ConnectionSignal?.Cancel();
-                // Connected?.Invoke(this, EventArgs.Empty);
                 break;
 
-            case "subscribed":
-                requestId = Convert.ToInt32(message["requestId"]);
-                SubscriptionIds.Add(requestId);
-                if (SubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource subscriptionSignal))
+            case "subscribed": // Response from subscription and subscription update
+                clientId = message["clientId"] as string;
+                if (clientId == ClientId)
                 {
-                    subscriptionSignal?.Cancel();
+                    requestId = Convert.ToInt32(message["requestId"]);
+                    SubscriptionIds.Add(requestId);
+                    if (SubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource subscriptionSignal))
+                    {
+                        subscriptionSignal?.Cancel();
+                    }
                 }
-                // Subscribed?.Invoke(this, requestId);
                 break;
-
-            // TODO subscription update case
 
             case "unsubscribed":
-                requestId = Convert.ToInt32(message["requestId"]);
-                SubscriptionIds.Remove(requestId);
-                if (UnsubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource unsubscriptionSignal))
+                clientId = message["clientId"] as string;
+                if (clientId == ClientId)
                 {
-                    unsubscriptionSignal?.Cancel();
+                    requestId = Convert.ToInt32(message["requestId"]);
+                    SubscriptionIds.Remove(requestId);
+                    if (UnsubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource unsubscriptionSignal))
+                    {
+                        unsubscriptionSignal?.Cancel();
+                    }
                 }
-                // Unsubscribed?.Invoke(this, requestId);
                 break;
 
             case "error":
                 if ((bool)message["reconnect"])
                 {
-                    OpenAsync();
+                    ConnectAsync();
                 }
-                string errorMessage = message["error"] as string;
-                Error?.Invoke(this, message);
+
+                ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs
+                {
+                    Error = message["error"] as string,
+                    Code = Convert.ToInt32(message["code"]),
+                    Reconnected = (bool)message["reconnect"]
+                };
+                Error?.Invoke(this, errorArgs);
                 break;
 
             case "create":
-                requestId = Convert.ToInt32(message["requestId"]);
-                if (Subscriptions.TryGetValue(requestId, out ParseLiveQuerySubscription subscription))
+                clientId = message["clientId"] as string;
+                if (clientId == ClientId)
                 {
-                    subscription.OnCreate(message);
+                    requestId = Convert.ToInt32(message["requestId"]);
+                    if (Subscriptions.TryGetValue(requestId, out subscription))
+                    {
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
+                        {
+                            Object = message["object"]
+                        };
+                        subscription.OnCreate(args);
+                    }
                 }
                 break;
 
             case "enter":
-                requestId = Convert.ToInt32(message["requestId"]);
-                if (Subscriptions.TryGetValue(requestId, out subscription))
+                clientId = message["clientId"] as string;
+                if (clientId == ClientId)
                 {
-                    subscription.OnEnter(message);
+                    requestId = Convert.ToInt32(message["requestId"]);
+                    if (Subscriptions.TryGetValue(requestId, out subscription))
+                    {
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
+                        {
+                            Object = message["object"],
+                            Original = message["original"]
+                        };
+                        subscription.OnEnter(args);
+                    }
                 }
                 break;
 
             case "update":
-                requestId = Convert.ToInt32(message["requestId"]);
-                if (Subscriptions.TryGetValue(requestId, out subscription))
+                clientId = message["clientId"] as string;
+                if (clientId == ClientId)
                 {
-                    subscription.OnUpdate(message);
+                    requestId = Convert.ToInt32(message["requestId"]);
+                    if (Subscriptions.TryGetValue(requestId, out subscription))
+                    {
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
+                        {
+                            Object = message["object"],
+                            Original = message["original"]
+                        };
+                        subscription.OnUpdate(args);
+                    }
                 }
                 break;
 
             case "leave":
-                requestId = Convert.ToInt32(message["requestId"]);
-                if (Subscriptions.TryGetValue(requestId, out subscription))
+                clientId = message["clientId"] as string;
+                if (clientId == ClientId)
                 {
-                    subscription.OnLeave(message);
+                    requestId = Convert.ToInt32(message["requestId"]);
+                    if (Subscriptions.TryGetValue(requestId, out subscription))
+                    {
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
+                        {
+                            Object = message["object"],
+                            Original = message["original"]
+                        };
+                        subscription.OnLeave(args);
+                    }
                 }
                 break;
 
             case "delete":
-                requestId = Convert.ToInt32(message["requestId"]);
-                if (Subscriptions.TryGetValue(requestId, out subscription))
+                clientId = message["clientId"] as string;
+                if (clientId == ClientId)
                 {
-                    subscription.OnDelete(message);
+                    requestId = Convert.ToInt32(message["requestId"]);
+                    if (Subscriptions.TryGetValue(requestId, out subscription))
+                    {
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
+                        {
+                            Object = message["object"],
+                        };
+                        subscription.OnDelete(args);
+                    }
                 }
                 break;
 
@@ -369,7 +431,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
     }
 
     /// <summary>
-    /// Closes the live query connection, resets the state to closed, and clears all active subscriptions and signals.
+    /// Closes the live query connection, resets the state to close, and clears all active subscriptions and signals.
     /// </summary>
     /// <param name="cancellationToken">
     /// A token to monitor for cancellation requests while closing the connection.

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Infrastructure.Data;
+using Parse.Infrastructure.Utilities;
 
 namespace Parse;
 
@@ -20,7 +21,7 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// <summary>
     /// Serialized <see langword="where"/> clauses.
     /// </summary>
-    Dictionary<string, object> Filters { get; }
+    string Filters { get; }
 
     /// <summary>
     /// Serialized key selections.
@@ -38,17 +39,12 @@ public class ParseLiveQuery<T> where T : ParseObject
 
     private int RequestId = 0;
 
-    public ParseLiveQuery(IServiceHub serviceHub, string className, IDictionary<string, object> filters, IEnumerable<string> selectedKeys = null, IEnumerable<string> watchedKeys = null)
+    public ParseLiveQuery(IServiceHub serviceHub, string className, object filters, IEnumerable<string> selectedKeys = null, IEnumerable<string> watchedKeys = null)
     {
-        if (filters.Count == 0)
-        {
-            // Throw error
-        }
-
         Services = serviceHub;
         ClassName = className;
+        Filters = JsonUtilities.Encode(filters);
 
-        Filters = new Dictionary<string, object>(filters);
         if (selectedKeys is not null)
         {
             KeySelections = new ReadOnlyCollection<string>(selectedKeys.ToList());
@@ -95,11 +91,11 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// <returns>A new query with the additional constraint.</returns>
     public ParseLiveQuery<T> Watch(string watch) => new(this, new List<string> { watch });
 
-    internal IDictionary<string, object> BuildParameters(bool includeClassName = false)
+    internal IDictionary<string, string> BuildParameters(bool includeClassName = false)
     {
-        Dictionary<string, object> result = new Dictionary<string, object>();
+        Dictionary<string, string> result = new Dictionary<string, string>();
         if (Filters != null)
-            result["where"] = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services);
+            result["where"] = Filters;
         if (KeySelections != null)
             result["keys"] = String.Join(",", KeySelections.ToArray());
         if (KeyWatchers != null)
