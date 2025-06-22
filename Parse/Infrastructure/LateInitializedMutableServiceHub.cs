@@ -48,12 +48,6 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
         set => LateInitializer.SetValue(value);
     }
 
-    public IWebSocketClient WebSocketClient
-    {
-        get => LateInitializer.GetValue<IWebSocketClient>(() => new TextWebSocketClient { });
-        set => LateInitializer.SetValue(value);
-    }
-
     public ICacheController CacheController
     {
         get => LateInitializer.GetValue<ICacheController>(() => new CacheController { });
@@ -75,6 +69,12 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
     public IParseCommandRunner CommandRunner
     {
         get => LateInitializer.GetValue<IParseCommandRunner>(() => new ParseCommandRunner(WebClient, InstallationController, MetadataController, ServerConnectionData, new Lazy<IParseUserController>(() => UserController)));
+        set => LateInitializer.SetValue(value);
+    }
+
+    public IWebSocketClient WebSocketClient
+    {
+        get => LateInitializer.GetValue<IWebSocketClient>(() => new TextWebSocketClient { });
         set => LateInitializer.SetValue(value);
     }
 

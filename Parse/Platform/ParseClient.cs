@@ -150,7 +150,7 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
         {
             Services = serviceHub switch
             {
-                IMutableServiceHub { } mutableServiceHub => BuildHub((Hub: mutableServiceHub, mutableServiceHub.ServerConnectionData = serviceHub.ServerConnectionData ?? Services.ServerConnectionData).Hub, Services, configurators),
+                IMutableServiceHub { } mutableServiceHub => BuildHub((Hub: mutableServiceHub, mutableServiceHub.ServerConnectionData = serviceHub.ServerConnectionData ?? Services.ServerConnectionData, mutableServiceHub.LiveQueryServerConnectionData = serviceHub.LiveQueryServerConnectionData ?? Services.LiveQueryServerConnectionData).Hub, Services, configurators),
                 { } => BuildHub(default, Services, configurators)
             };
         }

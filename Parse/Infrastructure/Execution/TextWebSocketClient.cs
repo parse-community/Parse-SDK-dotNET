@@ -54,9 +54,12 @@ class TextWebSocketClient : IWebSocketClient
     {
         _webSocket ??= new ClientWebSocket();
 
+        Debug.WriteLine($"Status: {_webSocket.State.ToString()}");
         if (_webSocket.State != WebSocketState.Open && _webSocket.State != WebSocketState.Connecting)
         {
+            Debug.WriteLine($"Connecting to: {serverUri}");
             await _webSocket.ConnectAsync(new Uri(serverUri), cancellationToken);
+            Debug.WriteLine($"Status: {_webSocket.State.ToString()}");
             StartListening(cancellationToken);
         }
     }
@@ -138,7 +141,11 @@ class TextWebSocketClient : IWebSocketClient
     /// </returns>
     public async Task SendAsync(string message, CancellationToken cancellationToken = default)
     {
+        Debug.WriteLine($"Sending: {message}");
         if (_webSocket is not null && _webSocket.State == WebSocketState.Open)
+        {
             await _webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, cancellationToken);
+            Console.WriteLine("Sent");
+        }
     }
 }

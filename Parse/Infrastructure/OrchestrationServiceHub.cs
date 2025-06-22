@@ -34,6 +34,7 @@ public class OrchestrationServiceHub : IServiceHub
     public IParseInstallationController InstallationController => Custom.InstallationController ?? Default.InstallationController;
 
     public IParseCommandRunner CommandRunner => Custom.CommandRunner ?? Default.CommandRunner;
+    public IWebSocketClient WebSocketClient => Custom.WebSocketClient ?? Default.WebSocketClient;
 
     public IParseCloudCodeController CloudCodeController => Custom.CloudCodeController ?? Default.CloudCodeController;
 
@@ -64,6 +65,7 @@ public class OrchestrationServiceHub : IServiceHub
     public IParseCurrentInstallationController CurrentInstallationController => Custom.CurrentInstallationController ?? Default.CurrentInstallationController;
 
     public IServerConnectionData ServerConnectionData => Custom.ServerConnectionData ?? Default.ServerConnectionData;
+
     public IServerConnectionData LiveQueryServerConnectionData => Custom.LiveQueryServerConnectionData ?? Default.LiveQueryServerConnectionData;
 
     public IParseDataDecoder Decoder => Custom.Decoder ?? Default.Decoder;

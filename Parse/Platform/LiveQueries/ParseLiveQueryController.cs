@@ -88,8 +88,17 @@ public class ParseLiveQueryController : IParseLiveQueryController
 
     private IDictionary<int, ParseLiveQuerySubscription> Subscriptions { get; set; } = new Dictionary<int, ParseLiveQuerySubscription> { };
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParseLiveQueryController"/> class.
+    /// </summary>
+    /// <param name="webSocketClient">
+    /// The <see cref="IWebSocketClient"/> implementation to use for the live query connection.
+    /// </param>
+    /// <remarks>
+    /// This constructor is used to initialize a new instance of the <see cref="ParseLiveQueryController"/> class
     public ParseLiveQueryController(IWebSocketClient webSocketClient)
     {
+        Debug.WriteLine("ParseLiveQueryController initialized.");
         WebSocketClient = webSocketClient;
         State = ParseLiveQueryState.Closed;
     }
@@ -99,7 +108,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
         int requestId;
         string clientId;
         ParseLiveQuerySubscription subscription;
-        switch (message["op"])
+        switch (message["op"] as string)
         {
             case "connected":
                 State = ParseLiveQueryState.Connected;
@@ -134,17 +143,10 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 break;
 
             case "error":
-                if ((bool)message["reconnect"])
-                {
-                    ConnectAsync();
-                }
-
-                ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs
-                {
-                    Error = message["error"] as string,
-                    Code = Convert.ToInt32(message["code"]),
-                    Reconnected = (bool)message["reconnect"]
-                };
+                ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs(
+                    Convert.ToInt32(message["code"]),
+                    message["error"] as string,
+                    (bool) message["reconnect"]);
                 Error?.Invoke(this, errorArgs);
                 break;
 
@@ -155,10 +157,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
-                        {
-                            Object = message["object"]
-                        };
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(message["object"]);
                         subscription.OnCreate(args);
                     }
                 }
@@ -171,11 +170,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
-                        {
-                            Object = message["object"],
-                            Original = message["original"]
-                        };
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(
+                            message["object"],
+                            message["original"]);
                         subscription.OnEnter(args);
                     }
                 }
@@ -188,11 +185,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
-                        {
-                            Object = message["object"],
-                            Original = message["original"]
-                        };
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(
+                            message["object"],
+                            message["original"]);
                         subscription.OnUpdate(args);
                     }
                 }
@@ -205,11 +200,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
-                        {
-                            Object = message["object"],
-                            Original = message["original"]
-                        };
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(
+                            message["object"],
+                            message["original"]);
                         subscription.OnLeave(args);
                     }
                 }
@@ -222,10 +215,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs()
-                        {
-                            Object = message["object"],
-                        };
+                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(message["object"]);
                         subscription.OnDelete(args);
                     }
                 }
@@ -291,7 +281,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
             {
                 { "op", "connect" },
                 { "applicationId", ParseClient.Instance.Services.LiveQueryServerConnectionData.ApplicationID },
-                { "clientKey", ParseClient.Instance.Services.LiveQueryServerConnectionData.Key }
+                { "windowsKey", ParseClient.Instance.Services.LiveQueryServerConnectionData.Key }
             };
             await SendMessage(message, cancellationToken);
             ConnectionSignal = new CancellationTokenSource();

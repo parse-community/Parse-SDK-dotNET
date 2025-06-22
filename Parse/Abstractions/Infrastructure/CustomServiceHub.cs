@@ -32,6 +32,8 @@ public abstract class CustomServiceHub : ICustomServiceHub
 
     public virtual IParseCommandRunner CommandRunner => Services.CommandRunner;
 
+    public virtual IWebSocketClient WebSocketClient => Services.WebSocketClient;
+
     public virtual IParseCloudCodeController CloudCodeController => Services.CloudCodeController;
 
     public virtual IParseConfigurationController ConfigurationController => Services.ConfigurationController;
@@ -62,7 +64,7 @@ public abstract class CustomServiceHub : ICustomServiceHub
 
     public virtual IServerConnectionData ServerConnectionData => Services.ServerConnectionData;
 
-    public virtual IServerConnectionData LiveQueryServerConnectionData => Services.ServerConnectionData;
+    public virtual IServerConnectionData LiveQueryServerConnectionData => Services.LiveQueryServerConnectionData;
 
     public virtual IParseDataDecoder Decoder => Services.Decoder;
 

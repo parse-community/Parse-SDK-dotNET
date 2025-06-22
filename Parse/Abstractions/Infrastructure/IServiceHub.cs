@@ -40,6 +40,7 @@ public interface IServiceHub
 
     IParseInstallationController InstallationController { get; }
     IParseCommandRunner CommandRunner { get; }
+    IWebSocketClient WebSocketClient { get; }
 
     IParseCloudCodeController CloudCodeController { get; }
     IParseConfigurationController ConfigurationController { get; }

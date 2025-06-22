@@ -19,6 +19,7 @@ namespace Parse.Abstractions.Infrastructure;
 public interface IMutableServiceHub : IServiceHub
 {
     IServerConnectionData ServerConnectionData { set; }
+    IServerConnectionData LiveQueryServerConnectionData { set; }
     IMetadataController MetadataController { set; }
 
     IServiceHubCloner Cloner { set; }
@@ -31,6 +32,7 @@ public interface IMutableServiceHub : IServiceHub
 
     IParseInstallationController InstallationController { set; }
     IParseCommandRunner CommandRunner { set; }
+    IWebSocketClient WebSocketClient { set; }
 
     IParseCloudCodeController CloudCodeController { set; }
     IParseConfigurationController ConfigurationController { set; }

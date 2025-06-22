@@ -52,7 +52,6 @@ public class ServiceHub : IServiceHub
 
     public IParseInstallationController InstallationController => LateInitializer.GetValue(() => new ParseInstallationController(CacheController));
     public IParseCommandRunner CommandRunner => LateInitializer.GetValue(() => new ParseCommandRunner(WebClient, InstallationController, MetadataController, ServerConnectionData, new Lazy<IParseUserController>(() => UserController)));
-
     public IWebSocketClient WebSocketClient => LateInitializer.GetValue(() => new TextWebSocketClient { });
 
     public IParseCloudCodeController CloudCodeController => LateInitializer.GetValue(() => new ParseCloudCodeController(CommandRunner, Decoder));

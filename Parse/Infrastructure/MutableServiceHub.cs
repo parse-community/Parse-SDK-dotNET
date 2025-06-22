@@ -20,6 +20,7 @@ using Parse.Platform.Cloud;
 using Parse.Platform.Configuration;
 using Parse.Platform.Files;
 using Parse.Platform.Installations;
+using Parse.Platform.LiveQueries;
 using Parse.Platform.Objects;
 using Parse.Platform.Push;
 using Parse.Platform.Queries;
@@ -48,6 +49,7 @@ public class MutableServiceHub : IMutableServiceHub
 
     public IParseInstallationController InstallationController { get; set; }
     public IParseCommandRunner CommandRunner { get; set; }
+    public IWebSocketClient WebSocketClient { get; set; }
 
     public IParseCloudCodeController CloudCodeController { get; set; }
     public IParseConfigurationController ConfigurationController { get; set; }
@@ -68,9 +70,10 @@ public class MutableServiceHub : IMutableServiceHub
     public IParseCurrentInstallationController CurrentInstallationController { get; set; }
     public IParseInstallationDataFinalizer InstallationDataFinalizer { get; set; }
 
-    public MutableServiceHub SetDefaults(IServerConnectionData connectionData = default)
+    public MutableServiceHub SetDefaults(IServerConnectionData connectionData = default, IServerConnectionData liveQueryConnectionData = default)
     {
         ServerConnectionData ??= connectionData;
+        LiveQueryServerConnectionData ??= liveQueryConnectionData;
         MetadataController ??= new MetadataController
         {
             EnvironmentData = EnvironmentData.Inferred,
@@ -87,12 +90,14 @@ public class MutableServiceHub : IMutableServiceHub
 
         InstallationController ??= new ParseInstallationController(CacheController);
         CommandRunner ??= new ParseCommandRunner(WebClient, InstallationController, MetadataController, ServerConnectionData, new Lazy<IParseUserController>(() => UserController));
+        WebSocketClient ??= new TextWebSocketClient { };
 
         CloudCodeController ??= new ParseCloudCodeController(CommandRunner, Decoder);
         ConfigurationController ??= new ParseConfigurationController(CommandRunner, CacheController, Decoder);
         FileController ??= new ParseFileController(CommandRunner);
         ObjectController ??= new ParseObjectController(CommandRunner, Decoder, ServerConnectionData);
         QueryController ??= new ParseQueryController(CommandRunner, Decoder);
+        LiveQueryController ??= new ParseLiveQueryController(WebSocketClient);
         SessionController ??= new ParseSessionController(CommandRunner, Decoder);
         UserController ??= new ParseUserController(CommandRunner, Decoder);
         CurrentUserController ??= new ParseCurrentUserController(CacheController, ClassController, Decoder);
