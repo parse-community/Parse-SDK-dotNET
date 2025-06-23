@@ -98,7 +98,6 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// This constructor is used to initialize a new instance of the <see cref="ParseLiveQueryController"/> class
     public ParseLiveQueryController(IWebSocketClient webSocketClient)
     {
-        Debug.WriteLine("ParseLiveQueryController initialized.");
         WebSocketClient = webSocketClient;
         State = ParseLiveQueryState.Closed;
     }
@@ -227,16 +226,19 @@ public class ParseLiveQueryController : IParseLiveQueryController
         }
     }
 
-    private IDictionary<string, object> AppendSessionToken(IDictionary<string, object> message)
+    private async Task<IDictionary<string, object>> AppendSessionToken(IDictionary<string, object> message)
     {
-        return message.Concat(new Dictionary<string, object> {
-            { "sessionToken", ParseClient.Instance.Services.GetCurrentSessionToken() }
-        }).ToDictionary();
+        string sessionToken = await ParseClient.Instance.Services.GetCurrentSessionToken();
+        return sessionToken is null
+            ? message
+            : message.Concat(new Dictionary<string, object> {
+                { "sessionToken", await ParseClient.Instance.Services.GetCurrentSessionToken() }
+            }).ToDictionary();
     }
 
     private async Task SendMessage(IDictionary<string, object> message, CancellationToken cancellationToken)
     {
-        await WebSocketClient.SendAsync(JsonUtilities.Encode(AppendSessionToken(message)), cancellationToken);
+        await WebSocketClient.SendAsync(JsonUtilities.Encode(message), cancellationToken);
     }
 
     private async Task OpenAsync(CancellationToken cancellationToken = default)
@@ -283,15 +285,15 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 { "applicationId", ParseClient.Instance.Services.LiveQueryServerConnectionData.ApplicationID },
                 { "windowsKey", ParseClient.Instance.Services.LiveQueryServerConnectionData.Key }
             };
-            await SendMessage(message, cancellationToken);
+            await SendMessage(await AppendSessionToken(message), cancellationToken);
             ConnectionSignal = new CancellationTokenSource();
             bool signalReceived = ConnectionSignal.Token.WaitHandle.WaitOne(TimeOut);
-            State = ParseLiveQueryState.Connected;
-            ConnectionSignal.Dispose();
             if (!signalReceived)
             {
                 throw new TimeoutException();
             }
+            State = ParseLiveQueryState.Connected;
+            ConnectionSignal.Dispose();
         }
         else if (State == ParseLiveQueryState.Connecting)
         {
@@ -339,9 +341,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
         {
             { "op", "subscribe" },
             { "requestId", requestId },
-            { "query", liveQuery.BuildParameters(true) }
+            { "query", liveQuery.BuildParameters() }
         };
-        await SendMessage(message, cancellationToken);
+        await SendMessage(await AppendSessionToken(message), cancellationToken);
         CancellationTokenSource completionSignal = new CancellationTokenSource();
         SubscriptionSignals.Add(requestId, completionSignal);
         bool signalReceived = completionSignal.Token.WaitHandle.WaitOne(TimeOut);
@@ -381,9 +383,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
         {
             { "op", "update" },
             { "requestId", requestId },
-            { "query", liveQuery.BuildParameters(true) }
+            { "query", liveQuery.BuildParameters() }
         };
-        await SendMessage(message, cancellationToken);
+        await SendMessage(await AppendSessionToken(message), cancellationToken);
     }
 
     /// <summary>

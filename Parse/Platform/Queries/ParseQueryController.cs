@@ -24,7 +24,6 @@ internal class ParseQueryController : IParseQueryController
 
     public ParseQueryController(IParseCommandRunner commandRunner, IParseDataDecoder decoder)
     {
-        Debug.WriteLine("ParseQueryController initialized");
         CommandRunner = commandRunner;
         Decoder = decoder;
     }

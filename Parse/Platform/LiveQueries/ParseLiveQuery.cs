@@ -21,7 +21,7 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// <summary>
     /// Serialized <see langword="where"/> clauses.
     /// </summary>
-    string Filters { get; }
+    IDictionary<string, object> Filters { get; }
 
     /// <summary>
     /// Serialized key selections.
@@ -39,11 +39,11 @@ public class ParseLiveQuery<T> where T : ParseObject
 
     private int RequestId = 0;
 
-    public ParseLiveQuery(IServiceHub serviceHub, string className, object filters, IEnumerable<string> selectedKeys = null, IEnumerable<string> watchedKeys = null)
+    public ParseLiveQuery(IServiceHub serviceHub, string className, IDictionary<string, object> filters, IEnumerable<string> selectedKeys = null, IEnumerable<string> watchedKeys = null)
     {
         Services = serviceHub;
         ClassName = className;
-        Filters = JsonUtilities.Encode(filters);
+        Filters = filters;
 
         if (selectedKeys is not null)
         {
@@ -91,17 +91,15 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// <returns>A new query with the additional constraint.</returns>
     public ParseLiveQuery<T> Watch(string watch) => new(this, new List<string> { watch });
 
-    internal IDictionary<string, string> BuildParameters(bool includeClassName = false)
+    internal IDictionary<string, object> BuildParameters()
     {
-        Dictionary<string, string> result = new Dictionary<string, string>();
-        if (Filters != null)
-            result["where"] = Filters;
+        Dictionary<string, object> result = new Dictionary<string, object>();
+        result["className"] = ClassName;
+        result["where"] = Filters;
         if (KeySelections != null)
-            result["keys"] = String.Join(",", KeySelections.ToArray());
+            result["keys"] = KeySelections.ToArray();
         if (KeyWatchers != null)
-            result["watch"] = String.Join(",", KeyWatchers.ToArray());
-        if (includeClassName)
-            result["className"] = ClassName;
+            result["watch"] = KeyWatchers.ToArray();
         return result;
     }
 

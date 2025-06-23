@@ -915,6 +915,6 @@ public class ParseQuery<T> where T : ParseObject
     public ParseLiveQuery<T> GetLive()
     {
         IDictionary<string, object> paramsDict = BuildParameters();
-        return new ParseLiveQuery<T>(Services, ClassName, paramsDict["where"], paramsDict.TryGetValue("keys", out object selectedKey) ? selectedKey as IEnumerable<string> : null);
+        return new ParseLiveQuery<T>(Services, ClassName, paramsDict["where"] as IDictionary<string, object>, KeySelections);
     }
 }
