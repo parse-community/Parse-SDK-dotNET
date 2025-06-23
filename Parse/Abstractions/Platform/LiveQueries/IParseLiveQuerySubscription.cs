@@ -24,20 +24,20 @@ public interface IParseLiveQuerySubscription
     /// This event is triggered when an object that did not previously match the query (and was thus not part of the subscription)
     /// starts matching the query, typically due to an update.
     /// </summary>
-    public event EventHandler<ParseLiveQueryEventArgs> Enter;
+    public event EventHandler<DualParseLiveQueryEventArgs> Enter;
 
     /// <summary>
     /// Represents the Update event for a live query subscription.
     /// This event is triggered when an existing object matching the subscription's query is updated.
     /// </summary>
-    public event EventHandler<ParseLiveQueryEventArgs> Update;
+    public event EventHandler<DualParseLiveQueryEventArgs> Update;
 
     /// <summary>
     /// Represents the Leave event for a live query subscription.
     /// This event is triggered when an object that previously matched the subscription's query
     /// no longer matches the criteria and is removed.
     /// </summary>
-    public event EventHandler<ParseLiveQueryEventArgs> Leave;
+    public event EventHandler<DualParseLiveQueryEventArgs> Leave;
 
     /// <summary>
     /// Represents the Delete event for a live query subscription.
