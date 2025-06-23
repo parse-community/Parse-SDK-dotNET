@@ -97,7 +97,7 @@ public class MutableServiceHub : IMutableServiceHub
         FileController ??= new ParseFileController(CommandRunner);
         ObjectController ??= new ParseObjectController(CommandRunner, Decoder, ServerConnectionData);
         QueryController ??= new ParseQueryController(CommandRunner, Decoder);
-        LiveQueryController ??= new ParseLiveQueryController(WebSocketClient);
+        LiveQueryController ??= new ParseLiveQueryController(WebSocketClient, Decoder);
         SessionController ??= new ParseSessionController(CommandRunner, Decoder);
         UserController ??= new ParseUserController(CommandRunner, Decoder);
         CurrentUserController ??= new ParseCurrentUserController(CacheController, ClassController, Decoder);

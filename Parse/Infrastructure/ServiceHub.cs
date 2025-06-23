@@ -59,7 +59,7 @@ public class ServiceHub : IServiceHub
     public IParseFileController FileController => LateInitializer.GetValue(() => new ParseFileController(CommandRunner));
     public IParseObjectController ObjectController => LateInitializer.GetValue(() => new ParseObjectController(CommandRunner, Decoder, ServerConnectionData));
     public IParseQueryController QueryController => LateInitializer.GetValue(() => new ParseQueryController(CommandRunner, Decoder));
-    public IParseLiveQueryController LiveQueryController => LateInitializer.GetValue(() => new ParseLiveQueryController(WebSocketClient));
+    public IParseLiveQueryController LiveQueryController => LateInitializer.GetValue(() => new ParseLiveQueryController(WebSocketClient, Decoder));
     public IParseSessionController SessionController => LateInitializer.GetValue(() => new ParseSessionController(CommandRunner, Decoder));
     public IParseUserController UserController => LateInitializer.GetValue(() => new ParseUserController(CommandRunner, Decoder));
     public IParseCurrentUserController CurrentUserController => LateInitializer.GetValue(() => new ParseCurrentUserController(CacheController, ClassController, Decoder));

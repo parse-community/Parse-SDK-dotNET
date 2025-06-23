@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Platform.Objects;
 using Parse.Platform.LiveQueries;
 
 namespace Parse.Abstractions.Platform.LiveQueries;
@@ -68,4 +68,10 @@ public interface IParseLiveQuerySubscription
     /// <param name="cancellationToken">A token to monitor for cancellation requests. If triggered, the cancellation process will halt.</param>
     /// <returns>A task that represents the asynchronous operation of canceling the subscription.</returns>
     Task CancelAsync(CancellationToken cancellationToken = default);
+
+    internal void OnCreate(IObjectState objectState);
+    internal void OnEnter(IObjectState objectState, IObjectState originalState);
+    internal void OnUpdate(IObjectState objectState, IObjectState originalState);
+    internal void OnLeave(IObjectState objectState, IObjectState originalState);
+    internal void OnDelete(IObjectState objectState);
 }

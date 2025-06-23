@@ -4,8 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Platform.LiveQueries;
+using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.LiveQueries;
@@ -16,6 +18,7 @@ namespace Parse.Platform.LiveQueries;
 /// </summary>
 public class ParseLiveQueryController : IParseLiveQueryController
 {
+    private IParseDataDecoder Decoder { get; }
     private IWebSocketClient WebSocketClient { get; }
 
     private int LastRequestId { get; set; } = 0;
@@ -62,7 +65,19 @@ public class ParseLiveQueryController : IParseLiveQueryController
         /// has been terminated, and no data updates are being received.
         /// </summary>
         Closed,
+
+        /// <summary>
+        /// Represents the state where the live query connection is in the process of being established.
+        /// This indicates that the client is actively attempting to connect to the live query server,
+        /// but the connection has not yet been fully established.
+        /// </summary>
         Connecting,
+
+        /// <summary>
+        /// Represents the state where the live query connection has been successfully established.
+        /// This state indicates that the client is actively connected to the Parse LiveQuery server
+        /// and is receiving real-time data updates.
+        /// </summary>
         Connected
     }
 
@@ -79,14 +94,10 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// </remarks>
     public ParseLiveQueryState State { get; private set; }
 
-    HashSet<int> SubscriptionIds { get; } = new HashSet<int> { };
-
     CancellationTokenSource ConnectionSignal { get; set; }
     private IDictionary<int, CancellationTokenSource> SubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
     private IDictionary<int, CancellationTokenSource> UnsubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
-    private IDictionary<int, CancellationTokenSource> SubscriptionUpdateSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
-
-    private IDictionary<int, ParseLiveQuerySubscription> Subscriptions { get; set; } = new Dictionary<int, ParseLiveQuerySubscription> { };
+    private IDictionary<int, IParseLiveQuerySubscription> Subscriptions { get; set; } = new Dictionary<int, IParseLiveQuerySubscription> { };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParseLiveQueryController"/> class.
@@ -94,19 +105,22 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// <param name="webSocketClient">
     /// The <see cref="IWebSocketClient"/> implementation to use for the live query connection.
     /// </param>
+    /// <param name="decoder"></param>
     /// <remarks>
     /// This constructor is used to initialize a new instance of the <see cref="ParseLiveQueryController"/> class
-    public ParseLiveQueryController(IWebSocketClient webSocketClient)
+    /// </remarks>
+    public ParseLiveQueryController(IWebSocketClient webSocketClient, IParseDataDecoder decoder)
     {
         WebSocketClient = webSocketClient;
         State = ParseLiveQueryState.Closed;
+        Decoder = decoder;
     }
 
     private void ProcessMessage(IDictionary<string, object> message)
     {
         int requestId;
         string clientId;
-        ParseLiveQuerySubscription subscription;
+        IParseLiveQuerySubscription subscription;
         switch (message["op"] as string)
         {
             case "connected":
@@ -120,7 +134,6 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 if (clientId == ClientId)
                 {
                     requestId = Convert.ToInt32(message["requestId"]);
-                    SubscriptionIds.Add(requestId);
                     if (SubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource subscriptionSignal))
                     {
                         subscriptionSignal?.Cancel();
@@ -133,7 +146,6 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 if (clientId == ClientId)
                 {
                     requestId = Convert.ToInt32(message["requestId"]);
-                    SubscriptionIds.Remove(requestId);
                     if (UnsubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource unsubscriptionSignal))
                     {
                         unsubscriptionSignal?.Cancel();
@@ -156,8 +168,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(message["object"]);
-                        subscription.OnCreate(args);
+                        subscription.OnCreate(ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
                     }
                 }
                 break;
@@ -169,10 +180,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(
-                            message["object"],
-                            message["original"]);
-                        subscription.OnEnter(args);
+                        subscription.OnEnter(
+                            ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services),
+                            ParseObjectCoder.Instance.Decode(message["original"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
                     }
                 }
                 break;
@@ -184,10 +194,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(
-                            message["object"],
-                            message["original"]);
-                        subscription.OnUpdate(args);
+                        subscription.OnUpdate(
+                            ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services),
+                            ParseObjectCoder.Instance.Decode(message["original"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
                     }
                 }
                 break;
@@ -199,10 +208,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(
-                            message["object"],
-                            message["original"]);
-                        subscription.OnLeave(args);
+                        subscription.OnLeave(
+                            ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services),
+                            ParseObjectCoder.Instance.Decode(message["original"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
                     }
                 }
                 break;
@@ -214,8 +222,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
                     requestId = Convert.ToInt32(message["requestId"]);
                     if (Subscriptions.TryGetValue(requestId, out subscription))
                     {
-                        ParseLiveQueryEventArgs args = new ParseLiveQueryEventArgs(message["object"]);
-                        subscription.OnDelete(args);
+                        subscription.OnDelete(ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
                     }
                 }
                 break;
@@ -351,7 +358,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
         completionSignal.Dispose();
         if (signalReceived)
         {
-            ParseLiveQuerySubscription subscription = new ParseLiveQuerySubscription(liveQuery.Services, requestId);
+            ParseLiveQuerySubscription<T> subscription = new ParseLiveQuerySubscription<T>(liveQuery.Services, liveQuery.ClassName, requestId);
             Subscriptions.Add(requestId, subscription);
             return subscription;
         }
@@ -386,6 +393,15 @@ public class ParseLiveQueryController : IParseLiveQueryController
             { "query", liveQuery.BuildParameters() }
         };
         await SendMessage(await AppendSessionToken(message), cancellationToken);
+        CancellationTokenSource completionSignal = new CancellationTokenSource();
+        SubscriptionSignals.Add(requestId, completionSignal);
+        bool signalReceived = completionSignal.Token.WaitHandle.WaitOne(TimeOut);
+        SubscriptionSignals.Remove(requestId);
+        completionSignal.Dispose();
+        if (!signalReceived)
+        {
+            throw new TimeoutException();
+        }
     }
 
     /// <summary>
@@ -437,7 +453,6 @@ public class ParseLiveQueryController : IParseLiveQueryController
         State = ParseLiveQueryState.Closed;
         SubscriptionSignals.Clear();
         UnsubscriptionSignals.Clear();
-        SubscriptionUpdateSignals.Clear();
         Subscriptions.Clear();
     }
 }

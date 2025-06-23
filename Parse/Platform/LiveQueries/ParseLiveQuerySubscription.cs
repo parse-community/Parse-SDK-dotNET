@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.LiveQueries;
+using Parse.Abstractions.Platform.Objects;
 
 namespace Parse.Platform.LiveQueries;
 
@@ -11,9 +11,10 @@ namespace Parse.Platform.LiveQueries;
 /// Represents a subscription to updates for a LiveQuery in a Parse Server. Provides hooks for handling
 /// various events such as creation, update, deletion, entering, and leaving of objects that match the query.
 /// </summary>
-public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
+public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T : ParseObject
 {
-    internal IServiceHub Services { get; }
+    string ClassName { get; }
+    IServiceHub Services { get; }
 
     private int RequestId { get; set; }
 
@@ -54,9 +55,10 @@ public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
     /// from the Parse Live Query server for a specified query. This class is responsible for handling events
     /// such as object creation, updates, deletions, and entering or leaving a query's result set.
     /// </summary>
-    public ParseLiveQuerySubscription(IServiceHub serviceHub, int requestId)
+    public ParseLiveQuerySubscription(IServiceHub serviceHub, string className, int requestId)
     {
         Services = serviceHub;
+        ClassName = className;
         RequestId = requestId;
     }
 
@@ -91,41 +93,65 @@ public class ParseLiveQuerySubscription : IParseLiveQuerySubscription
     }
 
     /// <summary>
-    /// Handles invocation of the Create event for the live query subscription, signaling that a new object
-    /// has been created and matches the query criteria. This method triggers the associated Create event
-    /// to notify any subscribed listeners about the creation event.
+    /// Handles the creation event for an object that matches the subscription's query.
+    /// Invokes the Create event with the parsed object details contained within the provided object state.
     /// </summary>
-    /// <param name="data">A dictionary containing the data associated with the created object, typically including
-    /// information such as object attributes and metadata.</param>
-    public void OnCreate(ParseLiveQueryEventArgs data) => Create?.Invoke(this, data);
+    /// <param name="objectState">
+    /// The state of the object that triggered the creation event, containing its data and metadata.
+    /// </param>
+    public void OnCreate(IObjectState objectState)
+    {
+        Create?.Invoke(this, new ParseLiveQueryEventArgs(Services.GenerateObjectFromState<T>(objectState, ClassName)));
+    }
 
     /// <summary>
-    /// Triggers the Enter event, indicating that an object has entered the result set of the live query.
-    /// This generally occurs when a Parse Object that did not previously match the query conditions now does.
+    /// Handles the event when an object enters the result set of a live query subscription. This occurs when an
+    /// object begins to satisfy the query conditions.
     /// </summary>
-    /// <param name="data">A dictionary containing the details of the object that triggered the event.</param>
-    public void OnEnter(ParseLiveQueryEventArgs data) => Enter?.Invoke(this, data);
+    /// <param name="objectState">The current state of the object that has entered the query result set.</param>
+    /// <param name="originalState">The original state of the object before entering the query result set.</param>
+    public void OnEnter(IObjectState objectState, IObjectState originalState)
+    {
+        Enter?.Invoke(this, new ParseLiveQueryEventArgs(
+            Services.GenerateObjectFromState<T>(objectState, ClassName),
+            Services.GenerateObjectFromState<T>(originalState, ClassName)));
+    }
 
     /// <summary>
-    /// Handles the event triggered when an object in the subscribed live query is updated. This method
-    /// invokes the corresponding handler with the provided update data.
+    /// Handles the update event for objects subscribed to the Live Query. This method triggers the Update
+    /// event, providing the updated object and its original state.
     /// </summary>
-    /// <param name="data">A dictionary containing the data associated with the update event.
-    /// The data typically includes updated fields and their new values.</param>
-    public void OnUpdate(ParseLiveQueryEventArgs data) => Update?.Invoke(this, data);
+    /// <param name="objectState">The new state of the object after the update.</param>
+    /// <param name="originalState">The original state of the object before the update.</param>
+    public void OnUpdate(IObjectState objectState, IObjectState originalState)
+    {
+        Update?.Invoke(this, new ParseLiveQueryEventArgs(
+            Services.GenerateObjectFromState<T>(objectState, ClassName),
+            Services.GenerateObjectFromState<T>(originalState, ClassName)));
+    }
 
     /// <summary>
-    /// Triggers the Leave event when an object leaves the query's result set.
-    /// This method notifies all registered event handlers, providing the relevant data associated
-    /// with the event.
+    /// Handles the event when an object leaves the result set of the live query subscription.
+    /// This method triggers the <see cref="Leave"/> event to notify that an object has
+    /// transitioned out of the query's result set.
     /// </summary>
-    /// <param name="data">A dictionary that contains information about the object leaving the query's result set.</param>
-    public void OnLeave(ParseLiveQueryEventArgs data) => Leave?.Invoke(this, data);
+    /// <param name="objectState">The state of the object that left the result set.</param>
+    /// <param name="originalState">The original state of the object before it left the result set.</param>
+    public void OnLeave(IObjectState objectState, IObjectState originalState)
+    {
+        Leave?.Invoke(this, new ParseLiveQueryEventArgs(
+            Services.GenerateObjectFromState<T>(objectState, ClassName),
+            Services.GenerateObjectFromState<T>(originalState, ClassName)));
+    }
 
     /// <summary>
-    /// Handles the deletion event triggered by the Parse Live Query server. This method is invoked when an object
-    /// that matches the current query result set is deleted, notifying all subscribers of this event.
+    /// Handles the "delete" event for a live query subscription, triggered when an object is removed
+    /// from the query's result set. This method processes the event by invoking the associated
+    /// delete event handler, if subscribed, with the relevant object data.
     /// </summary>
-    /// <param name="data">A dictionary containing information about the deleted object and any additional context provided by the server.</param>
-    public void OnDelete(ParseLiveQueryEventArgs data) => Delete?.Invoke(this, data);
+    /// <param name="objectState">The state information of the object that was deleted.</param>
+    public void OnDelete(IObjectState objectState)
+    {
+        Delete?.Invoke(this, new ParseLiveQueryEventArgs(Services.GenerateObjectFromState<T>(objectState, ClassName)));
+    }
 }

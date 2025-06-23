@@ -10,30 +10,29 @@ namespace Parse.Platform.LiveQueries;
 public class ParseLiveQueryEventArgs : EventArgs
 {
     /// <summary>
-    /// Event arguments for events triggered by Parse's Live Query service.
+    /// Represents the event arguments provided to Live Query event handlers in the Parse platform.
+    /// This class provides information about the current and original state of the Parse object
+    /// involved in the Live Query operation.
     /// </summary>
-    /// <remarks>
-    /// This class handles the encapsulation of event-related details for Live Query operations,
-    /// such as the current Parse object state and the original state before updates.
-    /// </remarks>
-    internal ParseLiveQueryEventArgs(object current, object original = null)
+    internal ParseLiveQueryEventArgs(ParseObject current, ParseObject original = null)
     {
         Object = current;
         Original = original;
     }
 
     /// <summary>
-    /// Gets the associated object involved in the live query event.
-    /// This property provides the current state of the Parse object
-    /// that triggered the event. The object may vary depending on the live query event
-    /// type, such as create, update, enter, or leave.
+    /// Gets the current state of the Parse object associated with the live query event.
+    /// This property provides the details of the Parse object as it existed at the time
+    /// the event was triggered, reflecting any changes made during operations such as
+    /// an update or creation.
     /// </summary>
-    public object Object { get; private set; }
+    public ParseObject Object { get; private set; }
 
     /// <summary>
-    /// Gets the original state of the Parse object before the live query event occurred.
-    /// This property holds the state of the object as it was prior to the event that
-    /// triggered the live query event, such as an update or leave operation.
+    /// Gets the state of the Parse object before the live query event was triggered.
+    /// This property represents the original data of the Parse object prior to any updates,
+    /// providing a snapshot of its previous state for comparison purposes during events
+    /// such as updates or deletes.
     /// </summary>
-    public object Original { get; private set; }
+    public ParseObject Original { get; private set; }
 }
