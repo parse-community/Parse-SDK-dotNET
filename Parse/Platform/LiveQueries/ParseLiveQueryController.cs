@@ -267,18 +267,17 @@ public class ParseLiveQueryController : IParseLiveQueryController
         => ProcessMessage(JsonUtilities.Parse(e) as IDictionary<string, object>);
 
     /// <summary>
-    /// Establishes a connection to the live query server asynchronously. This method initiates the connection process,
-    /// manages connection states, and handles any timeout scenarios if the connection cannot be established within the specified duration.
+    /// Initiates a connection to the live query server asynchronously.
     /// </summary>
     /// <param name="cancellationToken">
-    /// A cancellation token that can be used to cancel the connection process. If the token is triggered,
-    /// the connection process will be terminated.
+    /// A cancellation token to monitor for cancellation requests.
     /// </param>
     /// <returns>
-    /// A task that represents the asynchronous connection operation. If the connection is successful,
-    /// the task will complete when the connection is established. In the event of a timeout or error,
-    /// it will throw the appropriate exception.
+    /// A task representing the asynchronous operation.
     /// </returns>
+    /// <exception cref="TimeoutException">
+    /// Thrown if the connection attempt exceeds the specified timeout period.
+    /// </exception>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
         if (State == ParseLiveQueryState.Closed)

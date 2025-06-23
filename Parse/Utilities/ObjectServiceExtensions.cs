@@ -10,6 +10,7 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
 using System.Diagnostics;
+using Parse.Platform.LiveQueries;
 
 namespace Parse;
 
@@ -293,9 +294,13 @@ public static class ObjectServiceExtensions
     /// </summary>
     /// <param name="serviceHub">The service hub instance containing the Live Query controller to manage the connection.</param>
     /// <returns>A task that represents the asynchronous operation of connecting to the Live Query server.</returns>
-    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub)
+    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub, EventHandler<ParseLiveQueryErrorEventArgs> onError = null)
     {
         await serviceHub.LiveQueryController.ConnectAsync();
+        if (onError is not null)
+        {
+            serviceHub.LiveQueryController.Error += onError;
+        }
     }
 
     /// <summary>
