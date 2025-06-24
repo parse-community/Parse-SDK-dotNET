@@ -29,20 +29,20 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// This event is triggered when an object that did not previously match the query (and was thus not part of the subscription)
     /// starts matching the query, typically due to an update.
     /// </summary>
-    public event EventHandler<DualParseLiveQueryEventArgs> Enter;
+    public event EventHandler<ParseLiveQueryDualEventArgs> Enter;
 
     /// <summary>
     /// Represents the Update event for a live query subscription.
     /// This event is triggered when an existing object matching the subscription's query is updated.
     /// </summary>
-    public event EventHandler<DualParseLiveQueryEventArgs> Update;
+    public event EventHandler<ParseLiveQueryDualEventArgs> Update;
 
     /// <summary>
     /// Represents the Leave event for a live query subscription.
     /// This event is triggered when an object that previously matched the subscription's query
     /// no longer matches the criteria and is removed.
     /// </summary>
-    public event EventHandler<DualParseLiveQueryEventArgs> Leave;
+    public event EventHandler<ParseLiveQueryDualEventArgs> Leave;
 
     /// <summary>
     /// Represents the Delete event for a live query subscription.
@@ -112,7 +112,7 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// <param name="originalState">The original state of the object before entering the query result set.</param>
     public void OnEnter(IObjectState objectState, IObjectState originalState)
     {
-        Enter?.Invoke(this, new DualParseLiveQueryEventArgs(
+        Enter?.Invoke(this, new ParseLiveQueryDualEventArgs(
             Services.GenerateObjectFromState<T>(objectState, ClassName),
             Services.GenerateObjectFromState<T>(originalState, ClassName)));
     }
@@ -125,7 +125,7 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// <param name="originalState">The original state of the object before the update.</param>
     public void OnUpdate(IObjectState objectState, IObjectState originalState)
     {
-        Update?.Invoke(this, new DualParseLiveQueryEventArgs(
+        Update?.Invoke(this, new ParseLiveQueryDualEventArgs(
             Services.GenerateObjectFromState<T>(objectState, ClassName),
             Services.GenerateObjectFromState<T>(originalState, ClassName)));
     }
@@ -139,7 +139,7 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// <param name="originalState">The original state of the object before it left the result set.</param>
     public void OnLeave(IObjectState objectState, IObjectState originalState)
     {
-        Leave?.Invoke(this, new DualParseLiveQueryEventArgs(
+        Leave?.Invoke(this, new ParseLiveQueryDualEventArgs(
             Services.GenerateObjectFromState<T>(objectState, ClassName),
             Services.GenerateObjectFromState<T>(originalState, ClassName)));
     }

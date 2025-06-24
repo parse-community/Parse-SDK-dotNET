@@ -5,18 +5,8 @@ namespace Parse.Platform.LiveQueries;
 /// This class encapsulates details about a particular event, such as the operation type,
 /// client ID, request ID, and the associated Parse object data.
 /// </summary>
-public class DualParseLiveQueryEventArgs : ParseLiveQueryEventArgs
+public class ParseLiveQueryDualEventArgs : ParseLiveQueryEventArgs
 {
-    /// <summary>
-    /// Represents the event arguments provided to Live Query event handlers in the Parse platform.
-    /// This class provides information about the current and original state of the Parse object
-    /// involved in the Live Query operation.
-    /// </summary>
-    internal DualParseLiveQueryEventArgs(ParseObject current, ParseObject original) : base(current)
-    {
-        Original = original;
-    }
-
     /// <summary>
     /// Gets the state of the Parse object before the live query event was triggered.
     /// This property represents the original data of the Parse object prior to any updates,
@@ -24,4 +14,11 @@ public class DualParseLiveQueryEventArgs : ParseLiveQueryEventArgs
     /// such as updates or deletes.
     /// </summary>
     public ParseObject Original { get; private set; }
+
+    /// <summary>
+    /// Represents the event arguments provided to Live Query event handlers in the Parse platform.
+    /// This class provides information about the current and original state of the Parse object
+    /// involved in the Live Query operation.
+    /// </summary>
+    internal ParseLiveQueryDualEventArgs(ParseObject current, ParseObject original) : base(current) => Original = original;
 }

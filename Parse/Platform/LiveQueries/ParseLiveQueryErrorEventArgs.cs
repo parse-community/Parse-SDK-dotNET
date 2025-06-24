@@ -8,16 +8,6 @@ namespace Parse.Platform.LiveQueries;
 public class ParseLiveQueryErrorEventArgs : EventArgs
 {
     /// <summary>
-    /// Represents the arguments for an error event that occurs during a live query in the Parse platform.
-    /// </summary>
-    internal ParseLiveQueryErrorEventArgs(int code, string error, bool reconnect)
-    {
-        Error = error;
-        Code = code;
-        Reconnect = reconnect;
-    }
-
-    /// <summary>
     /// Gets or sets the error message associated with a live query operation.
     /// </summary>
     /// <remarks>
@@ -48,4 +38,14 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     /// connection with the server.
     /// </remarks>
     public bool Reconnect { get; private set; }
+
+    /// <summary>
+    /// Represents the arguments for an error event that occurs during a live query in the Parse platform.
+    /// </summary>
+    internal ParseLiveQueryErrorEventArgs(int code, string error, bool reconnect)
+    {
+        Error = error;
+        Code = code;
+        Reconnect = reconnect;
+    }
 }

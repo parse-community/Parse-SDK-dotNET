@@ -92,7 +92,7 @@ public static class ObjectServiceExtensions
     /// <returns>A new ParseObject for the given class name.</returns>
     public static T CreateObject<T>(this IParseObjectClassController classController, IServiceHub serviceHub) where T : ParseObject
     {
-        
+
         return (T) classController.Instantiate(classController.GetClassName(typeof(T)), serviceHub);
     }
 
@@ -289,18 +289,21 @@ public static class ObjectServiceExtensions
     }
 
     /// <summary>
-    /// Establishes a connection to the Live Query server using the provided <see cref="IServiceHub"/> instance.
-    /// This method ensures that the Live Query controller initiates and maintains a persistent connection.
+    /// Connects the Live Query server to the provided <see cref="IServiceHub"/> instance, enabling real-time updates for subscribed queries.
+    /// Allows error handling during the connection and sets a custom timeout period for the connection.
     /// </summary>
-    /// <param name="serviceHub">The service hub instance containing the Live Query controller to manage the connection.</param>
-    /// <returns>A task that represents the asynchronous operation of connecting to the Live Query server.</returns>
-    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub, EventHandler<ParseLiveQueryErrorEventArgs> onError = null)
+    /// <param name="serviceHub">The <see cref="IServiceHub"/> instance through which the Live Query server will be connected.</param>
+    /// <param name="onError">An optional event handler to capture Live Query connection errors.</param>
+    /// <param name="timeOut">An optional timeout value, in milliseconds, for the Live Query connection. Defaults to 5000 milliseconds.</param>
+    /// <returns>A task representing the asynchronous operation of connecting to the Live Query server.</returns>
+    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub, EventHandler<ParseLiveQueryErrorEventArgs> onError = null, int timeOut = 5000)
     {
         await serviceHub.LiveQueryController.ConnectAsync();
         if (onError is not null)
         {
             serviceHub.LiveQueryController.Error += onError;
         }
+        serviceHub.LiveQueryController.TimeOut = timeOut;
     }
 
     /// <summary>
@@ -363,21 +366,21 @@ public static class ObjectServiceExtensions
         {
             throw new ArgumentNullException(nameof(state), "The state cannot be null.");
         }
-        
+
         // Ensure the class name is determined or throw an exception
         string className = state.ClassName ?? defaultClassName;
         if (string.IsNullOrEmpty(className))
         {
-        
+
             throw new InvalidOperationException("Both state.ClassName and defaultClassName are null or empty. Unable to determine class name.");
         }
-        
+
         // Create the object using the class controller
         T obj = classController.Instantiate(className, serviceHub) as T;
-        
+
         if (obj == null)
         {
-        
+
             throw new InvalidOperationException($"Failed to instantiate object of type {typeof(T).Name} for class {className}.");
         }
 
@@ -464,7 +467,7 @@ public static class ObjectServiceExtensions
     {
         CollectDirtyChildren(serviceHub, node, dirtyChildren, new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()), new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()));
     }
-    
+
     internal static async Task DeepSaveAsync(this IServiceHub serviceHub, object target, string sessionToken, CancellationToken cancellationToken)
     {
         // Collect dirty objects
