@@ -17,5 +17,5 @@ public class ParseLiveQueryEventArgs : EventArgs
     /// </summary>
     public ParseObject Object { get; private set; }
 
-    internal ParseLiveQueryEventArgs(ParseObject current) => Object = current;
+    internal ParseLiveQueryEventArgs(ParseObject current) => Object = current ?? throw new ArgumentNullException(nameof(current));
 }

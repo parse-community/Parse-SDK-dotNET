@@ -41,6 +41,8 @@ class TextWebSocketClient : IWebSocketClient
     /// </summary>
     public event EventHandler<string> MessageReceived;
 
+    private readonly object connectionLock = new object();
+
     /// <summary>
     /// Opens a WebSocket connection to the specified server URI and starts listening for messages.
     /// If the connection is already open or in a connecting state, this method does nothing.
@@ -52,7 +54,10 @@ class TextWebSocketClient : IWebSocketClient
     /// </returns>
     public async Task OpenAsync(string serverUri, CancellationToken cancellationToken = default)
     {
-        webSocket ??= new ClientWebSocket();
+        lock (connectionLock)
+        {
+            webSocket ??= new ClientWebSocket();
+        }
 
         if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
         {
@@ -92,14 +97,26 @@ class TextWebSocketClient : IWebSocketClient
                 }
 
                 string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                Debug.WriteLine($"Received message: {message}");
                 MessageReceived?.Invoke(this, message);
             }
         }
         catch (OperationCanceledException ex)
         {
             // Normal cancellation, no need to handle
-            Debug.WriteLine($"ClientWebsocket connection was closed: {ex.Message}");
+            Debug.WriteLine($"Websocket connection was closed: {ex.Message}");
         }
+        catch (WebSocketException e)
+        {
+            // WebSocket error, notify the user
+            Debug.WriteLine($"Websocket error: {e.Message}");
+        }
+        catch (Exception e)
+        {
+            // Unexpected error, notify the user
+            Debug.WriteLine($"Unexpected error in Websocket listener: {e.Message}");
+        }
+        Debug.WriteLine("Websocket ListenForMessage stopped");
     }
 
     /// <summary>
@@ -123,7 +140,16 @@ class TextWebSocketClient : IWebSocketClient
             }
 
             await ListenForMessages(cancellationToken);
+            Debug.WriteLine("Websocket listeningTask stopped");
         }, cancellationToken);
+
+        _ = listeningTask.ContinueWith(task =>
+        {
+            if (!task.IsFaulted)
+                return;
+            Debug.WriteLine($"Websocket listener task faulted: {task.Exception}");
+            throw task.Exception;
+        }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     /// <summary>

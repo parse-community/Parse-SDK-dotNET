@@ -76,7 +76,7 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// <returns>A task that represents the asynchronous operation of updating
     /// the subscription with the new query parameters.</returns>
     public async Task UpdateAsync<T1>(ParseLiveQuery<T1> liveQuery, CancellationToken cancellationToken = default) where T1 : ParseObject =>
-        await Services.LiveQueryController.UpdateSubscriptionAsync(liveQuery, RequestId, CancellationToken.None);
+        await Services.LiveQueryController.UpdateSubscriptionAsync(liveQuery, RequestId, cancellationToken);
 
     /// <summary>
     /// Cancels the current live query subscription by unsubscribing from the Parse Live Query server.
@@ -86,7 +86,7 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// <param name="cancellationToken">A token to monitor for cancellation requests. If triggered, the cancellation process will halt.</param>
     /// <returns>A task that represents the asynchronous operation of canceling the subscription.</returns>
     public async Task CancelAsync(CancellationToken cancellationToken = default) =>
-        await Services.LiveQueryController.UnsubscribeAsync(RequestId, CancellationToken.None);
+        await Services.LiveQueryController.UnsubscribeAsync(RequestId, cancellationToken);
 
     /// <summary>
     /// Handles the creation event for an object that matches the subscription's query.

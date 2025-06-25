@@ -36,7 +36,7 @@ public class ParseLiveQuery<T> where T : ParseObject
 
     internal IServiceHub Services { get; }
 
-    public ParseLiveQuery(IServiceHub serviceHub, string className, IDictionary<string, object> filters, IEnumerable<string> selectedKeys = null, IEnumerable<string> watchedKeys = null)
+    internal ParseLiveQuery(IServiceHub serviceHub, string className, IDictionary<string, object> filters, IEnumerable<string> selectedKeys = null, IEnumerable<string> watchedKeys = null)
     {
         ArgumentNullException.ThrowIfNull(filters);
 
@@ -105,6 +105,6 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// A task representing the asynchronous subscription operation. Upon completion
     /// of the task, the subscription is successfully registered.
     /// </returns>
-    public async Task<IParseLiveQuerySubscription> SubscribeAsync() =>
-        await Services.LiveQueryController.SubscribeAsync(this, CancellationToken.None);
+    public async Task<IParseLiveQuerySubscription> SubscribeAsync(CancellationToken cancellationToken = default) =>
+        await Services.LiveQueryController.SubscribeAsync(this, cancellationToken);
 }

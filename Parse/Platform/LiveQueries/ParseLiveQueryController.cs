@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,14 +17,16 @@ namespace Parse.Platform.LiveQueries;
 /// The ParseLiveQueryController is responsible for managing live query subscriptions, maintaining a connection
 /// to the Parse LiveQuery server, and handling real-time updates from the server.
 /// </summary>
-public class ParseLiveQueryController : IParseLiveQueryController
+public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 {
     private IParseDataDecoder Decoder { get; }
     private IWebSocketClient WebSocketClient { get; }
 
-    private int LastRequestId { get; set; } = 0;
+    private int LastRequestId;
 
     private string ClientId { get; set; }
+
+    private bool disposed;
 
     /// <summary>
     /// Gets or sets the timeout duration, in milliseconds, used by the ParseLiveQueryController
@@ -92,12 +95,14 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// This property is updated based on the controller's connection lifecycle events,
     /// such as when a connection is established or closed, or when an error occurs.
     /// </remarks>
-    public ParseLiveQueryState State { get; private set; }
+    public ParseLiveQueryState State => _state;
+    private volatile ParseLiveQueryState _state;
 
-    CancellationTokenSource ConnectionSignal { get; set; }
-    private Dictionary<int, CancellationTokenSource> SubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
-    private Dictionary<int, CancellationTokenSource> UnsubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
-    private Dictionary<int, IParseLiveQuerySubscription> Subscriptions { get; set; } = new Dictionary<int, IParseLiveQuerySubscription> { };
+    TaskCompletionSource ConnectionSignal { get; set; }
+    private ConcurrentDictionary<int, TaskCompletionSource> SubscriptionSignals { get; } = new ConcurrentDictionary<int, TaskCompletionSource>();
+    private ConcurrentDictionary<int, TaskCompletionSource> UnsubscriptionSignals { get; } = new ConcurrentDictionary<int, TaskCompletionSource>();
+    private ConcurrentDictionary<int, IParseLiveQuerySubscription> Subscriptions { get; set; } = new ConcurrentDictionary<int, IParseLiveQuerySubscription>();
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParseLiveQueryController"/> class.
@@ -112,125 +117,181 @@ public class ParseLiveQueryController : IParseLiveQueryController
     public ParseLiveQueryController(IWebSocketClient webSocketClient, IParseDataDecoder decoder)
     {
         WebSocketClient = webSocketClient;
-        State = ParseLiveQueryState.Closed;
+        _state = ParseLiveQueryState.Closed;
         Decoder = decoder;
     }
 
     private void ProcessMessage(IDictionary<string, object> message)
     {
-        int requestId;
-        string clientId;
-        IParseLiveQuerySubscription subscription;
-        switch (message["op"] as string)
+        if (!message.TryGetValue("op", out object opValue) || opValue is not string op)
+        {
+            Debug.WriteLine("Missing or invalid operation in message");
+            return;
+        }
+
+        switch (op)
         {
             case "connected":
-                State = ParseLiveQueryState.Connected;
-                ClientId = message["clientId"] as string;
-                ConnectionSignal?.Cancel();
+                ProcessConnectionMessage(message);
                 break;
-
             case "subscribed": // Response from subscription and subscription update
-                clientId = message["clientId"] as string;
-                if (clientId == ClientId)
-                {
-                    requestId = Convert.ToInt32(message["requestId"]);
-                    if (SubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource subscriptionSignal))
-                    {
-                        subscriptionSignal?.Cancel();
-                    }
-                }
+                ProcessSubscriptionMessage(message);
                 break;
-
             case "unsubscribed":
-                clientId = message["clientId"] as string;
-                if (clientId == ClientId)
-                {
-                    requestId = Convert.ToInt32(message["requestId"]);
-                    if (UnsubscriptionSignals.TryGetValue(requestId, out CancellationTokenSource unsubscriptionSignal))
-                    {
-                        unsubscriptionSignal?.Cancel();
-                    }
-                }
+                ProcessUnsubscriptionMessage(message);
                 break;
-
             case "error":
-                ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs(
-                    Convert.ToInt32(message["code"]),
-                    message["error"] as string,
-                    (bool) message["reconnect"]);
-                Error?.Invoke(this, errorArgs);
+                ProcessErrorMessage(message);
                 break;
-
             case "create":
-                clientId = message["clientId"] as string;
-                if (clientId == ClientId)
-                {
-                    requestId = Convert.ToInt32(message["requestId"]);
-                    if (Subscriptions.TryGetValue(requestId, out subscription))
-                    {
-                        subscription.OnCreate(ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
-                    }
-                }
+                ProcessCreateEventMessage(message);
                 break;
-
             case "enter":
-                clientId = message["clientId"] as string;
-                if (clientId == ClientId)
-                {
-                    requestId = Convert.ToInt32(message["requestId"]);
-                    if (Subscriptions.TryGetValue(requestId, out subscription))
-                    {
-                        subscription.OnEnter(
-                            ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services),
-                            ParseObjectCoder.Instance.Decode(message["original"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
-                    }
-                }
+                ProcessEnterEventMessage(message);
                 break;
-
             case "update":
-                clientId = message["clientId"] as string;
-                if (clientId == ClientId)
-                {
-                    requestId = Convert.ToInt32(message["requestId"]);
-                    if (Subscriptions.TryGetValue(requestId, out subscription))
-                    {
-                        subscription.OnUpdate(
-                            ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services),
-                            ParseObjectCoder.Instance.Decode(message["original"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
-                    }
-                }
+                ProcessUpdateEventMessage(message);
                 break;
-
             case "leave":
-                clientId = message["clientId"] as string;
-                if (clientId == ClientId)
-                {
-                    requestId = Convert.ToInt32(message["requestId"]);
-                    if (Subscriptions.TryGetValue(requestId, out subscription))
-                    {
-                        subscription.OnLeave(
-                            ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services),
-                            ParseObjectCoder.Instance.Decode(message["original"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
-                    }
-                }
+                ProcessLeaveEventMessage(message);
                 break;
-
             case "delete":
-                clientId = message["clientId"] as string;
-                if (clientId == ClientId)
-                {
-                    requestId = Convert.ToInt32(message["requestId"]);
-                    if (Subscriptions.TryGetValue(requestId, out subscription))
-                    {
-                        subscription.OnDelete(ParseObjectCoder.Instance.Decode(message["object"] as IDictionary<string, object>, Decoder, ParseClient.Instance.Services));
-                    }
-                }
+                ProcessDeleteEventMessage(message);
                 break;
-
             default:
                 Debug.WriteLine($"Unknown operation: {message["op"]}");
                 break;
         }
+    }
+
+    void ProcessDeleteEventMessage(IDictionary<string, object> message)
+    {
+        string clientId = message["clientId"] as string;
+        if (clientId != ClientId)
+            return;
+        int requestId = Convert.ToInt32(message["requestId"]);
+        if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
+        {
+            subscription.OnDelete(ParseObjectCoder.Instance.Decode(
+                message["object"] as IDictionary<string, object>,
+                Decoder,
+                ParseClient.Instance.Services));
+        }
+    }
+
+    void ProcessLeaveEventMessage(IDictionary<string, object> message)
+    {
+        string clientId = message["clientId"] as string;
+        if (clientId != ClientId)
+            return;
+        int requestId = Convert.ToInt32(message["requestId"]);
+        if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
+        {
+            subscription.OnLeave(
+                ParseObjectCoder.Instance.Decode(
+                    message["object"] as IDictionary<string, object>,
+                    Decoder,
+                    ParseClient.Instance.Services),
+                ParseObjectCoder.Instance.Decode(
+                    message["original"] as IDictionary<string, object>,
+                    Decoder,
+                    ParseClient.Instance.Services));
+        }
+    }
+
+    void ProcessUpdateEventMessage(IDictionary<string, object> message)
+    {
+        string clientId = message["clientId"] as string;
+        if (clientId != ClientId)
+            return;
+        int requestId = Convert.ToInt32(message["requestId"]);
+        if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
+        {
+            subscription.OnUpdate(
+                ParseObjectCoder.Instance.Decode(
+                    message["object"] as IDictionary<string, object>,
+                    Decoder,
+                    ParseClient.Instance.Services),
+                ParseObjectCoder.Instance.Decode(
+                    message["original"] as IDictionary<string, object>,
+                    Decoder,
+                    ParseClient.Instance.Services));
+        }
+    }
+
+    void ProcessEnterEventMessage(IDictionary<string, object> message)
+    {
+        string clientId = message["clientId"] as string;
+        if (clientId != ClientId)
+            return;
+        int requestId = Convert.ToInt32(message["requestId"]);
+        if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
+        {
+            subscription.OnEnter(
+                ParseObjectCoder.Instance.Decode(
+                    message["object"] as IDictionary<string, object>,
+                    Decoder,
+                    ParseClient.Instance.Services),
+                ParseObjectCoder.Instance.Decode(
+                    message["original"] as IDictionary<string, object>,
+                    Decoder,
+                    ParseClient.Instance.Services));
+        }
+    }
+
+    void ProcessCreateEventMessage(IDictionary<string, object> message)
+    {
+        string clientId = message["clientId"] as string;
+        if (clientId != ClientId)
+            return;
+        int requestId = Convert.ToInt32(message["requestId"]);
+        if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
+        {
+            subscription.OnCreate(ParseObjectCoder.Instance.Decode(
+                message["object"] as IDictionary<string, object>,
+                Decoder,
+                ParseClient.Instance.Services));
+        }
+    }
+
+    void ProcessErrorMessage(IDictionary<string, object> message)
+    {
+        ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs(
+            Convert.ToInt32(message["code"]),
+            message["error"] as string,
+            (bool) message["reconnect"]);
+        Error?.Invoke(this, errorArgs);
+    }
+
+    void ProcessUnsubscriptionMessage(IDictionary<string, object> message)
+    {
+        string clientId = message["clientId"] as string;
+        if (clientId != ClientId)
+            return;
+        int requestId = Convert.ToInt32(message["requestId"]);
+        if (UnsubscriptionSignals.TryGetValue(requestId, out TaskCompletionSource unsubscriptionSign))
+        {
+            unsubscriptionSign?.TrySetResult();
+        }
+    }
+
+    void ProcessSubscriptionMessage(IDictionary<string, object> message)
+    {
+        string clientId = message["clientId"] as string;
+        if (clientId != ClientId)
+            return;
+        int requestId = Convert.ToInt32(message["requestId"]);
+        if (SubscriptionSignals.TryGetValue(requestId, out TaskCompletionSource subscriptionSignal))
+        {
+            subscriptionSignal?.TrySetResult();
+        }
+    }
+
+    void ProcessConnectionMessage(IDictionary<string, object> message)
+    {
+        _state = ParseLiveQueryState.Connected;
+        ClientId = message["clientId"] as string;
+        ConnectionSignal.TrySetResult();
     }
 
     private async Task<IDictionary<string, object>> AppendSessionToken(IDictionary<string, object> message)
@@ -239,7 +300,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
         return sessionToken is null
             ? message
             : message.Concat(new Dictionary<string, object> {
-                { "sessionToken", await ParseClient.Instance.Services.GetCurrentSessionToken() }
+                { "sessionToken", sessionToken }
             }).ToDictionary();
     }
 
@@ -261,8 +322,18 @@ public class ParseLiveQueryController : IParseLiveQueryController
         await WebSocketClient.OpenAsync(ParseClient.Instance.Services.LiveQueryServerConnectionData.ServerURI, cancellationToken);
     }
 
-    private void WebSocketClientOnMessageReceived(object sender, string e) =>
-        ProcessMessage(JsonUtilities.Parse(e) as IDictionary<string, object>);
+    private void WebSocketClientOnMessageReceived(object sender, string e)
+    {
+        object parsed = JsonUtilities.Parse(e);
+        if (parsed is IDictionary<string, object> message)
+        {
+            ProcessMessage(message);
+        }
+        else
+        {
+            Debug.WriteLine($"Invalid message format received: {e}");
+        }
+    }
 
     /// <summary>
     /// Initiates a connection to the live query server asynchronously.
@@ -278,9 +349,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// </exception>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
-        if (State == ParseLiveQueryState.Closed)
+        if (_state == ParseLiveQueryState.Closed)
         {
-            State = ParseLiveQueryState.Connecting;
+            _state = ParseLiveQueryState.Connecting;
             await OpenAsync(cancellationToken);
             WebSocketClient.MessageReceived += WebSocketClientOnMessageReceived;
             Dictionary<string, object> message = new Dictionary<string, object>
@@ -289,25 +360,58 @@ public class ParseLiveQueryController : IParseLiveQueryController
                 { "applicationId", ParseClient.Instance.Services.LiveQueryServerConnectionData.ApplicationID },
                 { "windowsKey", ParseClient.Instance.Services.LiveQueryServerConnectionData.Key }
             };
-            await SendMessage(await AppendSessionToken(message), cancellationToken);
-            ConnectionSignal = new CancellationTokenSource();
-            bool signalReceived = ConnectionSignal.Token.WaitHandle.WaitOne(TimeOut);
-            if (!signalReceived)
+
+            ConnectionSignal = new TaskCompletionSource();
+            try
             {
-                throw new TimeoutException();
+                await SendMessage(await AppendSessionToken(message), cancellationToken);
+
+                using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(TimeOut);
+
+                await ConnectionSignal.Task.WaitAsync(cts.Token);
+                _state = ParseLiveQueryState.Connected;
             }
-            State = ParseLiveQueryState.Connected;
-            ConnectionSignal.Dispose();
+            catch (OperationCanceledException)
+            {
+                throw new TimeoutException("Live query server connection request has reached timeout");
+            }
+            finally
+            {
+                ConnectionSignal.Task.Dispose();
+                ConnectionSignal = null;
+            }
         }
-        else if (State == ParseLiveQueryState.Connecting)
+        else if (_state == ParseLiveQueryState.Connecting && ConnectionSignal is not null)
         {
-            if (ConnectionSignal is not null)
-            {
-                if (!ConnectionSignal.Token.WaitHandle.WaitOne(TimeOut))
-                {
-                    throw new TimeoutException();
-                }
-            }
+            await ConnectionSignal.Task.WaitAsync(cancellationToken);
+        }
+    }
+
+    private async Task SendAndWaitForSignalAsync(IDictionary<string, object> message,
+        ConcurrentDictionary<int, TaskCompletionSource> signalDictionary,
+        int requestId,
+        CancellationToken cancellationToken)
+    {
+        TaskCompletionSource tcs = new TaskCompletionSource();
+        signalDictionary.TryAdd(requestId, tcs);
+
+        try
+        {
+            await SendMessage(message, cancellationToken);
+
+            using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeOut);
+
+            await tcs.Task.WaitAsync(cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            throw new TimeoutException($"Operation timeout for request {requestId}");
+        }
+        finally
+        {
+            signalDictionary.TryRemove(requestId, out _);
         }
     }
 
@@ -335,30 +439,21 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// </exception>
     public async Task<IParseLiveQuerySubscription> SubscribeAsync<T>(ParseLiveQuery<T> liveQuery, CancellationToken cancellationToken = default) where T : ParseObject
     {
-        if (State == ParseLiveQueryState.Closed)
+        if (_state == ParseLiveQueryState.Closed)
         {
             throw new InvalidOperationException("Cannot subscribe to a live query when the connection is closed.");
         }
 
-        int requestId = ++LastRequestId;
+        int requestId = Interlocked.Increment(ref LastRequestId);
         Dictionary<string, object> message = new Dictionary<string, object>
         {
             { "op", "subscribe" },
             { "requestId", requestId },
             { "query", liveQuery.BuildParameters() }
         };
-        await SendMessage(await AppendSessionToken(message), cancellationToken);
-        CancellationTokenSource completionSignal = new CancellationTokenSource();
-        SubscriptionSignals.Add(requestId, completionSignal);
-        bool signalReceived = completionSignal.Token.WaitHandle.WaitOne(TimeOut);
-        SubscriptionSignals.Remove(requestId);
-        completionSignal.Dispose();
-        if (!signalReceived)
-        {
-            throw new TimeoutException();
-        }
+        await SendAndWaitForSignalAsync(await AppendSessionToken(message), SubscriptionSignals, requestId, cancellationToken);
         ParseLiveQuerySubscription<T> subscription = new ParseLiveQuerySubscription<T>(liveQuery.Services, liveQuery.ClassName, requestId);
-        Subscriptions.Add(requestId, subscription);
+        Subscriptions.TryAdd(requestId, subscription);
         return subscription;
     }
 
@@ -389,16 +484,7 @@ public class ParseLiveQueryController : IParseLiveQueryController
             { "requestId", requestId },
             { "query", liveQuery.BuildParameters() }
         };
-        await SendMessage(await AppendSessionToken(message), cancellationToken);
-        CancellationTokenSource completionSignal = new CancellationTokenSource();
-        SubscriptionSignals.Add(requestId, completionSignal);
-        bool signalReceived = completionSignal.Token.WaitHandle.WaitOne(TimeOut);
-        SubscriptionSignals.Remove(requestId);
-        completionSignal.Dispose();
-        if (!signalReceived)
-        {
-            throw new TimeoutException();
-        }
+        await SendAndWaitForSignalAsync(await AppendSessionToken(message), SubscriptionSignals, requestId, cancellationToken);
     }
 
     /// <summary>
@@ -423,16 +509,8 @@ public class ParseLiveQueryController : IParseLiveQueryController
             { "op", "unsubscribe" },
             { "requestId", requestId }
         };
-        await SendMessage(message, cancellationToken);
-        CancellationTokenSource completionSignal = new CancellationTokenSource();
-        UnsubscriptionSignals.Add(requestId, completionSignal);
-        bool signalReceived = completionSignal.Token.WaitHandle.WaitOne(TimeOut);
-        UnsubscriptionSignals.Remove(requestId);
-        completionSignal.Dispose();
-        if (!signalReceived)
-        {
-            throw new TimeoutException();
-        }
+        await SendAndWaitForSignalAsync(message, UnsubscriptionSignals, requestId, cancellationToken);
+        Subscriptions.TryRemove(requestId, out _);
     }
 
     /// <summary>
@@ -446,10 +524,43 @@ public class ParseLiveQueryController : IParseLiveQueryController
     /// </returns>
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
+        WebSocketClient.MessageReceived -= WebSocketClientOnMessageReceived;
         await WebSocketClient.CloseAsync(cancellationToken);
-        State = ParseLiveQueryState.Closed;
+        _state = ParseLiveQueryState.Closed;
         SubscriptionSignals.Clear();
         UnsubscriptionSignals.Clear();
         Subscriptions.Clear();
+    }
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="ParseLiveQueryController"/> instance.
+    /// </summary>
+    /// <remarks>
+    /// This method is used to clean up resources, such as closing open connections or unsubscribing from events,
+    /// and should be called when the instance is no longer needed. After calling this method, the instance
+    /// cannot be used unless re-initialized.
+    /// </remarks>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases the resources used by the <see cref="ParseLiveQueryController"/> instance.
+    /// </summary>
+    /// <remarks>
+    /// This method implements the <see cref="IDisposable"/> interface and is used to clean up any managed or unmanaged
+    /// resources used by the <see cref="ParseLiveQueryController"/> instance.
+    /// </remarks>
+    private void Dispose(bool disposing)
+    {
+        if (disposed)
+            return;
+        if (disposing)
+        {
+            CloseAsync().GetAwaiter().GetResult();
+        }
+        disposed = true;
     }
 }

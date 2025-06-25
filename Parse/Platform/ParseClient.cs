@@ -130,7 +130,7 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
 
         IServerConnectionData GenerateLiveQueryServerConnectionData() => liveQueryConfiguration switch
         {
-            null => throw new ArgumentNullException(nameof(configuration)),
+            null => throw new ArgumentNullException(nameof(liveQueryConfiguration)),
             ServerConnectionData { Test: true, ServerURI: { } } data => data,
             ServerConnectionData { Test: true } data => new ServerConnectionData
             {

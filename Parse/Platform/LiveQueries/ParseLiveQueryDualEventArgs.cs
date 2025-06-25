@@ -1,3 +1,5 @@
+using System;
+
 namespace Parse.Platform.LiveQueries;
 
 /// <summary>
@@ -15,5 +17,6 @@ public class ParseLiveQueryDualEventArgs : ParseLiveQueryEventArgs
     /// </summary>
     public ParseObject Original { get; private set; }
 
-    internal ParseLiveQueryDualEventArgs(ParseObject current, ParseObject original) : base(current) => Original = original;
+    internal ParseLiveQueryDualEventArgs(ParseObject current, ParseObject original) : base(current) =>
+        Original = original ?? throw new ArgumentNullException(nameof(original));
 }
