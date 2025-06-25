@@ -912,9 +912,15 @@ public class ParseQuery<T> where T : ParseObject
         return 0;
     }
 
+    /// <summary>
+    /// Converts the current query into a live query that allows real-time updates to be monitored
+    /// for changes that match the specified query criteria.
+    /// </summary>
+    /// <returns>A ParseLiveQuery object configured to monitor changes for the query.</returns>
     public ParseLiveQuery<T> GetLive()
     {
-        IDictionary<string, object> paramsDict = BuildParameters();
-        return new ParseLiveQuery<T>(Services, ClassName, paramsDict["where"] as IDictionary<string, object>, KeySelections);
+        ArgumentNullException.ThrowIfNull(Filters);
+        IDictionary<string, object> filters = BuildParameters().TryGetValue("where", out object where) ? where as IDictionary<string, object> : null;
+        return new ParseLiveQuery<T>(Services, ClassName, filters, KeySelections);
     }
 }

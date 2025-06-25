@@ -38,6 +38,8 @@ public class ParseLiveQuery<T> where T : ParseObject
 
     public ParseLiveQuery(IServiceHub serviceHub, string className, IDictionary<string, object> filters, IEnumerable<string> selectedKeys = null, IEnumerable<string> watchedKeys = null)
     {
+        ArgumentNullException.ThrowIfNull(filters);
+
         Services = serviceHub;
         ClassName = className;
         Filters = filters;
