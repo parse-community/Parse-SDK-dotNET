@@ -21,7 +21,7 @@ class TextWebSocketClient : IWebSocketClient
     /// when establishing a connection and is used internally for operations such as sending messages
     /// and listening for incoming data.
     /// </summary>
-    private ClientWebSocket _webSocket;
+    private ClientWebSocket webSocket;
 
     /// <summary>
     /// A private instance of the Task class representing the background operation
@@ -31,7 +31,7 @@ class TextWebSocketClient : IWebSocketClient
     /// It is initialized when the listening process starts and monitored to prevent
     /// multiple concurrent listeners from being created.
     /// </summary>
-    private Task _listeningTask;
+    private Task listeningTask;
 
     /// <summary>
     /// An event triggered whenever a message is received from the WebSocket server.
@@ -52,11 +52,11 @@ class TextWebSocketClient : IWebSocketClient
     /// </returns>
     public async Task OpenAsync(string serverUri, CancellationToken cancellationToken = default)
     {
-        _webSocket ??= new ClientWebSocket();
+        webSocket ??= new ClientWebSocket();
 
-        if (_webSocket.State != WebSocketState.Open && _webSocket.State != WebSocketState.Connecting)
+        if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
         {
-            await _webSocket.ConnectAsync(new Uri(serverUri), cancellationToken);
+            await webSocket.ConnectAsync(new Uri(serverUri), cancellationToken);
             StartListening(cancellationToken);
         }
     }
@@ -69,8 +69,8 @@ class TextWebSocketClient : IWebSocketClient
     /// <returns>
     /// A task representing the asynchronous operation of closing the WebSocket connection.
     /// </returns>
-    public async Task CloseAsync(CancellationToken cancellationToken = default)
-        => await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken);
+    public async Task CloseAsync(CancellationToken cancellationToken = default) =>
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken);
 
     private async Task ListenForMessages(CancellationToken cancellationToken)
     {
@@ -79,9 +79,9 @@ class TextWebSocketClient : IWebSocketClient
         try
         {
             while (!cancellationToken.IsCancellationRequested &&
-                   _webSocket.State == WebSocketState.Open)
+                   webSocket.State == WebSocketState.Open)
             {
-                WebSocketReceiveResult result = await _webSocket.ReceiveAsync(
+                WebSocketReceiveResult result = await webSocket.ReceiveAsync(
                     new ArraySegment<byte>(buffer),
                     cancellationToken);
 
@@ -102,7 +102,6 @@ class TextWebSocketClient : IWebSocketClient
         }
     }
 
-
     /// <summary>
     /// Starts listening for incoming messages from the WebSocket connection. This method ensures that only one listener task is running at a time.
     /// </summary>
@@ -110,13 +109,13 @@ class TextWebSocketClient : IWebSocketClient
     private void StartListening(CancellationToken cancellationToken)
     {
         // Make sure we don't start multiple listeners
-        if (_listeningTask is { IsCompleted: false })
+        if (listeningTask is { IsCompleted: false })
         {
             return;
         }
 
         // Start the listener task
-        _listeningTask = Task.Run(async () =>
+        listeningTask = Task.Run(async () =>
         {
             if (cancellationToken.IsCancellationRequested)
             {
@@ -138,9 +137,9 @@ class TextWebSocketClient : IWebSocketClient
     /// </returns>
     public async Task SendAsync(string message, CancellationToken cancellationToken = default)
     {
-        if (_webSocket is not null && _webSocket.State == WebSocketState.Open)
+        if (webSocket is not null && webSocket.State == WebSocketState.Open)
         {
-            await _webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, cancellationToken);
+            await webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, cancellationToken);
         }
     }
 }

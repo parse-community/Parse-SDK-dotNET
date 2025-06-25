@@ -95,9 +95,9 @@ public class ParseLiveQueryController : IParseLiveQueryController
     public ParseLiveQueryState State { get; private set; }
 
     CancellationTokenSource ConnectionSignal { get; set; }
-    private IDictionary<int, CancellationTokenSource> SubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
-    private IDictionary<int, CancellationTokenSource> UnsubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
-    private IDictionary<int, IParseLiveQuerySubscription> Subscriptions { get; set; } = new Dictionary<int, IParseLiveQuerySubscription> { };
+    private Dictionary<int, CancellationTokenSource> SubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
+    private Dictionary<int, CancellationTokenSource> UnsubscriptionSignals { get; } = new Dictionary<int, CancellationTokenSource> { };
+    private Dictionary<int, IParseLiveQuerySubscription> Subscriptions { get; set; } = new Dictionary<int, IParseLiveQuerySubscription> { };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParseLiveQueryController"/> class.
@@ -243,10 +243,8 @@ public class ParseLiveQueryController : IParseLiveQueryController
             }).ToDictionary();
     }
 
-    private async Task SendMessage(IDictionary<string, object> message, CancellationToken cancellationToken)
-    {
+    private async Task SendMessage(IDictionary<string, object> message, CancellationToken cancellationToken) =>
         await WebSocketClient.SendAsync(JsonUtilities.Encode(message), cancellationToken);
-    }
 
     private async Task OpenAsync(CancellationToken cancellationToken = default)
     {
@@ -263,8 +261,8 @@ public class ParseLiveQueryController : IParseLiveQueryController
         await WebSocketClient.OpenAsync(ParseClient.Instance.Services.LiveQueryServerConnectionData.ServerURI, cancellationToken);
     }
 
-    private void WebSocketClientOnMessageReceived(object sender, string e)
-        => ProcessMessage(JsonUtilities.Parse(e) as IDictionary<string, object>);
+    private void WebSocketClientOnMessageReceived(object sender, string e) =>
+        ProcessMessage(JsonUtilities.Parse(e) as IDictionary<string, object>);
 
     /// <summary>
     /// Initiates a connection to the live query server asynchronously.
@@ -355,13 +353,13 @@ public class ParseLiveQueryController : IParseLiveQueryController
         bool signalReceived = completionSignal.Token.WaitHandle.WaitOne(TimeOut);
         SubscriptionSignals.Remove(requestId);
         completionSignal.Dispose();
-        if (signalReceived)
+        if (!signalReceived)
         {
-            ParseLiveQuerySubscription<T> subscription = new ParseLiveQuerySubscription<T>(liveQuery.Services, liveQuery.ClassName, requestId);
-            Subscriptions.Add(requestId, subscription);
-            return subscription;
+            throw new TimeoutException();
         }
-        throw new TimeoutException();
+        ParseLiveQuerySubscription<T> subscription = new ParseLiveQuerySubscription<T>(liveQuery.Services, liveQuery.ClassName, requestId);
+        Subscriptions.Add(requestId, subscription);
+        return subscription;
     }
 
     /// <summary>

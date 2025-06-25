@@ -68,17 +68,15 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// This allows adjustments to the filter or watched keys without unsubscribing
     /// and re-subscribing.
     /// </summary>
-    /// <typeparam name="T">The type of the ParseObject associated with the subscription.</typeparam>
+    /// <typeparam name="T1">The type of the ParseObject associated with the subscription.</typeparam>
     /// <param name="liveQuery">The updated live query containing new parameters that
     /// will replace the existing ones for this subscription.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. If triggered,
     /// the update process will be halted.</param>
     /// <returns>A task that represents the asynchronous operation of updating
     /// the subscription with the new query parameters.</returns>
-    public async Task UpdateAsync<T>(ParseLiveQuery<T> liveQuery, CancellationToken cancellationToken = default) where T : ParseObject
-    {
+    public async Task UpdateAsync<T1>(ParseLiveQuery<T1> liveQuery, CancellationToken cancellationToken = default) where T1 : ParseObject =>
         await Services.LiveQueryController.UpdateSubscriptionAsync(liveQuery, RequestId, CancellationToken.None);
-    }
 
     /// <summary>
     /// Cancels the current live query subscription by unsubscribing from the Parse Live Query server.
@@ -87,10 +85,8 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// </summary>
     /// <param name="cancellationToken">A token to monitor for cancellation requests. If triggered, the cancellation process will halt.</param>
     /// <returns>A task that represents the asynchronous operation of canceling the subscription.</returns>
-    public async Task CancelAsync(CancellationToken cancellationToken = default)
-    {
+    public async Task CancelAsync(CancellationToken cancellationToken = default) =>
         await Services.LiveQueryController.UnsubscribeAsync(RequestId, CancellationToken.None);
-    }
 
     /// <summary>
     /// Handles the creation event for an object that matches the subscription's query.
@@ -99,10 +95,8 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// <param name="objectState">
     /// The state of the object that triggered the creation event, containing its data and metadata.
     /// </param>
-    public void OnCreate(IObjectState objectState)
-    {
+    public void OnCreate(IObjectState objectState) =>
         Create?.Invoke(this, new ParseLiveQueryEventArgs(Services.GenerateObjectFromState<T>(objectState, ClassName)));
-    }
 
     /// <summary>
     /// Handles the event when an object enters the result set of a live query subscription. This occurs when an
@@ -110,12 +104,10 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// </summary>
     /// <param name="objectState">The current state of the object that has entered the query result set.</param>
     /// <param name="originalState">The original state of the object before entering the query result set.</param>
-    public void OnEnter(IObjectState objectState, IObjectState originalState)
-    {
+    public void OnEnter(IObjectState objectState, IObjectState originalState) =>
         Enter?.Invoke(this, new ParseLiveQueryDualEventArgs(
             Services.GenerateObjectFromState<T>(objectState, ClassName),
             Services.GenerateObjectFromState<T>(originalState, ClassName)));
-    }
 
     /// <summary>
     /// Handles the update event for objects subscribed to the Live Query. This method triggers the Update
@@ -123,12 +115,10 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// </summary>
     /// <param name="objectState">The new state of the object after the update.</param>
     /// <param name="originalState">The original state of the object before the update.</param>
-    public void OnUpdate(IObjectState objectState, IObjectState originalState)
-    {
+    public void OnUpdate(IObjectState objectState, IObjectState originalState) =>
         Update?.Invoke(this, new ParseLiveQueryDualEventArgs(
             Services.GenerateObjectFromState<T>(objectState, ClassName),
             Services.GenerateObjectFromState<T>(originalState, ClassName)));
-    }
 
     /// <summary>
     /// Handles the event when an object leaves the result set of the live query subscription.
@@ -137,12 +127,10 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// </summary>
     /// <param name="objectState">The state of the object that left the result set.</param>
     /// <param name="originalState">The original state of the object before it left the result set.</param>
-    public void OnLeave(IObjectState objectState, IObjectState originalState)
-    {
+    public void OnLeave(IObjectState objectState, IObjectState originalState) =>
         Leave?.Invoke(this, new ParseLiveQueryDualEventArgs(
             Services.GenerateObjectFromState<T>(objectState, ClassName),
             Services.GenerateObjectFromState<T>(originalState, ClassName)));
-    }
 
     /// <summary>
     /// Handles the "delete" event for a live query subscription, triggered when an object is removed
@@ -150,8 +138,6 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// delete event handler, if subscribed, with the relevant object data.
     /// </summary>
     /// <param name="objectState">The state information of the object that was deleted.</param>
-    public void OnDelete(IObjectState objectState)
-    {
+    public void OnDelete(IObjectState objectState) =>
         Delete?.Invoke(this, new ParseLiveQueryEventArgs(Services.GenerateObjectFromState<T>(objectState, ClassName)));
-    }
 }
