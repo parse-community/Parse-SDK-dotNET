@@ -60,10 +60,7 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// </summary>
     private ParseLiveQuery(ParseLiveQuery<T> source, IEnumerable<string> watchedKeys = null)
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
+        ArgumentNullException.ThrowIfNull(source);
 
         Services = source.Services;
         ClassName = source.ClassName;
