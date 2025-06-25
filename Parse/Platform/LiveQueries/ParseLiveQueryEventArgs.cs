@@ -17,10 +17,5 @@ public class ParseLiveQueryEventArgs : EventArgs
     /// </summary>
     public ParseObject Object { get; private set; }
 
-    /// <summary>
-    /// Represents the event arguments provided to Live Query event handlers in the Parse platform.
-    /// This class provides information about the current and original state of the Parse object
-    /// involved in the Live Query operation.
-    /// </summary>
     internal ParseLiveQueryEventArgs(ParseObject current) => Object = current;
 }

@@ -913,10 +913,10 @@ public class ParseQuery<T> where T : ParseObject
     }
 
     /// <summary>
-    /// Converts the current query into a live query that allows real-time updates to be monitored
-    /// for changes that match the specified query criteria.
+    /// Creates a live query from this query that can be used to receive real-time updates
+    /// when objects matching the query are created, updated, or deleted.
     /// </summary>
-    /// <returns>A ParseLiveQuery object configured to monitor changes for the query.</returns>
+    /// <returns>A new ParseLiveQuery instace configured with this query's parameters.</returns>
     public ParseLiveQuery<T> GetLive()
     {
         ArgumentNullException.ThrowIfNull(Filters);

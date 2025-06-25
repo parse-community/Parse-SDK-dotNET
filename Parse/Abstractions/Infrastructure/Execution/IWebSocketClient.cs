@@ -45,5 +45,6 @@ public interface IWebSocketClient
     /// A token to observe cancellation requests. The operation will stop if the token is canceled.
     /// </param>
     /// <returns>A task that represents the asynchronous operation of sending the message.</returns>
-    public Task SendAsync(string message, CancellationToken cancellationToken);
+    /// <exception cref="InvalidOperationException">Thrown when trying to send a message on a WebSocket connection that is not in the Open state.</exception>
+    public Task SendAsync(string message, CancellationToken cancellationToken = default);
 }

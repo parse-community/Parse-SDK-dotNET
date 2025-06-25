@@ -135,11 +135,12 @@ class TextWebSocketClient : IWebSocketClient
     /// <returns>
     /// A task representing the asynchronous operation of sending the message to the WebSocket server.
     /// </returns>
+    /// <exception cref="ArgumentNullException">Thrown when the WebSocket instance is null.</exception>
+    /// <exception cref="WebSocketException">Thrown when there is an error during the WebSocket communication.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when trying to send a message on a WebSocket connection that is not in the Open state.</exception>
     public async Task SendAsync(string message, CancellationToken cancellationToken = default)
     {
-        if (webSocket is not null && webSocket.State == WebSocketState.Open)
-        {
-            await webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, cancellationToken);
-        }
+        ArgumentNullException.ThrowIfNull(webSocket);
+        await webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, cancellationToken);
     }
 }
