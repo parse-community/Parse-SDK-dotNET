@@ -75,7 +75,7 @@ class TextWebSocketClient : IWebSocketClient
     /// A task representing the asynchronous operation of closing the WebSocket connection.
     /// </returns>
     public async Task CloseAsync(CancellationToken cancellationToken = default) =>
-        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken);
+        await webSocket?.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken)!;
 
     private async Task ListenForMessages(CancellationToken cancellationToken)
     {
@@ -96,9 +96,26 @@ class TextWebSocketClient : IWebSocketClient
                     break;
                 }
 
-                string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                Debug.WriteLine($"Received message: {message}");
-                MessageReceived?.Invoke(this, message);
+                if (result.EndOfMessage)
+                {
+                    string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                    MessageReceived?.Invoke(this, message);
+                }
+                else
+                {
+                    // Handle partial messages by accumulating data until EndOfMessage is true
+                    StringBuilder messageBuilder = new StringBuilder();
+                    messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                    while (!result.EndOfMessage)
+                    {
+                        result = await webSocket.ReceiveAsync(
+                            new ArraySegment<byte>(buffer),
+                            cancellationToken);
+                        messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                    }
+                    string fullMessage = messageBuilder.ToString();
+                    MessageReceived?.Invoke(this, fullMessage);
+                }
             }
         }
         catch (OperationCanceledException ex)
@@ -148,7 +165,6 @@ class TextWebSocketClient : IWebSocketClient
             if (!task.IsFaulted)
                 return;
             Debug.WriteLine($"Websocket listener task faulted: {task.Exception}");
-            throw task.Exception;
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
