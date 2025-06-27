@@ -72,12 +72,6 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
         set => LateInitializer.SetValue(value);
     }
 
-    public IWebSocketClient WebSocketClient
-    {
-        get => LateInitializer.GetValue<IWebSocketClient>(() => new TextWebSocketClient { });
-        set => LateInitializer.SetValue(value);
-    }
-
     public IParseCloudCodeController CloudCodeController
     {
         get => LateInitializer.GetValue<IParseCloudCodeController>(() => new ParseCloudCodeController(CommandRunner, Decoder));
@@ -105,12 +99,6 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
     public IParseQueryController QueryController
     {
         get => LateInitializer.GetValue<IParseQueryController>(() => new ParseQueryController(CommandRunner, Decoder));
-        set => LateInitializer.SetValue(value);
-    }
-
-    public IParseLiveQueryController LiveQueryController
-    {
-        get => LateInitializer.GetValue<IParseLiveQueryController>(() => new ParseLiveQueryController(WebSocketClient, Decoder));
         set => LateInitializer.SetValue(value);
     }
 
@@ -174,6 +162,19 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
         set => LateInitializer.SetValue(value);
     }
 
+
+    public IWebSocketClient WebSocketClient
+    {
+        get => LateInitializer.GetValue<IWebSocketClient>(() => LiveQueryServerConnectionData is null ? null : new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize));
+        set => LateInitializer.SetValue(value);
+    }
+
+    public IParseLiveQueryController LiveQueryController
+    {
+        get => LateInitializer.GetValue<IParseLiveQueryController>(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.TimeOut, WebSocketClient, Decoder));
+        set => LateInitializer.SetValue(value);
+    }
+
     public IServerConnectionData ServerConnectionData { get; set; }
-    public IServerConnectionData LiveQueryServerConnectionData { get; set; }
+    public ILiveQueryServerConnectionData LiveQueryServerConnectionData { get; set; }
 }

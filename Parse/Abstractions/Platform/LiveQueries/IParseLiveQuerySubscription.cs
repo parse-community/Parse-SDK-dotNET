@@ -6,11 +6,6 @@ using Parse.Platform.LiveQueries;
 
 namespace Parse.Abstractions.Platform.LiveQueries;
 
-/// <summary>
-/// Represents a live query subscription that is used with Parse's Live Query service.
-/// It allows real-time monitoring and event handling for object changes that match
-/// a specified query.
-/// </summary>
 public interface IParseLiveQuerySubscription
 {
     /// <summary>

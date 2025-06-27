@@ -39,7 +39,7 @@ public class ServiceHub : IServiceHub
     LateInitializer LateInitializer { get; } = new LateInitializer { };
 
     public IServerConnectionData ServerConnectionData { get; set; }
-    public IServerConnectionData LiveQueryServerConnectionData { get; set; }
+    public ILiveQueryServerConnectionData LiveQueryServerConnectionData { get; set; }
     public IMetadataController MetadataController => LateInitializer.GetValue(() => new MetadataController { HostManifestData = HostManifestData.Inferred, EnvironmentData = EnvironmentData.Inferred });
 
     public IServiceHubCloner Cloner => LateInitializer.GetValue(() => new { } as object as IServiceHubCloner);
@@ -52,14 +52,12 @@ public class ServiceHub : IServiceHub
 
     public IParseInstallationController InstallationController => LateInitializer.GetValue(() => new ParseInstallationController(CacheController));
     public IParseCommandRunner CommandRunner => LateInitializer.GetValue(() => new ParseCommandRunner(WebClient, InstallationController, MetadataController, ServerConnectionData, new Lazy<IParseUserController>(() => UserController)));
-    public IWebSocketClient WebSocketClient => LateInitializer.GetValue(() => new TextWebSocketClient { });
 
     public IParseCloudCodeController CloudCodeController => LateInitializer.GetValue(() => new ParseCloudCodeController(CommandRunner, Decoder));
     public IParseConfigurationController ConfigurationController => LateInitializer.GetValue(() => new ParseConfigurationController(CommandRunner, CacheController, Decoder));
     public IParseFileController FileController => LateInitializer.GetValue(() => new ParseFileController(CommandRunner));
     public IParseObjectController ObjectController => LateInitializer.GetValue(() => new ParseObjectController(CommandRunner, Decoder, ServerConnectionData));
     public IParseQueryController QueryController => LateInitializer.GetValue(() => new ParseQueryController(CommandRunner, Decoder));
-    public IParseLiveQueryController LiveQueryController => LateInitializer.GetValue(() => new ParseLiveQueryController(WebSocketClient, Decoder));
     public IParseSessionController SessionController => LateInitializer.GetValue(() => new ParseSessionController(CommandRunner, Decoder));
     public IParseUserController UserController => LateInitializer.GetValue(() => new ParseUserController(CommandRunner, Decoder));
     public IParseCurrentUserController CurrentUserController => LateInitializer.GetValue(() => new ParseCurrentUserController(CacheController, ClassController, Decoder));
@@ -72,6 +70,9 @@ public class ServiceHub : IServiceHub
     public IParsePushController PushController => LateInitializer.GetValue(() => new ParsePushController(CommandRunner, CurrentUserController));
     public IParseCurrentInstallationController CurrentInstallationController => LateInitializer.GetValue(() => new ParseCurrentInstallationController(InstallationController, CacheController, InstallationCoder, ClassController));
     public IParseInstallationDataFinalizer InstallationDataFinalizer => LateInitializer.GetValue(() => new ParseInstallationDataFinalizer { });
+
+    public IWebSocketClient WebSocketClient => LateInitializer.GetValue(() => LiveQueryServerConnectionData is null ? null : new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize));
+    public IParseLiveQueryController LiveQueryController => LateInitializer.GetValue(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.TimeOut, WebSocketClient, Decoder));
 
     public bool Reset()
     {

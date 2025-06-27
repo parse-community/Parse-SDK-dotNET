@@ -12,18 +12,6 @@ namespace Parse.Abstractions.Platform.LiveQueries;
 public interface IParseLiveQueryController
 {
     /// <summary>
-    /// Gets or sets the timeout duration, in milliseconds, for operations performed by the LiveQuery controller.
-    /// </summary>
-    /// <remarks>
-    /// This property determines the maximum time the system will wait for an operation to complete
-    /// before timing out. It is particularly relevant to tasks such as establishing a connection
-    /// to the LiveQuery server or awaiting responses for subscription or query update requests.
-    /// Developers can use this property to configure timeouts based on the expected network
-    /// and performance conditions of the application environment.
-    /// </remarks>
-    public int TimeOut { get; set; }
-
-    /// <summary>
     /// Event triggered when an error occurs during the operation of the ParseLiveQueryController.
     /// </summary>
     /// <remarks>

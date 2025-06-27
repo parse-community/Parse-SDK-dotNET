@@ -27,7 +27,7 @@ public interface IServiceHub
     /// The current server connection data that the Parse SDK has been initialized with.
     /// </summary>
     IServerConnectionData ServerConnectionData { get; }
-    IServerConnectionData LiveQueryServerConnectionData { get; }
+    ILiveQueryServerConnectionData LiveQueryServerConnectionData { get; }
     IMetadataController MetadataController { get; }
 
     IServiceHubCloner Cloner { get; }

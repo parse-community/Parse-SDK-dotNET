@@ -10,6 +10,8 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
 using System.Diagnostics;
+using Parse.Abstractions.Infrastructure.Execution;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Platform.LiveQueries;
 
 namespace Parse;
@@ -289,21 +291,19 @@ public static class ObjectServiceExtensions
     }
 
     /// <summary>
-    /// Connects the Live Query server to the provided <see cref="IServiceHub"/> instance, enabling real-time updates for subscribed queries.
-    /// Allows error handling during the connection and sets a custom timeout period for the connection.
+    /// Establishes a connection to the Live Query Server, enabling real-time updates and operations for subscribed queries.
+    /// This method configures error handling for the connection.
     /// </summary>
-    /// <param name="serviceHub">The <see cref="IServiceHub"/> instance through which the Live Query server will be connected.</param>
-    /// <param name="onError">An optional event handler to capture Live Query connection errors.</param>
-    /// <param name="timeOut">An optional timeout value, in milliseconds, for the Live Query connection. Defaults to 5000 milliseconds.</param>
-    /// <returns>A task representing the asynchronous operation of connecting to the Live Query server.</returns>
-    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub, EventHandler<ParseLiveQueryErrorEventArgs> onError = null, int timeOut = 5000)
+    /// <param name="serviceHub">The current <see cref="IServiceHub"/> instance managing the Parse services.</param>
+    /// <param name="onError">Optional event handler to manage errors occurring during the live query operations.</param>
+    /// <returns>A task that represents the asynchronous operation of connecting to the Live Query Server. The task completes when the connection is established.</returns>
+    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub, EventHandler<ParseLiveQueryErrorEventArgs> onError = null)
     {
-        await serviceHub.LiveQueryController.ConnectAsync();
         if (onError is not null)
         {
             serviceHub.LiveQueryController.Error += onError;
         }
-        serviceHub.LiveQueryController.TimeOut = timeOut;
+        await serviceHub.LiveQueryController.ConnectAsync();
     }
 
     /// <summary>

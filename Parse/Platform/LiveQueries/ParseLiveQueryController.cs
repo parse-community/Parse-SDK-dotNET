@@ -40,7 +40,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
     /// - Unsubscribing from a query.
     /// Ensure that the value is configured appropriately to avoid premature timeout errors in network-dependent processes.
     /// </remarks>
-    public int TimeOut { get; set; } = 5000;
+    private int TimeOut { get; }
 
     /// <summary>
     /// Event triggered when an error occurs during the operation of the ParseLiveQueryController.
@@ -107,6 +107,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="ParseLiveQueryController"/> class.
     /// </summary>
+    /// <param name="timeOut"></param>
     /// <param name="webSocketClient">
     /// The <see cref="IWebSocketClient"/> implementation to use for the live query connection.
     /// </param>
@@ -114,8 +115,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
     /// <remarks>
     /// This constructor is used to initialize a new instance of the <see cref="ParseLiveQueryController"/> class
     /// </remarks>
-    public ParseLiveQueryController(IWebSocketClient webSocketClient, IParseDataDecoder decoder)
+    public ParseLiveQueryController(int timeOut, IWebSocketClient webSocketClient, IParseDataDecoder decoder)
     {
+        TimeOut = timeOut;
         WebSocketClient = webSocketClient;
         _state = ParseLiveQueryState.Closed;
         Decoder = decoder;
@@ -259,7 +261,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
         ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs(
             Convert.ToInt32(message["code"]),
             message["error"] as string,
-            (bool) message["reconnect"]);
+            Convert.ToBoolean(message["reconnect"]));
         Error?.Invoke(this, errorArgs);
     }
 
@@ -336,16 +338,16 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
     }
 
     /// <summary>
-    /// Initiates a connection to the live query server asynchronously.
+    /// Establishes a connection to the live query server asynchronously.
     /// </summary>
     /// <param name="cancellationToken">
-    /// A cancellation token to monitor for cancellation requests.
+    /// A cancellation token used to propagate notification that the operation should be canceled.
     /// </param>
     /// <returns>
-    /// A task representing the asynchronous operation.
+    /// A task that represents the asynchronous operation.
     /// </returns>
     /// <exception cref="TimeoutException">
-    /// Thrown if the connection attempt exceeds the specified timeout period.
+    /// Thrown if the live query server connection request exceeds the defined timeout.
     /// </exception>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {

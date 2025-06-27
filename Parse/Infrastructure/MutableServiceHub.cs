@@ -36,7 +36,7 @@ namespace Parse.Infrastructure;
 public class MutableServiceHub : IMutableServiceHub
 {
     public IServerConnectionData ServerConnectionData { get; set; }
-    public IServerConnectionData LiveQueryServerConnectionData { get; set; }
+    public ILiveQueryServerConnectionData LiveQueryServerConnectionData { get; set; }
     public IMetadataController MetadataController { get; set; }
 
     public IServiceHubCloner Cloner { get; set; }
@@ -70,7 +70,7 @@ public class MutableServiceHub : IMutableServiceHub
     public IParseCurrentInstallationController CurrentInstallationController { get; set; }
     public IParseInstallationDataFinalizer InstallationDataFinalizer { get; set; }
 
-    public MutableServiceHub SetDefaults(IServerConnectionData connectionData = default, IServerConnectionData liveQueryConnectionData = default)
+    public MutableServiceHub SetDefaults(IServerConnectionData connectionData = default, ILiveQueryServerConnectionData liveQueryConnectionData = default)
     {
         ServerConnectionData ??= connectionData;
         LiveQueryServerConnectionData ??= liveQueryConnectionData;
@@ -90,14 +90,12 @@ public class MutableServiceHub : IMutableServiceHub
 
         InstallationController ??= new ParseInstallationController(CacheController);
         CommandRunner ??= new ParseCommandRunner(WebClient, InstallationController, MetadataController, ServerConnectionData, new Lazy<IParseUserController>(() => UserController));
-        WebSocketClient ??= new TextWebSocketClient { };
 
         CloudCodeController ??= new ParseCloudCodeController(CommandRunner, Decoder);
         ConfigurationController ??= new ParseConfigurationController(CommandRunner, CacheController, Decoder);
         FileController ??= new ParseFileController(CommandRunner);
         ObjectController ??= new ParseObjectController(CommandRunner, Decoder, ServerConnectionData);
         QueryController ??= new ParseQueryController(CommandRunner, Decoder);
-        LiveQueryController ??= new ParseLiveQueryController(WebSocketClient, Decoder);
         SessionController ??= new ParseSessionController(CommandRunner, Decoder);
         UserController ??= new ParseUserController(CommandRunner, Decoder);
         CurrentUserController ??= new ParseCurrentUserController(CacheController, ClassController, Decoder);
@@ -110,6 +108,9 @@ public class MutableServiceHub : IMutableServiceHub
         CurrentInstallationController ??= new ParseCurrentInstallationController(InstallationController, CacheController, InstallationCoder, ClassController);
         PushChannelsController ??= new ParsePushChannelsController(CurrentInstallationController);
         InstallationDataFinalizer ??= new ParseInstallationDataFinalizer { };
+
+        WebSocketClient ??= LiveQueryServerConnectionData is null ? null : new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize);
+        LiveQueryController ??= LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.TimeOut, WebSocketClient, Decoder);
 
         return this;
     }

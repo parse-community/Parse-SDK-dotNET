@@ -12,7 +12,7 @@ namespace Parse.Infrastructure.Execution;
 /// Represents a WebSocket client that allows connecting to a WebSocket server, sending messages, and receiving messages.
 /// Implements the <c>IWebSocketClient</c> interface for WebSocket operations.
 /// </summary>
-class TextWebSocketClient : IWebSocketClient
+class TextWebSocketClient(int bufferSize) : IWebSocketClient
 {
     /// <summary>
     /// A private instance of the ClientWebSocket class used to manage the WebSocket connection.
@@ -43,6 +43,8 @@ class TextWebSocketClient : IWebSocketClient
 
     private readonly object connectionLock = new object();
 
+    private int BufferSize { get; } = bufferSize;
+
     /// <summary>
     /// Opens a WebSocket connection to the specified server URI and starts listening for messages.
     /// If the connection is already open or in a connecting state, this method does nothing.
@@ -54,14 +56,19 @@ class TextWebSocketClient : IWebSocketClient
     /// </returns>
     public async Task OpenAsync(string serverUri, CancellationToken cancellationToken = default)
     {
+        ClientWebSocket webSocketToConnect = null;
         lock (connectionLock)
         {
             webSocket ??= new ClientWebSocket();
+            if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
+            {
+                webSocketToConnect = webSocket;
+            }
         }
 
-        if (webSocket.State != WebSocketState.Open && webSocket.State != WebSocketState.Connecting)
+        if (webSocketToConnect is not null)
         {
-            await webSocket.ConnectAsync(new Uri(serverUri), cancellationToken);
+            await webSocketToConnect.ConnectAsync(new Uri(serverUri), cancellationToken);
             StartListening(cancellationToken);
         }
     }
@@ -74,12 +81,17 @@ class TextWebSocketClient : IWebSocketClient
     /// <returns>
     /// A task representing the asynchronous operation of closing the WebSocket connection.
     /// </returns>
-    public async Task CloseAsync(CancellationToken cancellationToken = default) =>
-        await webSocket?.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken)!;
+    public async Task CloseAsync(CancellationToken cancellationToken = default)
+    {
+        if (webSocket is not null)
+        {
+            await webSocket?.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken)!;
+        }
+    }
 
     private async Task ListenForMessages(CancellationToken cancellationToken)
     {
-        byte[] buffer = new byte[1024 * 4];
+        byte[] buffer = new byte[BufferSize];
 
         try
         {
@@ -183,6 +195,10 @@ class TextWebSocketClient : IWebSocketClient
     public async Task SendAsync(string message, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(webSocket);
+        if (webSocket.State != WebSocketState.Open)
+        {
+            throw new InvalidOperationException($"WebSocket is not in Open state. Current state: {webSocket.State}");
+        }
         await webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, cancellationToken);
     }
 }

@@ -104,7 +104,7 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
     /// <param name="liveQueryConfiguration">The configuration to initialize the Parse live query client with.</param>
     /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
     /// <param name="configurators">A set of <see cref="IServiceHubMutator"/> implementation instances to tweak the behaviour of the SDK.</param>
-    public ParseClient(IServerConnectionData configuration, IServerConnectionData liveQueryConfiguration, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators)
+    public ParseClient(IServerConnectionData configuration, ILiveQueryServerConnectionData liveQueryConfiguration, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators)
     {
         Services = serviceHub is { }
             ? new OrchestrationServiceHub { Custom = serviceHub, Default = new ServiceHub { ServerConnectionData = GenerateServerConnectionData(), LiveQueryServerConnectionData = GenerateLiveQueryServerConnectionData() } }
@@ -128,11 +128,11 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
             _ => throw new InvalidOperationException("The IServerConnectionData implementation instance provided to the ParseClient constructor must be populated with the information needed to connect to a Parse server instance.")
         };
 
-        IServerConnectionData GenerateLiveQueryServerConnectionData() => liveQueryConfiguration switch
+        ILiveQueryServerConnectionData GenerateLiveQueryServerConnectionData() => liveQueryConfiguration switch
         {
             null => throw new ArgumentNullException(nameof(liveQueryConfiguration)),
-            ServerConnectionData { Test: true, ServerURI: { } } data => data,
-            ServerConnectionData { Test: true } data => new ServerConnectionData
+            LiveQueryServerConnectionData { Test: true, ServerURI: { } } data => data,
+            LiveQueryServerConnectionData { Test: true } data => new LiveQueryServerConnectionData
             {
                 ApplicationID = data.ApplicationID,
                 Headers = data.Headers,
