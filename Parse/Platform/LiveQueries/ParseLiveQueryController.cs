@@ -380,7 +380,6 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
             }
             finally
             {
-                ConnectionSignal.Task.Dispose();
                 ConnectionSignal = null;
             }
         }
@@ -561,7 +560,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
             return;
         if (disposing)
         {
-            CloseAsync().GetAwaiter().GetResult();
+            CloseAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
         disposed = true;
     }
