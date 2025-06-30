@@ -15,7 +15,7 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     /// a live query operation. It can provide detailed information about the nature of the issue,
     /// which can be helpful for debugging or logging purposes.
     /// </remarks>
-    public string Error { get; private set; }
+    public string Error { get; }
 
     /// <summary>
     /// Gets or sets the error code associated with a live query operation.
@@ -25,7 +25,7 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     /// the type or category of the error that occurred during a live query operation.
     /// This is used alongside the error message to provide detailed diagnostics or logging.
     /// </remarks>
-    public int Code { get; private set; }
+    public int Code { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the client should attempt to reconnect
@@ -37,15 +37,18 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     /// This can be used to determine the client's behavior in maintaining a continuous
     /// connection with the server.
     /// </remarks>
-    public bool Reconnect { get; private set; }
+    public bool Reconnect { get; }
+
+    public Exception LocalException { get; }
 
     /// <summary>
     /// Represents the arguments for an error event that occurs during a live query in the Parse platform.
     /// </summary>
-    internal ParseLiveQueryErrorEventArgs(int code, string error, bool reconnect)
+    internal ParseLiveQueryErrorEventArgs(int code, string error, bool reconnect, Exception localException = null)
     {
         Error = error;
         Code = code;
         Reconnect = reconnect;
+        LocalException = localException;
     }
 }

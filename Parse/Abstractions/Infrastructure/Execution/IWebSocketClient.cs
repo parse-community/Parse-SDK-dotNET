@@ -1,6 +1,8 @@
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Parse.Infrastructure.Execution;
 
 namespace Parse.Abstractions.Infrastructure.Execution;
 
@@ -16,7 +18,26 @@ public interface IWebSocketClient
     /// The event handler receives the message as a string parameter. This can be used to process incoming
     /// WebSocket messages, such as notifications, commands, or data updates.
     /// </remarks>
-    public event EventHandler<string> MessageReceived;
+    public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+
+    /// <summary>
+    /// An event that is triggered when an error occurs during the WebSocket operation.
+    /// </summary>
+    /// <remarks>
+    /// This event communicates WebSocket-specific errors along with additional details encapsulated in
+    /// the <see cref="ErrorEventArgs"/> object. It can be used to handle and log errors during WebSocket
+    /// communication or connection lifecycle.
+    /// </remarks>
+    public event EventHandler<ErrorEventArgs> WebsocketError;
+
+    /// <summary>
+    /// An event that is triggered when an unknown or unexpected error occurs during WebSocket communication.
+    /// </summary>
+    /// <remarks>
+    /// This event can be used to handle errors that do not fall under typical WebSocket error events. The event
+    /// handler receives an <see cref="ErrorEventArgs"/> parameter containing details about the error.
+    /// </remarks>
+    public event EventHandler<ErrorEventArgs> UnknownError;
 
     /// <summary>
     /// Establishes a WebSocket connection to the specified server URI.

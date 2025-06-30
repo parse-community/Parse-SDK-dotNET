@@ -2,13 +2,16 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Parse.Abstractions.Infrastructure.Data;
 using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Infrastructure.Data;
+using Parse.Infrastructure.Execution;
 using Parse.Infrastructure.Utilities;
 
 namespace Parse.Platform.LiveQueries;
@@ -133,6 +136,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
 
         switch (op)
         {
+            // CONNECTION
             case "connected":
                 ProcessConnectionMessage(message);
                 break;
@@ -354,16 +358,16 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         await WebSocketClient.OpenAsync(ParseClient.Instance.Services.LiveQueryServerConnectionData.ServerURI, cancellationToken);
     }
 
-    private void WebSocketClientOnMessageReceived(object sender, string e)
+    private void WebSocketClientOnMessageReceived(object sender, MessageReceivedEventArgs args)
     {
-        object parsed = JsonUtilities.Parse(e);
+        object parsed = JsonUtilities.Parse(args.Message);
         if (parsed is IDictionary<string, object> message)
         {
             ProcessMessage(message);
         }
         else
         {
-            Debug.WriteLine($"Invalid message format received: {e}");
+            Debug.WriteLine($"Invalid message format received: {args.Message}");
         }
     }
 
@@ -386,6 +390,8 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
             _state = ParseLiveQueryState.Connecting;
             await OpenAsync(cancellationToken);
             WebSocketClient.MessageReceived += WebSocketClientOnMessageReceived;
+            WebSocketClient.WebsocketError += WebSocketClientOnWebsocketError;
+            WebSocketClient.UnknownError += WebSocketClientOnUnknownError;
             Dictionary<string, object> message = new Dictionary<string, object>
             {
                 { "op", "connect" },
@@ -420,6 +426,22 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
             {
                 await signal.Task.WaitAsync(cancellationToken);
             }
+        }
+    }
+
+    void WebSocketClientOnWebsocketError(object sender, ErrorEventArgs args)
+    {
+        if (args.GetException() is WebSocketException ex)
+        {
+            Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(ex.ErrorCode, ex.Message, false, ex));
+        }
+    }
+
+    void WebSocketClientOnUnknownError(object sender, ErrorEventArgs args)
+    {
+        if (args.GetException() is { } ex)
+        {
+            Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(-1, ex.Message, false, ex));
         }
     }
 
@@ -560,6 +582,8 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
         WebSocketClient.MessageReceived -= WebSocketClientOnMessageReceived;
+        WebSocketClient.WebsocketError -= WebSocketClientOnWebsocketError;
+        WebSocketClient.UnknownError -= WebSocketClientOnUnknownError;
         await WebSocketClient.CloseAsync(cancellationToken);
         _state = ParseLiveQueryState.Closed;
         SubscriptionSignals.Clear();

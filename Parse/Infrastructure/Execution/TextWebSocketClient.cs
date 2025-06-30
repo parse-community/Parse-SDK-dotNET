@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -39,7 +41,9 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
     /// represented as a string. Handlers for this event can process or respond to the message
     /// based on the application's requirements.
     /// </summary>
-    public event EventHandler<string> MessageReceived;
+    public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+    public event EventHandler<ErrorEventArgs> WebsocketError;
+    public event EventHandler<ErrorEventArgs> UnknownError;
 
     private readonly object connectionLock = new object();
 
@@ -111,7 +115,7 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
                 if (result.EndOfMessage)
                 {
                     string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    MessageReceived?.Invoke(this, message);
+                    MessageReceived?.Invoke(this, new MessageReceivedEventArgs(message));
                 }
                 else
                 {
@@ -126,7 +130,7 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
                         messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
                     }
                     string fullMessage = messageBuilder.ToString();
-                    MessageReceived?.Invoke(this, fullMessage);
+                    MessageReceived?.Invoke(this, new MessageReceivedEventArgs(fullMessage));;
                 }
             }
         }
@@ -135,15 +139,17 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
             // Normal cancellation, no need to handle
             Debug.WriteLine($"Websocket connection was closed: {ex.Message}");
         }
-        catch (WebSocketException e)
+        catch (WebSocketException ex)
         {
             // WebSocket error, notify the user
-            Debug.WriteLine($"Websocket error: {e.Message}");
+            Debug.WriteLine($"Websocket error ({ex.ErrorCode}): {ex.Message}");
+            WebsocketError?.Invoke(this, new ErrorEventArgs(ex));
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
             // Unexpected error, notify the user
-            Debug.WriteLine($"Unexpected error in Websocket listener: {e.Message}");
+            Debug.WriteLine($"Unexpected error in Websocket listener: {ex.Message}");
+            UnknownError?.Invoke(this, new ErrorEventArgs(ex));
         }
         Debug.WriteLine("Websocket ListenForMessage stopped");
     }

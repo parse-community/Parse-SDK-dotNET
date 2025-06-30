@@ -15,7 +15,7 @@ public class ParseLiveQueryDualEventArgs : ParseLiveQueryEventArgs
     /// providing a snapshot of its previous state for comparison purposes during events
     /// such as updates or deletes.
     /// </summary>
-    public ParseObject Original { get; private set; }
+    public ParseObject Original { get; }
 
     internal ParseLiveQueryDualEventArgs(ParseObject current, ParseObject original) : base(current) =>
         Original = original ?? throw new ArgumentNullException(nameof(original));

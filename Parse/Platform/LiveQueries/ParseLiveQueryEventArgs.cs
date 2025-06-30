@@ -15,7 +15,7 @@ public class ParseLiveQueryEventArgs : EventArgs
     /// the event was triggered, reflecting any changes made during operations such as
     /// an update or creation.
     /// </summary>
-    public ParseObject Object { get; private set; }
+    public ParseObject Object { get; }
 
     internal ParseLiveQueryEventArgs(ParseObject current) => Object = current ?? throw new ArgumentNullException(nameof(current));
 }
