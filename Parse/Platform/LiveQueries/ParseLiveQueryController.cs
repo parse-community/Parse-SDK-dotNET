@@ -17,7 +17,7 @@ namespace Parse.Platform.LiveQueries;
 /// The ParseLiveQueryController is responsible for managing live query subscriptions, maintaining a connection
 /// to the Parse LiveQuery server, and handling real-time updates from the server.
 /// </summary>
-public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
+public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, IAsyncDisposable
 {
     private IParseDataDecoder Decoder { get; }
     private IWebSocketClient WebSocketClient { get; }
@@ -578,6 +578,22 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
     }
 
     /// <summary>
+    /// Asynchronously releases the resources used by the <see cref="ParseLiveQueryController"/> instance.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="ValueTask"/> representing the asynchronous dispose operation.
+    /// </returns>
+    /// <remarks>
+    /// This method is called to perform an asynchronous disposal of the resources held by the current
+    /// instance. It suppresses finalization of the object to optimize resource cleanup.
+    /// </remarks>
+    public async ValueTask DisposeAsync()
+    {
+        await CloseAsync();
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
     /// Releases the resources used by the <see cref="ParseLiveQueryController"/> instance.
     /// </summary>
     /// <remarks>
@@ -590,7 +606,8 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
             return;
         if (disposing)
         {
-            CloseAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            // For sync disposal, the best effort cleanup without waiting
+            _ = Task.Run(async () => await CloseAsync());
         }
         disposed = true;
     }
