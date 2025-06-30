@@ -196,10 +196,10 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
         if (!ValidateClientMessage(message, out int requestId))
             return;
 
-        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
+        if (!GetDictEntry(message, "object", out IDictionary<string, object> objectDict))
             return;
 
-        if (!GetDictEntry(message, "object", out IDictionary<string, object> objectDict))
+        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
             return;
 
         subscription.OnDelete(ParseObjectCoder.Instance.Decode(objectDict, Decoder, ParseClient.Instance.Services));
@@ -210,13 +210,13 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
         if (!ValidateClientMessage(message, out int requestId))
             return;
 
-        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
-            return;
-
         if (!GetDictEntry(message, "object", out IDictionary<string, object> objectDict))
             return;
 
         if (!GetDictEntry(message, "original", out IDictionary<string, object> originalDict))
+            return;
+
+        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
             return;
 
         subscription.OnLeave(
@@ -229,13 +229,13 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
         if (!ValidateClientMessage(message, out int requestId))
             return;
 
-        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
-            return;
-
         if (!GetDictEntry(message, "object", out IDictionary<string, object> objectDict))
             return;
 
         if (!GetDictEntry(message, "original", out IDictionary<string, object> originalDict))
+            return;
+
+        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
             return;
 
         subscription.OnUpdate(
@@ -248,13 +248,13 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
         if (!ValidateClientMessage(message, out int requestId))
             return;
 
-        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
-            return;
-
         if (!GetDictEntry(message, "object", out IDictionary<string, object> objectDict))
             return;
 
         if (!GetDictEntry(message, "original", out IDictionary<string, object> originalDict))
+            return;
+
+        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
             return;
 
         subscription.OnEnter(
@@ -267,10 +267,10 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
         if (!ValidateClientMessage(message, out int requestId))
             return;
 
-        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
+        if (!GetDictEntry(message, "object", out IDictionary<string, object> objectDict))
             return;
 
-        if (!GetDictEntry(message, "object", out IDictionary<string, object> objectDict))
+        if (!Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
             return;
 
         subscription.OnCreate(ParseObjectCoder.Instance.Decode(objectDict, Decoder, ParseClient.Instance.Services));
@@ -323,7 +323,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
         ClientId = clientId;
         _state = ParseLiveQueryState.Connected;
-        ConnectionSignal.TrySetResult();
+        ConnectionSignal?.TrySetResult();
     }
 
     private async Task<IDictionary<string, object>> AppendSessionToken(IDictionary<string, object> message)
