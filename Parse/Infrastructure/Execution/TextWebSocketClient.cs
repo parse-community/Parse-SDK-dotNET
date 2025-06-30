@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -130,7 +129,7 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
                         messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
                     }
                     string fullMessage = messageBuilder.ToString();
-                    MessageReceived?.Invoke(this, new MessageReceivedEventArgs(fullMessage));;
+                    MessageReceived?.Invoke(this, new MessageReceivedEventArgs(fullMessage));
                 }
             }
         }
