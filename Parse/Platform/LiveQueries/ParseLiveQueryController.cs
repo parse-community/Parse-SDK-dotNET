@@ -166,12 +166,23 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
         }
     }
 
+    private bool ValidateClientMessage(IDictionary<string, object> message, out int requestId)
+    {
+        requestId = 0;
+
+        if (!(message.TryGetValue("clientId", out object clientIdObj) &&
+              clientIdObj is string clientId && clientId == ClientId))
+            return false;
+
+        return message.TryGetValue("requestId", out object requestIdObj) &&
+               Int32.TryParse(requestIdObj?.ToString(), out requestId);
+    }
+
     void ProcessDeleteEventMessage(IDictionary<string, object> message)
     {
-        string clientId = message["clientId"] as string;
-        if (clientId != ClientId)
+        if (!ValidateClientMessage(message, out int requestId))
             return;
-        int requestId = Convert.ToInt32(message["requestId"]);
+
         if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
         {
             subscription.OnDelete(ParseObjectCoder.Instance.Decode(
@@ -183,10 +194,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
     void ProcessLeaveEventMessage(IDictionary<string, object> message)
     {
-        string clientId = message["clientId"] as string;
-        if (clientId != ClientId)
+        if (!ValidateClientMessage(message, out int requestId))
             return;
-        int requestId = Convert.ToInt32(message["requestId"]);
+
         if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
         {
             subscription.OnLeave(
@@ -203,10 +213,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
     void ProcessUpdateEventMessage(IDictionary<string, object> message)
     {
-        string clientId = message["clientId"] as string;
-        if (clientId != ClientId)
+        if (!ValidateClientMessage(message, out int requestId))
             return;
-        int requestId = Convert.ToInt32(message["requestId"]);
+
         if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
         {
             subscription.OnUpdate(
@@ -223,10 +232,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
     void ProcessEnterEventMessage(IDictionary<string, object> message)
     {
-        string clientId = message["clientId"] as string;
-        if (clientId != ClientId)
+        if (!ValidateClientMessage(message, out int requestId))
             return;
-        int requestId = Convert.ToInt32(message["requestId"]);
+
         if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
         {
             subscription.OnEnter(
@@ -243,10 +251,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
     void ProcessCreateEventMessage(IDictionary<string, object> message)
     {
-        string clientId = message["clientId"] as string;
-        if (clientId != ClientId)
+        if (!ValidateClientMessage(message, out int requestId))
             return;
-        int requestId = Convert.ToInt32(message["requestId"]);
+
         if (Subscriptions.TryGetValue(requestId, out IParseLiveQuerySubscription subscription))
         {
             subscription.OnCreate(ParseObjectCoder.Instance.Decode(
@@ -258,19 +265,27 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
     void ProcessErrorMessage(IDictionary<string, object> message)
     {
-        ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs(
-            Convert.ToInt32(message["code"]),
-            message["error"] as string,
-            Convert.ToBoolean(message["reconnect"]));
+        if (!(message.TryGetValue("code", out object codeObj) &&
+            Int32.TryParse(codeObj?.ToString(), out int code)))
+            return;
+
+        if (!(message.TryGetValue("error", out object errorObj) &&
+              errorObj is string error))
+            return;
+
+        if (!(message.TryGetValue("reconnect", out object reconnectObj) &&
+            Boolean.TryParse(reconnectObj?.ToString(), out bool reconnect)))
+            return;
+
+        ParseLiveQueryErrorEventArgs errorArgs = new ParseLiveQueryErrorEventArgs(code, error, reconnect);
         Error?.Invoke(this, errorArgs);
     }
 
     void ProcessUnsubscriptionMessage(IDictionary<string, object> message)
     {
-        string clientId = message["clientId"] as string;
-        if (clientId != ClientId)
+        if (!ValidateClientMessage(message, out int requestId))
             return;
-        int requestId = Convert.ToInt32(message["requestId"]);
+
         if (UnsubscriptionSignals.TryGetValue(requestId, out TaskCompletionSource unsubscriptionSign))
         {
             unsubscriptionSign?.TrySetResult();
@@ -279,10 +294,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
     void ProcessSubscriptionMessage(IDictionary<string, object> message)
     {
-        string clientId = message["clientId"] as string;
-        if (clientId != ClientId)
+        if (!ValidateClientMessage(message, out int requestId))
             return;
-        int requestId = Convert.ToInt32(message["requestId"]);
+
         if (SubscriptionSignals.TryGetValue(requestId, out TaskCompletionSource subscriptionSignal))
         {
             subscriptionSignal?.TrySetResult();
@@ -291,8 +305,12 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable
 
     void ProcessConnectionMessage(IDictionary<string, object> message)
     {
+        if (!(message.TryGetValue("clientId", out object clientIdObj) &&
+            clientIdObj is string clientId))
+            return;
+
+        ClientId = clientId;
         _state = ParseLiveQueryState.Connected;
-        ClientId = message["clientId"] as string;
         ConnectionSignal.TrySetResult();
     }
 
