@@ -117,10 +117,10 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// </remarks>
     public ParseLiveQueryController(int timeOut, IWebSocketClient webSocketClient, IParseDataDecoder decoder)
     {
+        WebSocketClient = webSocketClient ?? throw new ArgumentNullException(nameof(webSocketClient));
+        Decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
         TimeOut = timeOut;
-        WebSocketClient = webSocketClient;
         _state = ParseLiveQueryState.Closed;
-        Decoder = decoder;
     }
 
     private void ProcessMessage(IDictionary<string, object> message)
@@ -413,9 +413,13 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
                 ConnectionSignal = null;
             }
         }
-        else if (_state == ParseLiveQueryState.Connecting && ConnectionSignal is not null)
+        else if (_state == ParseLiveQueryState.Connecting)
         {
-            await ConnectionSignal.Task.WaitAsync(cancellationToken);
+            TaskCompletionSource signal = ConnectionSignal;
+            if (signal is not null)
+            {
+                await signal.Task.WaitAsync(cancellationToken);
+            }
         }
     }
 
@@ -607,7 +611,17 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         if (disposing)
         {
             // For sync disposal, the best effort cleanup without waiting
-            _ = Task.Run(async () => await CloseAsync());
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await CloseAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error during disposal: {ex}");
+                }
+            });
         }
         disposed = true;
     }
