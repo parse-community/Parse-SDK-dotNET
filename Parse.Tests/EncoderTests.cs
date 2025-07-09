@@ -28,6 +28,12 @@ public class EncoderTests
         protected override IDictionary<string, object> EncodeObject(ParseObject value) => null;
     }
 
+    [TestInitialize]
+    public void SetUp()
+    {
+        Client.Publicize();
+    }
+
     [TestMethod]
     public void TestIsValidType()
     {
