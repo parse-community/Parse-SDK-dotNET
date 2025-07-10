@@ -143,7 +143,6 @@ public class RelationTests
     public async Task UpdateUserRelationAsync_ThrowsException_WhenRelationFieldIsNull()
     {
         var user = new ParseUser() { Username = "TestUser", Password = "TestPass", Services = Client.Services };
-        await user.SignUpAsync();
 
         var relatedObjectsToAdd = new List<ParseObject>
             {
@@ -168,8 +167,6 @@ public class RelationTests
     public async Task DeleteUserRelationAsync_ThrowsException_WhenRelationFieldIsNull()
     {
         var user = new ParseUser() { Username = "TestUser", Password = "TestPass", Services = Client.Services };
-        await user.SignUpAsync();
-
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => UserManagement.DeleteUserRelationAsync(user, null));
     }
     [TestMethod]
