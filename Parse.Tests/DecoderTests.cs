@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using Parse.Abstractions.Internal;
 using Parse.Infrastructure;
+using Parse.Infrastructure.Control;
 using Parse.Infrastructure.Data;
 
 namespace Parse.Tests;
@@ -29,7 +33,7 @@ public class DecoderTests
     [TestMethod]
     public void TestDecodePrimitives()
     {
-        Assert.AreEqual(1, Client.Decoder.Decode(1));
+        Assert.AreEqual(1,Client.Decoder.Decode(1));
         Assert.AreEqual(0.3, Client.Decoder.Decode(0.3));
         Assert.AreEqual("halyosy", Client.Decoder.Decode("halyosy"));
 
@@ -37,8 +41,105 @@ public class DecoderTests
     }
 
     [TestMethod]
-    // Decoding ParseFieldOperation is not supported on .NET now. We only need this for LDS.
-    public void TestDecodeFieldOperation() => Assert.ThrowsException<NotImplementedException>(() => Client.Decoder.Decode(new Dictionary<string, object> { { "__op", "Increment" }, { "amount", "322" } }));
+    [Description("Tests that an Increment operation is decoded correctly from JSON.")]
+    public void TestDecodeFieldOperation_Increment()
+    {
+        // Arrange: The JSON data for an increment operation.
+        var incrementData = new Dictionary<string, object> { { "__op", "Increment" }, { "amount", 322 } };
+
+        // Act: Decode the data.
+        var result = Client.Decoder.Decode(incrementData);
+
+        // Assert: Verify that the result is a valid ParseIncrementOperation.
+        Assert.IsNotNull(result, "The decoded operation should not be null.");
+        Assert.IsInstanceOfType(result, typeof(ParseIncrementOperation), "The operation should be a ParseIncrementOperation.");
+
+        var incrementOp = result as ParseIncrementOperation;
+        Assert.AreEqual(322, Convert.ToInt32(incrementOp.Amount), "The increment amount should be 322.");
+    }
+
+    [TestMethod]
+    [Description("Tests that a Delete operation is decoded correctly from JSON.")]
+    public void TestDecodeFieldOperation_Delete()
+    {
+        // Arrange: The JSON data for a delete operation.
+        var deleteData = new Dictionary<string, object> { { "__op", "Delete" } };
+
+        // Act: Decode the data.
+        var result = Client.Decoder.Decode(deleteData);
+
+        // Assert: Verify that the result is the correct singleton instance.
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(ParseDeleteOperation));
+        Assert.AreSame(ParseDeleteOperation.Instance, result, "Should be the singleton instance of ParseDeleteOperation.");
+    }
+
+    [TestMethod]
+    [Description("Tests that an Add operation is decoded correctly from JSON.")]
+    public void TestDecodeFieldOperation_Add()
+    {
+        // Arrange: The JSON data for an add operation.
+        var addData = new Dictionary<string, object>
+    {
+        { "__op", "Add" },
+        { "objects", new List<object> { "item1", 123, true } }
+    };
+
+        // Act: Decode the data.
+        var result = Client.Decoder.Decode(addData) as ParseAddOperation;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(ParseAddOperation));
+        Assert.AreEqual(3, result.Objects.Count());
+        Assert.IsTrue(result.Objects.Contains("item1"));
+        Assert.IsTrue(result.Objects.Contains(123)); // JSON numbers are often parsed as long
+        Assert.IsTrue(result.Objects.Contains(true));
+    }
+
+
+    [TestMethod]
+    [Description("Tests that an AddUnique operation is decoded correctly from JSON.")]
+    public void TestDecodeFieldOperation_AddUnique()
+    {
+        // Arrange
+        var addUniqueData = new Dictionary<string, object>
+    {
+        { "__op", "AddUnique" },
+        { "objects", new List<object> { "item1", "item2" } }
+    };
+
+        // Act
+        var result = Client.Decoder.Decode(addUniqueData) as ParseAddUniqueOperation;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(ParseAddUniqueOperation));
+        Assert.AreEqual(2, result.Objects.Count());
+        Assert.IsTrue(result.Objects.Contains("item2"));
+    }
+
+
+    [TestMethod]
+    [Description("Tests that a Remove operation is decoded correctly from JSON.")]
+    public void TestDecodeFieldOperation_Remove()
+    {
+        // Arrange
+        var removeData = new Dictionary<string, object>
+    {
+        { "__op", "Remove" },
+        { "objects", new List<object> { "itemToRemove" } }
+    };
+
+        // Act
+        var result = Client.Decoder.Decode(removeData) as ParseRemoveOperation;
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsInstanceOfType(result, typeof(ParseRemoveOperation));
+        Assert.AreEqual(1, result.Objects.Count());
+        Assert.AreEqual("itemToRemove", result.Objects.First());
+    }
 
     [TestMethod]
     public void TestDecodeDate()
@@ -154,7 +255,7 @@ public class DecoderTests
         IDictionary<string, object> value = new Dictionary<string, object>()
         {
             ["megurine"] = "luka",
-            ["hatsune"] = new ParseObject("Miku"),
+            ["hatsune"] = new ParseObject("Miku",Client),
             ["decodedGeoPoint"] = new Dictionary<string, object>
             {
                 ["__type"] = "GeoPoint",
