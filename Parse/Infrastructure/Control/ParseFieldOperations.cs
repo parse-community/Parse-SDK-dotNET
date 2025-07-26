@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 using Parse.Abstractions.Infrastructure.Control;
+using Parse.Abstractions.Infrastructure.Data;
+using Parse.Abstractions.Platform.Objects;
 
 namespace Parse.Infrastructure.Control;
 
@@ -30,22 +34,77 @@ public class ParseObjectIdComparer : IEqualityComparer<object>
 
 static class ParseFieldOperations
 {
-    private static ParseObjectIdComparer comparer;
+    private static readonly ParseObjectIdComparer comparer = new();
+    public static IEqualityComparer<object> ParseObjectComparer => comparer;
 
-    public static IParseFieldOperation Decode(IDictionary<string, object> json)
+    /// <summary>
+    /// The factory method for creating IParseFieldOperation instances from JSON.
+    /// </summary>
+    /// <param name="json">The JSON dictionary representing the operation.</param>
+    /// <param name="decoder">The decoder to be used for nested objects.</param>
+    /// <returns>A concrete IParseFieldOperation.</returns>
+    public static IParseFieldOperation Decode(IDictionary<string, object> json, IParseDataDecoder decoder
+        , IParseObjectClassController classController)
     {
-        throw new NotImplementedException();
-    }
+        string opName = json["__op"] as string;
 
-    public static IEqualityComparer<object> ParseObjectComparer
-    {
-        get
+        switch (opName)
         {
-            if (comparer == null)
-            {
-                comparer = new ParseObjectIdComparer();
-            }
-            return comparer;
+            case "Delete":
+                return ParseDeleteOperation.Instance;
+
+            case "Increment":
+                return new ParseIncrementOperation(json["amount"]);
+
+            case "Add":
+            case "AddUnique":
+            case "Remove":
+                var objects = (json["objects"] as IEnumerable<object>)
+                    .Select(item => decoder.Decode(item, null)) // Recursively decode each item
+                    .ToList();
+                return opName switch
+                {
+                    "Add" => new ParseAddOperation(objects),
+                    "AddUnique" => new ParseAddUniqueOperation(objects),
+                    "Remove" => new ParseRemoveOperation(objects),
+                    _ => null // Should not happen
+                };
+
+            case "AddRelation":
+            case "RemoveRelation":
+                var relationObjects = (json["objects"] as IEnumerable<object>)
+                    .Select(item => decoder.Decode(item, null) as ParseObject)
+                    .ToList();
+                string targetClass = relationObjects.FirstOrDefault()?.ClassName;
+                var adds = opName == "AddRelation" ? relationObjects : new List<ParseObject>();
+                var removes = opName == "RemoveRelation" ? relationObjects : new List<ParseObject>();
+                return new ParseRelationOperation(classController, adds, removes);
+
+            case "Batch":
+                var allAdds = new List<ParseObject>();
+                var allRemoves = new List<ParseObject>();
+                foreach (var op in json["ops"] as IEnumerable<object>)
+                {
+                    var opJson = op as IDictionary<string, object>;
+                    string innerOpName = opJson["__op"] as string;
+                    var innerObjects = (opJson["objects"] as IEnumerable<object>)
+                        .Select(item => decoder.Decode(item, null) as ParseObject)
+                        .ToList();
+
+                    if (innerOpName == "AddRelation")
+                        allAdds.AddRange(innerObjects);
+                    if (innerOpName == "RemoveRelation")
+                        allRemoves.AddRange(innerObjects);
+                }
+                return new ParseRelationOperation(classController, allAdds, allRemoves);
+
+            default:
+                throw new NotSupportedException($"Decoding for operation '{opName}' is not supported.");
         }
     }
+
+
+
+
+
 }
