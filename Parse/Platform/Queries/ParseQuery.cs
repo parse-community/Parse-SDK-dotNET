@@ -920,7 +920,7 @@ public class ParseQuery<T> where T : ParseObject
     public ParseLiveQuery<T> GetLive()
     {
         ArgumentNullException.ThrowIfNull(Filters);
-        IDictionary<string, object> filters = BuildParameters().TryGetValue("where", out object where) ? where as IDictionary<string, object> : null;
+        IDictionary<string, object> filters = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services) as IDictionary<string, object>;
         return new ParseLiveQuery<T>(Services, ClassName, filters, KeySelections);
     }
 }

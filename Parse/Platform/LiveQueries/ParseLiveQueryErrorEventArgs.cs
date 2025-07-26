@@ -39,6 +39,14 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     /// </remarks>
     public bool Reconnect { get; }
 
+    /// <summary>
+    /// Gets the local exception that occurred during a live query operation, if any.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="LocalException"/> property contains the exception instance that was thrown locally,
+    /// providing additional context or details about the error that occurred during the live query operation.
+    /// This property may be <c>null</c> if no local exception was thrown.
+    /// </remarks>
     public Exception LocalException { get; }
 
     /// <summary>
