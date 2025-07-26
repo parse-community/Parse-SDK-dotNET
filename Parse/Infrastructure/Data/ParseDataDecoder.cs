@@ -20,7 +20,7 @@ public class ParseDataDecoder : IParseDataDecoder
 
     static string[] Types { get; } = { "Date", "Bytes", "Pointer", "File", "GeoPoint", "Object", "Relation" };
 
-    public object Decode(object data, IServiceHub serviceHub)
+    public object Decode(object data)
     {
         return data switch
         {
@@ -36,7 +36,7 @@ public class ParseDataDecoder : IParseDataDecoder
                 "Pointer" => DecodePointer(
                     dictionary.TryGetValue("className", out var className) ? className as string : throw new KeyNotFoundException("Missing 'className' for Pointer type"),
                     dictionary.TryGetValue("objectId", out var objectId) ? objectId as string : throw new KeyNotFoundException("Missing 'objectId' for Pointer type"),
-                    serviceHub),
+                    this.Services),
 
                 "File" => new ParseFile(
                     dictionary.TryGetValue("name", out var name) ? name as string : throw new KeyNotFoundException("Missing 'name' for File type"),
@@ -47,23 +47,23 @@ public class ParseDataDecoder : IParseDataDecoder
                     Conversion.To<double>(dictionary.TryGetValue("longitude", out var longitude) ? longitude : throw new KeyNotFoundException("Missing 'longitude' for GeoPoint type"))),
 
                 "Object" => ClassController.GenerateObjectFromState<ParseObject>(
-                    ParseObjectCoder.Instance.Decode(dictionary, this, serviceHub),
+                    ParseObjectCoder.Instance.Decode(dictionary, this, this.Services),
                     dictionary.TryGetValue("className", out var objClassName) ? objClassName as string : throw new KeyNotFoundException("Missing 'className' for Object type"),
-                    serviceHub),
+                     this.Services),
 
-                "Relation" => serviceHub.CreateRelation(null, null, dictionary.TryGetValue("className", out var relClassName) ? relClassName as string : throw new KeyNotFoundException("Missing 'className' for Relation type")),
+                "Relation" => this.Services.CreateRelation(null, null, dictionary.TryGetValue("className", out var relClassName) ? relClassName as string : throw new KeyNotFoundException("Missing 'className' for Relation type")),
                 _ => throw new NotSupportedException($"Unsupported Parse type '{type}' encountered")
             },
 
-            IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value, serviceHub)),
-            IList<object> { } list => list.Select(item => Decode(item, serviceHub)).ToList(),
+            IDictionary<string, object> { } dictionary => dictionary.ToDictionary(pair => pair.Key, pair => Decode(pair.Value)),
+            IList<object> { } list => list.Select(item => Decode(item)).ToList(),
             _ => data
         };
 
     }
 
-    protected virtual object DecodePointer(string className, string objectId, IServiceHub serviceHub) =>
-        ClassController.CreateObjectWithoutData(className, objectId, serviceHub);
+    protected virtual object DecodePointer(string className, string objectId, IServiceHub services) =>
+        ClassController.CreateObjectWithoutData(className, objectId, this.Services);
 
     public static DateTime? ParseDate(string input)
     {

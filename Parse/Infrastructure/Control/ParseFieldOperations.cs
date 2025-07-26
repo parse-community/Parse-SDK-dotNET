@@ -60,7 +60,7 @@ static class ParseFieldOperations
             case "AddUnique":
             case "Remove":
                 var objects = (json["objects"] as IEnumerable<object>)
-                    .Select(item => decoder.Decode(item, null)) // Recursively decode each item
+                    .Select(item => decoder.Decode(item)) // Recursively decode each item
                     .ToList();
                 return opName switch
                 {
@@ -73,7 +73,7 @@ static class ParseFieldOperations
             case "AddRelation":
             case "RemoveRelation":
                 var relationObjects = (json["objects"] as IEnumerable<object>)
-                    .Select(item => decoder.Decode(item, null) as ParseObject)
+                    .Select(item => decoder.Decode(item) as ParseObject)
                     .ToList();
                 string targetClass = relationObjects.FirstOrDefault()?.ClassName;
                 var adds = opName == "AddRelation" ? relationObjects : new List<ParseObject>();
@@ -88,7 +88,7 @@ static class ParseFieldOperations
                     var opJson = op as IDictionary<string, object>;
                     string innerOpName = opJson["__op"] as string;
                     var innerObjects = (opJson["objects"] as IEnumerable<object>)
-                        .Select(item => decoder.Decode(item, null) as ParseObject)
+                        .Select(item => decoder.Decode(item) as ParseObject)
                         .ToList();
 
                     if (innerOpName == "AddRelation")
