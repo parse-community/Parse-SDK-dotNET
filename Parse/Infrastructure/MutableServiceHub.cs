@@ -80,6 +80,7 @@ public class MutableServiceHub : IMutableServiceHub
         WebClient ??= new UniversalWebClient { };
         CacheController ??= new CacheController { };
         ClassController ??= new ParseObjectClassController { };
+        Decoder ??= new ParseDataDecoder(this);
 
 
         InstallationController ??= new ParseInstallationController(CacheController);
