@@ -135,7 +135,7 @@ namespace Parse.Tests
             {
                 ["params"] = new Dictionary<string, object> { { "test", 1 } },
             };
-            mockDecoder.Setup(d => d.Decode(It.IsAny<object>(), It.IsAny<IServiceHub>())).Returns(new Dictionary<string, object> { { "test", 1 } });
+            mockDecoder.Setup(d => d.Decode(It.IsAny<object>())).Returns(new Dictionary<string, object> { { "test", 1 } });
 
             var config = ParseConfiguration.Create(dict, mockDecoder.Object, mockServices.Object);
             Assert.AreEqual(1, config["test"]);

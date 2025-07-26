@@ -24,7 +24,10 @@ public class GeoPointTests
             Thread.CurrentThread.CurrentCulture = culture;
 
             ParseGeoPoint point = new ParseGeoPoint(1.234, 1.234);
-            IDictionary<string, object> deserialized = Client.Decoder.Decode(JsonUtilities.Parse(JsonUtilities.Encode(new Dictionary<string, object> { [nameof(point)] = NoObjectsEncoder.Instance.Encode(point, Client) })), Client) as IDictionary<string, object>;
+            IDictionary<string, object> deserialized = Client.Decoder.Decode(
+                JsonUtilities.Parse(
+                    JsonUtilities.Encode(
+                        new Dictionary<string, object> { [nameof(point)] = NoObjectsEncoder.Instance.Encode(point, Client) }))) as IDictionary<string, object>;
             ParseGeoPoint pointAgain = (ParseGeoPoint) deserialized[nameof(point)];
 
             Assert.AreEqual(1.234, pointAgain.Latitude);

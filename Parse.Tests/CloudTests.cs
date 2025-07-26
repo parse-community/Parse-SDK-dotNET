@@ -61,7 +61,7 @@ public class CloudTests
                 }));
 
         _decoderMock
-            .Setup(decoder => decoder.Decode(It.IsAny<object>(), It.IsAny<IServiceHub>()))
+            .Setup(decoder => decoder.Decode(It.IsAny<object>()))
             .Returns(new Dictionary<string, object> { ["unexpectedKey"] = "unexpectedValue" });
     }
 
