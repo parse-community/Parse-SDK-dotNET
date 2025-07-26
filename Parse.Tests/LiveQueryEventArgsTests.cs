@@ -25,7 +25,7 @@ public class LiveQueryEventArgsTests
     public void TearDown() => (Client.Services as ServiceHub).Reset();
 
     [TestMethod]
-    public void TestParseLiveQueryErrorEventArgsConstructor()
+    public void TestParseLiveQueryEventArgsConstructor()
     {
         IObjectState state = new MutableObjectState
         {
