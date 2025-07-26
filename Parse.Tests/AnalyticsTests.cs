@@ -13,10 +13,6 @@ namespace Parse.Tests;
 [TestClass]
 public class AnalyticsTests
 {
-#warning Skipped post-test-evaluation cleaning method may be needed.
-
-    // [TestCleanup]
-    // public void TearDown() => (Client.Services as ServiceHub).Reset();
 
     [TestMethod]
     public async Task TestTrackEvent()
