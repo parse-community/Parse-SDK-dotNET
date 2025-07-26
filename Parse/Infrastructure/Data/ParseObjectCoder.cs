@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Control;
 using Parse.Abstractions.Infrastructure.Data;
@@ -8,10 +9,6 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Platform.Objects;
 
 namespace Parse.Infrastructure.Data;
-
-// TODO: (richardross) refactor entire parse coder interfaces.
-// Done: (YB) though, I wonder why Encode is never used in the ParseObjectCoder class. Might update if I find a use case.
-//Got it now. The Encode method is used in ParseObjectController.cs
 
 
 /// <summary>
@@ -116,24 +113,24 @@ public class ParseObjectCoder
     /// Extracts a value from a dictionary and removes the key.
     /// </summary>
     private static T Extract<T>(IDictionary<string, object> data, string key, Func<object, T> action)
-{
-    if (data.TryGetValue(key, out var value))
     {
-        data.Remove(key);
-        return action(value);
+        if (data.TryGetValue(key, out var value))
+        {
+            data.Remove(key);
+            return action(value);
+        }
+
+        return default;
     }
 
-    return default;
-}
-
-/// <summary>
-/// Populates server data with a value if not already present.
-/// </summary>
-private static void PopulateServerData(IDictionary<string, object> serverData, string key, object value)
-{
-    if (value != null && !serverData.ContainsKey(key))
+    /// <summary>
+    /// Populates server data with a value if not already present.
+    /// </summary>
+    private static void PopulateServerData(IDictionary<string, object> serverData, string key, object value)
     {
-        serverData[key] = value;
+        if (value != null && !serverData.ContainsKey(key))
+        {
+            serverData[key] = value;
+        }
     }
-}
 }
