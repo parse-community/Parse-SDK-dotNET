@@ -21,7 +21,7 @@ public class LiveQueryTests
     }
 
     [TestCleanup]
-    public void Clean() => (Client.Services as ServiceHub).Reset();
+    public void TearDown() => (Client.Services as ServiceHub).Reset();
 
     [TestMethod]
     public void TestConstructor()
