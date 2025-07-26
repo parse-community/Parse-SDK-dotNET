@@ -254,14 +254,16 @@ public class ParseFailureException : Exception
         /// Twitter) is unsupported.
         /// </summary>
         UnsupportedService = 252,
-        /// <summary>
-        /// ERROR 404
-        /// </summary>
-        ERROR404 = 404,
+
         /// <summary>
         /// Bad Request
         /// </summary>  
-        BadRequest = 400
+        BadRequest = 400,
+
+        /// <summary>
+        /// ERROR 404
+        /// </summary>
+        ERROR404 = 404
     }
 
     internal ParseFailureException(ErrorCode code, string message, Exception cause = null) : base(message, cause) => Code = code;
