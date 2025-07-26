@@ -41,7 +41,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests constructor, that classes are instantiated correctly.")]
-    public void Constructor_CreatesObjectCorrectly() // Mock difficulty: 1
+    public void Constructor_CreatesObjectCorrectly() // 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test");
 
@@ -52,7 +52,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests that ThenBy throws exception if there is no orderby set before hand.")]
-    public void ThenBy_ThrowsIfNotSetOrderBy()// Mock difficulty: 1
+    public void ThenBy_ThrowsIfNotSetOrderBy()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test");
         Assert.ThrowsException<ArgumentException>(() => query.ThenBy("test"));
@@ -61,7 +61,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests that where contains correctly constructs the query for given values")]
-    public void WhereContains_SetsRegexSearchValue()// Mock difficulty: 1
+    public void WhereContains_SetsRegexSearchValue()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereContains("test", "test");
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -71,7 +71,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests WhereDoesNotExist correctly builds query")]
-    public void WhereDoesNotExist_SetsNewWhereWithDoesNotExist()// Mock difficulty: 1
+    public void WhereDoesNotExist_SetsNewWhereWithDoesNotExist()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereDoesNotExist("test");
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -83,7 +83,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Test WhereEndsWith correctly set query.")]
-    public void WhereEndsWith_SetsCorrectRegexEnd()// Mock difficulty: 1
+    public void WhereEndsWith_SetsCorrectRegexEnd()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereEndsWith("test", "test");
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -93,14 +93,14 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests WhereEqualTo correctly builds the query.")]
-    public void WhereEqualTo_SetsKeyValueOnWhere() // Mock difficulty: 1
+    public void WhereEqualTo_SetsKeyValueOnWhere() // 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereEqualTo("test", "value");
         Assert.AreEqual("value", query.GetConstraint("test"));
     }
     [TestMethod]
     [Description("Tests WhereExists correctly builds query.")]
-    public void WhereExists_SetsKeyValueOnWhere()// Mock difficulty: 1
+    public void WhereExists_SetsKeyValueOnWhere()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereExists("test");
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -110,7 +110,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests WhereGreaterThan correctly builds the query.")]
-    public void WhereGreaterThan_SetsLowerBound()// Mock difficulty: 1
+    public void WhereGreaterThan_SetsLowerBound()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereGreaterThan("test", 10);
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -120,7 +120,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests where greater or equal than sets lower bound properly")]
-    public void WhereGreaterThanOrEqualTo_SetsLowerBound()// Mock difficulty: 1
+    public void WhereGreaterThanOrEqualTo_SetsLowerBound()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereGreaterThanOrEqualTo("test", 10);
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -129,7 +129,7 @@ public class ParseQueryTests
     }
     [TestMethod]
     [Description("Tests if WhereLessThan correctly build the query")]
-    public void WhereLessThan_SetsLowerBound()// Mock difficulty: 1
+    public void WhereLessThan_SetsLowerBound()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereLessThan("test", 10);
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -140,7 +140,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests where less than or equal to sets query properly")]
-    public void WhereLessThanOrEqualTo_SetsLowerBound()// Mock difficulty: 1
+    public void WhereLessThanOrEqualTo_SetsLowerBound()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereLessThanOrEqualTo("test", 10);
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -149,7 +149,7 @@ public class ParseQueryTests
     }
     [TestMethod]
     [Description("Tests if WhereMatches builds query using regex and modifiers correctly")]
-    public void WhereMatches_SetsRegexAndModifiersCorrectly()// Mock difficulty: 1
+    public void WhereMatches_SetsRegexAndModifiersCorrectly()// 1
     {
         var regex = new Regex("test", RegexOptions.ECMAScript | RegexOptions.IgnoreCase);
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereMatches("test", regex, "im");
@@ -163,7 +163,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests if exception is throw on Regex doesn't have proper flags.")]
-    public void WhereMatches_RegexWithoutFlag_Throws()// Mock difficulty: 1
+    public void WhereMatches_RegexWithoutFlag_Throws()// 1
     {
         var regex = new Regex("test");
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test");
@@ -173,7 +173,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests if WhereNear builds query with $nearSphere property.")]
-    public void WhereNear_CreatesQueryNearValue()// Mock difficulty: 1
+    public void WhereNear_CreatesQueryNearValue()// 1
     {
         var point = new ParseGeoPoint(1, 2);
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereNear("test", point);
@@ -185,7 +185,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests WhereNotEqualTo correctly builds the query.")]
-    public void WhereNotEqualTo_SetsValueOnWhere()// Mock difficulty: 1
+    public void WhereNotEqualTo_SetsValueOnWhere()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereNotEqualTo("test", "value");
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -195,7 +195,7 @@ public class ParseQueryTests
 
     [TestMethod]
     [Description("Tests where starts with sets regex values")]
-    public void WhereStartsWith_SetsCorrectRegexValue()// Mock difficulty: 1
+    public void WhereStartsWith_SetsCorrectRegexValue()// 1
     {
         var query = new ParseQuery<ParseObject>(MockHub.Object, "test").WhereStartsWith("test", "test");
         var results = query.GetConstraint("test") as IDictionary<string, object>;
@@ -204,7 +204,7 @@ public class ParseQueryTests
     }
     [TestMethod]
     [Description("Tests if WhereWithinGeoBox builds query with the correct values")]
-    public void WhereWithinGeoBox_SetsWithingValues()// Mock difficulty: 1
+    public void WhereWithinGeoBox_SetsWithingValues()// 1
     {
         var point1 = new ParseGeoPoint(1, 2);
         var point2 = new ParseGeoPoint(3, 4);

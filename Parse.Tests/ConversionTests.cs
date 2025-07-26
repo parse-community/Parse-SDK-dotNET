@@ -1,7 +1,5 @@
 using System;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Parse.Infrastructure.Utilities;
 
 namespace Parse.Tests
@@ -28,9 +26,8 @@ namespace Parse.Tests
             // Test invalid conversion between two nullable value types
             Assert.ThrowsExactly<InvalidCastException>(() =>
             {
-                Conversion.To<DummyValueTypeA?>((DummyValueTypeB) new DummyValueTypeB());
+                Conversion.To<DummyValueTypeA?>(new DummyValueTypeB());
             });
-           
         }
 
         [TestMethod]
@@ -41,7 +38,7 @@ namespace Parse.Tests
 
             // Act
             string jsonEncoded = JsonUtilities.Encode(inputValue);
-            float convertedValue = (float) Conversion.ConvertTo<float>(jsonEncoded);
+            float convertedValue = (float)Conversion.ConvertTo<float>(jsonEncoded);
 
             // Assert
             Assert.AreEqual(inputValue, convertedValue, "Converted value does not match the input value.");

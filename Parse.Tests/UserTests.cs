@@ -37,11 +37,11 @@ public class UserTests
     [TestInitialize]
     public void SetUp()
     {
-
+        
         Client = new ParseClient(new ServerConnectionData { Test = true });
         Client.Publicize();  // Ensure the Clientinstance is globally available
 
-
+        
         Client.AddValidClass<ParseSession>();
         Client.AddValidClass<ParseUser>();
 
@@ -61,10 +61,10 @@ public class UserTests
     private ParseUser CreateParseUser(MutableObjectState state)
     {
         var user = ParseObject.Create<ParseUser>();
-
+        
         user.HandleFetchResult(state);
         user.Bind(Client);
-
+        
 
         return user;
     }
@@ -123,9 +123,9 @@ public class UserTests
         var user = CreateParseUser(state);
         user.Bind(client);
 
-
+        
         await user.SignUpAsync();
-
+        
 
         // Verify SignUpAsync is invoked
         mockController.Verify(
@@ -221,7 +221,7 @@ public class UserTests
     public async Task TestRequestPasswordResetAsync()
     {
         var hub = new MutableServiceHub();
-        var Client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        var Client= new ParseClient(new ServerConnectionData { Test = true }, hub);
 
         var mockController = new Mock<IParseUserController>();
         hub.UserController = mockController.Object;
@@ -359,7 +359,7 @@ public class UserTests
                 It.IsAny<string>(),
                 It.IsAny<IServiceHub>(),
                 It.IsAny<CancellationToken>()))
-
+            
             .Verifiable();
 
         // Act

@@ -6,30 +6,9 @@ using Parse.Infrastructure;
 
 namespace Parse.Tests;
 
-
 [TestClass]
 public class ProgressTests
 {
-    private Mock<IProgress<IDataTransferLevel>> mockProgress;
-    private int _callbackCallCount;
-
-
-    [TestInitialize]
-    public void Initialize()
-    {
-        mockProgress = new Mock<IProgress<IDataTransferLevel>>();
-        _callbackCallCount = 0;
-        mockProgress.Setup(obj => obj.Report(It.IsAny<IDataTransferLevel>()))
-                    .Callback(() => _callbackCallCount++);
-
-    }
-
-    [TestCleanup]
-    public void Cleanup()
-    {
-        mockProgress = null; // Ensure mock is released
-    }
-
     [TestMethod]
     public void TestDownloadProgressEventGetterSetter()
     {
@@ -53,6 +32,9 @@ public class ProgressTests
     [TestMethod]
     public void TestObservingDownloadProgress()
     {
+        int called = 0;
+        Mock<IProgress<IDataTransferLevel>> mockProgress = new Mock<IProgress<IDataTransferLevel>>();
+        mockProgress.Setup(obj => obj.Report(It.IsAny<IDataTransferLevel>())).Callback(() => called++);
         IProgress<IDataTransferLevel> progress = mockProgress.Object;
 
         progress.Report(new DataTransferLevel { Amount = 0.2f });
@@ -61,12 +43,15 @@ public class ProgressTests
         progress.Report(new DataTransferLevel { Amount = 0.68f });
         progress.Report(new DataTransferLevel { Amount = 0.88f });
 
-        Assert.AreEqual(5, _callbackCallCount);
+        Assert.AreEqual(5, called);
     }
 
     [TestMethod]
     public void TestObservingUploadProgress()
     {
+        int called = 0;
+        Mock<IProgress<IDataTransferLevel>> mockProgress = new Mock<IProgress<IDataTransferLevel>>();
+        mockProgress.Setup(obj => obj.Report(It.IsAny<IDataTransferLevel>())).Callback(() => called++);
         IProgress<IDataTransferLevel> progress = mockProgress.Object;
 
         progress.Report(new DataTransferLevel { Amount = 0.2f });
@@ -75,6 +60,6 @@ public class ProgressTests
         progress.Report(new DataTransferLevel { Amount = 0.68f });
         progress.Report(new DataTransferLevel { Amount = 0.88f });
 
-        Assert.AreEqual(5, _callbackCallCount);
+        Assert.AreEqual(5, called);
     }
 }

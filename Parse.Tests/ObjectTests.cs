@@ -29,7 +29,7 @@ public class ObjectTests
 
     [ParseClassName(nameof(UnregisteredSubClass))]
     class UnregisteredSubClass : ParseObject { }
-    private ParseClient Client { get; set; }
+        private ParseClient Client { get; set; }
 
     [TestInitialize]
     public void SetUp()
@@ -40,8 +40,8 @@ public class ObjectTests
         // Register the valid classes
         Client.RegisterSubclass(typeof(ParseSession));
         Client.RegisterSubclass(typeof(ParseUser));
-
-
+        
+       
     }
     [TestCleanup]
     public void TearDown() => (Client.Services as ServiceHub).Reset();
@@ -728,15 +728,15 @@ public class ObjectTests
     [TestMethod]
     public void TestFetchAll()
     {
-
+        
     }
 
 
     #region New Tests
-
+   
     [TestMethod]
     [Description("Tests Bind method attach an IServiceHub object")]
-    public void Bind_AttachesServiceHubCorrectly() // Mock difficulty: 1
+    public void Bind_AttachesServiceHubCorrectly() // 1
     {
         var mockHub = new Mock<IServiceHub>();
         var obj = new ParseObject("TestClass");
@@ -747,30 +747,30 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests that accessing ACL returns default values if no ACL is set.")]
-    public void ACL_ReturnsDefaultValueWhenNotSet() // Mock difficulty: 1
+    public void ACL_ReturnsDefaultValueWhenNotSet() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         Assert.IsNull(obj.ACL);
     }
     [TestMethod]
     [Description("Tests that setting and getting the class name returns the correct value.")]
-    public void ClassName_ReturnsCorrectValue() // Mock difficulty: 1
+    public void ClassName_ReturnsCorrectValue() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         Assert.AreEqual("TestClass", obj.ClassName);
     }
     [TestMethod]
     [Description("Tests that CreatedAt and UpdatedAt returns null if they are not yet set.")]
-    public void CreatedAt_UpdatedAt_ReturnNullIfNotSet() // Mock difficulty: 1
+    public void CreatedAt_UpdatedAt_ReturnNullIfNotSet() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         Assert.IsNull(obj.CreatedAt);
         Assert.IsNull(obj.UpdatedAt);
     }
-
+    
     [TestMethod]
     [Description("Tests that IsDirty is true after a value is set.")]
-    public void IsDirty_ReturnsTrueAfterSet() // Mock difficulty: 1
+    public void IsDirty_ReturnsTrueAfterSet() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         Assert.IsTrue(obj.IsDirty);
@@ -780,7 +780,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that IsNew is true by default and changed when value is set")]
-    public void IsNew_ReturnsCorrectValue() // Mock difficulty: 1
+    public void IsNew_ReturnsCorrectValue() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         Assert.IsFalse(obj.IsNew);
@@ -790,7 +790,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that Keys returns a collection of strings.")]
-    public void Keys_ReturnsCollectionOfKeys() // Mock difficulty: 1
+    public void Keys_ReturnsCollectionOfKeys() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = "test";
@@ -799,7 +799,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that objectId correctly stores data.")]
-    public void ObjectId_ReturnsCorrectValue() // Mock difficulty: 1
+    public void ObjectId_ReturnsCorrectValue() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj.ObjectId = "testObjectId";
@@ -809,7 +809,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests the [] indexer get and set operations")]
-    public void Indexer_GetSetOperations() // Mock difficulty: 1
+    public void Indexer_GetSetOperations() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
 
@@ -821,7 +821,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests the Add method correctly adds keys.")]
-    public void Add_AddsNewKey() // Mock difficulty: 1
+    public void Add_AddsNewKey() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj.Add("newKey", "value");
@@ -831,7 +831,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests that AddRangeToList adds values.")]
-    public void AddRangeToList_AddsValuesToList() // Mock difficulty: 1
+    public void AddRangeToList_AddsValuesToList() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj.AddRangeToList("testList", new[] { 1, 2, 3 });
@@ -840,7 +840,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that AddRangeUniqueToList adds unique values.")]
-    public void AddRangeUniqueToList_AddsUniqueValues() // Mock difficulty: 1
+    public void AddRangeUniqueToList_AddsUniqueValues() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj.AddRangeUniqueToList("testList", new[] { 1, 2, 1, 3 });
@@ -848,7 +848,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests that AddToList adds a value to the list.")]
-    public void AddToList_AddsValueToList() // Mock difficulty: 1
+    public void AddToList_AddsValueToList() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj.AddToList("testList", 1);
@@ -857,7 +857,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that AddUniqueToList adds a unique value to the list.")]
-    public void AddUniqueToList_AddsUniqueValueToList() // Mock difficulty: 1
+    public void AddUniqueToList_AddsUniqueValueToList() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj.AddUniqueToList("testList", 1);
@@ -868,7 +868,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that ContainsKey returns true if the key exists.")]
-    public void ContainsKey_ReturnsCorrectly() // Mock difficulty: 1
+    public void ContainsKey_ReturnsCorrectly() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = "test";
@@ -878,7 +878,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests Get method that attempts to convert to a type and throws exceptions")]
-    public void Get_ReturnsCorrectTypeOrThrows() // Mock difficulty: 1
+    public void Get_ReturnsCorrectTypeOrThrows() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["testInt"] = 1;
@@ -890,11 +890,11 @@ public class ObjectTests
         Assert.ThrowsException<InvalidCastException>(() => obj.Get<int>("testString"));
     }
 
-
+  
 
     [TestMethod]
     [Description("Tests that HasSameId returns correctly")]
-    public void HasSameId_ReturnsCorrectly() // Mock difficulty: 1
+    public void HasSameId_ReturnsCorrectly() // 1
     {
         var obj1 = new ParseObject("TestClass", Client.Services);
         var obj2 = new ParseObject("TestClass", Client.Services);
@@ -907,7 +907,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests Increment method by 1.")]
-    public void Increment_IncrementsValueByOne() // Mock difficulty: 1
+    public void Increment_IncrementsValueByOne() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["testInt"] = 1;
@@ -916,7 +916,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests Increment by long value")]
-    public void Increment_IncrementsValueByLong() // Mock difficulty: 1
+    public void Increment_IncrementsValueByLong() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["testInt"] = 1;
@@ -926,7 +926,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests increment by double value.")]
-    public void Increment_IncrementsValueByDouble() // Mock difficulty: 1
+    public void Increment_IncrementsValueByDouble() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["testDouble"] = 1.0;
@@ -936,7 +936,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that IsKeyDirty correctly retrieves dirty keys")]
-    public void IsKeyDirty_ReturnsCorrectly() // Mock difficulty: 1
+    public void IsKeyDirty_ReturnsCorrectly() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         Assert.IsFalse(obj.IsKeyDirty("test"));
@@ -945,7 +945,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests the Remove method from the object")]
-    public void Remove_RemovesKeyFromObject() // Mock difficulty: 1
+    public void Remove_RemovesKeyFromObject() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = "test";
@@ -956,7 +956,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests the Revert method that discards all the changes")]
-    public void Revert_ClearsAllChanges() // Mock difficulty: 1
+    public void Revert_ClearsAllChanges() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = "test";
@@ -966,7 +966,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests TryGetValue returns correctly.")]
-    public void TryGetValue_ReturnsCorrectly() // Mock difficulty: 1
+    public void TryGetValue_ReturnsCorrectly() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = 1;
@@ -974,11 +974,11 @@ public class ObjectTests
         Assert.AreEqual(1, result);
         Assert.IsFalse(obj.TryGetValue("nonExistantKey", out int result2));
     }
-
-
+   
+   
     [TestMethod]
     [Description("Tests MergeFromObject copies the data of other ParseObject")]
-    public void MergeFromObject_CopiesDataFromOtherObject() // Mock difficulty: 2
+    public void MergeFromObject_CopiesDataFromOtherObject() // 2
     {
         var obj1 = new ParseObject("TestClass", Client.Services);
         var obj2 = new ParseObject("TestClass", Client.Services);
@@ -989,7 +989,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests MutateState and checks if estimated data is updated after mutation")]
-    public void MutateState_UpdatesEstimatedData() // Mock difficulty: 1
+    public void MutateState_UpdatesEstimatedData() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = 1;
@@ -1000,7 +1000,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests that OnSettingValue Throws exceptions if key is null")]
-    public void OnSettingValue_ThrowsIfKeyIsNull() // Mock difficulty: 1
+    public void OnSettingValue_ThrowsIfKeyIsNull() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         string key = null;
@@ -1013,7 +1013,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests PerformOperation with ParseSetOperation correctly sets value")]
-    public void PerformOperation_SetsValueWithSetOperation() // Mock difficulty: 2
+    public void PerformOperation_SetsValueWithSetOperation() // 2
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj.PerformOperation("test", new ParseSetOperation("value"));
@@ -1022,7 +1022,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests PerformOperation with ParseDeleteOperation deletes the value")]
-    public void PerformOperation_DeletesValueWithDeleteOperation() // Mock difficulty: 2
+    public void PerformOperation_DeletesValueWithDeleteOperation() // 2
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = "test";
@@ -1032,7 +1032,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests the RebuildEstimatedData method rebuilds all data")]
-    public void RebuildEstimatedData_RebuildsData() // Mock difficulty: 1
+    public void RebuildEstimatedData_RebuildsData() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
         obj["test"] = 1;
@@ -1042,7 +1042,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests set method validates the key/value and throws an Argument Exception")]
-    public void Set_ThrowsArgumentExceptionForInvalidType() // Mock difficulty: 1
+    public void Set_ThrowsArgumentExceptionForInvalidType() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
 
@@ -1050,7 +1050,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests set method sets a new value")]
-    public void Set_SetsCorrectValue() // Mock difficulty: 1
+    public void Set_SetsCorrectValue() // 1
     {
         var obj = new ParseObject("TestClass", Client.Services);
 
@@ -1062,7 +1062,7 @@ public class ObjectTests
     #endregion
     [TestMethod]
     [Description("Tests that ParseObjectClass correctly extract properties and fields.")]
-    public void Constructor_ExtractsPropertiesCorrectly() // Mock difficulty: 1
+    public void Constructor_ExtractsPropertiesCorrectly() // 1
     {
         ConstructorInfo constructor = typeof(TestParseObject).GetConstructor(Type.EmptyTypes);
         ParseObjectClass obj = new ParseObjectClass(typeof(TestParseObject), constructor);
@@ -1073,7 +1073,7 @@ public class ObjectTests
 
     [TestMethod]
     [Description("Tests that Instantiate can correctly instatiate with parameterless constructor.")]
-    public void Instantiate_WithParameterlessConstructor_CreatesInstance() // Mock difficulty: 1
+    public void Instantiate_WithParameterlessConstructor_CreatesInstance() // 1
     {
         ConstructorInfo constructor = typeof(TestParseObject).GetConstructor(Type.EmptyTypes);
         ParseObjectClass obj = new ParseObjectClass(typeof(TestParseObject), constructor);
@@ -1083,7 +1083,7 @@ public class ObjectTests
     }
     [TestMethod]
     [Description("Tests that Instantiate can correctly instantiate with IServiceHub constructor.")]
-    public void Instantiate_WithServiceHubConstructor_CreatesInstance() // Mock difficulty: 1
+    public void Instantiate_WithServiceHubConstructor_CreatesInstance() // 1
     {
         ConstructorInfo constructor = typeof(ParseObject).GetConstructor(new[] { typeof(string), typeof(IServiceHub) });
         ParseObjectClass obj = new ParseObjectClass(typeof(ParseObject), constructor);

@@ -80,7 +80,7 @@ namespace Parse.Tests
             await task.OnSuccess(t =>
             {
                 continuationExecuted = true;
-                return;
+                return ;
             });
 
             Assert.IsTrue(continuationExecuted);
@@ -102,7 +102,7 @@ namespace Parse.Tests
 
             Assert.AreEqual(3, counter);
         }
-
+    
 
         [TestMethod]
         [Description("Tests that OnSuccess with Action<Task> executes the continuation for a successful task.")]
@@ -166,6 +166,6 @@ namespace Parse.Tests
             await Assert.ThrowsExceptionAsync<TaskCanceledException>(async () => await resultTask);
         }
 
-
+       
     }
 }
