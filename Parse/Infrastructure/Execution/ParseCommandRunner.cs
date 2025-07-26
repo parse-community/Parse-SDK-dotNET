@@ -77,19 +77,7 @@ public class ParseCommandRunner : IParseCommandRunner
         var responseCode = (int) statusCode;
 
 
-        if (responseCode <= 100 && responseCode <200)
-        {
-
-        }
-        if (responseCode == 200)
-        {
-
-        }
-        else if (responseCode == 201)
-        {
-            // Created
-        }
-        else if (responseCode == 400)
+        if (responseCode == 400)
         {
             ParseErrorPayload payload = null;
             try
@@ -111,7 +99,7 @@ public class ParseCommandRunner : IParseCommandRunner
         }
         else if (responseCode == 401)
         {
-            throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, content);
+            throw new ParseFailureException(ParseFailureException.ErrorCode.InvalidSessionToken, content);
         }
         else if (responseCode == 403)
         {
