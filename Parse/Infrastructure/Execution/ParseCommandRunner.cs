@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Execution;
 using Parse.Abstractions.Platform.Installations;
@@ -71,12 +73,53 @@ public class ParseCommandRunner : IParseCommandRunner
         IDictionary<string, object> contentJson = null;
         // Extract response
         var statusCode = response.Item1;
-         var content = response.Item2;
+        var content = response.Item2;
         var responseCode = (int) statusCode;
-        
-        if (responseCode == 404)
+
+
+        if (responseCode <= 100 && responseCode <200)
         {
-            throw new ParseFailureException(ParseFailureException.ErrorCode.ERROR404, "Error 404");
+
+        }
+        if (responseCode == 200)
+        {
+
+        }
+        else if (responseCode == 201)
+        {
+            // Created
+        }
+        else if (responseCode == 400)
+        {
+            ParseErrorPayload payload = null;
+            try
+            {
+                payload = JsonSerializer.Deserialize<ParseErrorPayload>(content);
+            }
+            catch (JsonException)
+            {
+                throw new ParseFailureException(
+                    ParseFailureException.ErrorCode.BadRequest,
+                    "Bad Request: unable to parse error payload");
+            }
+
+            ParseFailureException.ErrorCode code = (ParseFailureException.ErrorCode) payload.code;
+
+
+            throw new ParseFailureException(code: code, payload.error);
+
+        }
+        else if (responseCode == 401)
+        {
+            throw new ParseFailureException(ParseFailureException.ErrorCode.ObjectNotFound, content);
+        }
+        else if (responseCode == 403)
+        {
+            throw new ParseFailureException(ParseFailureException.ErrorCode.OperationForbidden, content);
+        }
+        else if (responseCode == 404)
+        {
+            throw new ParseFailureException(ParseFailureException.ErrorCode.ERROR404, "Error 404 " +response.Item1+ response.Item2);
         }
         if (responseCode == 410)
         {
@@ -193,7 +236,6 @@ public class ParseCommandRunner : IParseCommandRunner
 
         return newCommand;
 
-        //by the way, The original installationFetchTask variable was removed, as the async/await pattern eliminates the need for it.
     }
 
 }
