@@ -43,7 +43,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// - Unsubscribing from a query.
     /// Ensure that the value is configured appropriately to avoid premature timeout errors in network-dependent processes.
     /// </remarks>
-    private int TimeOut { get; }
+    private TimeSpan Timeout { get; }
 
     /// <summary>
     /// Event triggered when an error occurs during the operation of the ParseLiveQueryController.
@@ -110,7 +110,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParseLiveQueryController"/> class.
     /// </summary>
-    /// <param name="timeOut"></param>
+    /// <param name="timeout"></param>
     /// <param name="webSocketClient">
     /// The <see cref="IWebSocketClient"/> implementation to use for the live query connection.
     /// </param>
@@ -118,11 +118,11 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// <remarks>
     /// This constructor is used to initialize a new instance of the <see cref="ParseLiveQueryController"/> class
     /// </remarks>
-    public ParseLiveQueryController(int timeOut, IWebSocketClient webSocketClient, IParseDataDecoder decoder)
+    public ParseLiveQueryController(TimeSpan timeout, IWebSocketClient webSocketClient, IParseDataDecoder decoder)
     {
         WebSocketClient = webSocketClient ?? throw new ArgumentNullException(nameof(webSocketClient));
         Decoder = decoder ?? throw new ArgumentNullException(nameof(decoder));
-        TimeOut = timeOut;
+        Timeout = timeout;
         _state = ParseLiveQueryState.Closed;
     }
 
@@ -360,17 +360,24 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
 
     private void WebSocketClientOnMessageReceived(object sender, MessageReceivedEventArgs args)
     {
-        object parsed = JsonUtilities.Parse(args.Message);
-        if (parsed is IDictionary<string, object> message)
+        try
         {
-            ProcessMessage(message);
+            object parsed = JsonUtilities.Parse(args.Message);
+            if (parsed is IDictionary<string, object> message)
+            {
+                ProcessMessage(message);
+            }
+            else
+            {
+                Debug.WriteLine($"Invalid message format received: {args.Message}");
+            }
         }
-        else
+        catch (ArgumentException ex)
         {
-            Debug.WriteLine($"Invalid message format received: {args.Message}");
+            Debug.WriteLine($"Error parsing message: {ex.Message}");
+            Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(31, $"Failed to parse message: {ex.Message}", true, ex));
         }
     }
-
     /// <summary>
     /// Establishes a connection to the live query server asynchronously.
     /// </summary>
@@ -385,6 +392,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// </exception>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         if (_state == ParseLiveQueryState.Closed)
         {
             _state = ParseLiveQueryState.Connecting;
@@ -405,10 +413,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
                 await SendMessage(await AppendSessionToken(message), cancellationToken);
 
                 using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                cts.CancelAfter(TimeOut);
+                cts.CancelAfter(Timeout);
 
                 await ConnectionSignal.Task.WaitAsync(cts.Token);
-                _state = ParseLiveQueryState.Connected;
             }
             catch (OperationCanceledException)
             {
@@ -458,7 +465,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
             await SendMessage(message, cancellationToken);
 
             using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            cts.CancelAfter(TimeOut);
+            cts.CancelAfter(Timeout);
 
             await tcs.Task.WaitAsync(cts.Token);
         }
@@ -496,6 +503,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// </exception>
     public async Task<IParseLiveQuerySubscription> SubscribeAsync<T>(ParseLiveQuery<T> liveQuery, CancellationToken cancellationToken = default) where T : ParseObject
     {
+        ThrowIfDisposed();
         if (_state == ParseLiveQueryState.Closed)
         {
             throw new InvalidOperationException("Cannot subscribe to a live query when the connection is closed.");
@@ -535,6 +543,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// </returns>
     public async Task UpdateSubscriptionAsync<T>(ParseLiveQuery<T> liveQuery, int requestId, CancellationToken cancellationToken = default) where T : ParseObject
     {
+        ThrowIfDisposed();
         Dictionary<string, object> message = new Dictionary<string, object>
         {
             { "op", "update" },
@@ -561,6 +570,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// </exception>
     public async Task UnsubscribeAsync(int requestId, CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         Dictionary<string, object> message = new Dictionary<string, object>
         {
             { "op", "unsubscribe" },
@@ -581,6 +591,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     /// </returns>
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
+        ThrowIfDisposed();
         WebSocketClient.MessageReceived -= WebSocketClientOnMessageReceived;
         WebSocketClient.WebsocketError -= WebSocketClientOnWebsocketError;
         WebSocketClient.UnknownError -= WebSocketClientOnUnknownError;
@@ -635,18 +646,17 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         if (disposing)
         {
             // For sync disposal, the best effort cleanup without waiting
-            _ = Task.Run(async () =>
+            try
             {
-                try
-                {
-                    await CloseAsync();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error during disposal: {ex}");
-                }
-            });
+                CloseAsync().GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error during disposal: {ex}");
+            }
         }
         disposed = true;
     }
+
+    private void ThrowIfDisposed() => ObjectDisposedException.ThrowIf(disposed, nameof(ParseLiveQueryController));
 }

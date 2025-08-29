@@ -109,8 +109,11 @@ public class MutableServiceHub : IMutableServiceHub
         PushChannelsController ??= new ParsePushChannelsController(CurrentInstallationController);
         InstallationDataFinalizer ??= new ParseInstallationDataFinalizer { };
 
-        WebSocketClient ??= LiveQueryServerConnectionData is null ? null : new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize);
-        LiveQueryController ??= LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.TimeOut, WebSocketClient, Decoder);
+        if (LiveQueryServerConnectionData is not null)
+        {
+            WebSocketClient ??= new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize);
+            LiveQueryController ??= new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, Decoder);
+        }
 
         return this;
     }

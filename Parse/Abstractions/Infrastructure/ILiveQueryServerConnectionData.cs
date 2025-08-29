@@ -1,17 +1,19 @@
-﻿namespace Parse.Abstractions.Infrastructure;
+﻿using System;
+
+namespace Parse.Abstractions.Infrastructure;
 
 public interface ILiveQueryServerConnectionData : IServerConnectionData
 {
     /// <summary>
     /// Represents the default timeout duration, in milliseconds.
     /// </summary>
-    public const int DefaultTimeOut = 5000; // 5 seconds
+    public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
     /// The timeout duration, in milliseconds, used for various operations, such as
     /// establishing a connection or completing a subscription.
     /// </summary>
-    int TimeOut { get; set; }
+    TimeSpan Timeout { get; set; }
 
     /// <summary>
     /// The default buffer size, in bytes.

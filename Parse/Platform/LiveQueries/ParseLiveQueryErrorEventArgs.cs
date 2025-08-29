@@ -8,7 +8,7 @@ namespace Parse.Platform.LiveQueries;
 public class ParseLiveQueryErrorEventArgs : EventArgs
 {
     /// <summary>
-    /// Gets or sets the error message associated with a live query operation.
+    /// Gets the error message associated with a live query operation.
     /// </summary>
     /// <remarks>
     /// The <see cref="Error"/> property contains a description of the error that occurred during
@@ -18,7 +18,7 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     public string Error { get; }
 
     /// <summary>
-    /// Gets or sets the error code associated with a live query operation.
+    /// Gets the error code associated with a live query operation.
     /// </summary>
     /// <remarks>
     /// The <see cref="Code"/> property contains a numerical identifier that represents
@@ -28,7 +28,7 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     public int Code { get; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the client should attempt to reconnect
+    /// Gets a value indicating whether the client should attempt to reconnect
     /// after an error occurs during a live query operation.
     /// </summary>
     /// <remarks>
@@ -50,10 +50,13 @@ public class ParseLiveQueryErrorEventArgs : EventArgs
     public Exception LocalException { get; }
 
     /// <summary>
-    /// Represents the arguments for an error event that occurs during a live query in the Parse platform.
+    /// Initializes a new instance of the <see cref="ParseLiveQueryErrorEventArgs"/> class.
     /// </summary>
-    internal ParseLiveQueryErrorEventArgs(int code, string error, bool reconnect, Exception localException = null)
-    {
+    /// <param name="code">The error code associated with the live query operation.</param>
+    /// <param name="error">The error message associated with the live query operation.</param>
+    /// <param name="reconnect">A value indicating whether the client should attempt to reconnect.</param>
+    /// <param name="localException">The local exception that occurred, if any.</param>
+    internal ParseLiveQueryErrorEventArgs(int code, string error, bool reconnect, Exception localException = null)    {
         Error = error;
         Code = code;
         Reconnect = reconnect;

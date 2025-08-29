@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Parse.Abstractions.Infrastructure;
 
@@ -16,7 +17,7 @@ public struct LiveQueryServerConnectionData : ILiveQueryServerConnectionData
     /// The timeout duration, in milliseconds, used for various operations, such as
     /// establishing a connection or completing a subscription.
     /// </summary>
-    public int TimeOut { get; set; } = ILiveQueryServerConnectionData.DefaultTimeOut;
+    public TimeSpan Timeout { get; set; } = ILiveQueryServerConnectionData.DefaultTimeout;
 
     /// <summary>
     /// The buffer size, in bytes, used by the WebSocket client for communication operations.

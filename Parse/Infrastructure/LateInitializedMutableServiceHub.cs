@@ -171,7 +171,7 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
 
     public IParseLiveQueryController LiveQueryController
     {
-        get => LateInitializer.GetValue<IParseLiveQueryController>(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.TimeOut, WebSocketClient, Decoder));
+        get => LateInitializer.GetValue<IParseLiveQueryController>(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, Decoder));
         set => LateInitializer.SetValue(value);
     }
 

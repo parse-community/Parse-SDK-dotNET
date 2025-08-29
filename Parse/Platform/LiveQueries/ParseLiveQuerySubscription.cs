@@ -57,8 +57,10 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     /// </summary>
     public ParseLiveQuerySubscription(IServiceHub serviceHub, string className, int requestId)
     {
-        Services = serviceHub;
-        ClassName = className;
+        Services = serviceHub ?? throw new ArgumentNullException(nameof(serviceHub));
+        ClassName = !string.IsNullOrWhiteSpace(className)
+            ? className
+            : throw new ArgumentException("Class name cannot be null or empty", nameof(className));
         RequestId = requestId;
     }
 

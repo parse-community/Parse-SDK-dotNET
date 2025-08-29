@@ -87,7 +87,11 @@ public class ParseLiveQuery<T> where T : ParseObject
     /// </summary>
     /// <param name="watch">The key that should be watched.</param>
     /// <returns>A new query with the additional constraint.</returns>
-    public ParseLiveQuery<T> Watch(string watch) => new(this, new List<string> { watch });
+    public ParseLiveQuery<T> Watch(string watch)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(watch);
+        return new ParseLiveQuery<T>(this, [ watch ]);
+    }
 
     internal IDictionary<string, object> BuildParameters()
     {

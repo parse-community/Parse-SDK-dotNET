@@ -920,7 +920,9 @@ public class ParseQuery<T> where T : ParseObject
     public ParseLiveQuery<T> GetLive()
     {
         ArgumentNullException.ThrowIfNull(Filters);
-        IDictionary<string, object> filters = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services) as IDictionary<string, object>;
+        IDictionary<string, object> filters = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services) as IDictionary<string, object>
+            ?? throw new InvalidOperationException("Failed to encode filters for live query.");
+
         return new ParseLiveQuery<T>(Services, ClassName, filters, KeySelections);
     }
 }

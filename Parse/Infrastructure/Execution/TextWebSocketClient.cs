@@ -13,7 +13,7 @@ namespace Parse.Infrastructure.Execution;
 /// Represents a WebSocket client that allows connecting to a WebSocket server, sending messages, and receiving messages.
 /// Implements the <c>IWebSocketClient</c> interface for WebSocket operations.
 /// </summary>
-class TextWebSocketClient(int bufferSize) : IWebSocketClient
+class TextWebSocketClient(int bufferSize) : IWebSocketClient, IDisposable
 {
     /// <summary>
     /// A private instance of the ClientWebSocket class used to manage the WebSocket connection.
@@ -68,7 +68,7 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
                 webSocketToConnect = webSocket;
             }
         }
-
+        listeningCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         if (webSocketToConnect is not null)
         {
             await webSocketToConnect.ConnectAsync(new Uri(serverUri), cancellationToken);
@@ -86,10 +86,7 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
     /// </returns>
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
-        if (webSocket is not null)
-        {
-            await webSocket?.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken)!;
-        }
+        await webSocket?.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken)!;
     }
 
     private async Task ListenForMessages(CancellationToken cancellationToken)
@@ -107,7 +104,6 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
 
                 if (result.MessageType == WebSocketMessageType.Close)
                 {
-                    await CloseAsync(cancellationToken);
                     break;
                 }
 
@@ -118,17 +114,17 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
                 }
                 else
                 {
-                    // Handle partial messages by accumulating data until EndOfMessage is true
-                    StringBuilder messageBuilder = new StringBuilder();
-                    messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                    // Accumulate bytes to handle UTF-8 characters split across boundaries
+                    using var messageStream = new MemoryStream();
+                    messageStream.Write(buffer, 0, result.Count);
                     while (!result.EndOfMessage)
                     {
                         result = await webSocket.ReceiveAsync(
                             new ArraySegment<byte>(buffer),
                             cancellationToken);
-                        messageBuilder.Append(Encoding.UTF8.GetString(buffer, 0, result.Count));
+                        messageStream.Write(buffer, 0, result.Count);
                     }
-                    string fullMessage = messageBuilder.ToString();
+                    string fullMessage = Encoding.UTF8.GetString(messageStream.ToArray());
                     MessageReceived?.Invoke(this, new MessageReceivedEventArgs(fullMessage));
                 }
             }
@@ -205,5 +201,34 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient
             throw new InvalidOperationException($"WebSocket is not in Open state. Current state: {webSocket.State}");
         }
         await webSocket.SendAsync(Encoding.UTF8.GetBytes(message), WebSocketMessageType.Text, true, cancellationToken);
+    }
+
+    private CancellationTokenSource listeningCts;
+    private bool disposed;
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposed)
+        {
+            if (disposing)
+            {
+                listeningCts?.Cancel();
+                try
+                {
+                    listeningTask?.Wait(TimeSpan.FromSeconds(5));
+                }
+                catch { }
+                
+                webSocket?.Dispose();
+                listeningCts?.Dispose();
+            }
+            disposed = true;
+        }
     }
 }

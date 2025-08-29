@@ -72,7 +72,7 @@ public class ServiceHub : IServiceHub
     public IParseInstallationDataFinalizer InstallationDataFinalizer => LateInitializer.GetValue(() => new ParseInstallationDataFinalizer { });
 
     public IWebSocketClient WebSocketClient => LateInitializer.GetValue(() => LiveQueryServerConnectionData is null ? null : new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize));
-    public IParseLiveQueryController LiveQueryController => LateInitializer.GetValue(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.TimeOut, WebSocketClient, Decoder));
+    public IParseLiveQueryController LiveQueryController => LateInitializer.GetValue(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, Decoder));
 
     public bool Reset()
     {

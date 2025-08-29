@@ -3,9 +3,7 @@ using System;
 namespace Parse.Platform.LiveQueries;
 
 /// <summary>
-/// Provides event arguments for events triggered by Parse's Live Query service.
-/// This class encapsulates details about a particular event, such as the operation type,
-/// client ID, request ID, and the associated Parse object data.
+/// Provides the data object for events triggered by Parse's Live Query service.
 /// </summary>
 public class ParseLiveQueryEventArgs : EventArgs
 {

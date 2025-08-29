@@ -10,5 +10,5 @@ public class MessageReceivedEventArgs(string message) : EventArgs
     /// <summary>
     /// Gets the message content that was received.
     /// </summary>
-    public string Message { get; } = message;
+    public string Message { get; } = message ?? throw new ArgumentNullException(nameof(message));
 }
