@@ -12,8 +12,7 @@ public class DecoderTests
 {
     ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
 
-    [TestInitialize]
-    public void SetUp()
+    public DecoderTests()
     {
         Client.Publicize();
     }
