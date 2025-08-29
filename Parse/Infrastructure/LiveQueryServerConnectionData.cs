@@ -12,12 +12,17 @@ public struct LiveQueryServerConnectionData : ILiveQueryServerConnectionData
     public LiveQueryServerConnectionData() { }
 
     internal bool Test { get; set; }
+ 
+    /// <summary>
+    /// Represents the default timeout duration, in seconds.
+    /// </summary>
+    public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// The timeout duration, in milliseconds, used for various operations, such as
+    /// The timeout duration, in seconds, used for various operations, such as
     /// establishing a connection or completing a subscription.
     /// </summary>
-    public TimeSpan Timeout { get; set; } = ILiveQueryServerConnectionData.DefaultTimeout;
+    public TimeSpan Timeout { get; set; } = DefaultTimeout;
 
     /// <summary>
     /// The buffer size, in bytes, used by the WebSocket client for communication operations.

@@ -68,11 +68,13 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient, IDisposable
                 webSocketToConnect = webSocket;
             }
         }
+        listeningCts?.Cancel();
+        listeningCts?.Dispose();
         listeningCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         if (webSocketToConnect is not null)
         {
             await webSocketToConnect.ConnectAsync(new Uri(serverUri), cancellationToken);
-            StartListening(cancellationToken);
+            StartListening(listeningCts.Token);
         }
     }
 
@@ -86,7 +88,10 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient, IDisposable
     /// </returns>
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
-        await webSocket?.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken)!;
+        if (webSocket is null)
+            return;
+
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, String.Empty, cancellationToken);
     }
 
     private async Task ListenForMessages(CancellationToken cancellationToken)
