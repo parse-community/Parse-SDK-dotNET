@@ -8,7 +8,7 @@ namespace Parse.Tests;
 public class LiveQueryErrorEventArgsTests
 {
     [TestMethod]
-    public void TestParseLiveQueryErrorEventArgsConstructor()
+    public void TestConstructor()
     {
         InvalidOperationException exception = new InvalidOperationException("Test exception");
         ParseLiveQueryErrorEventArgs args = new ParseLiveQueryErrorEventArgs(42, "Test error", false, exception);
@@ -21,7 +21,7 @@ public class LiveQueryErrorEventArgsTests
     }
 
     [TestMethod]
-    public void TestParseLiveQueryErrorEventArgsConstructorWithoutException()
+    public void TestConstructorWithoutException()
     {
         ParseLiveQueryErrorEventArgs args = new ParseLiveQueryErrorEventArgs(42, "Test error", true);
 

@@ -40,8 +40,33 @@ public class LiveQueryTests
         Assert.IsTrue(buildParameters.ContainsKey("keys"), "The 'keys' key should be present in the build parameters.");
         Assert.IsInstanceOfType<Dictionary<string, object>>(buildParameters["where"], "The 'where' parameter should be a Dictionary<string, object>.");
         Assert.IsInstanceOfType<string[]>(buildParameters["keys"], "The 'keys' parameter should be a string array.");
-        Assert.AreEqual("bar", ((Dictionary<string, object>)buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
-        Assert.AreEqual("foo", ((string[])buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
+        Assert.AreEqual("bar", ((Dictionary<string, object>) buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
+        Assert.AreEqual("foo", ((string[]) buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
+        Assert.IsFalse(buildParameters.ContainsKey("watch"), "The 'watch' parameter should not be present.");
+    }
+
+    [TestMethod]
+    public void TestConstructorWithWatchedKeys()
+    {
+        ParseLiveQuery<ParseObject> liveQuery = new ParseLiveQuery<ParseObject>(
+            Client.Services,
+            "DummyClass",
+            new Dictionary<string, object> { { "foo", "bar" } },
+            ["foo"],
+            ["foo"]);
+
+        // Assert
+        Assert.AreEqual("DummyClass", liveQuery.ClassName, "The ClassName property of liveQuery should be 'DummyClass'.");
+        IDictionary<string, object> buildParameters = liveQuery.BuildParameters();
+        Assert.AreEqual("DummyClass", buildParameters["className"], "The ClassName property of liveQuery should be 'DummyClass'.");
+        Assert.IsTrue(buildParameters.ContainsKey("where"), "The 'where' key should be present in the build parameters.");
+        Assert.IsTrue(buildParameters.ContainsKey("keys"), "The 'keys' key should be present in the build parameters.");
+        Assert.IsInstanceOfType<Dictionary<string, object>>(buildParameters["where"], "The 'where' parameter should be a Dictionary<string, object>.");
+        Assert.IsInstanceOfType<string[]>(buildParameters["keys"], "The 'keys' parameter should be a string array.");
+        Assert.AreEqual("bar", ((Dictionary<string, object>) buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
+        Assert.AreEqual("foo", ((string[]) buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
+        Assert.IsInstanceOfType<string[]>(buildParameters["watch"], "The 'watch' parameter should be a string array.");
+        Assert.AreEqual("foo", ((string[]) buildParameters["watch"]).First(), "The 'watch' parameter should contain 'foo'.");
     }
 
     [TestMethod]
@@ -53,8 +78,7 @@ public class LiveQueryTests
             .Select("foo");
 
         // Act
-        ParseLiveQuery<ParseObject> liveQuery = query.GetLive()
-            .Watch("foo");
+        ParseLiveQuery<ParseObject> liveQuery = query.GetLive();
 
         // Assert
         Assert.AreEqual("DummyClass", liveQuery.ClassName, "The ClassName property of liveQuery should be 'DummyClass'.");
@@ -62,12 +86,39 @@ public class LiveQueryTests
         Assert.AreEqual("DummyClass", buildParameters["className"], "The ClassName property of liveQuery should be 'DummyClass'.");
         Assert.IsTrue(buildParameters.ContainsKey("where"), "The 'where' key should be present in the build parameters.");
         Assert.IsTrue(buildParameters.ContainsKey("keys"), "The 'keys' key should be present in the build parameters.");
-        Assert.IsTrue(buildParameters.ContainsKey("watch"), "The 'watch' key should be present in the build parameters.");
         Assert.IsInstanceOfType<Dictionary<string, object>>(buildParameters["where"], "The 'where' parameter should be a Dictionary<string, object>.");
         Assert.IsInstanceOfType<string[]>(buildParameters["keys"], "The 'keys' parameter should be a string array.");
+        Assert.AreEqual("bar", ((Dictionary<string, object>) buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
+        Assert.AreEqual("foo", ((string[]) buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
+    }
+
+    [TestMethod]
+    public void TestWatch()
+    {
+        // Arrange
+        ParseLiveQuery<ParseObject> liveQuery = new ParseLiveQuery<ParseObject>(
+            Client.Services,
+            "DummyClass",
+            new Dictionary<string, object> { { "foo", "bar" } },
+            ["foo"]);
+
+        // Assert
+        IDictionary<string, object> buildParameters = liveQuery.BuildParameters();
+        Assert.IsFalse(buildParameters.ContainsKey("watch"), "The 'watch' key should not be present in the build parameters initially.");
+
+        // Act
+        liveQuery = liveQuery.Watch("foo");
+
+        // Assert
+        buildParameters = liveQuery.BuildParameters();
         Assert.IsInstanceOfType<string[]>(buildParameters["watch"], "The 'watch' parameter should be a string array.");
-        Assert.AreEqual("bar", ((Dictionary<string, object>)buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
-        Assert.AreEqual("foo", ((string[])buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
-        Assert.AreEqual("foo", ((string[])buildParameters["watch"]).First(), "The 'watch' parameter should contain 'foo'.");
+        Assert.AreEqual("foo", ((string[]) buildParameters["watch"]).First(), "The 'watch' parameter should contain 'foo'.");
+
+        // Act
+        liveQuery = liveQuery.Watch("bar");
+
+        // Assert
+        buildParameters = liveQuery.BuildParameters();
+        Assert.Contains("bar", (string[]) buildParameters["watch"], "The 'watch' parameter should contain 'bar'.");
     }
 }

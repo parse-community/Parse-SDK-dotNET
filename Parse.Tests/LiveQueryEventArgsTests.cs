@@ -25,7 +25,7 @@ public class LiveQueryEventArgsTests
     public void TearDown() => (Client.Services as ServiceHub).Reset();
 
     [TestMethod]
-    public void TestParseLiveQueryEventArgsConstructor()
+    public void TestConstructor()
     {
         IObjectState state = new MutableObjectState
         {
@@ -45,4 +45,8 @@ public class LiveQueryEventArgsTests
         // Assert
         Assert.AreEqual(obj, args.Object);
     }
+
+    [TestMethod]
+    public void TestConstructorException()
+        => Assert.ThrowsExactly<ArgumentNullException>(() => new ParseLiveQueryEventArgs(null));
 }

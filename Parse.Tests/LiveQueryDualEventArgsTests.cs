@@ -25,7 +25,7 @@ public class LiveQueryDualEventArgsTests
     public void TearDown() => (Client.Services as ServiceHub).Reset();
 
     [TestMethod]
-    public void TestParseLiveQueryDualEventArgsConstructor()
+    public void TestConstructor()
     {
         IObjectState state = new MutableObjectState
         {
@@ -47,5 +47,43 @@ public class LiveQueryDualEventArgsTests
 
         Assert.AreEqual(obj, args.Object);
         Assert.AreEqual(objOrig, args.Original);
+    }
+
+    [TestMethod]
+    public void TestCurrent()
+    {
+        IObjectState state = new MutableObjectState
+        {
+            ObjectId = "waGiManPutr4Pet1r",
+            ClassName = "Pagi",
+            CreatedAt = new DateTime { },
+            ServerData = new Dictionary<string, object>
+            {
+                ["username"] = "kevin",
+                ["sessionToken"] = "se551onT0k3n"
+            }
+        };
+
+        ParseObject objOrig = Client.GenerateObjectFromState<ParseObject>(state, "Corgi");
+        Assert.ThrowsExactly<ArgumentNullException>(() => new ParseLiveQueryDualEventArgs(null, objOrig));
+    }
+   
+    [TestMethod]
+    public void TestConstructorExceptionOriginal()
+    {
+        IObjectState state = new MutableObjectState
+        {
+            ObjectId = "waGiManPutr4Pet1r",
+            ClassName = "Pagi",
+            CreatedAt = new DateTime { },
+            ServerData = new Dictionary<string, object>
+            {
+                ["username"] = "kevin",
+                ["sessionToken"] = "se551onT0k3n"
+            }
+        };
+
+        ParseObject obj = Client.GenerateObjectFromState<ParseObject>(state, "Corgi");
+        Assert.ThrowsExactly<ArgumentNullException>(() => new ParseLiveQueryDualEventArgs(obj, null));
     }
 }
