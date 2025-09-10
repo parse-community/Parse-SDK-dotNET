@@ -56,6 +56,8 @@ public class MutableServiceHub : IMutableServiceHub
     public IParseFileController FileController { get; set; }
     public IParseObjectController ObjectController { get; set; }
     public IParseQueryController QueryController { get; set; }
+    public IParseLiveQueryMessageParser LiveQueryMessageParser { get; set; }
+    public IParseLiveQueryMessageBuilder LiveQueryMessageBuilder { get; set; }
     public IParseLiveQueryController LiveQueryController { get; set; }
     public IParseSessionController SessionController { get; set; }
     public IParseUserController UserController { get; set; }
@@ -109,10 +111,12 @@ public class MutableServiceHub : IMutableServiceHub
         PushChannelsController ??= new ParsePushChannelsController(CurrentInstallationController);
         InstallationDataFinalizer ??= new ParseInstallationDataFinalizer { };
 
+        LiveQueryMessageParser ??= new ParseLiveQueryMessageParser(Decoder);
+        LiveQueryMessageBuilder ??= new ParseLiveQueryMessageBuilder();
         if (LiveQueryServerConnectionData is not null)
         {
             WebSocketClient ??= new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize);
-            LiveQueryController ??= new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, Decoder);
+            LiveQueryController ??= new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, LiveQueryMessageParser, LiveQueryMessageBuilder);
         }
 
         return this;

@@ -47,6 +47,8 @@ public interface IServiceHub
     IParseFileController FileController { get; }
     IParseObjectController ObjectController { get; }
     IParseQueryController QueryController { get; }
+    IParseLiveQueryMessageParser LiveQueryMessageParser { get; }
+    IParseLiveQueryMessageBuilder LiveQueryMessageBuilder { get; }
     IParseLiveQueryController LiveQueryController { get; }
     IParseSessionController SessionController { get; }
     IParseUserController UserController { get; }

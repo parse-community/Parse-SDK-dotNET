@@ -11,18 +11,12 @@ namespace Parse.Tests;
 [TestClass]
 public class LiveQueryDualEventArgsTests
 {
-    private ParseClient Client { get; set; }
+    private ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
 
-    [TestInitialize]
-    public void SetUp()
-    {
-        // Initialize the client and ensure the instance is set
-        Client = new ParseClient(new ServerConnectionData { Test = true });
+    public LiveQueryDualEventArgsTests()
+    { 
         Client.Publicize();
     }
-
-    [TestCleanup]
-    public void TearDown() => (Client.Services as ServiceHub).Reset();
 
     [TestMethod]
     public void TestConstructor()
@@ -45,8 +39,8 @@ public class LiveQueryDualEventArgsTests
         objOrig.Set("test", "before");
         ParseLiveQueryDualEventArgs args = new ParseLiveQueryDualEventArgs(obj, objOrig);
 
-        Assert.AreEqual(obj, args.Object);
-        Assert.AreEqual(objOrig, args.Original);
+        Assert.AreSame(obj, args.Object);
+        Assert.AreSame(objOrig, args.Original);
     }
 
     [TestMethod]

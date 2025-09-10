@@ -66,6 +66,10 @@ public class OrchestrationServiceHub : IServiceHub
 
     public IServerConnectionData ServerConnectionData => Custom.ServerConnectionData ?? Default.ServerConnectionData;
 
+    public IParseLiveQueryMessageParser LiveQueryMessageParser => Custom.LiveQueryMessageParser ?? Default.LiveQueryMessageParser;
+
+    public IParseLiveQueryMessageBuilder LiveQueryMessageBuilder => Custom.LiveQueryMessageBuilder ?? Default.LiveQueryMessageBuilder;
+
     public ILiveQueryServerConnectionData LiveQueryServerConnectionData => Custom.LiveQueryServerConnectionData ?? Default.LiveQueryServerConnectionData;
 
     public IParseDataDecoder Decoder => Custom.Decoder ?? Default.Decoder;

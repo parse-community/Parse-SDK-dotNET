@@ -39,6 +39,8 @@ public interface IMutableServiceHub : IServiceHub
     IParseFileController FileController { set; }
     IParseObjectController ObjectController { set; }
     IParseQueryController QueryController { set; }
+    IParseLiveQueryMessageParser LiveQueryMessageParser { set; }
+    IParseLiveQueryMessageBuilder LiveQueryMessageBuilder { set; }
     IParseLiveQueryController LiveQueryController { set; }
     IParseSessionController SessionController { set; }
     IParseUserController UserController { set; }

@@ -162,16 +162,28 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
         set => LateInitializer.SetValue(value);
     }
 
-
     public IWebSocketClient WebSocketClient
     {
         get => LateInitializer.GetValue<IWebSocketClient>(() => LiveQueryServerConnectionData is null ? null : new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize));
         set => LateInitializer.SetValue(value);
     }
 
+    public IParseLiveQueryMessageParser LiveQueryMessageParser
+    {
+        get => LateInitializer.GetValue<IParseLiveQueryMessageParser>(() => new ParseLiveQueryMessageParser(Decoder));
+        set => LateInitializer.SetValue(value);
+    }
+
+
+    public IParseLiveQueryMessageBuilder LiveQueryMessageBuilder
+    {
+        get => LateInitializer.GetValue<IParseLiveQueryMessageBuilder>(() => new ParseLiveQueryMessageBuilder());
+        set => LateInitializer.SetValue(value);
+    }
+
     public IParseLiveQueryController LiveQueryController
     {
-        get => LateInitializer.GetValue<IParseLiveQueryController>(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, Decoder));
+        get => LateInitializer.GetValue<IParseLiveQueryController>(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, LiveQueryMessageParser, LiveQueryMessageBuilder));
         set => LateInitializer.SetValue(value);
     }
 

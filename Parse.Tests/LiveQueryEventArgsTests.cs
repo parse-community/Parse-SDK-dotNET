@@ -11,18 +11,12 @@ namespace Parse.Tests;
 [TestClass]
 public class LiveQueryEventArgsTests
 {
-    private ParseClient Client { get; set; }
+    private ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
 
-    [TestInitialize]
-    public void SetUp()
+    public LiveQueryEventArgsTests()
     {
-        // Initialize the client and ensure the instance is set
-        Client = new ParseClient(new ServerConnectionData { Test = true });
         Client.Publicize();
     }
-
-    [TestCleanup]
-    public void TearDown() => (Client.Services as ServiceHub).Reset();
 
     [TestMethod]
     public void TestConstructor()

@@ -64,6 +64,10 @@ public abstract class CustomServiceHub : ICustomServiceHub
 
     public virtual IServerConnectionData ServerConnectionData => Services.ServerConnectionData;
 
+    public virtual IParseLiveQueryMessageParser LiveQueryMessageParser => Services.LiveQueryMessageParser;
+    
+    public virtual IParseLiveQueryMessageBuilder LiveQueryMessageBuilder => Services.LiveQueryMessageBuilder;
+
     public virtual ILiveQueryServerConnectionData LiveQueryServerConnectionData => Services.LiveQueryServerConnectionData;
 
     public virtual IParseDataDecoder Decoder => Services.Decoder;
