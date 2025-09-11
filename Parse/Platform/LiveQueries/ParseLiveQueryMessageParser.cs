@@ -40,9 +40,6 @@ class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
 
     private IDictionary<string, object> GetDictionary(IDictionary<string, object> message, string key)
     {
-        if (message is null)
-            throw new ArgumentNullException(nameof(message));
-
         if (!(message.TryGetValue(key, out object obj) && obj is IDictionary<string, object> dict))
             throw new ArgumentException(@"Message does not contain a valid %{key}.", nameof(message));
 
@@ -54,9 +51,8 @@ class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
         if (message is null)
             throw new ArgumentNullException(nameof(message));
 
-        IDictionary<string, object> current = GetDictionary(message, "object");
-        if (current is null)
-            throw new ArgumentException("Message does not contain a valid object state.", nameof(message));
+        IDictionary<string, object> current = GetDictionary(message, "object")
+            ?? throw new ArgumentException("Message does not contain a valid object state.", nameof(message));
 
         return ParseObjectCoder.Instance.Decode(current, Decoder, ParseClient.Instance.Services);
     }
@@ -66,9 +62,8 @@ class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
         if (message is null)
             throw new ArgumentNullException(nameof(message));
 
-        IDictionary<string, object> original = GetDictionary(message, "original");
-        if (original is null)
-            throw new ArgumentException("Message does not contain a valid original object state.", nameof(message));
+        IDictionary<string, object> original = GetDictionary(message, "original")
+            ?? throw new ArgumentException("Message does not contain a valid original object state.", nameof(message));
 
         return ParseObjectCoder.Instance.Decode(original, Decoder, ParseClient.Instance.Services);
     }

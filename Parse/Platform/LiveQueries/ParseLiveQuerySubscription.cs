@@ -16,7 +16,7 @@ public class ParseLiveQuerySubscription<T> : IParseLiveQuerySubscription where T
     string ClassName { get; }
     IServiceHub Services { get; }
 
-    private int RequestId { get; set; }
+    private readonly int RequestId;
 
     /// <summary>
     /// Represents the Create event for a live query subscription.

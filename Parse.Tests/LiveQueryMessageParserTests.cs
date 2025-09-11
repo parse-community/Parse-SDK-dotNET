@@ -86,6 +86,7 @@ public class LiveQueryMessageParserTests
 
         Assert.ThrowsExactly<ArgumentNullException>(() => parser.GetObjectState(null));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetObjectState(new Dictionary<string, object> { { "wrongKey", objData } }));
+        Assert.ThrowsExactly<ArgumentException>(() => parser.GetObjectState(new Dictionary<string, object> { { "object", null } }));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetObjectState(new Dictionary<string, object> { { "object", "notADictionary" } }));
     }
 
@@ -116,6 +117,7 @@ public class LiveQueryMessageParserTests
 
         Assert.ThrowsExactly<ArgumentNullException>(() => parser.GetOriginalState(null));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetOriginalState(new Dictionary<string, object> { { "wrongKey", objData } }));
+        Assert.ThrowsExactly<ArgumentException>(() => parser.GetOriginalState(new Dictionary<string, object> { { "original", null } }));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetOriginalState(new Dictionary<string, object> { { "original", "notADictionary" } }));
     }
 
@@ -134,14 +136,18 @@ public class LiveQueryMessageParserTests
         };
 
         (int code, string error, bool shouldReconnect) = parser.GetError(message);
+        Assert.HasCount(3, message);
         Assert.AreEqual(errorCode, code);
         Assert.AreEqual(errorMessage, error);
         Assert.AreEqual(reconnect, shouldReconnect);
 
         Assert.ThrowsExactly<ArgumentNullException>(() => parser.GetError(null));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "wrongField", 123 } }));
+        Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "error", errorMessage }, { "reconnect", reconnect } }));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "code", "notALong" }, { "error", errorMessage }, { "reconnect", reconnect } }));
+        Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "code", (long) errorCode }, { "reconnect", reconnect } }));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "code", (long) errorCode }, { "error", 12345 }, { "reconnect", reconnect } }));
+        Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "code", (long) errorCode }, { "error", errorMessage } }));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "code", (long) errorCode }, { "error", errorMessage }, { "reconnect", "notABoolean" } }));
     }
 }

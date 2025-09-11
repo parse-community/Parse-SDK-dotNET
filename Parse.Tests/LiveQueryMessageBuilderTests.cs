@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Parse.Abstractions.Platform.Objects;
+using Moq;
+using Parse.Abstractions.Infrastructure;
+using Parse.Abstractions.Platform.Users;
 using Parse.Infrastructure;
 using Parse.Platform.LiveQueries;
 
@@ -11,12 +14,26 @@ namespace Parse.Tests;
 [TestClass]
 public class LiveQueryMessageBuilderTests
 {
-    private ParseClient Client { get; } = new ParseClient(
-        new ServerConnectionData { Test = true },
-        new LiveQueryServerConnectionData { ApplicationID = "TestApp", Key = "t3stK3y", Test = true });
+    private readonly Mock<IParseCurrentUserController> _mockCurrentUserController;
+    private readonly MutableServiceHub _hub;
+
+    private ParseClient Client { get; }
 
     public LiveQueryMessageBuilderTests()
     {
+        _mockCurrentUserController = new Mock<IParseCurrentUserController>();
+
+        _mockCurrentUserController
+            .Setup(controller => controller.GetCurrentSessionTokenAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("s3ss!0nT0k3n");
+
+        _hub = new MutableServiceHub { CurrentUserController = _mockCurrentUserController.Object };
+
+        Client = new ParseClient(
+            new ServerConnectionData { Test = true },
+            new LiveQueryServerConnectionData { ApplicationID = "TestApp", Key = "t3stK3y", Test = true },
+            _hub);
+
         Client.Publicize();
     }
 
@@ -38,10 +55,12 @@ public class LiveQueryMessageBuilderTests
         Assert.IsTrue(message.ContainsKey("op"));
         Assert.IsTrue(message.ContainsKey("applicationId"));
         Assert.IsTrue(message.ContainsKey("windowsKey"));
-        Assert.HasCount(3, message);
+        Assert.IsTrue(message.ContainsKey("sessionToken"));
+        Assert.HasCount(4, message);
         Assert.AreEqual("connect", message["op"]);
         Assert.AreEqual(Client.Services.LiveQueryServerConnectionData.ApplicationID, message["applicationId"]);
         Assert.AreEqual(Client.Services.LiveQueryServerConnectionData.Key, message["windowsKey"]);
+        Assert.AreEqual(await Client.Services.GetCurrentSessionToken(), message["sessionToken"]);
     }
 
     [TestMethod]
@@ -75,7 +94,7 @@ public class LiveQueryMessageBuilderTests
         IDictionary<string, object> message = await builder.BuildSubscribeMessage<ParseObject>(requestId, liveQuery);
 
         Assert.IsNotNull(message);
-        Assert.HasCount(3, message);
+        Assert.HasCount(4, message);
 
         Assert.IsTrue(message.ContainsKey("op"));
         Assert.AreEqual("subscribe", message["op"]);
@@ -126,7 +145,7 @@ public class LiveQueryMessageBuilderTests
         IDictionary<string, object> message = await builder.BuildUpdateSubscriptionMessage<ParseObject>(requestId, liveQuery);
 
         Assert.IsNotNull(message);
-        Assert.HasCount(3, message);
+        Assert.HasCount(4, message);
 
         Assert.IsTrue(message.ContainsKey("op"));
         Assert.AreEqual("update", message["op"]);
