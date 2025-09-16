@@ -7,7 +7,7 @@ using Parse.Infrastructure.Data;
 
 namespace Parse.Platform.LiveQueries;
 
-class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
+internal sealed class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
 {
     private IParseDataDecoder Decoder { get; }
 
@@ -21,7 +21,7 @@ class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
         if (message is null)
             throw new ArgumentNullException(nameof(message));
 
-        if (!(message.TryGetValue("clientId", out object clientIdObj) && clientIdObj is string clientId && !String.IsNullOrWhiteSpace(clientId)))
+        if (!(message.TryGetValue("clientId", out object clientIdObj) && clientIdObj is string clientId && !string.IsNullOrWhiteSpace(clientId)))
             throw new ArgumentException(@"Message does not contain a valid client ID.", nameof(message));
 
         return clientId;
@@ -40,17 +40,17 @@ class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
 
     private IDictionary<string, object> GetDictionary(IDictionary<string, object> message, string key)
     {
+        if (message is null)
+            throw new ArgumentNullException(nameof(message));
+
         if (!(message.TryGetValue(key, out object obj) && obj is IDictionary<string, object> dict))
-            throw new ArgumentException(@"Message does not contain a valid %{key}.", nameof(message));
+            throw new ArgumentException($"Message does not contain a valid {key}.", nameof(message));
 
         return dict;
     }
 
     public IObjectState GetObjectState(IDictionary<string, object> message)
     {
-        if (message is null)
-            throw new ArgumentNullException(nameof(message));
-
         IDictionary<string, object> current = GetDictionary(message, "object")
             ?? throw new ArgumentException("Message does not contain a valid object state.", nameof(message));
 
@@ -59,16 +59,13 @@ class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
 
     public IObjectState GetOriginalState(IDictionary<string, object> message)
     {
-        if (message is null)
-            throw new ArgumentNullException(nameof(message));
-
         IDictionary<string, object> original = GetDictionary(message, "original")
             ?? throw new ArgumentException("Message does not contain a valid original object state.", nameof(message));
 
         return ParseObjectCoder.Instance.Decode(original, Decoder, ParseClient.Instance.Services);
     }
 
-    public (int code, string error, bool reconnect) GetError(IDictionary<string, object> message)
+    public IParseLiveQueryMessageParser.LiveQueryError GetError(IDictionary<string, object> message)
     {
         if (message is null)
             throw new ArgumentNullException(nameof(message));
@@ -82,6 +79,6 @@ class ParseLiveQueryMessageParser : IParseLiveQueryMessageParser
         if (!(message.TryGetValue("reconnect", out object reconnectObj) && reconnectObj is bool reconnect))
             throw new ArgumentException("Message does not contain a valid reconnect flag.", nameof(message));
 
-        return ((int)codeLong, error, reconnect);
+        return new IParseLiveQueryMessageParser.LiveQueryError((int)codeLong, error, reconnect);
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure;
 using Parse.Platform.LiveQueries;
@@ -67,8 +68,8 @@ public class LiveQueryMessageParserTests
         {
             { "objectId", "obj123" },
             { "className", "TestClass" },
-            { "createdAt", "2023-10-01T12:00.000Z" },
-            { "updatedAt", "2023-10-01T12:00.000Z" },
+            { "createdAt", "2023-10-01T12:00.00.000Z" },
+            { "updatedAt", "2023-10-01T12:00.00.000Z" },
             {
                 "ACL", new Dictionary<string, object>
                 {
@@ -135,11 +136,11 @@ public class LiveQueryMessageParserTests
             { "reconnect", reconnect }
         };
 
-        (int code, string error, bool shouldReconnect) = parser.GetError(message);
+        IParseLiveQueryMessageParser.LiveQueryError error = parser.GetError(message);
         Assert.HasCount(3, message);
-        Assert.AreEqual(errorCode, code);
-        Assert.AreEqual(errorMessage, error);
-        Assert.AreEqual(reconnect, shouldReconnect);
+        Assert.AreEqual(errorCode, error.Code);
+        Assert.AreEqual(errorMessage, error.Message);
+        Assert.AreEqual(reconnect, error.Reconnect);
 
         Assert.ThrowsExactly<ArgumentNullException>(() => parser.GetError(null));
         Assert.ThrowsExactly<ArgumentException>(() => parser.GetError(new Dictionary<string, object> { { "wrongField", 123 } }));

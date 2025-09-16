@@ -16,15 +16,6 @@ public class LiveQuerySubscriptionTests
 
     public LiveQuerySubscriptionTests() => Client.Publicize();
 
-    [TestInitialize]
-    public void SetUp()
-    {
-        Client.Publicize();
-    }
-
-    [TestCleanup]
-    public void TearDown() => (Client.Services as ServiceHub).Reset();
-
     [TestMethod]
     public void TestConstructor() => Assert.IsNotNull(
         new ParseLiveQuerySubscription<ParseObject>(Client.Services, "Foo", 1),
@@ -54,8 +45,10 @@ public class LiveQuerySubscriptionTests
 
         ParseLiveQuerySubscription<ParseObject> subscription = new(Client.Services, "Corgi", 1);
 
+        bool createInvoked = false;
         subscription.Create += (_, args) =>
         {
+            createInvoked = true;
             Assert.IsNotNull(args, "The event args should not be null.");
             Assert.AreEqual(args.Object.ObjectId, state.ObjectId);
             Assert.AreEqual(args.Object.ClassName, state.ClassName);
@@ -63,6 +56,7 @@ public class LiveQuerySubscriptionTests
         };
 
         subscription.OnCreate(state);
+        Assert.IsTrue(createInvoked, "Create event should have been invoked.");
     }
 
     [TestMethod]
@@ -79,8 +73,16 @@ public class LiveQuerySubscriptionTests
             }
         };
 
-        MutableObjectState state = originalState;
-        state["key"] = "after";
+        MutableObjectState state = new()
+        {
+            ObjectId = originalState.ObjectId,
+            ClassName = originalState.ClassName,
+            CreatedAt = originalState.CreatedAt,
+            ServerData = new Dictionary<string, object>
+            {
+                ["key"] = "after"
+            }
+        };
 
         ParseLiveQuerySubscription<ParseObject> subscription = new(Client.Services, "Corgi", 1);
 

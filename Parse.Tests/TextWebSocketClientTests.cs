@@ -15,36 +15,37 @@ public class TextWebSocketClientTests
     {
         TextWebSocketClient client = new TextWebSocketClient(4096);
         Assert.IsNotNull(client);
-
-        client.Dispose();
     }
 
     [TestMethod]
+    [TestCategory("Integration")]
+    [Timeout(10000)]
     public async Task TestSendAndReceive()
     {
         TextWebSocketClient client = new TextWebSocketClient(32);
-        await client.OpenAsync("wss://echo.websocket.org", CancellationToken.None);
+        CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        TaskCompletionSource receiveTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        TaskCompletionSource ConnectionSignal = new TaskCompletionSource();
-        CancellationTokenSource cts = new CancellationTokenSource();
+        await client.OpenAsync("wss://echo.websocket.org", cts.Token);
 
-        client.MessageReceived += (_, e) =>
+        string receivedMessage = null;
+        EventHandler<MessageReceivedEventArgs> handler = (_, e) =>
         {
             if (e.Message.StartsWith("Request served by"))
             {
                 return;
             }
-            Assert.AreEqual("Hello world, WebSocket listening!", e.Message);
-            ConnectionSignal?.TrySetResult();
+            receivedMessage = e.Message;
+            receiveTcs?.TrySetResult();
         };
+        client.MessageReceived += handler;
 
         await client.SendAsync("Hello world, WebSocket listening!", cts.Token);
         cts.CancelAfter(5000);
-        await ConnectionSignal.Task.WaitAsync(cts.Token);
-        ConnectionSignal = null;
-        await client.CloseAsync();
-        client.Dispose();
-    }
+        await receiveTcs.Task.WaitAsync(cts.Token);
+        Assert.AreEqual("Hello world, WebSocket listening!", receivedMessage);
 
-    
+        client.MessageReceived -= handler;
+        await client.CloseAsync(cts.Token);
+    }
 }

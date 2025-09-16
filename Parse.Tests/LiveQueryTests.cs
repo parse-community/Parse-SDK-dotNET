@@ -32,11 +32,12 @@ public class LiveQueryTests
         Assert.AreEqual("DummyClass", buildParameters["className"], "The ClassName property of liveQuery should be 'DummyClass'.");
         Assert.IsTrue(buildParameters.ContainsKey("where"), "The 'where' key should be present in the build parameters.");
         Assert.IsTrue(buildParameters.ContainsKey("keys"), "The 'keys' key should be present in the build parameters.");
-        Assert.IsInstanceOfType<IDictionary<string, object>>(buildParameters["where"], "The 'where' parameter should be a Dictionary<string, object>.");
-        Assert.IsInstanceOfType<string[]>(buildParameters["keys"], "The 'keys' parameter should be a string array.");
+        Assert.IsInstanceOfType(buildParameters["where"], typeof(IDictionary<string, object>), "The 'where' parameter should be a Dictionary<string, object>.");
+        Assert.IsInstanceOfType(buildParameters["keys"], typeof(string[]), "The 'keys' parameter should be a string array.");
         Assert.AreEqual("bar", ((IDictionary<string, object>) buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
         Assert.AreEqual("foo", ((string[]) buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
         Assert.IsFalse(buildParameters.ContainsKey("watch"), "The 'watch' parameter should not be present.");
+        
     }
 
     [TestMethod]
@@ -55,11 +56,11 @@ public class LiveQueryTests
         Assert.AreEqual("DummyClass", buildParameters["className"], "The ClassName property of liveQuery should be 'DummyClass'.");
         Assert.IsTrue(buildParameters.ContainsKey("where"), "The 'where' key should be present in the build parameters.");
         Assert.IsTrue(buildParameters.ContainsKey("keys"), "The 'keys' key should be present in the build parameters.");
-        Assert.IsInstanceOfType<Dictionary<string, object>>(buildParameters["where"], "The 'where' parameter should be a Dictionary<string, object>.");
-        Assert.IsInstanceOfType<string[]>(buildParameters["keys"], "The 'keys' parameter should be a string array.");
+        Assert.IsInstanceOfType(buildParameters["where"], typeof(IDictionary<string, object>), "The 'where' parameter should be a Dictionary<string, object>.");
+        Assert.IsInstanceOfType(buildParameters["keys"], typeof(string[]), "The 'keys' parameter should be a string array.");
         Assert.AreEqual("bar", ((IDictionary<string, object>) buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
         Assert.AreEqual("foo", ((string[]) buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
-        Assert.IsInstanceOfType<string[]>(buildParameters["watch"], "The 'watch' parameter should be a string array.");
+        Assert.IsInstanceOfType(buildParameters["watch"], typeof(string[]), "The 'watch' parameter should be a string array.");
         Assert.AreEqual("foo", ((string[]) buildParameters["watch"]).First(), "The 'watch' parameter should contain 'foo'.");
     }
 
@@ -80,8 +81,8 @@ public class LiveQueryTests
         Assert.AreEqual("DummyClass", buildParameters["className"], "The ClassName property of liveQuery should be 'DummyClass'.");
         Assert.IsTrue(buildParameters.ContainsKey("where"), "The 'where' key should be present in the build parameters.");
         Assert.IsTrue(buildParameters.ContainsKey("keys"), "The 'keys' key should be present in the build parameters.");
-        Assert.IsInstanceOfType<IDictionary<string, object>>(buildParameters["where"], "The 'where' parameter should be a Dictionary<string, object>.");
-        Assert.IsInstanceOfType<string[]>(buildParameters["keys"], "The 'keys' parameter should be a string array.");
+        Assert.IsInstanceOfType(buildParameters["where"], typeof(IDictionary<string, object>), "The 'where' parameter should be a Dictionary<string, object>.");
+        Assert.IsInstanceOfType(buildParameters["keys"], typeof(string[]), "The 'keys' parameter should be a string array.");
         Assert.AreEqual("bar", ((Dictionary<string, object>) buildParameters["where"])["foo"], "The 'where' clause should match the query condition.");
         Assert.AreEqual("foo", ((string[]) buildParameters["keys"]).First(), "The 'keys' parameter should contain 'foo'.");
     }
@@ -105,7 +106,7 @@ public class LiveQueryTests
 
         // Assert
         buildParameters = liveQuery.BuildParameters();
-        Assert.IsInstanceOfType<string[]>(buildParameters["watch"], "The 'watch' parameter should be a string array.");
+        Assert.IsInstanceOfType(buildParameters["watch"], typeof(string[]), "The 'watch' parameter should be a string array.");
         Assert.AreEqual("foo", ((string[]) buildParameters["watch"]).First(), "The 'watch' parameter should contain 'foo'.");
 
         // Act
@@ -113,6 +114,6 @@ public class LiveQueryTests
 
         // Assert
         buildParameters = liveQuery.BuildParameters();
-        Assert.Contains("bar", (string[]) buildParameters["watch"], "The 'watch' parameter should contain 'bar'.");
+        CollectionAssert.Contains((string[]) buildParameters["watch"], "bar", "The 'watch' parameter should contain 'bar'.");
     }
 }

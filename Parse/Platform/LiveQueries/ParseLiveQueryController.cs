@@ -172,18 +172,19 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
                 ProcessDeleteEventMessage(message);
                 break;
             default:
-                Debug.WriteLine($"Unknown operation: {message["op"]}");
+                Debug.WriteLine($"Unknown operation: {op}");
                 break;
         }
     }
 
     private bool ValidateClientMessage(IDictionary<string, object> message, out int requestId)
     {
-        requestId = 0;
-
         ClientId = MessageParser.GetClientId(message);
         if (ClientId is null)
+        {
+            requestId = 0;
             return false;
+        }
 
         requestId = MessageParser.GetRequestId(message);
         return requestId != 0;
@@ -290,7 +291,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
             Boolean.TryParse(reconnectObj?.ToString(), out bool reconnect)))
             return;
 
-        Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(code, error, reconnect));
+        var liveQueryError = MessageParser.GetError(message);
+
+        Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(liveQueryError.Code, liveQueryError.Message, liveQueryError.Reconnect));
     }
 
     void ProcessUnsubscriptionMessage(IDictionary<string, object> message)
@@ -370,6 +373,41 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
             Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(31, $"Failed to parse message: {ex.Message}", true, ex));
         }
     }
+
+    private async Task EstablishConnectionAsync(CancellationToken cancellationToken)
+    {
+        _state = ParseLiveQueryState.Connecting;
+        await OpenAsync(cancellationToken);
+        
+        WebSocketClient.MessageReceived += WebSocketClientOnMessageReceived;
+        WebSocketClient.WebsocketError += WebSocketClientOnWebsocketError;
+        WebSocketClient.UnknownError += WebSocketClientOnUnknownError;
+        
+        IDictionary<string, object> message = await MessageBuilder.BuildConnectMessage();
+        ConnectionSignal = new TaskCompletionSource();
+        
+        try
+        {
+            await SendMessage(message, cancellationToken);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(Timeout);
+            await ConnectionSignal.Task.WaitAsync(cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            try
+            {
+                await CloseAsync(CancellationToken.None);
+            }
+            catch { } // Ignore cleanup errors
+            throw new TimeoutException("Live query server connection request has reached timeout");
+        }
+        finally
+        {
+            ConnectionSignal = null;
+        }
+    }
+
     /// <summary>
     /// Establishes a connection to the live query server asynchronously.
     /// </summary>
@@ -387,32 +425,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         ThrowIfDisposed();
         if (_state == ParseLiveQueryState.Closed)
         {
-            _state = ParseLiveQueryState.Connecting;
-            await OpenAsync(cancellationToken);
-            WebSocketClient.MessageReceived += WebSocketClientOnMessageReceived;
-            WebSocketClient.WebsocketError += WebSocketClientOnWebsocketError;
-            WebSocketClient.UnknownError += WebSocketClientOnUnknownError;
-
-            IDictionary<string, object> message = await MessageBuilder.BuildConnectMessage();
-
-            ConnectionSignal = new TaskCompletionSource();
-            try
-            {
-                await SendMessage(message, cancellationToken);
-
-                using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                cts.CancelAfter(Timeout);
-
-                await ConnectionSignal.Task.WaitAsync(cts.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                throw new TimeoutException("Live query server connection request has reached timeout");
-            }
-            finally
-            {
-                ConnectionSignal = null;
-            }
+            await EstablishConnectionAsync(cancellationToken);
         }
         else if (_state == ParseLiveQueryState.Connecting)
         {
@@ -566,12 +579,20 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
         ThrowIfDisposed();
+        _state = ParseLiveQueryState.Closed;
         WebSocketClient.MessageReceived -= WebSocketClientOnMessageReceived;
         WebSocketClient.WebsocketError -= WebSocketClientOnWebsocketError;
         WebSocketClient.UnknownError -= WebSocketClientOnUnknownError;
         await WebSocketClient.CloseAsync(cancellationToken);
-        _state = ParseLiveQueryState.Closed;
+        foreach (var signal in SubscriptionSignals.Values)
+        {
+            signal.TrySetCanceled();
+        }
         SubscriptionSignals.Clear();
+        foreach (var signal in UnsubscriptionSignals.Values)
+        {
+            signal.TrySetCanceled();
+        }
         UnsubscriptionSignals.Clear();
         Subscriptions.Clear();
     }
@@ -619,15 +640,17 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
             return;
         if (disposing)
         {
-            // For sync disposal, the best effort cleanup without waiting
-            try
+            Task.Run(async () =>
             {
-                CloseAsync().GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error during disposal: {ex}");
-            }
+                try
+                {
+                    await DisposeAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error during async disposal: {ex}");
+                }
+            });
         }
         disposed = true;
     }
