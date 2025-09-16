@@ -137,7 +137,7 @@ public class LiveQueryMessageParserTests
         };
 
         IParseLiveQueryMessageParser.LiveQueryError error = parser.GetError(message);
-        Assert.HasCount(3, message);
+        Assert.AreEqual(3, message.Count);
         Assert.AreEqual(errorCode, error.Code);
         Assert.AreEqual(errorMessage, error.Message);
         Assert.AreEqual(reconnect, error.Reconnect);

@@ -9,7 +9,10 @@ namespace Parse.Abstractions.Platform.LiveQueries;
 public interface IParseLiveQueryMessageParser
 {
 
-    struct LiveQueryError
+    /// <summary>
+    /// Structure representing a Live Query Server error
+    /// </summary>
+    readonly struct LiveQueryError
     {
         public int Code { get; }
         public string Message { get; }
@@ -56,7 +59,7 @@ public interface IParseLiveQueryMessageParser
     /// </summary>
     /// <param name="message">The message containing error details.</param>
     /// <returns>
-    /// A tuple containing the error code, error message, and a boolean indicating whether to reconnect.
+    /// A LiveQueryError containing the error code, message, and a boolean indicating whether to reconnect.
     /// </returns>
     LiveQueryError GetError(IDictionary<string, object> message);
 }

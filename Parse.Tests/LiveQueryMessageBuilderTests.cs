@@ -48,7 +48,7 @@ public class LiveQueryMessageBuilderTests
         Assert.IsTrue(message.ContainsKey("applicationId"));
         Assert.IsTrue(message.ContainsKey("windowsKey"));
         Assert.IsTrue(message.ContainsKey("sessionToken"));
-        Assert.HasCount(4, message);
+        Assert.AreEqual(4, message.Count);
         Assert.AreEqual("connect", message["op"]);
         Assert.AreEqual(Client.Services.LiveQueryServerConnectionData.ApplicationID, message["applicationId"]);
         Assert.AreEqual(Client.Services.LiveQueryServerConnectionData.Key, message["windowsKey"]);
@@ -65,17 +65,17 @@ public class LiveQueryMessageBuilderTests
         Assert.IsNotNull(message);
         Assert.IsTrue(message.ContainsKey("op"));
         Assert.IsTrue(message.ContainsKey("requestId"));
-        Assert.HasCount(2, message);
+        Assert.AreEqual(2, message.Count);
         Assert.AreEqual("unsubscribe", message["op"]);
         Assert.AreEqual(requestId, message["requestId"]);
 
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => builder.BuildUnsubscribeMessage(0));
+        Assert.ThrowsException<ArgumentOutOfRangeException>(() => builder.BuildUnsubscribeMessage(0));
     }
 
     private void ValidateSubscriptionMessage(IDictionary<string, object> message, string expectedOp, int requestId)
     {
         Assert.IsNotNull(message);
-        Assert.HasCount(4, message);
+        Assert.AreEqual(4, message.Count);
 
         Assert.IsTrue(message.ContainsKey("op"));
         Assert.AreEqual(expectedOp, message["op"]);
@@ -84,28 +84,28 @@ public class LiveQueryMessageBuilderTests
         Assert.AreEqual(requestId, message["requestId"]);
 
         Assert.IsTrue(message.ContainsKey("query"));
-        Assert.IsInstanceOfType<IDictionary<string, object>>(message["query"], "The 'query' value should be a Dictionary<string, object>.");
-        Assert.HasCount(4, (IDictionary<string, object>) message["query"]);
+        Assert.IsInstanceOfType(message["query"], typeof(IDictionary<string, object>), "The 'query' value should be a Dictionary<string, object>.");
+        Assert.AreEqual(4, ((IDictionary<string, object>) message["query"]).Count);
         IDictionary<string, object> query = message["query"] as IDictionary<string, object>;
 
         Assert.IsTrue(query.ContainsKey("className"), "The 'query' dictionary should contain the 'className' key.");
         Assert.AreEqual("DummyClass", query["className"], "The 'className' property should be 'DummyClass'.");
 
         Assert.IsTrue(query.ContainsKey("where"), "The 'query' dictionary should contain the 'where' key.");
-        Assert.IsInstanceOfType<IDictionary<string, object>>(query["where"], "The 'where' property should be a Dictionary<string, object>.");
+        Assert.IsInstanceOfType(query["where"], typeof(IDictionary<string, object>), "The 'where' property should be a Dictionary<string, object>.");
         IDictionary<string, object> where = (IDictionary<string, object>) query["where"];
-        Assert.HasCount(1, where, "The 'where' dictionary should contain exactly one key-value pair.");
+        Assert.AreEqual(1, where.Count, "The 'where' dictionary should contain exactly one key-value pair.");
         Assert.IsTrue(where.ContainsKey("foo"), "The 'where' dictionary should contain the 'foo' key.");
         Assert.AreEqual("bar", where["foo"], "The 'foo' property in 'where' should be 'bar'.");
 
         Assert.IsTrue(query.ContainsKey("keys"), "The 'query' dictionary should contain the 'keys' key.");
-        Assert.IsInstanceOfType<string[]>(query["keys"], "The 'keys' property should be a string array.");
-        Assert.HasCount(1, (string[]) query["keys"], "The 'keys' array should contain exactly one element.");
+        Assert.IsInstanceOfType(query["keys"], typeof(string[]), "The 'keys' property should be a string array.");
+        Assert.AreEqual(1, ((string[]) query["keys"]).Length, "The 'keys' array should contain exactly one element.");
         Assert.AreEqual("foo", ((string[]) query["keys"])[0], "The 'keys' parameter should contain 'foo'.");
 
         Assert.IsTrue(query.ContainsKey("watch"), "The 'query' dictionary should contain the 'watch' key.");
-        Assert.IsInstanceOfType<string[]>(query["watch"], "The 'watch' property should be a string array.");
-        Assert.HasCount(1, (string[]) query["watch"], "The 'watch' array should contain exactly one element.");
+        Assert.IsInstanceOfType(query["watch"], typeof(string[]), "The 'watch' property should be a string array.");
+        Assert.AreEqual(1, ((string[]) query["watch"]).Length, "The 'watch' array should contain exactly one element.");
         Assert.AreEqual("foo", ((string[]) query["watch"])[0], "The 'watch' parameter should contain 'foo'.");
 
     }
@@ -118,15 +118,15 @@ public class LiveQueryMessageBuilderTests
             Client.Services,
             "DummyClass",
             new Dictionary<string, object> { { "foo", "bar" } },
-            ["foo"],
-            ["foo"]);
+            new[] { "foo" },
+            new[] { "foo" });
         ParseLiveQueryMessageBuilder builder = new ParseLiveQueryMessageBuilder();
         IDictionary<string, object> message = await builder.BuildSubscribeMessage<ParseObject>(requestId, liveQuery);
 
         ValidateSubscriptionMessage(message, "subscribe", requestId);
 
-        await Assert.ThrowsExactlyAsync<ArgumentOutOfRangeException>(async () => await builder.BuildSubscribeMessage<ParseObject>(0, liveQuery));
-        await Assert.ThrowsExactlyAsync<ArgumentNullException>(async () => await builder.BuildSubscribeMessage<ParseObject>(requestId, null));
+        await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(async () => await builder.BuildSubscribeMessage<ParseObject>(0, liveQuery));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await builder.BuildSubscribeMessage<ParseObject>(requestId, null));
     }
 
     [TestMethod]
@@ -137,14 +137,14 @@ public class LiveQueryMessageBuilderTests
             Client.Services,
             "DummyClass",
             new Dictionary<string, object> { { "foo", "bar" } },
-            ["foo"],
-            ["foo"]);
+            new[] { "foo" },
+            new[] { "foo" });
         ParseLiveQueryMessageBuilder builder = new ParseLiveQueryMessageBuilder();
         IDictionary<string, object> message = await builder.BuildUpdateSubscriptionMessage<ParseObject>(requestId, liveQuery);
 
         ValidateSubscriptionMessage(message, "update", requestId);
 
-        await Assert.ThrowsExactlyAsync<ArgumentOutOfRangeException>(async () => await builder.BuildUpdateSubscriptionMessage<ParseObject>(0, liveQuery));
-        await Assert.ThrowsExactlyAsync<ArgumentNullException>(async () => await builder.BuildUpdateSubscriptionMessage<ParseObject>(requestId, null));
+        await Assert.ThrowsExceptionAsync<ArgumentOutOfRangeException>(async () => await builder.BuildUpdateSubscriptionMessage<ParseObject>(0, liveQuery));
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await builder.BuildUpdateSubscriptionMessage<ParseObject>(requestId, null));
     }
 }

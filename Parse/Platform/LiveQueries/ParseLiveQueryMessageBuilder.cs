@@ -32,7 +32,7 @@ internal class ParseLiveQueryMessageBuilder : IParseLiveQueryMessageBuilder
             }
         });
 
-    public async Task<IDictionary<string, object>> BuildSubscribeMessage<T>(int requestId, ParseLiveQuery<T> liveQuery) where T : ParseObject
+    private async Task<IDictionary<string, object>> BuildSubscriptionMessageCore<T>(string operation, int requestId, ParseLiveQuery<T> liveQuery) where T : ParseObject
     {
         if (requestId <= 0)
             throw new ArgumentOutOfRangeException(nameof(requestId), "Request ID must be greater than zero.");
@@ -42,27 +42,17 @@ internal class ParseLiveQueryMessageBuilder : IParseLiveQueryMessageBuilder
 
         return await AppendSessionToken(new Dictionary<string, object>
         {
-            { "op", "subscribe" },
+            { "op", operation },
             { "requestId", requestId },
             { "query", liveQuery.BuildParameters() }
         });
     }
+
+    public async Task<IDictionary<string, object>> BuildSubscribeMessage<T>(int requestId, ParseLiveQuery<T> liveQuery) where T : ParseObject
+        => await BuildSubscriptionMessageCore("subscribe", requestId, liveQuery);
 
     public async Task<IDictionary<string, object>> BuildUpdateSubscriptionMessage<T>(int requestId, ParseLiveQuery<T> liveQuery) where T : ParseObject
-    {
-        if (requestId <= 0)
-            throw new ArgumentOutOfRangeException(nameof(requestId), "Request ID must be greater than zero.");
-
-        if (liveQuery is null)
-            throw new ArgumentNullException(nameof(liveQuery));
-
-        return await AppendSessionToken(new Dictionary<string, object>
-        {
-            { "op", "update" },
-            { "requestId", requestId },
-            { "query", liveQuery.BuildParameters() }
-        });
-    }
+        => await BuildSubscriptionMessageCore("update", requestId, liveQuery);
 
     public IDictionary<string, object> BuildUnsubscribeMessage(int requestId)
     {

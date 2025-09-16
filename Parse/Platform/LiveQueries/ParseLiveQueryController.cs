@@ -34,7 +34,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     private bool disposed;
 
     /// <summary>
-    /// Gets or sets the timeout duration, in milliseconds, used by the ParseLiveQueryController
+    /// Gets or sets the timeout duration used by the ParseLiveQueryController (as a TimeSpan)
     /// for various operations, such as establishing a connection or completing a subscription.
     /// </summary>
     /// <remarks>
@@ -106,7 +106,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
     TaskCompletionSource ConnectionSignal { get; set; }
     private ConcurrentDictionary<int, TaskCompletionSource> SubscriptionSignals { get; } = new ConcurrentDictionary<int, TaskCompletionSource>();
     private ConcurrentDictionary<int, TaskCompletionSource> UnsubscriptionSignals { get; } = new ConcurrentDictionary<int, TaskCompletionSource>();
-    private ConcurrentDictionary<int, IParseLiveQuerySubscription> Subscriptions { get; set; } = new ConcurrentDictionary<int, IParseLiveQuerySubscription>();
+    private ConcurrentDictionary<int, IParseLiveQuerySubscription> Subscriptions { get; } = new ConcurrentDictionary<int, IParseLiveQuerySubscription>();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ParseLiveQueryController"/> class.
@@ -279,20 +279,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
 
     void ProcessErrorMessage(IDictionary<string, object> message)
     {
-        if (!(message.TryGetValue("code", out object codeObj) &&
-            Int32.TryParse(codeObj?.ToString(), out int code)))
-            return;
-
-        if (!(message.TryGetValue("error", out object errorObj) &&
-              errorObj is string error))
-            return;
-
-        if (!(message.TryGetValue("reconnect", out object reconnectObj) &&
-            Boolean.TryParse(reconnectObj?.ToString(), out bool reconnect)))
-            return;
-
         var liveQueryError = MessageParser.GetError(message);
-
         Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(liveQueryError.Code, liveQueryError.Message, liveQueryError.Reconnect));
     }
 
@@ -325,27 +312,17 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         ConnectionSignal?.TrySetResult();
     }
 
-    private async Task<IDictionary<string, object>> AppendSessionToken(IDictionary<string, object> message)
-    {
-        string sessionToken = await ParseClient.Instance.Services.GetCurrentSessionToken();
-        return sessionToken is null
-            ? message
-            : message.Concat(new Dictionary<string, object> {
-                { "sessionToken", sessionToken }
-            }).ToDictionary();
-    }
-
     private async Task SendMessage(IDictionary<string, object> message, CancellationToken cancellationToken) =>
         await WebSocketClient.SendAsync(JsonUtilities.Encode(message), cancellationToken);
 
     private async Task OpenAsync(CancellationToken cancellationToken = default)
     {
-        if (ParseClient.Instance.Services == null)
+        if (ParseClient.Instance.Services is null)
         {
             throw new InvalidOperationException("ParseClient.Services must be initialized before connecting to the LiveQuery server.");
         }
 
-        if (ParseClient.Instance.Services.LiveQueryServerConnectionData == null)
+        if (ParseClient.Instance.Services.LiveQueryServerConnectionData is null)
         {
             throw new InvalidOperationException("ParseClient.Services.LiveQueryServerConnectionData must be initialized before connecting to the LiveQuery server.");
         }
@@ -384,12 +361,12 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         WebSocketClient.UnknownError += WebSocketClientOnUnknownError;
         
         IDictionary<string, object> message = await MessageBuilder.BuildConnectMessage();
-        ConnectionSignal = new TaskCompletionSource();
-        
+        ConnectionSignal = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
         try
         {
             await SendMessage(message, cancellationToken);
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(Timeout);
             await ConnectionSignal.Task.WaitAsync(cts.Token);
         }
@@ -404,6 +381,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         }
         finally
         {
+            cts.Dispose();
             ConnectionSignal = null;
         }
     }
@@ -458,16 +436,14 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         int requestId,
         CancellationToken cancellationToken)
     {
-        TaskCompletionSource tcs = new TaskCompletionSource();
+        CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        TaskCompletionSource tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         signalDictionary.TryAdd(requestId, tcs);
 
         try
         {
             await SendMessage(message, cancellationToken);
-
-            CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(Timeout);
-
             await tcs.Task.WaitAsync(cts.Token);
         }
         catch (OperationCanceledException)
@@ -477,6 +453,8 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         finally
         {
             signalDictionary.TryRemove(requestId, out _);
+            tcs = null;
+            cts.Dispose();
         }
     }
 
