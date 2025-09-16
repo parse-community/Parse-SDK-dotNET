@@ -120,7 +120,7 @@ class TextWebSocketClient(int bufferSize) : IWebSocketClient, IDisposable
                 else
                 {
                     // Accumulate bytes to handle UTF-8 characters split across boundaries
-                    using var messageStream = new MemoryStream();
+                    MemoryStream messageStream = new MemoryStream();
                     messageStream.Write(buffer, 0, result.Count);
                     while (!result.EndOfMessage)
                     {

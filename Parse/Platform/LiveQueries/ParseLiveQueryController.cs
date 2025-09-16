@@ -452,7 +452,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         {
             await SendMessage(message, cancellationToken);
 
-            using CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            CancellationTokenSource cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             cts.CancelAfter(Timeout);
 
             await tcs.Task.WaitAsync(cts.Token);
