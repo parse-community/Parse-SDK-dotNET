@@ -12,19 +12,7 @@ public interface IParseLiveQueryMessageParser
     /// <summary>
     /// Structure representing a Live Query Server error
     /// </summary>
-    readonly struct LiveQueryError
-    {
-        public int Code { get; }
-        public string Message { get; }
-        public bool Reconnect { get; }
-
-        public LiveQueryError(int code, string message, bool reconnect)
-        {
-            Code = code;
-            Message = message;
-            Reconnect = reconnect;
-        }
-    }
+    readonly record struct LiveQueryError(int Code, string Message, bool Reconnect);
 
     /// <summary>
     /// Gets the client identifier from the specified message.

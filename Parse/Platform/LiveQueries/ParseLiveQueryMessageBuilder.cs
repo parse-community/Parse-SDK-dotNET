@@ -14,7 +14,13 @@ internal class ParseLiveQueryMessageBuilder : IParseLiveQueryMessageBuilder
 
         string sessionToken = await ParseClient.Instance.Services.GetCurrentSessionToken();
         if (sessionToken is not null)
-            message.Add("sessionToken", sessionToken);
+        {
+            Dictionary<string, object> copy = new Dictionary<string, object>(message)
+            {
+                { "sessionToken", sessionToken }
+            };
+            return copy;
+        }
 
         return message;
     }
