@@ -19,9 +19,14 @@ public class ClientTests
     [TestMethod]
     public void TestPublicize()
     {
+        ParseClient previous = ParseClient.Instance;
         ParseClient client = new("appId", "https://api.dummy-parse.com/1/", "dotnetKey");
-        client.Publicize();
-        Assert.AreSame(client, ParseClient.Instance);
+        try {
+            client.Publicize();
+            Assert.AreSame(client, ParseClient.Instance);
+        } finally {
+            previous?.Publicize();
+        }
     }
 
     [TestMethod]

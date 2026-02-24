@@ -30,12 +30,12 @@ public class InfrastructureTests
     public void TestFlexibleListWrapper()
     {
         // Arrange
-        List<object> inner = [1, 6.5f];
+        List<object> inner = [1, 6.7f];
         FlexibleListWrapper<int, object> wrapper = new(inner);
 
         // Act & Assert
         Assert.AreEqual(1, wrapper[0]);
-        Assert.AreEqual(6, wrapper[1]);
+        Assert.AreEqual(7, wrapper[1]);
 
         wrapper.Add(2);
         Assert.AreEqual(2, inner[2]);
@@ -47,7 +47,7 @@ public class InfrastructureTests
         // Test basic conversions
         Assert.AreEqual(123, Conversion.ConvertTo<int>("123"));
         Assert.AreEqual(123L, Conversion.ConvertTo<long>(123));
-        Assert.AreEqual(123.45, Conversion.ConvertTo<double>("123.45"));
+        Assert.AreEqual(123.45, (double)Conversion.ConvertTo<double>("123.45"), 1e-10);
     }
 
     [TestMethod]

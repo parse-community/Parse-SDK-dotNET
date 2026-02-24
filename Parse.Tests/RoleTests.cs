@@ -32,7 +32,12 @@ public class RoleTests
     }
 
     [TestMethod]
-    public void TestRoleNameValidation()
+    [DataRow("ValidName")]
+    [DataRow("Valid-Name")]
+    [DataRow("Valid_Name")]
+    [DataRow("Valid Name")]
+    [DataRow("123")]
+    public void TestRoleNameValidation_Valid(string name)
     {
         ParseACL acl = new();
         ParseRole role = new()
@@ -40,16 +45,20 @@ public class RoleTests
             ACL = acl,
 
             // Valid names
-            Name = "ValidName"
+            Name = name
         };
-        role.Name = "Valid-Name";
-        role.Name = "Valid_Name";
-        role.Name = "Valid Name";
-        role.Name = "123";
+        Assert.AreEqual(name, role.Name);
+    }
 
-        // Invalid names (should throw ArgumentException in OnSettingValue)
-        Assert.ThrowsExactly<ArgumentException>(() => role.Name = "Invalid@Name");
-        Assert.ThrowsExactly<ArgumentException>(() => role.Name = "Invalid#Name");
+    [TestMethod]
+    [DataRow("Invalid@Name")]
+    [DataRow("Invalid#Name")]
+    public void TestRoleNameValidation_Invalid(string name)
+    {
+        ParseACL acl = new();
+        ParseRole role = new() { ACL = acl};
+
+        Assert.ThrowsExactly<ArgumentException>(() => role.Name = name);
     }
 
     [TestMethod]

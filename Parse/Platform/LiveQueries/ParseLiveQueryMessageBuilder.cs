@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Platform.LiveQueries;
 
 namespace Parse.Platform.LiveQueries;
@@ -25,18 +26,18 @@ internal class ParseLiveQueryMessageBuilder : IParseLiveQueryMessageBuilder
         return message;
     }
 
-    public async Task<IDictionary<string, object>> BuildConnectMessage() => await AppendSessionToken(new Dictionary<string, object>
+    public async Task<IDictionary<string, object>> BuildConnectMessage()
+    {
+        ILiveQueryServerConnectionData lqData = ParseClient.Instance.Services.LiveQueryServerConnectionData 
+            ?? throw new InvalidOperationException("LiveQueryServerConnectionData is not configured");
+
+        return await AppendSessionToken(new Dictionary<string, object> 
         {
             { "op", "connect" },
-            {
-                "applicationId",
-                ParseClient.Instance.Services.LiveQueryServerConnectionData?.ApplicationID ?? throw new InvalidOperationException("LiveQueryServerConnectionData is not configured")
-            },
-            {
-                "windowsKey",
-                ParseClient.Instance.Services.LiveQueryServerConnectionData?.Key ?? throw new InvalidOperationException("LiveQueryServerConnectionData is not configured")
-            }
+            { "applicationId", lqData.ApplicationID ?? throw new InvalidOperationException("LiveQueryServerConnectionData is not configured")},
+            { "windowsKey", lqData.Key ?? throw new InvalidOperationException("LiveQueryServerConnectionData is not configured") } 
         });
+    }
 
     private async Task<IDictionary<string, object>> BuildSubscriptionMessageCore<T>(string operation, int requestId, ParseLiveQuery<T> liveQuery) where T : ParseObject
     {
