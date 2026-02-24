@@ -15,5 +15,10 @@ public class ParseLiveQueryEventArgs : EventArgs
     /// </summary>
     public ParseObject Object { get; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ParseLiveQueryEventArgs"/> class with the specified Parse object.
+    /// </summary>
+    /// <param name="current">The current state of the Parse object associated with the live query event.</param>
+    /// <exception cref="ArgumentNullException"></exception>
     internal ParseLiveQueryEventArgs(ParseObject current) => Object = current ?? throw new ArgumentNullException(nameof(current));
 }
