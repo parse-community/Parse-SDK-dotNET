@@ -93,7 +93,12 @@ public class ParseLiveQuery<T> where T : ParseObject
 
     internal IDictionary<string, object> BuildParameters()
     {
-        Dictionary<string, object> result = new Dictionary<string, object> { ["className"] = ClassName, ["where"] = Filters };
+        Dictionary<string, object> result = new()
+        { 
+            ["className"] = ClassName, 
+            ["where"] = new Dictionary<string, object>(Filters) 
+        };
+
         if (KeySelections != null)
             result["keys"] = KeySelections.ToArray();
         if (KeyWatchers != null)

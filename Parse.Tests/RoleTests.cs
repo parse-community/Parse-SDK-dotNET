@@ -13,9 +13,7 @@ public class RoleTests
     [TestInitialize]
     public void Initialize()
     {
-        Client = new ParseClient(new ServerConnectionData { Test = true })
-        {
-        };
+        Client = new ParseClient(new ServerConnectionData { Test = true });
         Client.Publicize();
     }
 
@@ -53,6 +51,10 @@ public class RoleTests
     [TestMethod]
     [DataRow("Invalid@Name")]
     [DataRow("Invalid#Name")]
+    [DataRow("Invalid$Name")]
+    [DataRow("Invalid!Name")]
+    [DataRow("Invalid/Name")]
+    [DataRow("Invalid\\Name")]
     public void TestRoleNameValidation_Invalid(string name)
     {
         ParseACL acl = new();
