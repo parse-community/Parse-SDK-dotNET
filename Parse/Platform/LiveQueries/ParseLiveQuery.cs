@@ -70,9 +70,10 @@ public class ParseLiveQuery<T> where T : ParseObject
         ClassName = source.ClassName;
         Filters = source.Filters;
         KeySelections = source.KeySelections;
-        KeyWatchers = watchedKeys is null 
-            ? source.KeyWatchers
-            : new ReadOnlyCollection<string>(MergeWatchers(watchedKeys).ToList());
+        KeyWatchers = source.KeyWatchers;
+        
+        if (watchedKeys is not null)
+            KeyWatchers = new ReadOnlyCollection<string>([.. MergeWatchers(watchedKeys)]);
     }
 
     private HashSet<string> MergeWatchers(IEnumerable<string> keys) => [..(KeyWatchers ?? Enumerable.Empty<string>()).Concat(keys)];

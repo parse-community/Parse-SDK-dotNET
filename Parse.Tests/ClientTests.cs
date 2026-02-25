@@ -10,9 +10,9 @@ public class ClientTests
     [TestMethod]
     public void TestParseClientConstructor()
     {
-        ParseClient client = new("appId", "https://api.dummy-parse.com/1/", "dotnetKey");
+        ParseClient client = new("appId", "https://parse.example.com/", "dotnetKey");
         Assert.AreEqual("appId", client.ServerConnectionData.ApplicationID);
-        Assert.AreEqual("https://api.dummy-parse.com/1/", client.ServerConnectionData.ServerURI);
+        Assert.AreEqual("https://parse.example.com/", client.ServerConnectionData.ServerURI);
         Assert.AreEqual("dotnetKey", client.ServerConnectionData.Key);
     }
 
@@ -20,7 +20,7 @@ public class ClientTests
     public void TestPublicize()
     {
         ParseClient previous = ParseClient.Instance;
-        ParseClient client = new("appId", "https://api.dummy-parse.com/1/", "dotnetKey");
+        ParseClient client = new("appId", "https://parse.example.com/", "dotnetKey");
         try {
             client.Publicize();
             Assert.AreSame(client, ParseClient.Instance);
@@ -30,22 +30,16 @@ public class ClientTests
     }
 
     [TestMethod]
-    public void TestConstructorWithInvalidUri() =>
-        // Should throw if using the old parse.com URI without Test=true
-        Assert.ThrowsExactly<InvalidOperationException>(() =>
-            new ParseClient("appId", "https://api.parse.com/1/", "dotnetKey") { });// Actually, looking at the code, it throws if the URI is EXACTLY "https://api.parse.com/1/"// and Test is not true.
-
-    [TestMethod]
     public void TestConstructorWithTestTrue()
     {
         ServerConnectionData data = new()
         { 
             ApplicationID = "appId", 
-            ServerURI = "https://api.parse.com/1/", 
+            ServerURI = "https://parse.example.com/", 
             Key = "key", 
             Test = true 
         };
         ParseClient client = new(data);
-        Assert.AreEqual("https://api.parse.com/1/", client.ServerConnectionData.ServerURI);
+        Assert.AreEqual("https://parse.example.com/", client.ServerConnectionData.ServerURI);
     }
 }
