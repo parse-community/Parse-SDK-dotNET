@@ -279,7 +279,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
 
     void ProcessErrorMessage(IDictionary<string, object> message)
     {
-        var liveQueryError = MessageParser.GetError(message);
+        IParseLiveQueryMessageParser.LiveQueryError liveQueryError = MessageParser.GetError(message);
         Error?.Invoke(this, new ParseLiveQueryErrorEventArgs(liveQueryError.Code, liveQueryError.Message, liveQueryError.Reconnect));
     }
 
@@ -562,12 +562,12 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         WebSocketClient.WebsocketError -= WebSocketClientOnWebsocketError;
         WebSocketClient.UnknownError -= WebSocketClientOnUnknownError;
         await WebSocketClient.CloseAsync(cancellationToken);
-        foreach (var signal in SubscriptionSignals.Values)
+        foreach (TaskCompletionSource signal in SubscriptionSignals.Values)
         {
             signal.TrySetCanceled();
         }
         SubscriptionSignals.Clear();
-        foreach (var signal in UnsubscriptionSignals.Values)
+        foreach (TaskCompletionSource signal in UnsubscriptionSignals.Values)
         {
             signal.TrySetCanceled();
         }

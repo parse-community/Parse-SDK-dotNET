@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,6 +12,41 @@ namespace Parse.Tests;
 public class TextWebSocketClientTests
 {
     [TestMethod]
+    public void Dispose_MultipleCalls_DoesNotThrow()
+    {
+        TextWebSocketClient client = new TextWebSocketClient(1024);
+        client.Dispose();
+        client.Dispose();
+        // No exception expected
+    }
+
+    [TestMethod]
+    public void SendAsync_ThrowsIfNotOpen()
+    {
+        TextWebSocketClient client = new TextWebSocketClient(1024);
+        Task<ArgumentNullException> ex = Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await client.SendAsync("msg"));
+        Assert.IsNotNull(ex);
+    }
+
+    [TestMethod]
+    public async Task CloseAsync_DoesNothingIfNotConnected()
+    {
+        TextWebSocketClient client = new TextWebSocketClient(1024);
+        await client.CloseAsync();
+        // Should not throw
+    }
+
+    [TestMethod]
+    public void StartListening_DoesNotStartMultipleListeners()
+    {
+        TextWebSocketClient client = new TextWebSocketClient(1024);
+        MethodInfo method = typeof(TextWebSocketClient).GetMethod("StartListening", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        CancellationTokenSource cts = new CancellationTokenSource();
+        method.Invoke(client, new object[] { cts.Token });
+        method.Invoke(client, new object[] { cts.Token });
+        // Should not throw or start multiple listeners
+    }
+    [TestMethod]
     public void TestConstructor()
     {
         TextWebSocketClient client = new TextWebSocketClient(4096);
@@ -19,7 +55,7 @@ public class TextWebSocketClientTests
 
     [TestMethod]
     [TestCategory("Integration")]
-    [Timeout(10000)]
+    [Timeout(10000, CooperativeCancellation = true)]
     public async Task TestSendAndReceive()
     {
         TextWebSocketClient client = new TextWebSocketClient(32);

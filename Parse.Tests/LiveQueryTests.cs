@@ -8,8 +8,6 @@ namespace Parse.Tests;
 [TestClass]
 public class LiveQueryTests
 {
-    public class DummyParseObject : ParseObject { }
-
     private ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true }, new LiveQueryServerConnectionData { Test = true });
 
     public LiveQueryTests()
