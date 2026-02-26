@@ -1,4 +1,3 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parse.Infrastructure;
 
@@ -14,6 +13,33 @@ public class ClientTests
         Assert.AreEqual("appId", client.ServerConnectionData.ApplicationID);
         Assert.AreEqual("https://parse.example.com/", client.ServerConnectionData.ServerURI);
         Assert.AreEqual("dotnetKey", client.ServerConnectionData.Key);
+    }
+
+    [TestMethod]
+    public void TestParseClientLiveQueryConstructor()
+    {
+        ServerConnectionData serverConnectionData = new()
+        { 
+            ApplicationID = "appId", 
+            ServerURI = "https://parse.example.com/",
+            Key = "dotnetKey" 
+        };
+
+        LiveQueryServerConnectionData liveQueryServerConnectionData = new()
+        { 
+            ApplicationID = "appId", 
+            ServerURI = "https://parse.example.com/", 
+            Key = "dotnetKey" 
+        };
+
+        ParseClient client = new(serverConnectionData, liveQueryServerConnectionData);
+        Assert.AreEqual("appId", client.ServerConnectionData.ApplicationID);
+        Assert.AreEqual("https://parse.example.com/", client.ServerConnectionData.ServerURI);
+        Assert.AreEqual("dotnetKey", client.ServerConnectionData.Key);
+
+        Assert.AreEqual("appId", client.LiveQueryServerConnectionData.ApplicationID);
+        Assert.AreEqual("https://parse.example.com/", client.LiveQueryServerConnectionData.ServerURI);
+        Assert.AreEqual("dotnetKey", client.LiveQueryServerConnectionData.Key);
     }
 
     [TestMethod]
