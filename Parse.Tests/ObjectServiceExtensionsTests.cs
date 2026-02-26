@@ -20,16 +20,6 @@ public class ObjectServiceExtensionsTests
     [ParseClassName(nameof(TestObject))]
     class TestObject : ParseObject { }
 
-    [ParseClassName(nameof(DirtyParseObject))]
-    class DirtyParseObject : ParseObject
-    {
-        public DirtyParseObject()
-        {
-            // mark dirty to trigger the validation error path
-            IsDirty = true;
-        }
-    }
-
     private ParseClient Client { get; set; }
 
     [TestInitialize]
