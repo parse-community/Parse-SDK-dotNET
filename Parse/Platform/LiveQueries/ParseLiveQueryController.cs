@@ -377,6 +377,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
                 await CloseAsync(CancellationToken.None);
             }
             catch { } // Ignore cleanup errors
+            if (cts.IsCancellationRequested)
+                throw;            
+
             throw new TimeoutException("Live query server connection request has reached timeout");
         }
         finally
@@ -448,6 +451,9 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         }
         catch (OperationCanceledException)
         {
+            if (cts.IsCancellationRequested)
+                throw;            
+
             throw new TimeoutException($"Operation timeout for request {requestId}");
         }
         finally
@@ -628,7 +634,7 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
                 {
                     Debug.WriteLine($"Error during async disposal: {ex}");
                 }
-            });
+            }).Wait();
         }
         disposed = true;
     }

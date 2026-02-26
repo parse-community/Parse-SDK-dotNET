@@ -30,14 +30,6 @@ public class ObjectServiceExtensionsTests
         Client.Publicize();
     }
 
-    public ObjectServiceExtensionsTests()
-    {
-        // ensure ParseObject constructor validations succeed
-        Mock<IServiceHub> mockHub = new Mock<IServiceHub>();
-        ParseClient client = new ParseClient(new ServerConnectionData { Test = true }, mockHub.Object);
-        client.Publicize();
-    }
-
     [TestMethod]
     public void AddValidClass_InvokesController()
     {

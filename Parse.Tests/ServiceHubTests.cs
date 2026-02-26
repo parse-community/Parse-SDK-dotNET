@@ -535,11 +535,11 @@ namespace Parse.Tests
             };
 
             // Access multiple properties
-            var webClient = hub.WebClient;
-            var cacheController = hub.CacheController;
-            var classController = hub.ClassController;
-            var decoder = hub.Decoder;
-            var commandRunner = hub.CommandRunner;
+            IWebClient webClient = hub.WebClient;
+            ICacheController cacheController = hub.CacheController;
+            IParseObjectClassController classController = hub.ClassController;
+            IParseDataDecoder decoder = hub.Decoder;
+            IParseCommandRunner commandRunner = hub.CommandRunner;
 
             // All should be non-null and distinct
             Assert.IsNotNull(webClient);

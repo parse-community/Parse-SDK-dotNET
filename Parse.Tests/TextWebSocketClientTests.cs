@@ -21,11 +21,10 @@ public class TextWebSocketClientTests
     }
 
     [TestMethod]
-    public void SendAsync_ThrowsIfNotOpen()
+    public async Task SendAsync_ThrowsIfNotOpen()
     {
         TextWebSocketClient client = new TextWebSocketClient(1024);
-        Task<ArgumentNullException> ex = Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await client.SendAsync("msg"));
-        Assert.IsNotNull(ex);
+        await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => await client.SendAsync("msg", CancellationToken.None));
     }
 
     [TestMethod]
