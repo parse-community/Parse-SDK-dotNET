@@ -11,6 +11,8 @@ namespace Parse.Tests;
 [TestClass]
 public class TextWebSocketClientTests
 {
+    public TestContext TestContext { get; set; }
+
     [TestMethod]
     public void Dispose_MultipleCalls_DoesNotThrow()
     {
@@ -57,11 +59,21 @@ public class TextWebSocketClientTests
     [Timeout(10000, CooperativeCancellation = true)]
     public async Task TestSendAndReceive()
     {
+        // obtain endpoint from environment/config
+        string wsUrl = Environment.GetEnvironmentVariable("TEST_WEBSOCKET_ECHO_URL")?.Trim();
+        if (string.IsNullOrEmpty(wsUrl))
+        {
+            // if not provided we cannot run the live integration; mark inconclusive
+            // users/CI can set TEST_WEBSOCKET_ECHO_URL to a reachable echo service
+            // e.g. wss://echo.example.org or localhost during local development
+            Assert.Inconclusive("TEST_WEBSOCKET_ECHO_URL not configured; skipping WebSocket integration test.");
+        }
+
         TextWebSocketClient client = new TextWebSocketClient(32);
         CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         TaskCompletionSource receiveTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        await client.OpenAsync("wss://echo.websocket.org", cts.Token);
+        await client.OpenAsync(wsUrl, cts.Token);
 
         string receivedMessage = null;
         EventHandler<MessageReceivedEventArgs> handler = (_, e) =>

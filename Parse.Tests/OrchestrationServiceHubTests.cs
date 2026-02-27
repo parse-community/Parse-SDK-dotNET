@@ -1,3 +1,4 @@
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parse.Abstractions.Infrastructure;
@@ -65,10 +66,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IServiceHubCloner customCloner = new Mock<IServiceHubCloner>().Object;
             IServiceHubCloner defaultCloner = new Mock<IServiceHubCloner>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.Cloner).Returns(customCloner);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.Cloner).Returns(defaultCloner);
             
             hub.Custom = customMock.Object;
@@ -82,10 +83,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IServiceHubCloner defaultCloner = new Mock<IServiceHubCloner>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.Cloner).Returns((IServiceHubCloner)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.Cloner).Returns(defaultCloner);
             
             hub.Custom = customMock.Object;
@@ -100,10 +101,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IMetadataController customController = new Mock<IMetadataController>().Object;
             IMetadataController defaultController = new Mock<IMetadataController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.MetadataController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.MetadataController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -117,10 +118,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IMetadataController defaultController = new Mock<IMetadataController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.MetadataController).Returns((IMetadataController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.MetadataController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -130,15 +131,24 @@ namespace Parse.Tests
         }
 
         [TestMethod]
+        public void Property_ShouldThrowWhenCustomIsNull()
+        {
+            OrchestrationServiceHub hub = new OrchestrationServiceHub();
+            hub.Default = new Mock<IServiceHub>().Object;
+            // Custom is null - accessing Cloner should throw
+            Assert.ThrowsExactly<NullReferenceException>(() => _ = hub.Cloner);
+        }
+
+        [TestMethod]
         public void WebClient_ShouldReturnCustomWhenAvailable()
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IWebClient customClient = new Mock<IWebClient>().Object;
             IWebClient defaultClient = new Mock<IWebClient>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.WebClient).Returns(customClient);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.WebClient).Returns(defaultClient);
             
             hub.Custom = customMock.Object;
@@ -152,10 +162,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             ICacheController defaultController = new Mock<ICacheController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.CacheController).Returns((ICacheController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.CacheController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -170,10 +180,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseObjectClassController customController = new Mock<IParseObjectClassController>().Object;
             IParseObjectClassController defaultController = new Mock<IParseObjectClassController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.ClassController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.ClassController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -187,10 +197,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseInstallationController defaultController = new Mock<IParseInstallationController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.InstallationController).Returns((IParseInstallationController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.InstallationController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -205,10 +215,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseCommandRunner customRunner = new Mock<IParseCommandRunner>().Object;
             IParseCommandRunner defaultRunner = new Mock<IParseCommandRunner>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.CommandRunner).Returns(customRunner);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.CommandRunner).Returns(defaultRunner);
             
             hub.Custom = customMock.Object;
@@ -222,10 +232,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IWebSocketClient defaultClient = new Mock<IWebSocketClient>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.WebSocketClient).Returns((IWebSocketClient)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.WebSocketClient).Returns(defaultClient);
             
             hub.Custom = customMock.Object;
@@ -240,10 +250,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseCloudCodeController customController = new Mock<IParseCloudCodeController>().Object;
             IParseCloudCodeController defaultController = new Mock<IParseCloudCodeController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.CloudCodeController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.CloudCodeController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -257,10 +267,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseConfigurationController defaultController = new Mock<IParseConfigurationController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.ConfigurationController).Returns((IParseConfigurationController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.ConfigurationController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -275,10 +285,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseFileController customController = new Mock<IParseFileController>().Object;
             IParseFileController defaultController = new Mock<IParseFileController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.FileController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.FileController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -292,10 +302,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseObjectController defaultController = new Mock<IParseObjectController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.ObjectController).Returns((IParseObjectController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.ObjectController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -310,10 +320,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseQueryController customController = new Mock<IParseQueryController>().Object;
             IParseQueryController defaultController = new Mock<IParseQueryController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.QueryController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.QueryController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -327,10 +337,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseLiveQueryController defaultController = new Mock<IParseLiveQueryController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.LiveQueryController).Returns((IParseLiveQueryController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.LiveQueryController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -345,10 +355,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseSessionController customController = new Mock<IParseSessionController>().Object;
             IParseSessionController defaultController = new Mock<IParseSessionController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.SessionController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.SessionController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -362,10 +372,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseUserController defaultController = new Mock<IParseUserController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.UserController).Returns((IParseUserController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.UserController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -380,10 +390,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseCurrentUserController customController = new Mock<IParseCurrentUserController>().Object;
             IParseCurrentUserController defaultController = new Mock<IParseCurrentUserController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.CurrentUserController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.CurrentUserController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -397,10 +407,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseAnalyticsController defaultController = new Mock<IParseAnalyticsController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.AnalyticsController).Returns((IParseAnalyticsController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.AnalyticsController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -415,10 +425,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseInstallationCoder customCoder = new Mock<IParseInstallationCoder>().Object;
             IParseInstallationCoder defaultCoder = new Mock<IParseInstallationCoder>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.InstallationCoder).Returns(customCoder);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.InstallationCoder).Returns(defaultCoder);
             
             hub.Custom = customMock.Object;
@@ -432,10 +442,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParsePushChannelsController defaultController = new Mock<IParsePushChannelsController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.PushChannelsController).Returns((IParsePushChannelsController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.PushChannelsController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -450,10 +460,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParsePushController customController = new Mock<IParsePushController>().Object;
             IParsePushController defaultController = new Mock<IParsePushController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.PushController).Returns(customController);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.PushController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -467,10 +477,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseCurrentInstallationController defaultController = new Mock<IParseCurrentInstallationController>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.CurrentInstallationController).Returns((IParseCurrentInstallationController)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.CurrentInstallationController).Returns(defaultController);
             
             hub.Custom = customMock.Object;
@@ -485,10 +495,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IServerConnectionData customData = new Mock<IServerConnectionData>().Object;
             IServerConnectionData defaultData = new Mock<IServerConnectionData>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.ServerConnectionData).Returns(customData);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.ServerConnectionData).Returns(defaultData);
             
             hub.Custom = customMock.Object;
@@ -502,10 +512,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseLiveQueryMessageParser defaultParser = new Mock<IParseLiveQueryMessageParser>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.LiveQueryMessageParser).Returns((IParseLiveQueryMessageParser)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.LiveQueryMessageParser).Returns(defaultParser);
             
             hub.Custom = customMock.Object;
@@ -520,10 +530,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseLiveQueryMessageBuilder customBuilder = new Mock<IParseLiveQueryMessageBuilder>().Object;
             IParseLiveQueryMessageBuilder defaultBuilder = new Mock<IParseLiveQueryMessageBuilder>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.LiveQueryMessageBuilder).Returns(customBuilder);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.LiveQueryMessageBuilder).Returns(defaultBuilder);
             
             hub.Custom = customMock.Object;
@@ -537,10 +547,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             ILiveQueryServerConnectionData defaultData = new Mock<ILiveQueryServerConnectionData>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.LiveQueryServerConnectionData).Returns((ILiveQueryServerConnectionData)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.LiveQueryServerConnectionData).Returns(defaultData);
             
             hub.Custom = customMock.Object;
@@ -555,10 +565,10 @@ namespace Parse.Tests
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseDataDecoder customDecoder = new Mock<IParseDataDecoder>().Object;
             IParseDataDecoder defaultDecoder = new Mock<IParseDataDecoder>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.Decoder).Returns(customDecoder);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.Decoder).Returns(defaultDecoder);
             
             hub.Custom = customMock.Object;
@@ -572,10 +582,10 @@ namespace Parse.Tests
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
             IParseInstallationDataFinalizer defaultFinalizer = new Mock<IParseInstallationDataFinalizer>().Object;
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.Setup(x => x.InstallationDataFinalizer).Returns((IParseInstallationDataFinalizer)null);
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.Setup(x => x.InstallationDataFinalizer).Returns(defaultFinalizer);
             
             hub.Custom = customMock.Object;
@@ -588,10 +598,10 @@ namespace Parse.Tests
         public void AllProperties_ShouldHandleNullCustomAndDefault()
         {
             OrchestrationServiceHub hub = new OrchestrationServiceHub();
-            
-            var customMock = new Mock<IServiceHub>();
+
+            Mock<IServiceHub> customMock = new Mock<IServiceHub>();
             customMock.SetupAllProperties();
-            var defaultMock = new Mock<IServiceHub>();
+            Mock<IServiceHub> defaultMock = new Mock<IServiceHub>();
             defaultMock.SetupAllProperties();
             
             hub.Custom = customMock.Object;

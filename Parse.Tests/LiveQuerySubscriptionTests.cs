@@ -120,7 +120,12 @@ public class LiveQuerySubscriptionTests
             }
         };
 
-        MutableObjectState state = originalState;
+        MutableObjectState state = new() {
+            ObjectId = originalState.ObjectId,
+            ClassName = originalState.ClassName,
+            CreatedAt = originalState.CreatedAt,
+            ServerData = new Dictionary<string, object>(originalState.ServerData)
+        };
         state["key"] = "after";
 
         ParseLiveQuerySubscription<ParseObject> subscription = new(Client.Services, "Corgi", 1);

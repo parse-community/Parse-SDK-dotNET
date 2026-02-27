@@ -264,4 +264,25 @@ public class ObjectServiceExtensionsTests
         mockHub.Setup(h => h.ClassController).Returns(mockController.Object);
         Assert.AreEqual("field", mockHub.Object.GetFieldForPropertyName("cls", "prop"));
     }
+
+    [TestMethod]
+    public async Task ConnectLiveQueryServerAsync_NullController_Throws()
+    {
+        Mock<IServiceHub> mockHub = new Mock<IServiceHub>();
+        mockHub.Setup(h => h.LiveQueryController).Returns((IParseLiveQueryController)null);
+        await Assert.ThrowsExceptionAsync<InvalidOperationException>(
+            () => mockHub.Object.ConnectLiveQueryServerAsync((s, e) => { }));
+    }
+
+    [TestMethod]
+    public async Task DisconnectLiveQueryServerAsync_CloseThrows_Propagates()
+    {
+        Mock<IServiceHub> mockHub = new Mock<IServiceHub>();
+        Mock<IParseLiveQueryController> mockLq = new Mock<IParseLiveQueryController>();
+        mockLq.Setup(l => l.CloseAsync(It.IsAny<CancellationToken>()))
+              .ThrowsAsync(new Exception("close failed"));
+        mockHub.Setup(h => h.LiveQueryController).Returns(mockLq.Object);
+
+        await Assert.ThrowsExceptionAsync<Exception>(() => mockHub.Object.DisconnectLiveQueryServerAsync());
+    }
 }

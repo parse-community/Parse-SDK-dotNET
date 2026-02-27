@@ -568,6 +568,10 @@ public class ParseLiveQueryController : IParseLiveQueryController, IDisposable, 
         WebSocketClient.WebsocketError -= WebSocketClientOnWebsocketError;
         WebSocketClient.UnknownError -= WebSocketClientOnUnknownError;
         await WebSocketClient.CloseAsync(cancellationToken);
+        // cancel any pending connection waiters as well
+        ConnectionSignal?.TrySetCanceled();
+        ConnectionSignal = null;
+
         foreach (TaskCompletionSource signal in SubscriptionSignals.Values)
         {
             signal.TrySetCanceled();
