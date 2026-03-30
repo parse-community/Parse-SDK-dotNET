@@ -1,3 +1,29 @@
+## [5.0.1](https://github.com/parse-community/Parse-SDK-dotNET/compare/5.0.0...5.0.1) (2025-03-30)
+
+
+### Bug Fixes
+
+* Security upgrade braces from 3.0.2 to 3.0.3 ([#395](https://github.com/parse-community/Parse-SDK-dotNET/issues/395)) ([2e81163](https://github.com/parse-community/Parse-SDK-dotNET/commit/2e81163d29488cf089f2540712e81c1e59dcb01f))
+
+# [5.0.0](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.2...5.0.0) (2025-03-07)
+
+
+### Features
+
+* Remove support for .NET 6.0, 7.0 ([#396](https://github.com/parse-community/Parse-SDK-dotNET/issues/396)) ([8fa9be9](https://github.com/parse-community/Parse-SDK-dotNET/commit/8fa9be925ee8db6b7a66afd8bde93eefbf8fcfa8))
+
+
+### BREAKING CHANGES
+
+* Removes support for .NET 6.0, 7.0 as they have reached their end-of-life date. ([8fa9be9](8fa9be9))
+
+## [4.0.2](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.1...4.0.2) (2025-02-02)
+
+
+### Bug Fixes
+
+* `ParseObject` Relations not working ([#407](https://github.com/parse-community/Parse-SDK-dotNET/issues/407)) ([9af640a](https://github.com/parse-community/Parse-SDK-dotNET/commit/9af640adc69ea400f8f281e1134fcda776e641a2))
+
 ## [4.0.1](https://github.com/parse-community/Parse-SDK-dotNET/compare/4.0.0...4.0.1) (2024-12-24)
 
 

@@ -6,7 +6,7 @@
 [![Coverage](https://img.shields.io/codecov/c/github/parse-community/Parse-SDK-dotNET/master.svg)](https://codecov.io/github/parse-community/Parse-SDK-dotNET?branch=master)
 [![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/parse-community/Parse-SDK-dotNET/releases)
 
-[![.NET Version](https://img.shields.io/badge/.NET-6,_7,_8,_9-5234CE.svg?logo=.net&style=flat)](https://dotnet.microsoft.com)
+[![.NET Version](https://img.shields.io/badge/.NET-8,_9-5234CE.svg?logo=.net&style=flat)](https://dotnet.microsoft.com)
 [![Nuget](https://img.shields.io/nuget/v/parse.svg)](http://nuget.org/packages/parse)
 
 [![Backers on Open Collective](https://opencollective.com/parse-server/backers/badge.svg)][open-collective-link]
@@ -40,8 +40,8 @@ Parse .NET SDK is continuously tested with the most recent releases of .NET to e
 | .NET Version | End-of-Life   | Parse .NET SDK Version |
 |--------------|---------------|------------------------|
 | Standard 2.0 | November 2024 | >=1.0.0 <4.0.0         |
-| 6.0          | November 2024 | >=1.0.0                |
-| 7.0          | May 2024      | >=1.0.0                |
+| 6.0          | November 2024 | >=1.0.0 <5.0.0         |
+| 7.0          | May 2024      | >=1.0.0 <5.0.0         |
 | 8.0          | November 2026 | >=1.0.0                |
 | 9.0          | May 2026      | >=1.0.0                |
 

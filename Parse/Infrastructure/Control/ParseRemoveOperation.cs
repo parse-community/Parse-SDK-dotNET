@@ -39,7 +39,7 @@ public class ParseRemoveOperation : IParseFieldOperation
             : new List<object> { }; // Return empty list if no previous value
     }
 
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
+    public object ConvertToJSON(IServiceHub serviceHub = default)
     {
         // Convert data to a JSON-compatible structure
         var encodedObjects = Data.Select(obj => PointerOrLocalIdEncoder.Instance.Encode(obj, serviceHub)).ToList();

@@ -55,7 +55,7 @@ public class ParseAddUniqueOperation : IParseFieldOperation
         return result;
     }
 
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
+    public object ConvertToJSON(IServiceHub serviceHub = default)
     {
         // Converts the data into JSON-compatible structures
         var encodedObjects = Data.Select(EncodeForParse).ToList();

@@ -73,16 +73,8 @@ public class ParseCommandRunner : IParseCommandRunner
         var statusCode = response.Item1;
          var content = response.Item2;
         var responseCode = (int) statusCode;
-
-
-        if (responseCode == 200)
-        {
-            
-        }
-        else if (responseCode == 201)
-        {
-        }
-        else if (responseCode == 404)
+        
+        if (responseCode == 404)
         {
             throw new ParseFailureException(ParseFailureException.ErrorCode.ERROR404, "Error 404");
         }

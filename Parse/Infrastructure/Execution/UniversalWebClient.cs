@@ -50,7 +50,7 @@ public class UniversalWebClient : IWebClient
         HttpRequestMessage message = new HttpRequestMessage(new HttpMethod(httpRequest.Method), httpRequest.Target);
 
         Stream data = httpRequest.Data;
-        if (data != null || httpRequest.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))             
+        if (data != null || httpRequest.Method.Equals("POST", StringComparison.OrdinalIgnoreCase))
         {
             message.Content = new StreamContent(data ?? new MemoryStream(new byte[0]));
         }

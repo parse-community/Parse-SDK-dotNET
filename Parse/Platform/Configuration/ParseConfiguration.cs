@@ -106,7 +106,7 @@ public class ParseConfiguration : IJsonConvertible
     /// <returns>The value for the key.</returns>
     virtual public object this[string key] => Properties[key];
 
-    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
+    public object ConvertToJSON(IServiceHub serviceHub = default)
     {
         return new Dictionary<string, object>
         {
