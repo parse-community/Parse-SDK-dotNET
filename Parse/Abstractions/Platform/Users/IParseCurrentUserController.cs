@@ -7,6 +7,8 @@ namespace Parse.Abstractions.Platform.Users;
 
 public interface IParseCurrentUserController : IParseObjectCurrentController<ParseUser>
 {
+    ParseUser CurrentUser { get; }
+
     Task<string> GetCurrentSessionTokenAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default);
 
     Task LogOutAsync(IServiceHub serviceHub, CancellationToken cancellationToken = default);

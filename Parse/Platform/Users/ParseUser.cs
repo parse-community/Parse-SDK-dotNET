@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Parse.Abstractions.Platform.Authentication;
 using Parse.Abstractions.Platform.Objects;
 
@@ -136,7 +137,6 @@ public class ParseUser : ParseObject
 
     internal override async Task<ParseObject> FetchAsyncInternal(CancellationToken cancellationToken)
     {
-        //await toAwait.ConfigureAwait(false);
 
         var result = await base.FetchAsyncInternal(cancellationToken).ConfigureAwait(false);
 
@@ -168,7 +168,6 @@ public class ParseUser : ParseObject
         var newSessionToken = await Services.UpgradeToRevocableSessionAsync(sessionToken, cancellationToken).ConfigureAwait(false);
         await SetSessionTokenAsync(newSessionToken, cancellationToken).ConfigureAwait(false);
     }
-    //public string SessionToken => State.ContainsKey("sessionToken") ? State["sessionToken"] as string : null;
 
     public IDictionary<string, IDictionary<string, object>> AuthData
     {

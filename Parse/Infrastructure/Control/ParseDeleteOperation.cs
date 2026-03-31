@@ -18,7 +18,7 @@ public class ParseDeleteOperation : IParseFieldOperation
     private ParseDeleteOperation() { }
 
     // Replaced Encode with ConvertToJSON
-    public object ConvertToJSON(IServiceHub serviceHub = default)
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         return new Dictionary<string, object>
         {
