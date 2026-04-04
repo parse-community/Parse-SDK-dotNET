@@ -35,9 +35,7 @@ jobs:
     - name: Restore NuGet packages
       run: nuget restore Parse.sln
     - name: Install Chocolatey packages
-      uses: crazy-max/ghaction-chocolatey@v1
-      with:
-        args: 'install opencover.portable codecov -y'
+      run: choco install opencover.portable codecov -y
     - name: Build
       run: dotnet build Parse.sln --configuration Debug --no-restore /p:DebugType=full /p:GenerateFullPaths=true /p:CollectCoverage=false
     - name: Run tests with coverage
