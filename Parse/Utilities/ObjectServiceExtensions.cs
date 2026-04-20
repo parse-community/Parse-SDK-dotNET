@@ -10,6 +10,9 @@ using Parse.Abstractions.Platform.Objects;
 using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure.Data;
 using System.Diagnostics;
+using Parse.Abstractions.Infrastructure.Execution;
+using Parse.Abstractions.Platform.LiveQueries;
+using Parse.Platform.LiveQueries;
 
 namespace Parse;
 
@@ -91,7 +94,7 @@ public static class ObjectServiceExtensions
     /// <returns>A new ParseObject for the given class name.</returns>
     public static T CreateObject<T>(this IParseObjectClassController classController, IServiceHub serviceHub) where T : ParseObject
     {
-        
+
         return (T) classController.Instantiate(classController.GetClassName(typeof(T)), serviceHub);
     }
 
@@ -288,6 +291,32 @@ public static class ObjectServiceExtensions
     }
 
     /// <summary>
+    /// Establishes a connection to the Live Query Server, enabling real-time updates and operations for subscribed queries.
+    /// This method configures error handling for the connection.
+    /// </summary>
+    /// <param name="serviceHub">The current <see cref="IServiceHub"/> instance managing the Parse services.</param>
+    /// <param name="onError">Optional event handler to manage errors occurring during the live query operations.</param>
+    /// <returns>A task that represents the asynchronous operation of connecting to the Live Query Server. The task completes when the connection is established.</returns>
+    public static async Task ConnectLiveQueryServerAsync(this IServiceHub serviceHub, EventHandler<ParseLiveQueryErrorEventArgs> onError = null)
+    {
+        if (onError is not null)
+        {
+            serviceHub.LiveQueryController.Error += onError;
+        }
+        await serviceHub.LiveQueryController.ConnectAsync();
+    }
+
+    /// <summary>
+    /// Disconnects from the live query server by closing the connection established through the LiveQueryController.
+    /// </summary>
+    /// <param name="serviceHub">The <see cref="IServiceHub"/> instance managing the service resources.</param>
+    /// <returns>A task representing the asynchronous operation of disconnecting from the live query server.</returns>
+    public static async Task DisconnectLiveQueryServerAsync(this IServiceHub serviceHub)
+    {
+        await serviceHub.LiveQueryController.CloseAsync();
+    }
+
+    /// <summary>
     /// Saves each object in the provided list.
     /// </summary>
     /// <param name="objects">The objects to save.</param>
@@ -337,21 +366,21 @@ public static class ObjectServiceExtensions
         {
             throw new ArgumentNullException(nameof(state), "The state cannot be null.");
         }
-        
+
         // Ensure the class name is determined or throw an exception
         string className = state.ClassName ?? defaultClassName;
         if (string.IsNullOrEmpty(className))
         {
-        
+
             throw new InvalidOperationException("Both state.ClassName and defaultClassName are null or empty. Unable to determine class name.");
         }
-        
+
         // Create the object using the class controller
         T obj = classController.Instantiate(className, serviceHub) as T;
-        
+
         if (obj == null)
         {
-        
+
             throw new InvalidOperationException($"Failed to instantiate object of type {typeof(T).Name} for class {className}.");
         }
 
@@ -438,7 +467,7 @@ public static class ObjectServiceExtensions
     {
         CollectDirtyChildren(serviceHub, node, dirtyChildren, new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()), new HashSet<ParseObject>(new IdentityEqualityComparer<ParseObject>()));
     }
-    
+
     internal static async Task DeepSaveAsync(this IServiceHub serviceHub, object target, string sessionToken, CancellationToken cancellationToken)
     {
         // Collect dirty objects

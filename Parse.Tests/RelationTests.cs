@@ -114,7 +114,7 @@ public class RelationTests
     public async Task AddRelationToUserAsync_ThrowsException_WhenRelationFieldIsNull()
     {
         var user = new ParseUser() { Username = "TestUser", Password = "TestPass", Services = Client.Services };
-        await user.SignUpAsync();
+
         var relatedObjects = new List<ParseObject>
             {
                     new ParseObject("Friend", Client.Services) { ["name"] = "Friend1" }
@@ -143,7 +143,6 @@ public class RelationTests
     public async Task UpdateUserRelationAsync_ThrowsException_WhenRelationFieldIsNull()
     {
         var user = new ParseUser() { Username = "TestUser", Password = "TestPass", Services = Client.Services };
-        await user.SignUpAsync();
 
         var relatedObjectsToAdd = new List<ParseObject>
             {
@@ -168,8 +167,6 @@ public class RelationTests
     public async Task DeleteUserRelationAsync_ThrowsException_WhenRelationFieldIsNull()
     {
         var user = new ParseUser() { Username = "TestUser", Password = "TestPass", Services = Client.Services };
-        await user.SignUpAsync();
-
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => UserManagement.DeleteUserRelationAsync(user, null));
     }
     [TestMethod]
@@ -183,7 +180,6 @@ public class RelationTests
     public async Task GetUserRelationsAsync_ThrowsException_WhenRelationFieldIsNull()
     {
         var user = new ParseUser() { Username = "TestUser", Password = "TestPass", Services = Client.Services };
-        await user.SignUpAsync();
 
         await Assert.ThrowsExceptionAsync<ArgumentException>(() => UserManagement.GetUserRelationsAsync(user, null));
     }
@@ -196,7 +192,6 @@ public class RelationTests
     {
         // Arrange: Create and sign up a test user.
         var user = new ParseUser() { Username = "TestUser", Password = "TestPass", Services = Client.Services };
-        await user.SignUpAsync();
 
         // Create an unsaved Friend object (do NOT call SaveAsync).
         var unsavedFriend = new ParseObject("Friend", Client.Services) { ["name"] = "UnsavedFriend" };
@@ -205,6 +200,7 @@ public class RelationTests
         // Act & Assert: Expect an exception when trying to add an unsaved object.
         await Assert.ThrowsExceptionAsync<ArgumentException>(() =>
             UserManagement.AddRelationToUserAsync(user, "friends", relatedObjects));
+
     }
 
 

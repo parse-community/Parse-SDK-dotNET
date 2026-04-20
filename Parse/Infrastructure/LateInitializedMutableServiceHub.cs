@@ -12,6 +12,7 @@ using Parse.Abstractions.Platform.Queries;
 using Parse.Abstractions.Platform.Sessions;
 using Parse.Abstractions.Platform.Users;
 using Parse.Abstractions.Platform.Analytics;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Infrastructure.Execution;
 using Parse.Platform.Objects;
 using Parse.Platform.Installations;
@@ -25,6 +26,7 @@ using Parse.Platform.Analytics;
 using Parse.Platform.Push;
 using Parse.Infrastructure.Data;
 using Parse.Infrastructure.Utilities;
+using Parse.Platform.LiveQueries;
 
 namespace Parse.Infrastructure;
 
@@ -160,5 +162,31 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
         set => LateInitializer.SetValue(value);
     }
 
+    public IWebSocketClient WebSocketClient
+    {
+        get => LateInitializer.GetValue<IWebSocketClient>(() => LiveQueryServerConnectionData is null ? null : new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize));
+        set => LateInitializer.SetValue(value);
+    }
+
+    public IParseLiveQueryMessageParser LiveQueryMessageParser
+    {
+        get => LateInitializer.GetValue<IParseLiveQueryMessageParser>(() => new ParseLiveQueryMessageParser(Decoder));
+        set => LateInitializer.SetValue(value);
+    }
+
+
+    public IParseLiveQueryMessageBuilder LiveQueryMessageBuilder
+    {
+        get => LateInitializer.GetValue<IParseLiveQueryMessageBuilder>(() => new ParseLiveQueryMessageBuilder());
+        set => LateInitializer.SetValue(value);
+    }
+
+    public IParseLiveQueryController LiveQueryController
+    {
+        get => LateInitializer.GetValue<IParseLiveQueryController>(() => LiveQueryServerConnectionData is null ? null : new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, LiveQueryMessageParser, LiveQueryMessageBuilder));
+        set => LateInitializer.SetValue(value);
+    }
+
     public IServerConnectionData ServerConnectionData { get; set; }
+    public ILiveQueryServerConnectionData LiveQueryServerConnectionData { get; set; }
 }

@@ -165,7 +165,7 @@ public class UserTests
         // Mock LogOutAsync to ensure it can execute its logic
         mockCurrentUserController
             .Setup(obj => obj.LogOutAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
-            .CallBase(); // Use the actual LogOutAsync implementation
+            .Returns(Task.CompletedTask);
 
         // Mock SessionController for session revocation
         var mockSessionController = new Mock<IParseSessionController>();
@@ -182,6 +182,7 @@ public class UserTests
 
         // Inject mocks into ParseClient
         var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        user.Bind(client);
 
         // Act: Perform logout
         await client.LogOutAsync(CancellationToken.None);

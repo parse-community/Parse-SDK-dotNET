@@ -6,6 +6,8 @@ using Parse.Platform.Objects;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+namespace Parse.Tests;
+
 [TestClass]
 public class ObjectCoderTests
 {

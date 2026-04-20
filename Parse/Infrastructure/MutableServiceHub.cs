@@ -7,6 +7,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -19,6 +20,7 @@ using Parse.Platform.Cloud;
 using Parse.Platform.Configuration;
 using Parse.Platform.Files;
 using Parse.Platform.Installations;
+using Parse.Platform.LiveQueries;
 using Parse.Platform.Objects;
 using Parse.Platform.Push;
 using Parse.Platform.Queries;
@@ -34,6 +36,7 @@ namespace Parse.Infrastructure;
 public class MutableServiceHub : IMutableServiceHub
 {
     public IServerConnectionData ServerConnectionData { get; set; }
+    public ILiveQueryServerConnectionData LiveQueryServerConnectionData { get; set; }
     public IMetadataController MetadataController { get; set; }
 
     public IServiceHubCloner Cloner { get; set; }
@@ -46,12 +49,16 @@ public class MutableServiceHub : IMutableServiceHub
 
     public IParseInstallationController InstallationController { get; set; }
     public IParseCommandRunner CommandRunner { get; set; }
+    public IWebSocketClient WebSocketClient { get; set; }
 
     public IParseCloudCodeController CloudCodeController { get; set; }
     public IParseConfigurationController ConfigurationController { get; set; }
     public IParseFileController FileController { get; set; }
     public IParseObjectController ObjectController { get; set; }
     public IParseQueryController QueryController { get; set; }
+    public IParseLiveQueryMessageParser LiveQueryMessageParser { get; set; }
+    public IParseLiveQueryMessageBuilder LiveQueryMessageBuilder { get; set; }
+    public IParseLiveQueryController LiveQueryController { get; set; }
     public IParseSessionController SessionController { get; set; }
     public IParseUserController UserController { get; set; }
     public IParseCurrentUserController CurrentUserController { get; set; }
@@ -65,9 +72,10 @@ public class MutableServiceHub : IMutableServiceHub
     public IParseCurrentInstallationController CurrentInstallationController { get; set; }
     public IParseInstallationDataFinalizer InstallationDataFinalizer { get; set; }
 
-    public MutableServiceHub SetDefaults(IServerConnectionData connectionData = default)
+    public MutableServiceHub SetDefaults(IServerConnectionData connectionData = default, ILiveQueryServerConnectionData liveQueryConnectionData = default)
     {
         ServerConnectionData ??= connectionData;
+        LiveQueryServerConnectionData ??= liveQueryConnectionData;
         MetadataController ??= new MetadataController
         {
             EnvironmentData = EnvironmentData.Inferred,
@@ -102,6 +110,14 @@ public class MutableServiceHub : IMutableServiceHub
         CurrentInstallationController ??= new ParseCurrentInstallationController(InstallationController, CacheController, InstallationCoder, ClassController);
         PushChannelsController ??= new ParsePushChannelsController(CurrentInstallationController);
         InstallationDataFinalizer ??= new ParseInstallationDataFinalizer { };
+
+        LiveQueryMessageParser ??= new ParseLiveQueryMessageParser(Decoder);
+        LiveQueryMessageBuilder ??= new ParseLiveQueryMessageBuilder();
+        if (LiveQueryServerConnectionData is not null)
+        {
+            WebSocketClient ??= new TextWebSocketClient(LiveQueryServerConnectionData.MessageBufferSize);
+            LiveQueryController ??= new ParseLiveQueryController(LiveQueryServerConnectionData.Timeout, WebSocketClient, LiveQueryMessageParser, LiveQueryMessageBuilder);
+        }
 
         return this;
     }
