@@ -254,6 +254,12 @@ public class ParseFailureException : Exception
         /// Twitter) is unsupported.
         /// </summary>
         UnsupportedService = 252,
+
+        /// <summary>
+        /// Bad Request
+        /// </summary>  
+        BadRequest = 400,
+
         /// <summary>
         /// ERROR 404
         /// </summary>
@@ -266,4 +272,9 @@ public class ParseFailureException : Exception
     /// The Parse error code associated with the exception.
     /// </summary>
     public ErrorCode Code { get; private set; }
+}
+public class ParseErrorPayload
+{
+    public int code { get; set; }
+    public string error { get; set; }
 }

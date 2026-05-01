@@ -31,7 +31,7 @@ public class EncoderTests
     [TestMethod]
     public void TestIsValidType()
     {
-        ParseObject corgi = new ParseObject("Corgi");
+        ParseObject corgi = new ParseObject("Corgi",Client);
         ParseRelation<ParseObject> corgiRelation = corgi.GetRelation<ParseObject>(nameof(corgi));
 
         Assert.IsTrue(ParseDataEncoder.Validate(322));
@@ -49,9 +49,9 @@ public class EncoderTests
         Assert.IsTrue(ParseDataEncoder.Validate(new Dictionary<string, object> { }));
 
         Assert.IsFalse(ParseDataEncoder.Validate(new ParseAddOperation(new List<object> { })));
-        Assert.IsFalse(ParseDataEncoder.Validate(Task.FromResult(new ParseObject("Corgi"))));
-        Assert.ThrowsException<MissingMethodException>(() => ParseDataEncoder.Validate(new Dictionary<object, object> { }));
-        Assert.ThrowsException<MissingMethodException>(() => ParseDataEncoder.Validate(new Dictionary<object, string> { }));
+        Assert.IsFalse(ParseDataEncoder.Validate(Task.FromResult(new ParseObject("Corgi", Client))));
+        Assert.ThrowsExactly<MissingMethodException>(() => ParseDataEncoder.Validate(new Dictionary<object, object> { }));
+        Assert.ThrowsExactly<MissingMethodException>(() => ParseDataEncoder.Validate(new Dictionary<object, string> { }));
     }
 
     [TestMethod]
@@ -76,6 +76,13 @@ public class EncoderTests
         Assert.AreEqual(Convert.ToBase64String(new byte[] { 1, 2, 3, 4 }), value["base64"]);
     }
 
+    [TestMethod]
+    public void TestEncodeParseObjectWithNoObjectsEncoder()
+    {
+        ParseObject obj = new ParseObject("Corgi", Client);
+
+        Assert.ThrowsExactly<ArgumentException>(() => NoObjectsEncoder.Instance.Encode(obj, Client));
+    }
 
     [TestMethod]
     public void TestEncodeParseObjectWithPointerOrLocalIdEncoder()
@@ -96,7 +103,7 @@ public class EncoderTests
 
         ParseFile file2 = new ParseFile(null, new MemoryStream(new byte[] { 1, 2, 3, 4 }));
 
-        Assert.ThrowsException<InvalidOperationException>(() => ParseEncoderTestClass.Instance.Encode(file2, Client));
+        Assert.ThrowsExactly<InvalidOperationException>(() => ParseEncoderTestClass.Instance.Encode(file2, Client));
     }
 
     [TestMethod]
@@ -141,7 +148,7 @@ public class EncoderTests
     [TestMethod]
     public void TestEncodeParseRelation()
     {
-        ParseObject obj = new ParseObject("Corgi");
+        ParseObject obj = new ParseObject("Corgi", Client);
         ParseRelation<ParseObject> relation = ParseRelationExtensions.Create<ParseObject>(obj, "nano", "Husky");
 
         IDictionary<string, object> value = ParseEncoderTestClass.Instance.Encode(relation, Client) as IDictionary<string, object>;
@@ -240,10 +247,10 @@ public class EncoderTests
         Assert.IsTrue(value["geo"] is IDictionary<string, object>);
         Assert.IsTrue(value["validDict"] is IDictionary<string, object>);
 
-        Assert.ThrowsException<ArgumentException>(() =>
+        Assert.ThrowsExactly<ArgumentException>(() =>
             ParseEncoderTestClass.Instance.Encode(new Dictionary<object, string>(), Client));
 
-        Assert.ThrowsException<ArgumentException>(() =>
+        Assert.ThrowsExactly<ArgumentException>(() =>
             ParseEncoderTestClass.Instance.Encode(new Dictionary<string, object>
             {
                 ["validDict"] = new Dictionary<object, string> { [new ParseACL()] = "jbf" }

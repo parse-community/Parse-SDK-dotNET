@@ -82,7 +82,7 @@ public class ParseRelationOperation : IParseFieldOperation
         return objects.Select(entity => entity.ObjectId).Distinct();
     }
 
-    public object ConvertToJSON(IServiceHub serviceHub = null)
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = null)
     {
         List<object> additions = Additions.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList(), removals = Removals.Select(id => PointerOrLocalIdEncoder.Instance.Encode(ClassController.CreateObjectWithoutData(TargetClassName, id, serviceHub), serviceHub)).ToList();
 
