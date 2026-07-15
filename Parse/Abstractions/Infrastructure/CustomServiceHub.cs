@@ -15,6 +15,7 @@ namespace Parse.Abstractions.Infrastructure;
 
 public abstract class CustomServiceHub : ICustomServiceHub
 {
+
     public virtual IServiceHub Services { get; internal set; }
 
     public virtual IServiceHubCloner Cloner => Services.Cloner;
@@ -46,7 +47,7 @@ public abstract class CustomServiceHub : ICustomServiceHub
     public virtual IParseUserController UserController => Services.UserController;
 
     public virtual IParseCurrentUserController CurrentUserController => Services.CurrentUserController;
-
+    public virtual ParseUser CurrentUser => Services.CurrentUserController.CurrentUser;
     public virtual IParseAnalyticsController AnalyticsController => Services.AnalyticsController;
 
     public virtual IParseInstallationCoder InstallationCoder => Services.InstallationCoder;

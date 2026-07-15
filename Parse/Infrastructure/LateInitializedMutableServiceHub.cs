@@ -150,7 +150,7 @@ public class LateInitializedMutableServiceHub : IMutableServiceHub
 
     public IParseDataDecoder Decoder
     {
-        get => LateInitializer.GetValue<IParseDataDecoder>(() => new ParseDataDecoder(ClassController));
+        get => LateInitializer.GetValue<IParseDataDecoder>(() => new ParseDataDecoder(this));
         set => LateInitializer.SetValue(value);
     }
 

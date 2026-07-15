@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Data;
 using Parse.Infrastructure.Data;
@@ -24,7 +25,7 @@ public class ParseConfiguration : IJsonConvertible
 
     internal static ParseConfiguration Create(IDictionary<string, object> configurationData, IParseDataDecoder decoder, IServiceHub serviceHub)
     {
-        return new ParseConfiguration(decoder.Decode(configurationData["params"], serviceHub) as IDictionary<string, object>, serviceHub);
+        return new ParseConfiguration(decoder.Decode(configurationData["params"]) as IDictionary<string, object>, serviceHub);
     }
 
     /// <summary>
@@ -106,7 +107,7 @@ public class ParseConfiguration : IJsonConvertible
     /// <returns>The value for the key.</returns>
     virtual public object this[string key] => Properties[key];
 
-    public object ConvertToJSON(IServiceHub serviceHub = default)
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         return new Dictionary<string, object>
         {

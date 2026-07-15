@@ -66,7 +66,7 @@ namespace Parse.Tests
 
         [TestMethod]
         [Description("Tests TestCurrentConfig Returns the right config")]
-        public async Task TestCurrentConfig()// Mock difficulty: 1
+        public async Task TestCurrentConfig()// 1
         {
             var config = await Client.GetCurrentConfiguration();
 
@@ -76,7 +76,7 @@ namespace Parse.Tests
 
         [TestMethod]
         [Description("Tests the conversion of properties to json objects")]
-        public async Task TestToJSON() // Mock difficulty: 1
+        public async Task TestToJSON() // 1
         {
             var expectedJson = new Dictionary<string, object>
             {
@@ -90,7 +90,7 @@ namespace Parse.Tests
 
         [TestMethod]
         [Description("Tests the fetching of a new config with an IServiceHub instance.")]
-        public async Task TestGetConfigAsync()// Mock difficulty: 1
+        public async Task TestGetConfigAsync()// 1
         {
             var config = await Client.GetConfigurationAsync();
 
@@ -100,7 +100,7 @@ namespace Parse.Tests
 
         [TestMethod]
         [Description("Tests fetching of config is cancelled when requested via a cancellation token.")]
-        public async Task TestGetConfigCancelAsync() // Mock difficulty: 1
+        public async Task TestGetConfigCancelAsync() // 1
         {
             var tokenSource = new CancellationTokenSource();
             tokenSource.Cancel();
@@ -114,20 +114,20 @@ namespace Parse.Tests
     [TestClass]
     public class ParseConfigurationTests
     {
-
-        //[TestMethod]
-        //[Description("Tests that Get method throws an exception if key is not found")]
-        //public void Get_ThrowsExceptionNotFound() // Mock difficulty: 1
-        //{
-        //    var services = new Mock<IServiceHub>().Object;
-        //    ParseConfiguration configuration = new(services);
-        //    Assert.ThrowsException<KeyNotFoundException>(() => configuration.Get<string>("doesNotExist"));
-        //}
-
+       
+        [TestMethod]
+        [Description("Tests that Get method throws an exception if key is not found")]
+        public void Get_ThrowsExceptionNotFound() // 1
+        {
+            var services = new Mock<IServiceHub>().Object;
+            ParseConfiguration configuration = new(services);
+            Assert.ThrowsException<KeyNotFoundException>(() => configuration.Get<string>("doesNotExist"));
+        }
+      
 
         [TestMethod]
         [Description("Tests that create function creates correct configuration object")]
-        public void Create_BuildsConfigurationFromDictionary() // Mock difficulty: 3
+        public void Create_BuildsConfigurationFromDictionary() // 3
         {
             var mockDecoder = new Mock<IParseDataDecoder>();
             var mockServices = new Mock<IServiceHub>();
@@ -135,7 +135,7 @@ namespace Parse.Tests
             {
                 ["params"] = new Dictionary<string, object> { { "test", 1 } },
             };
-            mockDecoder.Setup(d => d.Decode(It.IsAny<object>(), It.IsAny<IServiceHub>())).Returns(new Dictionary<string, object> { { "test", 1 } });
+            mockDecoder.Setup(d => d.Decode(It.IsAny<object>())).Returns(new Dictionary<string, object> { { "test", 1 } });
 
             var config = ParseConfiguration.Create(dict, mockDecoder.Object, mockServices.Object);
             Assert.AreEqual(1, config["test"]);

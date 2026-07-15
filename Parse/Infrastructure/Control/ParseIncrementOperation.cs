@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using Parse.Abstractions.Infrastructure;
 using Parse.Abstractions.Infrastructure.Control;
 
@@ -97,7 +98,7 @@ public class ParseIncrementOperation : IParseFieldOperation
     public ParseIncrementOperation(object amount) => Amount = amount;
 
     // Updated Encode to ConvertToJSON
-    public object ConvertToJSON(IServiceHub serviceHub = default)
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         // Updated to produce a JSON-compatible structure
         return new Dictionary<string, object>

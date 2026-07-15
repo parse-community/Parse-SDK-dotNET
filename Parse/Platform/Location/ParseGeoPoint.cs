@@ -91,7 +91,7 @@ public struct ParseGeoPoint : IJsonConvertible
         return new ParseGeoDistance(2 * Math.Asin(Math.Sqrt(a)));
     }
 
-    public object ConvertToJSON(IServiceHub serviceHub = default)
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         return new Dictionary<string, object> {
         {"__type", "GeoPoint"},

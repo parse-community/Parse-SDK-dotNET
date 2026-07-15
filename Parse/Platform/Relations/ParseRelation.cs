@@ -70,7 +70,7 @@ public abstract class ParseRelationBase : IJsonConvertible
         TargetClassName = change.TargetClassName;
     }
 
-    public object ConvertToJSON(IServiceHub serviceHub = default)
+    public IDictionary<string, object> ConvertToJSON(IServiceHub serviceHub = default)
     {
         return new Dictionary<string, object>
         {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+
 using Parse.Infrastructure.Data;
 
 namespace Parse.Abstractions.Internal;
@@ -268,25 +269,6 @@ public static class ParseQueryExtensions
         /// </summary>
         protected override Expression VisitUnary(UnaryExpression node)
         {
-            // This is incorrect because control is supposed to be able to flow out of the binaryOperand case if the value of NodeType is not matched against an ExpressionType value, which it will not do.
-            //
-            // return node switch
-            // {
-            //     { NodeType: ExpressionType.Not, Operand: var operand } => Visit(operand) switch
-            //     {
-            //         BinaryExpression { Left: var left, Right: var right, NodeType: var type } binaryOperand => type switch
-            //         {
-            //             ExpressionType.GreaterThan => Expression.LessThanOrEqual(left, right),
-            //             ExpressionType.GreaterThanOrEqual => Expression.LessThan(left, right),
-            //             ExpressionType.LessThan => Expression.GreaterThanOrEqual(left, right),
-            //             ExpressionType.LessThanOrEqual => Expression.GreaterThan(left, right),
-            //             ExpressionType.Equal => Expression.NotEqual(left, right),
-            //             ExpressionType.NotEqual => Expression.Equal(left, right),
-            //         },
-            //         _ => base.VisitUnary(node)
-            //     },
-            //     _ => base.VisitUnary(node)
-            // };
 
             // Normalizes inversion
 

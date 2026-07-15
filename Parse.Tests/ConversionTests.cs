@@ -24,7 +24,7 @@ namespace Parse.Tests
         public void TestToWithConstructedNullableNonPrimitive()
         {
             // Test invalid conversion between two nullable value types
-            Assert.ThrowsException<InvalidCastException>(() =>
+            Assert.ThrowsExactly<InvalidCastException>(() =>
             {
                 Conversion.To<DummyValueTypeA?>(new DummyValueTypeB());
             });

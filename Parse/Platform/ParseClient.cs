@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using Parse.Abstractions.Infrastructure;
-using Parse.Infrastructure.Utilities;
 using Parse.Infrastructure;
+using Parse.Infrastructure.Data;
+using Parse.Infrastructure.Utilities;
 
 #if DEBUG
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Parse.Tests")]
@@ -92,6 +94,28 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
                 IMutableServiceHub { } mutableServiceHub => BuildHub((Hub: mutableServiceHub, mutableServiceHub.ServerConnectionData = serviceHub.ServerConnectionData ?? Services.ServerConnectionData).Hub, Services, configurators),
                 { } => BuildHub(default, Services, configurators)
             };
+        }
+
+
+        FinalizeDecoder(Services);
+        void FinalizeDecoder(IServiceHub hubToFinalize)
+        {
+            if (hubToFinalize is OrchestrationServiceHub orchestrationHub)
+            {
+                FinalizeDecoder(orchestrationHub.Default);
+                FinalizeDecoder(orchestrationHub.Custom);
+                return;
+            }
+
+            if (hubToFinalize is ServiceHub hub && hub.Decoder == null)
+            {
+                hub.Decoder = new ParseDataDecoder(hub);
+            }
+
+            else if (hubToFinalize is MutableServiceHub mutableHub && mutableHub.Decoder == null)
+            {
+                mutableHub.Decoder = new ParseDataDecoder(mutableHub);
+            }
         }
 
         Services.ClassController.AddIntrinsic();

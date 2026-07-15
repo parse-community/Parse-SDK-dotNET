@@ -11,5 +11,5 @@ public interface IParseDataDecoder
     /// <param name="data">The target input data to decode.</param>
     /// <param name="serviceHub">A <see cref="IServiceHub"/> implementation instance to use when instantiating <see cref="ParseObject"/>s.</param>
     /// <returns>A Parse SDK entity such as a <see cref="ParseObject"/>.</returns>
-    object Decode(object data, IServiceHub serviceHub);
+    object Decode(object data);
 }
