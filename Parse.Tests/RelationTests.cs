@@ -31,18 +31,11 @@ public class RelationTests
     [TestInitialize]
     public void SetUp()
     {
-        // Initialize the client and ensure the instance is set
-        Client = new ParseClient(new ServerConnectionData { Test = true });
-        Client.Publicize();
-
-        // Register the test classes
-        Client.RegisterSubclass(typeof(TestObject));
-        Client.RegisterSubclass(typeof(Friend));
-        Client.RegisterSubclass(typeof(ParseUser));
-        Client.RegisterSubclass(typeof(ParseSession));
-        Client.RegisterSubclass(typeof(ParseUser));
-
         // **--- Mocking Setup ---**
+        // Build a service hub with mocked controllers so the tests never make real
+        // network requests (previously the mock hub was created but never wired into
+        // the client, so calls such as SignUpAsync hit the dead https://api.parse.com
+        // default server and failed on the CI runner).
         var hub = new MutableServiceHub(); // Use MutableServiceHub for mocking
         var mockUserController = new Mock<IParseUserController>();
         var mockObjectController = new Mock<IParseObjectController>();
@@ -52,7 +45,7 @@ public class RelationTests
             .Setup(controller => controller.SignUpAsync(
                 It.IsAny<IObjectState>(),
                 It.IsAny<IDictionary<string, IParseFieldOperation>>(),
-            It.IsAny<IServiceHub>(),
+                It.IsAny<IServiceHub>(),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(new MutableObjectState { ObjectId = "some0neTol4v4" }); // Predefined ObjectId for User
 
@@ -74,10 +67,19 @@ public class RelationTests
         hub.UserController = mockUserController.Object;
         hub.ObjectController = mockObjectController.Object;
 
+        // Initialize the client with the mocked hub and ensure the instance is set.
+        Client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        Client.Publicize();
+
+        // Register the test classes
+        Client.RegisterSubclass(typeof(TestObject));
+        Client.RegisterSubclass(typeof(Friend));
+        Client.RegisterSubclass(typeof(ParseUser));
+        Client.RegisterSubclass(typeof(ParseSession));
     }
-    
+
     [TestCleanup]
-    public void TearDown() => (Client.Services as ServiceHub).Reset();
+    public void TearDown() => (Client.Services as ServiceHub ?? (Client.Services as OrchestrationServiceHub)?.Default as ServiceHub)?.Reset();
 
     [TestMethod]
     public void TestRelationQuery()
