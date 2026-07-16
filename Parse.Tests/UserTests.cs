@@ -162,10 +162,11 @@ public class UserTests
             .Setup(obj => obj.ClearFromDiskAsync())
             .Returns(Task.CompletedTask);
 
-        // Mock LogOutAsync to ensure it can execute its logic
+        // Mock LogOutAsync to complete successfully. (CallBase() cannot be used here because
+        // IParseCurrentUserController is an interface and has no base implementation to proceed to.)
         mockCurrentUserController
             .Setup(obj => obj.LogOutAsync(It.IsAny<IServiceHub>(), It.IsAny<CancellationToken>()))
-            .CallBase(); // Use the actual LogOutAsync implementation
+            .Returns(Task.CompletedTask);
 
         // Mock SessionController for session revocation
         var mockSessionController = new Mock<IParseSessionController>();
@@ -182,6 +183,10 @@ public class UserTests
 
         // Inject mocks into ParseClient
         var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+
+        // Bind the user to the mocked client so session revocation during logout uses the
+        // mocked SessionController instead of making a real network request.
+        user.Bind(client);
 
         // Act: Perform logout
         await client.LogOutAsync(CancellationToken.None);
