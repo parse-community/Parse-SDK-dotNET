@@ -911,4 +911,18 @@ public class ParseQuery<T> where T : ParseObject
         // TODO (richardross): Implement this.
         return 0;
     }
+
+    /// <summary>
+    /// Creates a live query from this query that can be used to receive real-time updates
+    /// when objects matching the query are created, updated, or deleted.
+    /// </summary>
+    /// <returns>A new ParseLiveQuery instace configured with this query's parameters.</returns>
+    public ParseLiveQuery<T> GetLive()
+    {
+        ArgumentNullException.ThrowIfNull(Filters);
+        IDictionary<string, object> filters = PointerOrLocalIdEncoder.Instance.Encode(Filters, Services) as IDictionary<string, object>
+            ?? throw new InvalidOperationException("Failed to encode filters for live query.");
+
+        return new ParseLiveQuery<T>(Services, ClassName, filters, KeySelections);
+    }
 }

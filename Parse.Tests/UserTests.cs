@@ -183,6 +183,7 @@ public class UserTests
 
         // Inject mocks into ParseClient
         var client = new ParseClient(new ServerConnectionData { Test = true }, hub);
+        user.Bind(client);
 
         // Bind the user to the mocked client so session revocation during logout uses the
         // mocked SessionController instead of making a real network request.

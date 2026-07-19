@@ -5,6 +5,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -31,6 +32,8 @@ public abstract class CustomServiceHub : ICustomServiceHub
 
     public virtual IParseCommandRunner CommandRunner => Services.CommandRunner;
 
+    public virtual IWebSocketClient WebSocketClient => Services.WebSocketClient;
+
     public virtual IParseCloudCodeController CloudCodeController => Services.CloudCodeController;
 
     public virtual IParseConfigurationController ConfigurationController => Services.ConfigurationController;
@@ -40,6 +43,8 @@ public abstract class CustomServiceHub : ICustomServiceHub
     public virtual IParseObjectController ObjectController => Services.ObjectController;
 
     public virtual IParseQueryController QueryController => Services.QueryController;
+
+    public virtual IParseLiveQueryController LiveQueryController => Services.LiveQueryController;
 
     public virtual IParseSessionController SessionController => Services.SessionController;
 
@@ -58,6 +63,12 @@ public abstract class CustomServiceHub : ICustomServiceHub
     public virtual IParseCurrentInstallationController CurrentInstallationController => Services.CurrentInstallationController;
 
     public virtual IServerConnectionData ServerConnectionData => Services.ServerConnectionData;
+
+    public virtual IParseLiveQueryMessageParser LiveQueryMessageParser => Services.LiveQueryMessageParser;
+    
+    public virtual IParseLiveQueryMessageBuilder LiveQueryMessageBuilder => Services.LiveQueryMessageBuilder;
+
+    public virtual ILiveQueryServerConnectionData LiveQueryServerConnectionData => Services.LiveQueryServerConnectionData;
 
     public virtual IParseDataDecoder Decoder => Services.Decoder;
 

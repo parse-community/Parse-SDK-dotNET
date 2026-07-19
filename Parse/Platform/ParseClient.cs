@@ -98,6 +98,67 @@ public class ParseClient : CustomServiceHub, IServiceHubComposer
     }
 
     /// <summary>
+    /// Creates a new <see cref="ParseClient"/> and authenticates it as belonging to your application. This class is a hub for interacting with the SDK. The recommended way to use this class on client applications is to instantiate it, then call <see cref="Publicize"/> on it in your application entry point. This allows you to access <see cref="Instance"/>.
+    /// </summary>
+    /// <param name="configuration">The configuration to initialize Parse with.</param>
+    /// <param name="liveQueryConfiguration">The configuration to initialize the Parse live query client with.</param>
+    /// <param name="serviceHub">A service hub to override internal services and thereby make the Parse SDK operate in a custom manner.</param>
+    /// <param name="configurators">A set of <see cref="IServiceHubMutator"/> implementation instances to tweak the behaviour of the SDK.</param>
+    public ParseClient(IServerConnectionData configuration, ILiveQueryServerConnectionData liveQueryConfiguration, IServiceHub serviceHub = default, params IServiceHubMutator[] configurators)
+    {
+        Services = serviceHub is { }
+            ? new OrchestrationServiceHub { Custom = serviceHub, Default = new ServiceHub { ServerConnectionData = GenerateServerConnectionData(), LiveQueryServerConnectionData = GenerateLiveQueryServerConnectionData() } }
+            : new ServiceHub { ServerConnectionData = GenerateServerConnectionData(), LiveQueryServerConnectionData = GenerateLiveQueryServerConnectionData() } as IServiceHub;
+
+        IServerConnectionData GenerateServerConnectionData() => configuration switch
+        {
+            null => throw new ArgumentNullException(nameof(configuration)),
+            ServerConnectionData { Test: true, ServerURI: { } } data => data,
+            ServerConnectionData { Test: true } data => new ServerConnectionData
+            {
+                ApplicationID = data.ApplicationID,
+                Headers = data.Headers,
+                MasterKey = data.MasterKey,
+                Test = data.Test,
+                Key = data.Key,
+                ServerURI = "https://api.parse.com/1/"
+            },
+            { ServerURI: "https://api.parse.com/1/" } => throw new InvalidOperationException("Since the official parse server has shut down, you must specify a URI that points to a hosted instance."),
+            { ApplicationID: { }, ServerURI: { }, Key: { } } data => data,
+            _ => throw new InvalidOperationException("The IServerConnectionData implementation instance provided to the ParseClient constructor must be populated with the information needed to connect to a Parse server instance.")
+        };
+
+        ILiveQueryServerConnectionData GenerateLiveQueryServerConnectionData() => liveQueryConfiguration switch
+        {
+            null => throw new ArgumentNullException(nameof(liveQueryConfiguration)),
+            LiveQueryServerConnectionData { Test: true, ServerURI: { } } data => data,
+            LiveQueryServerConnectionData { Test: true } data => new LiveQueryServerConnectionData
+            {
+                ApplicationID = data.ApplicationID,
+                Headers = data.Headers,
+                MasterKey = data.MasterKey,
+                Test = data.Test,
+                Key = data.Key,
+                ServerURI = "wss://api.parse.com/1/"
+            },
+            { ServerURI: "wss://api.parse.com/1/" } => throw new InvalidOperationException("Since the official parse server has shut down, you must specify a URI that points to a hosted instance."),
+            { ApplicationID: { }, ServerURI: { }, Key: { } } data => data,
+            _ => throw new InvalidOperationException("The IServerConnectionData implementation instance provided to the ParseClient constructor must be populated with the information needed to connect to a Parse server instance.")
+        };
+
+        if (configurators is { Length: int length } && length > 0)
+        {
+            Services = serviceHub switch
+            {
+                IMutableServiceHub { } mutableServiceHub => BuildHub((Hub: mutableServiceHub, mutableServiceHub.ServerConnectionData = serviceHub.ServerConnectionData ?? Services.ServerConnectionData, mutableServiceHub.LiveQueryServerConnectionData = serviceHub.LiveQueryServerConnectionData ?? Services.LiveQueryServerConnectionData).Hub, Services, configurators),
+                { } => BuildHub(default, Services, configurators)
+            };
+        }
+
+        Services.ClassController.AddIntrinsic();
+    }
+
+    /// <summary>
     /// Initializes a <see cref="ParseClient"/> instance using the <see cref="IServiceHub.Cloner"/> set on the <see cref="Instance"/>'s <see cref="Services"/> <see cref="IServiceHub"/> implementation instance.
     /// </summary>
     public ParseClient() => Services = (Instance ?? throw new InvalidOperationException("A ParseClient instance with an initializer service must first be publicized in order for the default constructor to be used.")).Services.Cloner.BuildHub(Instance.Services, this);

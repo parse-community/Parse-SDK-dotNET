@@ -7,6 +7,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -18,6 +19,7 @@ namespace Parse.Abstractions.Infrastructure;
 public interface IMutableServiceHub : IServiceHub
 {
     IServerConnectionData ServerConnectionData { set; }
+    ILiveQueryServerConnectionData LiveQueryServerConnectionData { set; }
     IMetadataController MetadataController { set; }
 
     IServiceHubCloner Cloner { set; }
@@ -30,12 +32,16 @@ public interface IMutableServiceHub : IServiceHub
 
     IParseInstallationController InstallationController { set; }
     IParseCommandRunner CommandRunner { set; }
+    IWebSocketClient WebSocketClient { set; }
 
     IParseCloudCodeController CloudCodeController { set; }
     IParseConfigurationController ConfigurationController { set; }
     IParseFileController FileController { set; }
     IParseObjectController ObjectController { set; }
     IParseQueryController QueryController { set; }
+    IParseLiveQueryMessageParser LiveQueryMessageParser { set; }
+    IParseLiveQueryMessageBuilder LiveQueryMessageBuilder { set; }
+    IParseLiveQueryController LiveQueryController { set; }
     IParseSessionController SessionController { set; }
     IParseUserController UserController { set; }
     IParseCurrentUserController CurrentUserController { set; }

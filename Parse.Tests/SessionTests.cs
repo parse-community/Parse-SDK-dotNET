@@ -10,6 +10,8 @@ using Parse;
 using Parse.Platform.Objects;
 using Parse.Abstractions.Platform.Users;
 
+namespace Parse.Tests;
+
 [TestClass]
 public class SessionTests
 {
