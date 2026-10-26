@@ -6,6 +6,7 @@ using Parse.Abstractions.Platform.Cloud;
 using Parse.Abstractions.Platform.Configuration;
 using Parse.Abstractions.Platform.Files;
 using Parse.Abstractions.Platform.Installations;
+using Parse.Abstractions.Platform.LiveQueries;
 using Parse.Abstractions.Platform.Objects;
 using Parse.Abstractions.Platform.Push;
 using Parse.Abstractions.Platform.Queries;
@@ -33,6 +34,7 @@ public class OrchestrationServiceHub : IServiceHub
     public IParseInstallationController InstallationController => Custom.InstallationController ?? Default.InstallationController;
 
     public IParseCommandRunner CommandRunner => Custom.CommandRunner ?? Default.CommandRunner;
+    public IWebSocketClient WebSocketClient => Custom.WebSocketClient ?? Default.WebSocketClient;
 
     public IParseCloudCodeController CloudCodeController => Custom.CloudCodeController ?? Default.CloudCodeController;
 
@@ -43,6 +45,8 @@ public class OrchestrationServiceHub : IServiceHub
     public IParseObjectController ObjectController => Custom.ObjectController ?? Default.ObjectController;
 
     public IParseQueryController QueryController => Custom.QueryController ?? Default.QueryController;
+
+    public IParseLiveQueryController LiveQueryController => Custom.LiveQueryController ?? Default.LiveQueryController;
 
     public IParseSessionController SessionController => Custom.SessionController ?? Default.SessionController;
 
@@ -61,6 +65,12 @@ public class OrchestrationServiceHub : IServiceHub
     public IParseCurrentInstallationController CurrentInstallationController => Custom.CurrentInstallationController ?? Default.CurrentInstallationController;
 
     public IServerConnectionData ServerConnectionData => Custom.ServerConnectionData ?? Default.ServerConnectionData;
+
+    public IParseLiveQueryMessageParser LiveQueryMessageParser => Custom.LiveQueryMessageParser ?? Default.LiveQueryMessageParser;
+
+    public IParseLiveQueryMessageBuilder LiveQueryMessageBuilder => Custom.LiveQueryMessageBuilder ?? Default.LiveQueryMessageBuilder;
+
+    public ILiveQueryServerConnectionData LiveQueryServerConnectionData => Custom.LiveQueryServerConnectionData ?? Default.LiveQueryServerConnectionData;
 
     public IParseDataDecoder Decoder => Custom.Decoder ?? Default.Decoder;
 

@@ -12,6 +12,11 @@ public class DecoderTests
 {
     ParseClient Client { get; } = new ParseClient(new ServerConnectionData { Test = true });
 
+    public DecoderTests()
+    {
+        Client.Publicize();
+    }
+
     [TestMethod]
     public void TestParseDate()
     {
